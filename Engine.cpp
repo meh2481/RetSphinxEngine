@@ -885,7 +885,8 @@ void Engine::commandline(list<string> argv)
 
 void Engine::addObject(obj* o)
 {
-	m_lObjects.push_back(o);
+	if(o != NULL)
+		m_lObjects.push_back(o);
 }
 
 void Engine::drawObjects()

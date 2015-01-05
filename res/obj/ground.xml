@@ -1,0 +1,8 @@
+<object>
+	<segment>
+		<body pos="0,-10.0" type="static">
+			<fixture type="box" size="100,20"/>
+		</body>
+		<image path="res/gfx/metalwall.png" size="100,20"/>
+	</segment>
+</object>

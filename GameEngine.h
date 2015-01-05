@@ -71,6 +71,8 @@ private:
 	
 	//Game stuff!
 	LuaInterface* Lua;
+	
+	myCursor* m_Cursor;
 
 protected:
 	void frame(float32 dt);
@@ -99,7 +101,7 @@ public:
 	void saveConfig(string sFilename);
 	
 	//Other stuff in Pony48.cpp
-	obj* objFromXML(string sXMLFilename, Point ptOffset, Point ptVel = Point(0,0));
+	obj* objFromXML(string sXMLFilename, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	Rect getCameraView();		//Return the rectangle, in world position z=0, that the camera can see
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
 	void spawnNewParticleSystem(string sFilename, Point ptPos);

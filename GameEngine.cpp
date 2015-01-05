@@ -66,7 +66,11 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 #else
 	m_bMouseGrabOnWindowRegain = true;
 #endif
-	hideCursor();
+	showCursor();
+	
+	m_Cursor = new myCursor();
+	m_Cursor->fromXML("res/cursor/arrow.xml");
+	setCursor(m_Cursor);
 	
 	setTimeScale(DEFAULT_TIMESCALE);
 	
@@ -127,6 +131,7 @@ Pony48Engine::~Pony48Engine()
 	errlog << "~Pony48Engine()" << endl;
 	saveConfig(getSaveLocation() + "config.xml");
 	cleanupObjects();
+	delete m_Cursor;
 }
 
 const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
@@ -157,6 +162,8 @@ void Pony48Engine::draw()
 	glColor4f(1,1,1,1);
 	
 	drawObjects();
+	
+	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -199,71 +206,7 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	seg->size.y = 20.0;
 	addScenery(seg);
 	
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(0.0f, 4.0f);
-	b2Body* body = getWorld()->CreateBody(&bodyDef);
-
-	// Define another box shape for our dynamic body.
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(0.5f, 0.5f);
-
-	// Define the dynamic body fixture.
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
-
-	// Set the box density to be non-zero, so it will be dynamic.
-	fixtureDef.density = 1.0f;
-
-	// Override the default friction.
-	fixtureDef.friction = 0.3f;
-
-	// Add the shape to the body.
-	body->CreateFixture(&fixtureDef);
-	
-	physSegment* seg2 = new physSegment;
-	seg2->body = body;
-	seg2->img = getImage("res/gfx/metalwall.png");
-	seg2->size.x = seg2->size.y = 1.0;
-	
-	b2DistanceJointDef jd;
-	jd.bodyA = body;
-	
-	//Add seg to object
-	obj* o = new obj;
-	o->addSegment(seg2);
-	
-	//Create second body
-	bodyDef.position.Set(0.7f, 6.0f);
-	body = getWorld()->CreateBody(&bodyDef);
-	body->CreateFixture(&fixtureDef);
-	
-	//Create second phys seg
-	seg2 = new physSegment;
-	seg2->body = body;
-	seg2->img = getImage("res/gfx/metalwall.png");
-	seg2->size.x = seg2->size.y = 1.0;
-	
-	//Add joint between segments
-	
-	b2Vec2 p1, p2, d;
-
-	jd.frequencyHz = 4.0f;
-	jd.dampingRatio = 0.0f;
-	
-	jd.bodyB = body;
-	jd.localAnchorA.Set(0,0);
-	jd.localAnchorB.Set(0,0);
-	p1 = jd.bodyA->GetWorldPoint(jd.localAnchorA);
-	p2 = jd.bodyB->GetWorldPoint(jd.localAnchorB);
-	d = p2 - p1;
-	jd.length = d.Length();
-	getWorld()->CreateJoint(&jd);
-	
-	
-	//Add second seg to object and put it in sim
-	o->addSegment(seg2);
-	addObject(o);
+	addObject(objFromXML("res/obj/test.xml"));
 }
 
 
@@ -278,6 +221,14 @@ void Pony48Engine::handleEvent(SDL_Event event)
 	{
 		//Key pressed
 		case SDL_KEYDOWN:
+			switch(event.key.keysym.scancode)
+			{
+				case SDL_SCANCODE_F5:
+					cleanupObjects();
+					addObject(objFromXML("res/obj/ground.xml"));
+					addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
+					break;
+			}
 			break;
 		
 		//Key released
@@ -288,7 +239,10 @@ void Pony48Engine::handleEvent(SDL_Event event)
 			break;
 		
 		case SDL_MOUSEBUTTONDOWN:
-			break;
+		{
+			addObject(objFromXML("res/obj/test.xml", worldPosFromCursor(getCursorPos())));
+		}
+		break;
 			
 		case SDL_MOUSEWHEEL:
 			/*if(event.wheel.y > 0)
@@ -653,7 +607,169 @@ void Pony48Engine::saveConfig(string sFilename)
 
 obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 {
-	return NULL;
+	errlog << "Parsing object XML file " << sXMLFilename << endl;
+	//Open file
+	XMLDocument* doc = new XMLDocument;
+	int iErr = doc->LoadFile(sXMLFilename.c_str());
+	if(iErr != XML_NO_ERROR)
+	{
+		errlog << "Error parsing object XML file: Error " << iErr << endl;
+		delete doc;
+		return NULL;
+	}
+	
+	//Grab root element
+	XMLElement* root = doc->RootElement();
+	if(root == NULL)
+	{
+		errlog << "Error: Root element NULL in XML file." << endl;
+		delete doc;
+		return NULL;
+	}
+	
+	obj* o = new obj;
+	map<string, b2Body*> mBodyNames;
+	
+	//Add segments
+	for(XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
+	{
+		physSegment* seg = new physSegment;
+		seg->parent = o;
+		XMLElement* body = segment->FirstChildElement("body");
+		if(body != NULL)
+		{
+			string sBodyName;
+			const char* cBodyName = body->Attribute("name");
+			if(cBodyName)
+				sBodyName = cBodyName;
+			
+			Point pos = ptOffset;
+			const char* cBodyPos = body->Attribute("pos");
+			if(cBodyPos)
+			{
+				Point p = pointFromString(cBodyPos);
+				pos.x += p.x;
+				pos.y += p.y;
+			}
+			
+			string sBodyType = "dynamic";
+			const char* cBodyType = body->Attribute("type");
+			if(cBodyType)
+				sBodyType = cBodyType;
+			
+			b2BodyDef bodyDef;
+			if(sBodyType == "dynamic")
+				bodyDef.type = b2_dynamicBody;
+			else if(sBodyType == "kinematic")
+				bodyDef.type = b2_kinematicBody;
+			else
+				bodyDef.type = b2_staticBody;
+			bodyDef.position = pos;
+			b2Body* bod = getWorld()->CreateBody(&bodyDef);
+			seg->body = bod;
+			
+			mBodyNames[sBodyName] = bod;
+			
+			//Create body fixtures
+			for(XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
+			{
+				b2FixtureDef fixtureDef;
+				b2PolygonShape dynamicBox;
+				b2CircleShape dynamicCircle;
+				
+				const char* cFixType = fixture->Attribute("type");
+				if(!cFixType) continue;
+				string sFixType = cFixType;
+				if(sFixType == "box")
+				{
+					const char* cBoxSize = fixture->Attribute("size");
+					if(!cBoxSize) continue;
+					
+					Point pBoxSize = pointFromString(cBoxSize);
+					dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
+					fixtureDef.shape = &dynamicBox;
+				}
+				else if(sFixType == "circle")
+				{
+					const char* cCircPos = fixture->Attribute("pos");
+					if(cCircPos)
+						dynamicCircle.m_p = pointFromString(cCircPos);
+						
+					dynamicCircle.m_radius = 1.0f;
+					fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
+					fixtureDef.shape = &dynamicCircle;
+				}
+				//else TODO
+				
+				fixtureDef.density = 1.0f;
+				fixtureDef.friction = 0.3f;
+				fixture->QueryFloatAttribute("friction", &fixtureDef.friction);
+				fixture->QueryFloatAttribute("density", &fixtureDef.density);
+				
+				bod->CreateFixture(&fixtureDef);
+			}
+		}
+		XMLElement* image = segment->FirstChildElement("image");
+		if(image != NULL)
+		{
+			const char* cImgPath = image->Attribute("path");
+			if(cImgPath)
+				seg->img = getImage(cImgPath);
+				
+			const char* cImgSize = image->Attribute("size");
+			if(cImgSize)
+				seg->size = pointFromString(cImgSize);
+		}
+		o->addSegment(seg);
+	}
+	//Create joints
+	for(XMLElement* joint = root->FirstChildElement("joint"); joint != NULL; joint = joint->NextSiblingElement("joint"))
+	{
+		const char* cJointType = joint->Attribute("type");
+		if(cJointType)
+		{
+			string sJointType = cJointType;
+			
+			if(sJointType == "distance")
+			{
+				b2DistanceJointDef jd;
+				const char* cBodyA = joint->Attribute("bodyA");
+				const char* cBodyB = joint->Attribute("bodyB");
+				if(!cBodyA || !cBodyB) continue;
+				if(!mBodyNames.count(cBodyA) || !mBodyNames.count(cBodyB)) continue;
+				
+				jd.bodyA = mBodyNames[cBodyA];
+				jd.bodyB = mBodyNames[cBodyB];
+				
+				jd.frequencyHz = 2.0f;
+				jd.dampingRatio = 0.0f;
+				
+				joint->QueryFloatAttribute("frequencyHz", &jd.frequencyHz);
+				joint->QueryFloatAttribute("dampingRatio", &jd.dampingRatio);
+				
+				const char* cAnchorA = joint->Attribute("anchorA");
+				const char* cAnchorB = joint->Attribute("anchorB");
+				
+				jd.localAnchorA.Set(0,0);
+				jd.localAnchorB.Set(0,0);
+				if(cAnchorA)
+					jd.localAnchorA = pointFromString(cAnchorA);
+				if(cAnchorB)
+					jd.localAnchorB = pointFromString(cAnchorB);
+				
+				b2Vec2 p1, p2, d;
+				p1 = jd.bodyA->GetWorldPoint(jd.localAnchorA);
+				p2 = jd.bodyB->GetWorldPoint(jd.localAnchorB);
+				d = p2 - p1;
+				jd.length = d.Length();
+				
+				getWorld()->CreateJoint(&jd);
+			}
+			//else TODO
+		}
+	}
+	delete doc;
+	return o;
 }
 
 void Pony48Engine::handleKeys()
