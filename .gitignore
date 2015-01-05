@@ -1,0 +1,11 @@
+*.d
+*.o
+*.exe
+_downloaded/*
+_gfxbase/*
+*.dll
+*.directory
+*.mp3
+*.flac
+*.kate-swp
+gmon.out

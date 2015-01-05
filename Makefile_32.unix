@@ -1,0 +1,26 @@
+objects := Image.o Engine.o Object.o Text.o globaldefs.o hud.o main.o tinyxml2.o Pony48.o opengl-api.o color.o
+libs := -lGL -lGLU -lttvfs -lBox2D -lfreeimage -lSDL2main -ltyrsound -lopenal -lvorbis -logg -L./lib/Linux_x32/ -Wl,-rpath=./lib/Linux_x32
+header := -I./ -I./include
+CXX=g++
+output=Pony48_32
+
+ifeq ($(BUILD),release)  
+# "Release" build - optimization, and no debug symbols
+	CXXFLAGS += -O2 -Os -s -DNDEBUG
+else
+# "Debug" build - no optimization, and debugging symbols
+	CXXFLAGS += -g -ggdb
+endif
+
+all: Pony48
+
+Pony48: $(objects)
+	$(CXX) -o $(output) $^ $(libs) $(CXXFLAGS) `sdl2-config --libs` -m32
+
+%.o: %.cpp
+	$(CXX) -c -MMD $(CXXFLAGS) -o  $@ $< `sdl2-config --cflags` $(header) -m32
+
+-include $(objects:.o=.d)
+
+clean:
+	rm -f *.o *.d $(output)
