@@ -111,44 +111,51 @@ void lattice::renderTex(GLuint tex)
     glDrawArrays(GL_QUADS, 0, numx * numy * 4);
 }
 
+/*DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
+{
+	glColor3f(color.r, color.g, color.b);
+	glBegin(GL_LINES);
+	glVertex2f(p1.x, p1.y);
+	glVertex2f(p2.x, p2.y);
+	glEnd();
+}*/
 
+void lattice::renderDebug()
+{
+	//latticeVert* ptr = vertex;
+	
+	//glColor3f(color.r, color.g, color.b);
+	//glBegin(GL_LINES);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	for(uint32 iy = 0; iy < numy; iy++)
+	{
+		for(uint32 ix = 0; ix < numx; ix++)
+		{
+			glBegin(GL_LINES);
+			latticeVert* vertul = &vertex[ix+iy*(numx+1)];
+			latticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];
+			latticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
+			latticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
+			
+			glVertex2f(vertul->x, vertul->y);
+			glVertex2f(vertur->x, vertur->y);
+			glVertex2f(vertur->x, vertur->y);
+			glVertex2f(vertbr->x, vertbr->y);
+			glVertex2f(vertbr->x, vertbr->y);
+			glVertex2f(vertbl->x, vertbl->y);
+			glVertex2f(vertbl->x, vertbl->y);
+			glVertex2f(vertul->x, vertul->y);
+			glEnd();
+		}
+	}
+	//glBegin(GL_LINES);
+	//glColor3f(1, 1, 1);
+}
 
 
 //-------------------------------------------------------------------------
 // LATTICE ANIMATIONS
 //-------------------------------------------------------------------------
-
-
-
-/*class latticeAnim
-{
-protected:
-	lattice* m_l;
-	latticeAnim(){};
-	
-public:
-	latticeAnim(lattice* l) {m_l = l;};
-	~latticeAnim(){};
-	
-	virtual void init() = 0;
-	virtual void update(float32 dt) = 0;
-};
-
-class sinLatticeAnim : public latticeAnim
-{
-protected:
-	float32 curtime;
-	
-public:
-	sinLatticeAnim();
-	~sinLatticeAnim();
-
-	void init();
-	virtual void update(float32 dt);
-	
-	float32 freq, amp, vtime;
-	
-};*/
 
 sinLatticeAnim::sinLatticeAnim(lattice* l) : latticeAnim(l)
 {
@@ -185,30 +192,18 @@ void sinLatticeAnim::setEffect()
 	
 	m_l->bind();
 }
-/*
-class wobbleLatticeAnim : public latticeAnim
-{
-protected:
-	float32* angle;
-	float32* dist;
-	
-	void setEffect();
-	
-public:
-	wobbleLatticeAnim(lattice* l);
-	~wobbleLatticeAnim(){};
-	
-	void init();
-	void update(float32 dt);
-	
-	float32 speed;
-};*/
+
+
+
 
 wobbleLatticeAnim::wobbleLatticeAnim(lattice* l) : latticeAnim(l)
 {
 	speed = 1.0f;
 	startdist = 0.05f;
 	distvar = 0.01f;
+	startangle = 0;
+	anglevar = 0;
+	hfac = vfac = 1;
 }
 
 wobbleLatticeAnim::~wobbleLatticeAnim()
@@ -228,7 +223,7 @@ void wobbleLatticeAnim::init()
 	{
 		for(uint32 ix = 0; ix <= m_l->numx; ix++)
 		{
-			*angptr++ = randFloat(0.0f, 2.0f*PI);
+			*angptr++ = randFloat(startangle-anglevar, startangle + anglevar);
 			*distptr++ = randFloat(startdist-distvar, startdist+distvar);
 		}
 	}
@@ -262,10 +257,10 @@ void wobbleLatticeAnim::setEffect()
 		for(uint32 ix = 0; ix <= m_l->numx; ix++)
 		{
 			//X = D * cos(A) and Y = D * sin(A)
-			(*ptr).x += *distptr * cos(*angptr);
+			(*ptr).x += (*distptr * cos(*angptr))*hfac;
 			if((*ptr).x < 0)(*ptr).x = 0;
 			if((*ptr).x > 1)(*ptr).x = 1;
-			(*ptr).y += *distptr * sin(*angptr);
+			(*ptr).y += (*distptr * sin(*angptr))*vfac;
 			if((*ptr).y < 0)(*ptr).y = 0;
 			if((*ptr).y > 1)(*ptr).y = 1;
 			ptr++;

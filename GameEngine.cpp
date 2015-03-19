@@ -169,7 +169,12 @@ void Pony48Engine::draw()
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	
 	//Draw lattice test thingy
-	getImage("res/gfx/grassblack.png")->renderLattice(m_lTest, Point(5,2.5));
+	glPushMatrix();
+	glTranslatef(0, -1, 0);
+	glScalef(5, 2.5, 1);
+	getImage("res/gfx/grassblack.png")->renderLattice(m_lTest, Point(1,1));
+	m_lTest->renderDebug();
+	glPopMatrix();
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -219,6 +224,9 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	m_lAnimTest->startdist = 0.03;
 	m_lAnimTest->distvar = 0.0075;
 	m_lAnimTest->speed = 1.3;
+	m_lAnimTest->hfac = 1.3;
+	m_lAnimTest->vfac = 0.3;
+	//m_lAnimTest->anglevar = PI;
 	m_lAnimTest->init();
 }
 

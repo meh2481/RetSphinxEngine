@@ -25,6 +25,7 @@ public:
 	~lattice();
 	
 	void renderTex(GLuint tex);
+	void renderDebug();
 	void bind();
 	void reset();
 	
@@ -82,4 +83,8 @@ public:
 	float32 speed;
 	float32 startdist;
 	float32 distvar;
+	float32 startangle;
+	float32 anglevar;
+	float32 hfac;
+	float32 vfac;
 };
