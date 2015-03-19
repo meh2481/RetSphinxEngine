@@ -132,6 +132,8 @@ Pony48Engine::~Pony48Engine()
 	saveConfig(getSaveLocation() + "config.xml");
 	cleanupObjects();
 	delete m_Cursor;
+	delete m_lTest;
+	delete m_lAnimTest;
 }
 
 const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
@@ -140,6 +142,7 @@ void Pony48Engine::frame(float32 dt)
 {
 	stepPhysics(dt);
 	updateParticles(dt);
+	m_lAnimTest->update(dt);
 }
 
 void Pony48Engine::draw()
@@ -166,7 +169,7 @@ void Pony48Engine::draw()
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	
 	//Draw lattice test thingy
-	getImage("res/gfx/metalwall.png")->renderLattice(m_lTest, Point(5,5));
+	getImage("res/gfx/grassblack.png")->renderLattice(m_lTest, Point(5,2.5));
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -211,7 +214,12 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	
 	addObject(objFromXML("res/obj/test.xml"));
 	
-	m_lTest = new lattice();
+	m_lTest = new lattice(6,3);
+	m_lAnimTest = new wobbleLatticeAnim(m_lTest);
+	m_lAnimTest->startdist = 0.03;
+	m_lAnimTest->distvar = 0.0075;
+	m_lAnimTest->speed = 1.3;
+	m_lAnimTest->init();
 }
 
 

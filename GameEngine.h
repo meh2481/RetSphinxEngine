@@ -75,6 +75,7 @@ private:
 	
 	//Testing stuff!
 	lattice* m_lTest;
+	wobbleLatticeAnim* m_lAnimTest;
 
 protected:
 	void frame(float32 dt);
