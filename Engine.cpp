@@ -144,6 +144,15 @@ void Engine::_render()
 	// Game-specific drawing
 	draw();
 	
+	// Draw physics debug stuff
+	if(m_bDebugDraw)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		m_physicsWorld->DrawDebugData();
+		glColor4f(1,1,1,1);
+	}
+	
 	//Draw cursor over everything
 	glClear(GL_DEPTH_BUFFER_BIT);
 	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
@@ -185,6 +194,13 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_physicsWorld = new b2World(gravity);
 	m_ptCursorPos.SetZero();
 	m_physicsWorld->SetAllowSleeping(true);
+	m_physicsWorld->SetDebugDraw(&m_debugDraw);
+	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
+#ifdef DEBUG
+	m_bDebugDraw = true;
+#else
+	m_bDebugDraw = false;
+#endif
 	m_iWidth = iWidth;
 	m_iHeight = iHeight;
 	m_iMSAA = 0;	//Default: MSAA off

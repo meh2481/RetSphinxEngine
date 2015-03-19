@@ -13,6 +13,7 @@ obj::obj()
   usr = NULL;
   body = NULL;
   curFrame = NULL;
+  meshImg = NULL;
 }
 
 obj::~obj()
@@ -51,6 +52,23 @@ void obj::draw()
 		}
 		else
 			(*i)->draw();
+	}
+	if(meshImg)
+	{
+		list<physSegment*>::iterator i = segments.begin();
+		if(i != segments.end())
+		{
+			physSegment* seg = *i;
+			if(seg != NULL && seg->body != NULL)
+			{
+				Point pos = seg->body->GetPosition();
+				float32 fAngle = seg->body->GetAngle();
+				glPushMatrix();
+				glTranslatef(pos.x, pos.y, 0);
+				meshImg->render(meshSize);
+				glPopMatrix();
+			}
+		}
 	}
 }
 

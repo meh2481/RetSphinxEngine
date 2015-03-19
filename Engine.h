@@ -37,6 +37,22 @@ public:
 	}
 };
 
+//Debug draw class for drawing Box2D stuff -- defined in DebugDraw.cpp
+class DebugDraw : public b2Draw
+{
+public:
+	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+	void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color);
+	void DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color);
+	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
+	void DrawTransform(const b2Transform& xf);
+    void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
+    void DrawString(int x, int y, const char* string, ...); 
+    void DrawString(const b2Vec2& p, const char* string, ...);
+    void DrawAABB(b2AABB* aabb, const b2Color& color);
+};
+
 class Engine
 {
 private:
@@ -47,6 +63,8 @@ private:
 	SDL_Window* m_Window;
 	list<commandlineArg> lCommandLine;
 	b2World* m_physicsWorld;
+	DebugDraw m_debugDraw;
+	bool m_bDebugDraw;
 	Point m_ptCursorPos;
 	bool  m_bShowCursor;
 	float32 m_fFramerate;
@@ -156,6 +174,9 @@ public:
 	void setGravity(Point ptGravity)	{m_physicsWorld->SetGravity(ptGravity);};
 	void setGravity(float32 x, float32 y)   {setGravity(Point(x,y));};
 	void stepPhysics(float32 dt)	{m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);};
+	void setDebugDraw(bool b) {m_bDebugDraw = b;};
+	bool getDebugDraw() {return m_bDebugDraw;};
+	void toggleDebugDraw() {m_bDebugDraw = !m_bDebugDraw;};
 	
 	//Mouse functions
 	Point getCursorPos()	{return m_ptCursorPos;};

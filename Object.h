@@ -77,6 +77,8 @@ public:
 	list<anim*> animations;
 	map<string, objframe*> frames;
     b2Body*         body;
+	Image*			meshImg;
+	Point			meshSize;
     void* usr;
 	string frame;
     

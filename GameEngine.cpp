@@ -228,6 +228,10 @@ void Pony48Engine::handleEvent(SDL_Event event)
 					addObject(objFromXML("res/obj/ground.xml"));
 					addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
 					break;
+					
+				case SDL_SCANCODE_V:
+					toggleDebugDraw();
+					break;
 			}
 			break;
 		
@@ -628,6 +632,15 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	}
 	
 	obj* o = new obj;
+	
+	const char* cMeshImg = root->Attribute("meshimg");
+	if(cMeshImg != NULL)
+		o->meshImg = getImage(cMeshImg);
+	
+	const char* cMeshImgSize = root->Attribute("meshsize");
+	if(cMeshImgSize != NULL)
+		o->meshSize = pointFromString(cMeshImgSize);
+	
 	map<string, b2Body*> mBodyNames;
 	
 	//Add segments
@@ -658,6 +671,7 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 				sBodyType = cBodyType;
 			
 			b2BodyDef bodyDef;
+			
 			if(sBodyType == "dynamic")
 				bodyDef.type = b2_dynamicBody;
 			else if(sBodyType == "kinematic")
@@ -665,10 +679,7 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 			else
 				bodyDef.type = b2_staticBody;
 			bodyDef.position = pos;
-			b2Body* bod = getWorld()->CreateBody(&bodyDef);
-			seg->body = bod;
 			
-			mBodyNames[sBodyName] = bod;
 			
 			//Create body fixtures
 			for(XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
@@ -694,6 +705,7 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 					const char* cCircPos = fixture->Attribute("pos");
 					if(cCircPos)
 						dynamicCircle.m_p = pointFromString(cCircPos);
+					bodyDef.fixedRotation = true;
 						
 					dynamicCircle.m_radius = 1.0f;
 					fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
@@ -706,6 +718,10 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 				fixture->QueryFloatAttribute("friction", &fixtureDef.friction);
 				fixture->QueryFloatAttribute("density", &fixtureDef.density);
 				
+				b2Body* bod = getWorld()->CreateBody(&bodyDef);
+				seg->body = bod;
+				
+				mBodyNames[sBodyName] = bod;
 				bod->CreateFixture(&fixtureDef);
 			}
 		}
