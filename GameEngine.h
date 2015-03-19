@@ -71,8 +71,10 @@ private:
 	
 	//Game stuff!
 	LuaInterface* Lua;
-	
 	myCursor* m_Cursor;
+	
+	//Testing stuff!
+	lattice* m_lTest;
 
 protected:
 	void frame(float32 dt);

@@ -6,6 +6,7 @@
 #define IMAGE_H
 
 #include "globaldefs.h"
+#include "lattice.h"
 
 class Image
 {
@@ -38,6 +39,7 @@ public:
 	
 	//Drawing methods for texel-based coordinates
 	void render(Point size);				//Render at 0,0 with specified texel size
+	void renderLattice(lattice* l, Point size);	//Render at 0,0 with specified lattice
 	void render(Point size, Rect rcImg);
 	void render(Point size, Point shear);	//Render at 0,0 with specified size and shear amount
 	void render4V(Point ul, Point ur, Point bl, Point br);

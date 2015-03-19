@@ -164,6 +164,9 @@ void Pony48Engine::draw()
 	drawObjects();
 	
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
+	
+	//Draw lattice test thingy
+	getImage("res/gfx/metalwall.png")->renderLattice(m_lTest, Point(5,5));
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -207,6 +210,8 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	addScenery(seg);
 	
 	addObject(objFromXML("res/obj/test.xml"));
+	
+	m_lTest = new lattice();
 }
 
 
