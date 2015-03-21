@@ -253,6 +253,10 @@ void Pony48Engine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_V:
 					toggleDebugDraw();
 					break;
+					
+				case SDL_SCANCODE_ESCAPE:
+					quit();
+					break;
 			}
 			break;
 		
