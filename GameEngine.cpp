@@ -174,7 +174,8 @@ void Pony48Engine::draw()
 	glTranslatef(0, -1, 0);
 	glScalef(5, 5, 1);
 	getImage("res/gfx/metalwall.png")->renderLattice(m_lTest, Point(1,1));
-	//m_lTest->renderDebug();
+	if(getDebugDraw())
+		m_lTest->renderDebug();
 	glPopMatrix();
 }
 
