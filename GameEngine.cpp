@@ -142,6 +142,7 @@ void Pony48Engine::frame(float32 dt)
 {
 	stepPhysics(dt);
 	updateParticles(dt);
+	updateObjects(dt);
 	m_lAnimTest->update(dt);
 }
 
@@ -833,6 +834,8 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	if(makeMesh && mBodyNames.count(sMeshCenterObj))
 	{
 		o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
+		//sinLatticeAnim* manim = new sinLatticeAnim(o->meshLattice);
+		//manim->amp = 0.05;
 		softBodyAnim* manim = new softBodyAnim(o->meshLattice);
 		manim->addBody(mBodyNames[sMeshCenterObj], true);
 		for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
@@ -840,6 +843,7 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 			if(i->first != sMeshCenterObj)
 				manim->addBody(i->second);
 		}
+		manim->init();
 		o->meshAnim = manim;
 	}
 	

@@ -310,7 +310,7 @@ Point softBodyAnim::relOffset(b2Body* b)
 	if(center.b == NULL || b == NULL)
 		return p;
 		
-	p = center.b->GetPosition() - b->GetPosition();
+	p = b->GetPosition() - center.b->GetPosition();
 	return p;
 }
 
