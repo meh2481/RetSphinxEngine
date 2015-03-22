@@ -25,6 +25,8 @@ class physSegment
 public:
     b2Body*         body;		//Physics body associated with this segment
     Image*  		img;		//Image to draw
+	lattice*		lat;		//Lattice to apply to image
+	latticeAnim*	latanim;	//Animation to apply to lattice
 	obj* 			parent;		//Parent object
 	
 	Point pos;		//Offset (after rotation)
@@ -78,6 +80,8 @@ public:
 	map<string, objframe*> frames;
     b2Body*         body;
 	Image*			meshImg;
+	lattice*		meshLattice;
+	latticeAnim*	meshAnim;
 	Point			meshSize;
     void* usr;
 	string frame;

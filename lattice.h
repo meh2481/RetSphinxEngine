@@ -88,3 +88,28 @@ public:
 	float32 hfac;
 	float32 vfac;
 };
+
+struct bodypos
+{
+	b2Body* b;
+	Point p;
+};
+
+class softBodyAnim : public latticeAnim
+{
+protected:
+	list<bodypos> bodies;
+	bodypos center;
+	
+	void setEffect();
+	Point relOffset(b2Body* b);
+	
+public:
+	softBodyAnim(lattice* l);
+	~softBodyAnim(){};
+	
+	void init();
+	void update(float32 dt);
+	
+	void addBody(b2Body* b, bool bCenter = false);
+};

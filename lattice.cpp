@@ -271,3 +271,90 @@ void wobbleLatticeAnim::setEffect()
 	
 	m_l->bind();
 }
+
+
+
+/*class softBodyAnim : public latticeAnim
+{
+protected:
+	list<bodypos> bodies;
+	b2Body* center;
+	
+	void setEffect();
+	Point relOffset(b2Body* b);
+	
+public:
+	softBodyAnim(lattice* l);
+	~softBodyAnim();
+	
+	void init();
+	void update(float32 dt);
+	
+	void addBody(b2Body* b, bool bCenter = false);
+};*/
+
+softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
+{
+	center.b = NULL;
+	
+}
+
+void softBodyAnim::setEffect()
+{
+	//TODO
+}
+
+Point softBodyAnim::relOffset(b2Body* b)
+{
+	Point p(0,0);
+	if(center.b == NULL || b == NULL)
+		return p;
+		
+	p = center.b->GetPosition() - b->GetPosition();
+	return p;
+}
+
+void softBodyAnim::init()
+{
+	//TODO
+}
+
+void softBodyAnim::update(float32 dt)
+{
+	setEffect();
+}
+
+void softBodyAnim::addBody(b2Body* b, bool bCenter)
+{
+	if(bCenter)
+	{
+		center.b = b;
+		center.p = b->GetPosition();
+	}
+	else
+	{
+		bodypos bp;
+		bp.b = b;
+		bp.p = b->GetPosition();
+		bodies.push_back(bp);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

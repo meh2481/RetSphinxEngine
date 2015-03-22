@@ -665,6 +665,25 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	const char* cMeshImgSize = root->Attribute("meshsize");
 	if(cMeshImgSize != NULL)
 		o->meshSize = pointFromString(cMeshImgSize);
+		
+	bool makeMesh = false;
+	root->QueryBoolAttribute("softbody", &makeMesh);
+	
+	string sMeshCenterObj = "";
+	Point pMeshSize(10,10);
+	
+	if(makeMesh)
+	{
+		const char* cBodyRes = root->Attribute("softbodyres");
+		if(cBodyRes != NULL)
+			pMeshSize = pointFromString(cBodyRes);
+			
+		const char* cBodyCenter = root->Attribute("softbodycenter");
+		if(cBodyCenter != NULL)
+			sMeshCenterObj = cBodyCenter;
+		else
+			makeMesh = false;
+	}
 	
 	map<string, b2Body*> mBodyNames;
 	
@@ -809,6 +828,21 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 			//else TODO
 		}
 	}
+	
+	//Set up mesh animation for object
+	if(makeMesh && mBodyNames.count(sMeshCenterObj))
+	{
+		o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
+		softBodyAnim* manim = new softBodyAnim(o->meshLattice);
+		manim->addBody(mBodyNames[sMeshCenterObj], true);
+		for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+		{
+			if(i->first != sMeshCenterObj)
+				manim->addBody(i->second);
+		}
+		o->meshAnim = manim;
+	}
+	
 	delete doc;
 	return o;
 }

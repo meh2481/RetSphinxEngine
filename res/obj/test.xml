@@ -1,9 +1,9 @@
-<object meshimg="res/gfx/blob1.png" meshsize="3,2.3">
+<object meshimg="res/gfx/blob2.png" meshsize="2.5,2.5" softbody="true" softbodyres="10,10" softbodycenter="center">
 	<segment>
 		<body name="center" pos="0,0" type="dynamic">
 			<fixture type="circle" radius=".25" density="2" friction="0" />
 		</body>
-		<image path="res/gfx/metalwall.png" size=".25,.25"/>
+		<image path="res/gfx/rock.png" size=".25,.25"/>
 	</segment>
 	
 	<segment>

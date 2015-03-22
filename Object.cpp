@@ -14,6 +14,8 @@ obj::obj()
   body = NULL;
   curFrame = NULL;
   meshImg = NULL;
+  meshLattice = NULL;
+  meshAnim = NULL;
 }
 
 obj::~obj()
@@ -24,6 +26,10 @@ obj::~obj()
 		delete (*i);
 	for(map<string, objframe*>::iterator i = frames.begin(); i != frames.end(); i++)
 		delete (i->second);
+	if(meshLattice)
+		delete meshLattice;
+	if(meshAnim)
+		delete meshAnim;
 }
 
 void obj::draw()
@@ -62,10 +68,13 @@ void obj::draw()
 			if(seg != NULL && seg->body != NULL)
 			{
 				Point pos = seg->body->GetPosition();
-				float32 fAngle = seg->body->GetAngle();
+				//float32 fAngle = seg->body->GetAngle();
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, 0);
-				meshImg->render(meshSize);
+				if(meshLattice)
+					meshImg->renderLattice(meshLattice, meshSize);
+				else
+					meshImg->render(meshSize);
 				glPopMatrix();
 			}
 		}
@@ -89,6 +98,8 @@ b2BodyDef* obj::update(float32 dt)
 		if(s.size())
 			setFrame(s);	//Set to a new frame if this one is done
 	}
+	if(meshAnim)
+		meshAnim->update(dt);
 	//for(map<string, objframe*>::iterator i = frames.begin(); i != frames.end(); i++)
 	//{
 	//	if(curFrame == i->second)	//Only update if this frame is currently being shown
@@ -129,10 +140,12 @@ physSegment::physSegment()
     body = NULL;
     img = NULL;
 	parent = NULL;
+	lat = NULL;
+	latanim = NULL;
 	
 	pos.SetZero();
 	center.SetZero();
-	shear.SetZero();
+	//shear.SetZero();
 	rot = depth = 0.0f;
 	size.x = size.y = 1.0f;
 	show = true;
@@ -143,6 +156,10 @@ physSegment::~physSegment()
 	//Free Box2D body
 	if(body != NULL)
 		body->GetWorld()->DestroyBody(body);
+	if(lat)
+		delete lat;
+	if(latanim)
+		delete latanim;
 }
 
 void physSegment::draw()
@@ -155,7 +172,10 @@ void physSegment::draw()
 		glTranslatef(center.x, center.y, 0.0f);
 		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
-		img->render(size, shear);
+		if(lat)
+			img->renderLattice(lat, size);
+		else
+			img->render(size);
 	}
 	else
 	{
@@ -165,7 +185,10 @@ void physSegment::draw()
 		glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
 		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
-		img->render(size, shear);
+		if(lat)
+			img->renderLattice(lat, size);
+		else
+			img->render(size);
 	}
 	glPopMatrix();
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -173,6 +196,8 @@ void physSegment::draw()
 
 void physSegment::update(float32 dt)
 {
+	if(latanim)
+		latanim->update(dt);
 }
 
 //----------------------------------------------------------------------------------------------------
