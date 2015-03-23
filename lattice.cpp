@@ -1,6 +1,6 @@
 #include "lattice.h"
 
-void lattice::reset()
+void lattice::reset(float32 sx, float32 sy)
 {
 	latticeVert* ptr = vertex;
 	latticeVert* ptruv = UV;
@@ -12,8 +12,8 @@ void lattice::reset()
 		{
 			(*ptruv).x = (GLfloat)(ix) * segsizex;
 			(*ptruv).y = (GLfloat)(iy) * segsizey;
-			(*ptr).x = (GLfloat)(ix) * segsizex - 0.5;
-			(*ptr).y = (GLfloat)(iy) * segsizey - 0.5;
+			(*ptr).x = ((GLfloat)(ix) * segsizex - 0.5)*sx;
+			(*ptr).y = ((GLfloat)(iy) * segsizey - 0.5)*sy;
 			ptr++;
 			ptruv++;
 		}
@@ -193,7 +193,7 @@ void sinLatticeAnim::setEffect()
 	m_l->bind();
 }
 
-
+//-------------------------------------------------------------------------
 
 
 wobbleLatticeAnim::wobbleLatticeAnim(lattice* l) : latticeAnim(l)
@@ -272,31 +272,16 @@ void wobbleLatticeAnim::setEffect()
 	m_l->bind();
 }
 
+//-------------------------------------------------------------------------
 
+/*
 
-/*class softBodyAnim : public latticeAnim
-{
-protected:
-	list<bodypos> bodies;
-	b2Body* center;
-	
-	void setEffect();
-	Point relOffset(b2Body* b);
-	
-public:
-	softBodyAnim(lattice* l);
-	~softBodyAnim();
-	
-	void init();
-	void update(float32 dt);
-	
-	void addBody(b2Body* b, bool bCenter = false);
-};*/
+*/
 
 softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
 {
 	center.b = NULL;
-	
+	size.SetZero();
 }
 
 void softBodyAnim::setEffect()
@@ -311,6 +296,10 @@ Point softBodyAnim::relOffset(b2Body* b)
 		return p;
 		
 	p = b->GetPosition() - center.b->GetPosition();
+	float32 angle = atan2(p.y, p.x);
+	float32 dist = p.Length();
+	p.x = angle;
+	p.y = dist;
 	return p;
 }
 

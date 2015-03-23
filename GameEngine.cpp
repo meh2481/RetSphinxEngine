@@ -839,6 +839,8 @@ obj* Pony48Engine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 		//manim->amp = 0.05;
 		softBodyAnim* manim = new softBodyAnim(o->meshLattice);
 		manim->addBody(mBodyNames[sMeshCenterObj], true);
+		manim->size = o->meshSize;
+		o->meshSize.SetZero();	//Can't take this into account on draw time; mesh will deform by hand
 		for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
 		{
 			if(i->first != sMeshCenterObj)

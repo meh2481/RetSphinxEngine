@@ -27,7 +27,7 @@ public:
 	void renderTex(GLuint tex);
 	void renderDebug();
 	void bind();
-	void reset();
+	void reset(float32 sx = 1.0f, float32 sy = 1.0f);
 	
 	//Point getVertex(uint32 x, uint32 y);
 	//void setVertex(uint32 x, uint32 y);
@@ -91,8 +91,10 @@ public:
 
 struct bodypos
 {
-	b2Body* b;
-	Point p;
+	b2Body* b;			//Body
+	float32 angle;		//Starting angle
+	float32 dist;		//Starting distance
+	float32* weights;	//Vertex weights
 };
 
 class softBodyAnim : public latticeAnim
@@ -102,11 +104,15 @@ protected:
 	bodypos center;
 	
 	void setEffect();
-	Point relOffset(b2Body* b);
+	Point relOffset(b2Body* b);	//returns angle, dist
+	Point getVertex(uint32 ix, uint32 iy);	//Get vertex in box2d coordinates
+	void setVertex(Point p, uint32 ix, uint32 iy);	//Set vertex position from box2d coordinates
 	
 public:
 	softBodyAnim(lattice* l);
 	~softBodyAnim(){};
+	
+	Point size;
 	
 	void init();
 	void update(float32 dt);
