@@ -1,7 +1,7 @@
 #include "lattice.h"
 
 void lattice::reset(float32 sx, float32 sy)
-{
+{	
 	latticeVert* ptr = vertex;
 	latticeVert* ptruv = UV;
 	GLfloat segsizex = 1.0f/(GLfloat)(numx);
@@ -284,28 +284,97 @@ softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
 	size.SetZero();
 }
 
+softBodyAnim::~softBodyAnim()
+{
+	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	{
+		delete [] i->weights;
+	}
+}
+
 void softBodyAnim::setEffect()
 {
 	//TODO
+	m_l->reset();
+	
+	float32 fAvgAngle = 0;
+	
+	float32 fLast = 0;
+	int num = 0;
+	
+	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	{
+		float32 f = distMoved(&(*i)).x;
+		if(num == 0)
+			fLast = f;
+		else
+		{
+			if(fabs(fLast - f) >= 180)
+			{
+				if(f < 0)
+					f += 360;
+				else
+					f -= 360;
+			}
+		}
+		fAvgAngle += f;
+		num++;
+	}
+	
+	fAvgAngle /= num;
+	
+	latticeVert* ptr = m_l->vertex;
+	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	{
+		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		{
+			Point vertPos = getVertex(ptr);
+			vertPos = rotateAroundPoint(vertPos, fAvgAngle, center.b->GetPosition());
+			setVertex(vertPos, ptr);
+			ptr++;
+		}
+	}
+	
+	m_l->bind();
 }
 
 Point softBodyAnim::relOffset(b2Body* b)
 {
 	Point p(0,0);
-	if(center.b == NULL || b == NULL)
+	if(center.b == NULL || b == NULL || b == center.b)
 		return p;
 		
 	p = b->GetPosition() - center.b->GetPosition();
-	float32 angle = atan2(p.y, p.x);
+	float32 angle = atan2(p.y, p.x) * RAD2DEG;
 	float32 dist = p.Length();
 	p.x = angle;
 	p.y = dist;
 	return p;
 }
 
+Point softBodyAnim::distMoved(bodypos* bp)
+{
+	Point rel = relOffset(bp->b);
+	if(rel.x <= 90 && bp->angle >= 270)
+		rel.x += 360;
+	else if(rel.x >= 270 && bp->angle <= 90)
+		rel.x -= 360;
+	//else
+	rel.x = rel.x - bp->angle;
+	rel.y = rel.y - bp->dist;
+	return rel;
+}
+
 void softBodyAnim::init()
 {
-	//TODO
+	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	{
+		Point pStart = relOffset(i->b);
+		i->angle = pStart.x;
+		i->dist = pStart.y;
+		i->weights = new float32[(m_l->numx+1)*(m_l->numy+1)];
+		//TODO Calc vertex weights
+	}
 }
 
 void softBodyAnim::update(float32 dt)
@@ -318,18 +387,39 @@ void softBodyAnim::addBody(b2Body* b, bool bCenter)
 	if(bCenter)
 	{
 		center.b = b;
-		center.p = b->GetPosition();
+		center.angle = center.dist = 0;
 	}
 	else
 	{
 		bodypos bp;
 		bp.b = b;
-		bp.p = b->GetPosition();
 		bodies.push_back(bp);
 	}
 }
 
+Point softBodyAnim::getVertex(latticeVert* v)
+{
+	Point p;
+	p.x = v->x;
+	p.y = v->y;
+	
+	Point pCenter = center.b->GetPosition();
+	p.x *= size.x;
+	p.y *= size.y;
+	
+	return p + pCenter;
+}
 
+void softBodyAnim::setVertex(Point p, latticeVert* v)
+{
+	p = p - center.b->GetPosition();
+	
+	p.x /= size.x;
+	p.y /= size.y;
+	
+	v->x = p.x;
+	v->y = p.y;
+}
 
 
 

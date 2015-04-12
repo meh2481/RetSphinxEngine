@@ -330,4 +330,11 @@ void Rect::centerOn(Point p)
 	offset(p.x - cen.x, p.y - cen.y);
 }
 
-
+float32 wrapAngle(float32 fAngle) 
+{
+	if(fAngle >= 360)
+		return fAngle - 360;
+	if(fAngle < 0)
+		return fAngle + 360; 
+	return fAngle;
+}

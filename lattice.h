@@ -104,13 +104,14 @@ protected:
 	bodypos center;
 	
 	void setEffect();
-	Point relOffset(b2Body* b);	//returns angle, dist
-	Point getVertex(uint32 ix, uint32 iy);	//Get vertex in box2d coordinates
-	void setVertex(Point p, uint32 ix, uint32 iy);	//Set vertex position from box2d coordinates
+	Point relOffset(b2Body* b);	//returns angle, dist relative to center body
+	Point distMoved(bodypos* bp);	//returns angle, dist that the body has moved relative to starting pos
+	Point getVertex(latticeVert* v);	//Get vertex in box2d coordinates
+	void setVertex(Point p, latticeVert* v);	//Set vertex position from box2d coordinates
 	
 public:
 	softBodyAnim(lattice* l);
-	~softBodyAnim(){};
+	~softBodyAnim();
 	
 	Point size;
 	
