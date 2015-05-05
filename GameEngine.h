@@ -12,6 +12,7 @@
 #include "webcam.h"
 #include "luainterface.h"
 #include "arc.h"
+#include "3DObject.h"
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -74,8 +75,7 @@ private:
 	myCursor* m_Cursor;
 	
 	//Testing stuff!
-	lattice* m_lTest;
-	sinLatticeAnim* m_lAnimTest;
+	Object3D* testObj;
 
 protected:
 	void frame(float32 dt);

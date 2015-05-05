@@ -585,6 +585,12 @@ void Engine::setup_sdl()
 //Set up OpenGL
 void Engine::setup_opengl()
 {
+	//GLfloat LightAmbient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+	// Diffuse Light Values
+	//GLfloat LightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+	// Light Position 
+	//GLfloat LightPosition[] = { 8.0f, 8.0f, -0.15f, 1.0f };
+
 	// Make the viewport
 	glViewport(0, 0, m_iWidth, m_iHeight);
 
@@ -614,6 +620,21 @@ void Engine::setup_opengl()
 	
 	//Set up lighting
 	glShadeModel(GL_SMOOTH);
+	//glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT1);
+    glEnable(GL_COLOR_MATERIAL);
+
+    //Set up the ambient light
+    //glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
+
+    //Set up the diffuse light
+    //glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
+
+    //Position the light
+    //glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);
+
+    //Enable light one
+    //glEnable(GL_LIGHT1 ); 
 	
 	setMSAA(m_iMSAA);
 	
@@ -786,6 +807,7 @@ void Engine::changeScreenResolution(float32 w, float32 h)
 	//Reload images & models
 #ifdef IMG_RELOAD
 	reloadImages();
+	reload3DObjects();
 #endif
 #endif
 }

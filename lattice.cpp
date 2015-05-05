@@ -294,12 +294,44 @@ softBodyAnim::~softBodyAnim()
 
 void softBodyAnim::setEffect()
 {
+	m_l->reset();
 	//TODO Deform vertices according to how the bodies have moved
 	// Find relative offset (x,y) from polar coords for each body, then multiply by weight to get final position
+	latticeVert* ptr = m_l->vertex;
+	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	{
+		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		{
+			//Point origVertPos = getVertex(ptr);
+			Point vertPos = getVertex(ptr);//origVertPos;
+			
+			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+			{
+				Point pMoved = distMoved(&(*i));
+				
+				//cout << "moved " << pMoved.x << "," << pMoved.y << endl;
+				
+				Point ptOffset;// = rotateAroundPoint(vertPos, pMoved.x, center.b->GetPosition());
+				ptOffset.x += cos(pMoved.x*DEG2RAD)*pMoved.y;
+				ptOffset.y += sin(pMoved.x*DEG2RAD)*pMoved.y;
+				
+				ptOffset *= i->weights[ix+(iy*(m_l->numx+1))];
+				//cout << "offset " << ptOffset.x << "," << ptOffset.y << endl;
+				vertPos += ptOffset;
+				//break;
+			}
+			
+			//vertPos = rotateAroundPoint(vertPos, fAvgAngle, center.b->GetPosition());
+			
+			
+			
+			setVertex(vertPos, ptr);
+			ptr++;
+		}
+	}
 	
-	m_l->reset();
 	
-	float32 fAvgAngle = 0;
+	/*float32 fAvgAngle = 0;
 	
 	float32 fLast = 0;
 	int num = 0;
@@ -335,7 +367,7 @@ void softBodyAnim::setEffect()
 			setVertex(vertPos, ptr);
 			ptr++;
 		}
-	}
+	}*/
 	
 	m_l->bind();
 }
@@ -368,6 +400,8 @@ Point softBodyAnim::distMoved(bodypos* bp)
 
 void softBodyAnim::init()
 {
+	int iBody = 0;
+	int iNum = m_l->numy / bodies.size();
 	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 	{
 		Point pStart = relOffset(i->b);
@@ -394,13 +428,23 @@ void softBodyAnim::init()
 						myDist = pBodyPos.LengthSquared();
 				}
 				
+				//TODO Better formula
 				//fac(i) = (sum(dist^2) - dist(i)^2)/(sum(dist^2)*(num-1)) 
-				*wt = (totalDist - myDist) / (totalDist * (bodies.size() - 1));
+				//*wt = (totalDist - myDist) / (totalDist * (bodies.size() - 1));
+				if(sqrt(myDist) <= 0.75)//if(iy < (iBody+1) * iNum)
+					*wt = 1;
+				else
+					*wt = 0;
+				
+				//cout << totalDist << "," << myDist << ";" << *wt << " ";
 				
 				ptr++;
 				wt++;
 			}
+			//cout << endl;
 		}
+		//cout << endl << endl;
+		iBody++;
 	}
 }
 

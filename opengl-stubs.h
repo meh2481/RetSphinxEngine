@@ -73,6 +73,9 @@ GL_FUNC(void,glDepthFunc,(GLenum func),(func),)
 GL_FUNC(void,glHint,(GLenum target,  GLenum mode),(target,mode),)
 GL_FUNC(void,glShadeModel,(GLenum  mode),(mode),)
 GL_FUNC(void,glLightfv,(GLenum light, GLenum pname, const GLfloat *params),(light,pname,params),)
+GL_FUNC(void,glLightModelfv,(GLenum pname, const GLfloat *params),(pname, params),)
+GL_FUNC(void,glMaterialfv,(GLenum face, GLenum pname, const GLfloat *params),(face, pname, params),)
+GL_FUNC(void,glMaterialf,(GLenum face, GLenum pname, const GLfloat param),(face, pname, param),)
 
 //Win32 context stuff
 #ifdef _WIN32

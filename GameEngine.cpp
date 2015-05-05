@@ -132,8 +132,9 @@ Pony48Engine::~Pony48Engine()
 	saveConfig(getSaveLocation() + "config.xml");
 	cleanupObjects();
 	delete m_Cursor;
-	delete m_lTest;
-	delete m_lAnimTest;
+	//delete m_lTest;
+	//delete m_lAnimTest;
+	delete testObj;
 }
 
 const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
@@ -143,12 +144,14 @@ void Pony48Engine::frame(float32 dt)
 	stepPhysics(dt);
 	updateParticles(dt);
 	updateObjects(dt);
-	m_lAnimTest->update(dt);
+	//m_lAnimTest->update(dt);
 }
 
 void Pony48Engine::draw()
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
+	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
+	glDisable(GL_LIGHTING);
 	fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -169,14 +172,68 @@ void Pony48Engine::draw()
 	
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	
+	//Rotate sun point around planet
+	glRotatef(getSeconds()*25, 0.0f, 1.0f, 0.0f);
+	
+	//Set up OpenGL lights
+	GLfloat lightPosition[] = {50.0, 0.0, 0.0, 1.0};
+	GLfloat lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+	GLfloat lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glShadeModel(GL_SMOOTH);
+
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	
+	
+	//Set up OpenGL materials
+	GLfloat materialAmbient[] = {0.2, 0.2, 0.2, 1.0};
+	GLfloat materialDiffuse[] = {1, 1, 1, 1};
+	GLfloat materialSpecular[] = {0.6, 0.6, 0.6, 1};
+	GLfloat materialEmission[] = {0, 0, 0, 1};
+	GLfloat materialShininess = 50;
+	
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+		
+		
+	//Set up global OpenGL lighting
+	GLfloat globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	
+	//Draw object
+	glLoadIdentity();
+	glTranslatef(0, 0, m_fDefCameraZ);
+	//glScalef(1,4,4);
+	//glRotatef(getSeconds()*-50, 0.0f, 1.0f, 0.0f);
+	
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_CULL_FACE);	//Only draw the front faces of 3D objects (faster)
+	testObj->render();
+	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
+	glDisable(GL_LIGHTING);
+	
 	//Draw lattice test thingy
-	glPushMatrix();
-	glTranslatef(0, -1, 0);
-	glScalef(5, 5, 1);
-	getImage("res/gfx/metalwall.png")->renderLattice(m_lTest, Point(1,1));
-	if(getDebugDraw())
-		m_lTest->renderDebug();
-	glPopMatrix();
+	//glPushMatrix();
+	//glTranslatef(0, -1, 0);
+	//glScalef(5, 5, 1);
+	//getImage("res/gfx/metalwall.png")->renderLattice(m_lTest, Point(1,1));
+	//if(getDebugDraw())
+	//	m_lTest->renderDebug();
+	//glPopMatrix();
+	
+	glLoadIdentity();
+	glTranslatef(0, 0, m_fDefCameraZ);
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -221,15 +278,16 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	
 	addObject(objFromXML("res/obj/test.xml"));
 	
-	m_lTest = new lattice(20,20);
-	m_lAnimTest = new sinLatticeAnim(m_lTest);
-	m_lAnimTest->amp = 0.05;
+	//m_lTest = new lattice(20,20);
+	//m_lAnimTest = new sinLatticeAnim(m_lTest);
+	//m_lAnimTest->amp = 0.05;
 	/*m_lAnimTest->distvar = 0.0075;
 	m_lAnimTest->speed = 1.3;
 	m_lAnimTest->hfac = 1.3;
 	m_lAnimTest->vfac = 0.3;
 	//m_lAnimTest->anglevar = PI;*/
-	m_lAnimTest->init();
+	//m_lAnimTest->init();
+	testObj = new Object3D("res/3d/dome.tiny3d", "res/3d/uvtest.png");
 }
 
 
