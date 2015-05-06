@@ -16,18 +16,20 @@ private:
 	GLuint   	m_hTex;
 	string     	m_sFilename;
 	uint32_t 	m_iWidth, m_iHeight;			// width and height of original image
+	
 #ifdef BIG_ENDIAN
 	uint32_t m_iRealWidth, m_iRealHeight;
 #endif
 
 	void _load(string sFilename);
+	void _loadNoise(string sXMLFilename);
 
 public:
 	GLuint _getTex() {return m_hTex;};
 	
 	//Constructor/destructor
 	Image(string sFilename);
-	Image(uint32_t width, uint32_t height, float32 scalex = 1.0f, float32 scaley = 1.0f, float32 xoffset = 0.0f, float32 yoffset = 0.0f);	//Create image from random noise
+	//Image(uint32_t width, uint32_t height, float32 sizex = 1.0f, float32 sizey = 1.0f, float32 xoffset = 0.0f, float32 yoffset = 0.0f);	//Create image from random noise
 	~Image();
     
 	//Engine use functions

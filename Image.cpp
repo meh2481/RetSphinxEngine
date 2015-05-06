@@ -4,23 +4,20 @@
 */
 
 #include "Image.h"
+#include "simplexnoise1234.h"
 #include <set>
 
 bool g_imageBlur = true;
 
 Image::Image(string sFilename)
 {
-	m_sFilename = sFilename;
-	_load(sFilename);
-	_addImgReload(this);
-}
-
-Image(uint32_t width, uint32_t height, float32 scalex, float32 scaley, float32 xoffset, float32 yoffset)
-{
 	m_hTex = 0;
-	m_sFilename = "";
-	m_iWidth = width;
-	m_iHeight = height;
+	m_sFilename = sFilename;
+	if(sFilename.find(".xml", sFilename.size()-4) != string::npos)
+		_loadNoise(sFilename);
+	else
+		_load(sFilename);
+	_addImgReload(this);
 }
 
 #ifdef __BIG_ENDIAN__
@@ -139,6 +136,75 @@ void Image::_load(string sFilename)
 	//Free FreeImage's copy of the data
 	FreeImage_Unload(dib);
 }
+
+void Image::_loadNoise(string sXMLFilename)
+{
+	XMLDocument* doc = new XMLDocument;
+	int iErr = doc->LoadFile(sXMLFilename.c_str());
+	if(iErr != XML_NO_ERROR)
+	{
+		errlog << "Error opening XML file: " << sXMLFilename << "- Error " << iErr << endl;
+		delete doc;
+		return;
+	}
+	
+	XMLElement* root = doc->RootElement();
+	if(root == NULL)
+	{
+		errlog << "Error: Root element NULL in XML file. Ignoring..." << endl;
+		delete doc;
+		return;
+	}
+	
+	uint32_t width = 512;
+	uint32_t height = 512;
+	float32 sizex = 10.0f;
+	float32 sizey = 10.0f;
+	float32 xoffset = randFloat(0, 5000);	//By default, use random position in noise function
+	float32 yoffset = randFloat(0, 5000);
+	
+	root->QueryUnsignedAttribute("width", &width);
+	root->QueryUnsignedAttribute("height", &height);
+	root->QueryFloatAttribute("sizex", &sizex);
+	root->QueryFloatAttribute("sizey", &sizey);
+	root->QueryFloatAttribute("xoffset", &xoffset);
+	root->QueryFloatAttribute("yoffset", &yoffset);
+	
+	//TODO Load gradient
+	
+	//Done loading XML
+	delete doc;
+	
+	m_iWidth = width;
+	m_iHeight = height;
+	
+	//Generate noise
+	SimplexNoise1234 noiseGen;
+	unsigned char* bits = new unsigned char[width*height*4];
+	unsigned char* ptr = bits;
+	for(uint32_t h = 0; h < height; h++)
+	{
+		for(uint32_t w = 0; w < width; w++)
+		{
+			*ptr++ = 255;
+			*ptr++ = 255;
+			*ptr++ = 255;	//Just set to white with noise as alpha val for now
+			
+			//val should be range [-1, 1]
+			float val = noiseGen.noise((float(w+1)/float(width))*sizex + xoffset,(float(h+1)/float(height))*sizey + yoffset);
+			*ptr++ = (val+1) * 128;
+		}
+	}
+	
+	glGenTextures(1, &m_hTex);
+	glBindTexture(GL_TEXTURE_2D, m_hTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	
+	delete[] bits;
+}
+
 
 Image::~Image()
 {
