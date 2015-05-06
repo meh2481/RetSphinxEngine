@@ -4,6 +4,10 @@
 */
 
 #include "globaldefs.h"
+#include "mtrand.h"
+
+MTRand_int32 irand;
+MTRand drand;
 
 float32 myabs(float x)	//Stupid namespace stuff
 {
@@ -147,7 +151,18 @@ Vec3 vec3FromString(string s)
 	return vec;
 }
 
-//TODO Use actual random number generator (Mersenne Twister or such)
+//Use actual random number generator
+void randSeed(unsigned long s)
+{
+	irand.seed(s);
+	drand.seed(s);
+}
+
+int32_t randInt()
+{
+	return irand();
+}
+
 int32_t randInt(int32_t min, int32_t max)
 {
 	if(min == max)
@@ -159,7 +174,12 @@ int32_t randInt(int32_t min, int32_t max)
 		max = temp;
 	}
 	int32_t diff = max-min+1;
-	return(rand()%diff + min);
+	return(irand()%diff + min);
+}
+
+float32 randFloat()
+{
+	return drand();
 }
 
 float32 randFloat(float32 min, float32 max)
@@ -172,8 +192,7 @@ float32 randFloat(float32 min, float32 max)
 		min = max;
 		max = temp;
 	}
-	float32 scale = rand() % 1001;
-	return((scale/1000.0)*(max-min) + min);
+	return(drand()*(max-min) + min);
 }
 
 Vec3::Vec3()

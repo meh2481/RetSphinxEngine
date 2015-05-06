@@ -222,7 +222,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fAccumulatedTime = 0.0;
 	//m_bFirstMusic = true;
 	m_bQuitting = false;
-	srand(SDL_GetTicks());	//Not as random as it could be... narf
+	randSeed(SDL_GetTicks());	//Not as random as it could be... who cares
 	m_fTimeScale = 1.0f;
 
 	errlog << "Initializing FMOD..." << endl;
