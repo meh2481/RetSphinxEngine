@@ -5,6 +5,7 @@
 
 #include "Image.h"
 #include "simplexnoise1234.h"
+#include "Gradient.h"
 #include <set>
 
 bool g_imageBlur = true;
@@ -143,7 +144,7 @@ void Image::_loadNoise(string sXMLFilename)
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
 	{
-		errlog << "Error opening XML file: " << sXMLFilename << "- Error " << iErr << endl;
+		errlog << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr << endl;
 		delete doc;
 		return;
 	}
@@ -151,7 +152,7 @@ void Image::_loadNoise(string sXMLFilename)
 	XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file. Ignoring..." << endl;
+		errlog << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..." << endl;
 		delete doc;
 		return;
 	}
@@ -170,7 +171,15 @@ void Image::_loadNoise(string sXMLFilename)
 	root->QueryFloatAttribute("xoffset", &xoffset);
 	root->QueryFloatAttribute("yoffset", &yoffset);
 	
-	//TODO Load gradient
+	Gradient g;
+	const char* cGradFile = root->Attribute("gradient");
+	if(cGradFile != NULL)
+		g.load(cGradFile);
+	else
+	{
+		g.insert(-1.0f, 255, 255, 255, 0);
+		g.insert(1.0f, 255, 255, 255, 255);	//Gradient from transparent white to opaque white
+	}
 	
 	//Done loading XML
 	delete doc;
@@ -186,13 +195,14 @@ void Image::_loadNoise(string sXMLFilename)
 	{
 		for(uint32_t w = 0; w < width; w++)
 		{
-			*ptr++ = 255;
-			*ptr++ = 255;
-			*ptr++ = 255;	//Just set to white with noise as alpha val for now
-			
 			//val should be range [-1, 1]
 			float val = noiseGen.noise((float(w+1)/float(width))*sizex + xoffset,(float(h+1)/float(height))*sizey + yoffset);
-			*ptr++ = (val+1) * 128;
+			Color c = g.getVal(val);
+			
+			*ptr++ = (unsigned char)(c.r * 255.0f);
+			*ptr++ = (unsigned char)(c.g * 255.0f);
+			*ptr++ = (unsigned char)(c.b * 255.0f);
+			*ptr++ = (unsigned char)(c.a * 255.0f);
 		}
 	}
 	
@@ -385,7 +395,10 @@ void Image::render4V(Point ul, Point ur, Point bl, Point br)
 
 void Image::_reload()
 {
-	_load(m_sFilename);
+	if(m_sFilename.find(".xml", m_sFilename.size()-4) != string::npos)
+		_loadNoise(m_sFilename);
+	else
+		_load(m_sFilename);
 }
 
 static set<Image*> sg_images;

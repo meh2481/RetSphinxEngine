@@ -323,6 +323,7 @@ void Pony48Engine::handleEvent(SDL_Event event)
 					cleanupObjects();
 					addObject(objFromXML("res/obj/ground.xml"));
 					addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
+					reloadImages();
 					break;
 					
 				case SDL_SCANCODE_V:
