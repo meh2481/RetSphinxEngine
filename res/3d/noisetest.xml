@@ -1,2 +1,1 @@
-<noise width="1024" height="1024" sizex="8" sizey="8" gradient="res/3d/gradienttest.xml">
-</noise>
+<noise width="1024" height="1024" sizex="1.75" sizey="7" gradient="res/3d/gradienttest.xml" />

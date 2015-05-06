@@ -157,6 +157,15 @@ void Pony48Engine::frame(float32 dt)
 		fPlanetRotAmt -= dt * 100;
 	else if(keyDown(SDL_SCANCODE_RIGHT))
 		fPlanetRotAmt += dt * 100;
+	
+	if(keyDown(SDL_SCANCODE_I))
+		CameraPos.y -= dt * 5;
+	else if(keyDown(SDL_SCANCODE_K))
+		CameraPos.y += dt * 5;
+	if(keyDown(SDL_SCANCODE_J))
+		CameraPos.x += dt * 5;
+	else if(keyDown(SDL_SCANCODE_L))
+		CameraPos.x -= dt * 5;
 }
 
 void Pony48Engine::draw()
@@ -167,7 +176,7 @@ void Pony48Engine::draw()
 	fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	glTranslatef(0, 0, m_fDefCameraZ);
+	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	
 	drawParticles();	//Draw engine particles here
 	
@@ -225,8 +234,8 @@ void Pony48Engine::draw()
 	
 	//Draw object
 	glLoadIdentity();
-	glTranslatef(0, 0, m_fDefCameraZ);
-	glScalef(1.25,1.25,1.25);
+	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+	//glScalef(1.25,1.25,1.25);
 	glEnable(GL_NORMALIZE);
 	glRotatef(fPlanetRotAmt, 0.0f, 1.0f, 0.0f);
 	
@@ -246,7 +255,7 @@ void Pony48Engine::draw()
 	//glPopMatrix();
 	
 	glLoadIdentity();
-	glTranslatef(0, 0, m_fDefCameraZ);
+	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -265,7 +274,7 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	
 	//Straight from the hello world example
 	// Define the ground body.
-	b2BodyDef groundBodyDef;
+	/*b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(0.0f, -10.0f);
 
 	// Call the body factory which allocates memory for the ground body
@@ -289,7 +298,7 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	seg->size.y = 20.0;
 	addScenery(seg);
 	
-	addObject(objFromXML("res/obj/test.xml"));
+	addObject(objFromXML("res/obj/test.xml"));*/
 	
 	//m_lTest = new lattice(20,20);
 	//m_lAnimTest = new sinLatticeAnim(m_lTest);
@@ -302,7 +311,21 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	//m_lAnimTest->init();
 	//Image* im = new Image();
 	
-	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/noisetest.xml"));
+	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/uvtest.png"));
+	
+	physSegment* seg = new physSegment();
+	seg->img = getImage("res/3d/noisetest.xml");
+	Rect r = getCameraView();
+	seg->size.x = r.width()*5;
+	seg->size.y = r.height()*5;
+	seg->depth = -10.0f;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/examplebg.png");
+	seg->size.x = seg->size.y = r.width()*5;
+	seg->depth = -20.0f;
+	addScenery(seg);
 }
 
 
@@ -320,9 +343,9 @@ void Pony48Engine::handleEvent(SDL_Event event)
 			switch(event.key.keysym.scancode)
 			{
 				case SDL_SCANCODE_F5:
-					cleanupObjects();
-					addObject(objFromXML("res/obj/ground.xml"));
-					addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
+					//cleanupObjects();
+					//addObject(objFromXML("res/obj/ground.xml"));
+					//addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
 					reloadImages();
 					break;
 					
@@ -345,7 +368,7 @@ void Pony48Engine::handleEvent(SDL_Event event)
 		
 		case SDL_MOUSEBUTTONDOWN:
 		{
-			addObject(objFromXML("res/obj/test.xml", worldPosFromCursor(getCursorPos())));
+			//addObject(objFromXML("res/obj/test.xml", worldPosFromCursor(getCursorPos())));
 		}
 		break;
 			
