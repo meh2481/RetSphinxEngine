@@ -1,4 +1,4 @@
-objects := Image.o Engine.o Object.o Text.o globaldefs.o hud.o main.o tinyxml2.o GameEngine.o opengl-api.o color.o bg.o particles.o luafuncs.o luainterface.o cursor.o arc.o DebugDraw.o lattice.o 3DObject.o mtrand.o
+objects := Image.o Engine.o Object.o Text.o globaldefs.o hud.o main.o tinyxml2.o GameEngine.o opengl-api.o color.o bg.o particles.o luafuncs.o luainterface.o cursor.o arc.o DebugDraw.o lattice.o 3DObject.o mtrand.o simplexnoise1234.o
 libs := -L./lib/Win32/ -L./dep/lua/ -lglu32 -lttvfs -lBox2D -static-libgcc -static-libstdc++ ./lib/Win32/FreeImage.lib -lmingw32 -lSDL2main -lSDL2.dll -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lshell32 -lversion -lvideoInputLib -lddraw -lstrmiids -llua -lz -lfmodex -lole32 -luuid -loleaut32
 HEADER := -I./ -I./include/ -I./include/windows/ -I./dep/lua/
 

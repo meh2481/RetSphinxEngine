@@ -15,6 +15,14 @@ Image::Image(string sFilename)
 	_addImgReload(this);
 }
 
+Image(uint32_t width, uint32_t height, float32 scalex, float32 scaley, float32 xoffset, float32 yoffset)
+{
+	m_hTex = 0;
+	m_sFilename = "";
+	m_iWidth = width;
+	m_iHeight = height;
+}
+
 #ifdef __BIG_ENDIAN__
 //returns the closest power of two value
 int power_of_two(int input)

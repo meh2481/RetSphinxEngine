@@ -27,6 +27,7 @@ public:
 	
 	//Constructor/destructor
 	Image(string sFilename);
+	Image(uint32_t width, uint32_t height, float32 scalex = 1.0f, float32 scaley = 1.0f, float32 xoffset = 0.0f, float32 yoffset = 0.0f);	//Create image from random noise
 	~Image();
     
 	//Engine use functions
