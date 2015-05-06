@@ -355,7 +355,7 @@ void Object3D::setTexture(string sFilename)
 	FIBITMAP *bitmap2 = FreeImage_Allocate(w, h, FreeImage_GetBPP(dib));
 	FreeImage_Paste(bitmap2, dib, 0, 0, 255);
 	FreeImage_FlipVertical(bitmap2);  //Apparently, FreeImage handles this strangely. Flipping beforehand doesn't work right.
-	FreeImage_FlipHorizontal(bitmap2);
+	//FreeImage_FlipHorizontal(bitmap2);
 	FreeImage_Unload(dib);
   
 	bits = FreeImage_GetBits(bitmap2);	//if this somehow one of these failed (they shouldn't), return failure

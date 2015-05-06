@@ -139,12 +139,24 @@ Pony48Engine::~Pony48Engine()
 
 const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
 
+float fSunRotAmt = 0;
+float fPlanetRotAmt = 0;
+
 void Pony48Engine::frame(float32 dt)
 {
 	stepPhysics(dt);
 	updateParticles(dt);
 	updateObjects(dt);
 	//m_lAnimTest->update(dt);
+	if(keyDown(SDL_SCANCODE_A))
+		fSunRotAmt -= dt * 50;
+	else if(keyDown(SDL_SCANCODE_D))
+		fSunRotAmt += dt * 50;
+		
+	if(keyDown(SDL_SCANCODE_LEFT))
+		fPlanetRotAmt -= dt * 100;
+	else if(keyDown(SDL_SCANCODE_RIGHT))
+		fPlanetRotAmt += dt * 100;
 }
 
 void Pony48Engine::draw()
@@ -173,7 +185,7 @@ void Pony48Engine::draw()
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	
 	//Rotate sun point around planet
-	glRotatef(getSeconds()*25, 0.0f, 1.0f, 0.0f);
+	glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
 	
 	//Set up OpenGL lights
 	GLfloat lightPosition[] = {50.0, 0.0, 0.0, 1.0};
@@ -214,8 +226,9 @@ void Pony48Engine::draw()
 	//Draw object
 	glLoadIdentity();
 	glTranslatef(0, 0, m_fDefCameraZ);
-	//glScalef(1,4,4);
-	//glRotatef(getSeconds()*-50, 0.0f, 1.0f, 0.0f);
+	glScalef(1.25,1.25,1.25);
+	glEnable(GL_NORMALIZE);
+	glRotatef(fPlanetRotAmt, 0.0f, 1.0f, 0.0f);
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);	//Only draw the front faces of 3D objects (faster)

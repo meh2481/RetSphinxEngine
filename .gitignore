@@ -8,4 +8,6 @@ _gfxbase/*
 *.mp3
 *.flac
 *.kate-swp
+*.blend1
+*.blend2
 gmon.out
