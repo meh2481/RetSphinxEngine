@@ -34,9 +34,8 @@ class Object3D
 {
 protected:
     GLuint m_obj;   //The object in 3D memory
-    GLuint m_tex;   //The texture that'll be drawn to the object
+	Image* mImg;
     string m_sObjFilename;
-    string m_sTexFilename;
 
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
@@ -44,20 +43,18 @@ public:
     
     void _reload();  //Reload memory associated with this object
 
-    Object3D(string sOBJFile, string sImgFile);
+    Object3D(string sOBJFile, Image* sImg);
     Object3D();
     ~Object3D();
 
     void fromOBJFile(string sFilename);
 	void fromTiny3DFile(string sFilename);
-    void setTexture(string sFilename);
+    void setTexture(Image* sImg);
 
     void render();
 	
 	//Accessor methods
 	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
-	string getTexFilename()	{if(m_tex)return m_sTexFilename;return NO_TEXTURE;};
-
 
 };
 

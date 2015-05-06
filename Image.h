@@ -23,6 +23,7 @@ private:
 	void _load(string sFilename);
 
 public:
+	GLuint _getTex() {return m_hTex;};
 	
 	//Constructor/destructor
 	Image(string sFilename);

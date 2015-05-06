@@ -300,7 +300,7 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	m_lAnimTest->vfac = 0.3;
 	//m_lAnimTest->anglevar = PI;*/
 	//m_lAnimTest->init();
-	testObj = new Object3D("res/3d/dome.tiny3d", "res/3d/uvtest.png");
+	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/uvtest.png"));
 }
 
 

@@ -11,17 +11,17 @@
 using namespace std;
 using namespace tiny3d;
 
-Object3D::Object3D(string sOBJFile, string sImgFile)
+Object3D::Object3D(string sOBJFile, Image* sImg)
 {
-    m_obj = m_tex = 0;
-    setTexture(sImgFile);
+	mImg = NULL;
+    m_obj = 0;
+    setTexture(sImg);
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
 		fromOBJFile(sOBJFile);
 	else
 		fromTiny3DFile(sOBJFile);
     m_sObjFilename = sOBJFile;
-    m_sTexFilename = sImgFile;
     _add3DObjReload(this);
 	wireframe = false;
 	shaded = true;
@@ -29,7 +29,8 @@ Object3D::Object3D(string sOBJFile, string sImgFile)
 
 Object3D::Object3D()
 {
-  m_obj = m_tex = 0;
+  m_obj = 0;
+  mImg = NULL;
   _add3DObjReload(this);
   wireframe = false;
   shaded = true;
@@ -41,8 +42,6 @@ Object3D::~Object3D()
 	//Free OpenGL graphics memory
 	if(m_obj)
 		glDeleteLists(m_obj, 1);
-	if(m_tex)
-		glDeleteTextures(1, &m_tex);
 }
 
 void Object3D::fromOBJFile(string sFilename)
@@ -260,21 +259,21 @@ void Object3D::fromTiny3DFile(string sFilename)
 		uv UV = uvs[faces[i].uv1];
 		normal norm = normals[faces[i].norm1];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
+        glTexCoord2f(UV.u, 1-UV.v);
         glVertex3f(v.x, v.y, v.z);
         
 		v = vertices[faces[i].v2];
 		UV = uvs[faces[i].uv2];
 		norm = normals[faces[i].norm2];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
+        glTexCoord2f(UV.u, 1-UV.v);
         glVertex3f(v.x, v.y, v.z);
 		
 		v = vertices[faces[i].v3];
 		UV = uvs[faces[i].uv3];
 		norm = normals[faces[i].norm3];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
+        glTexCoord2f(UV.u, 1-UV.v);
         glVertex3f(v.x, v.y, v.z);
     }
 
@@ -288,97 +287,9 @@ void Object3D::fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-int power_of_two(unsigned int val)
+void Object3D::setTexture(Image* sImg)
 {
-	int ret = 1;
-	while(ret < val)
-		ret *= 2;
-	return ret;
-}
-
-void Object3D::setTexture(string sFilename)
-{
-    m_sTexFilename = sFilename;
-    errlog << "Creating 3D object texture: " << sFilename << endl;
-	
-	//image format
-	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-	//pointer to the image, once loaded
-	FIBITMAP *dib(0);
-	//pointer to the image data
-	BYTE* bits(0);
-	//image width and height
-	unsigned int width(0), height(0);
-	
-	//check the file signature and deduce its format
-	fif = FreeImage_GetFileType(sFilename.c_str(), 0);
-	//if still unknown, try to guess the file format from the file extension
-	if(fif == FIF_UNKNOWN) 
-		fif = FreeImage_GetFIFFromFilename(sFilename.c_str());
-	//if still unkown, return failure
-	if(fif == FIF_UNKNOWN)
-	{
-		errlog << "Unknown image type for file " << sFilename << endl;
-		m_tex = 0;
-		return;
-	}
-  
-	//check that the plugin has reading capabilities and load the file
-	if(FreeImage_FIFSupportsReading(fif))
-		dib = FreeImage_Load(fif, sFilename.c_str());
-	//if the image failed to load, return failure
-	if(!dib)
-	{
-		errlog << "Error loading image " << sFilename << endl;
-		m_tex = 0;
-		return;
-	}  
-	//retrieve the image data
-  
-	//get the image width and height
-	width = FreeImage_GetWidth(dib);
-	height = FreeImage_GetHeight(dib);
-  
-	int w = power_of_two(width);
-	int h = power_of_two(height);
-	int mode, modeflip;
-	if(FreeImage_GetBPP(dib) == 24) // RGB 24bit
-	{
-		mode = GL_RGB;
-		modeflip = GL_BGR;
-	}
-	else if(FreeImage_GetBPP(dib) == 32)  // RGBA 32bit
-	{
-		mode = GL_RGBA;	
-		modeflip = GL_BGRA;
-	}
-	FIBITMAP *bitmap2 = FreeImage_Allocate(w, h, FreeImage_GetBPP(dib));
-	FreeImage_Paste(bitmap2, dib, 0, 0, 255);
-	FreeImage_FlipVertical(bitmap2);  //Apparently, FreeImage handles this strangely. Flipping beforehand doesn't work right.
-	//FreeImage_FlipHorizontal(bitmap2);
-	FreeImage_Unload(dib);
-  
-	bits = FreeImage_GetBits(bitmap2);	//if this somehow one of these failed (they shouldn't), return failure
-	if((bits == 0) || (width == 0) || (height == 0))
-	{
-		errlog << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity" << endl;
-		m_tex = 0;
-		return;
-	}
-  
-	//generate an OpenGL texture ID for this texture
-	glGenTextures(1, &m_tex);
-	//bind to the new texture ID
-	glBindTexture(GL_TEXTURE_2D, m_tex);
-	//store the texture data for OpenGL use
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, w, h, 0, modeflip, GL_UNSIGNED_BYTE, bits);
-  
-	// these affect how this texture is drawn later on...
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  
-	//Free FreeImage's copy of the data
-	FreeImage_Unload(bitmap2);
+	mImg = sImg;
 }
 
 void Object3D::render()
@@ -387,7 +298,8 @@ void Object3D::render()
 		glDisable(GL_LIGHTING);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glBindTexture(GL_TEXTURE_2D, m_tex);
+	if(mImg != NULL)
+		glBindTexture(GL_TEXTURE_2D, mImg->_getTex());
     glCallList(m_obj);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
@@ -397,7 +309,6 @@ void Object3D::render()
 
 void Object3D::_reload()
 {
-  setTexture(m_sTexFilename);
   fromOBJFile(m_sObjFilename);
   if(m_sObjFilename.find(".obj", m_sObjFilename.size()-4) != string::npos)
     fromOBJFile(m_sObjFilename);
