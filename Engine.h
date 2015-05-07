@@ -200,6 +200,7 @@ public:
 	//Object functions
 	void addObject(obj* o);
 	void addScenery(physSegment* seg) 	{m_lScenery.insert(seg);};
+	void updateSceneryLayer(physSegment* seg);
 	void drawBg();
 	void drawObjects();
 	void drawFg();

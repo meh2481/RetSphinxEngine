@@ -166,6 +166,11 @@ void Pony48Engine::frame(float32 dt)
 		CameraPos.x += dt * 5;
 	else if(keyDown(SDL_SCANCODE_L))
 		CameraPos.x -= dt * 5;
+	
+	m_sun->pos.x = cos(DEG2RAD*fSunRotAmt) * 50;
+	m_sun->depth = -sin(DEG2RAD*fSunRotAmt) * 50;
+	updateSceneryLayer(m_sun);
+	
 }
 
 void Pony48Engine::draw()
@@ -189,8 +194,15 @@ void Pony48Engine::draw()
 	}
 	glColor4f(1,1,1,1);
 	
-	drawBg();
-	drawObjects();
+	//drawBg();
+	//drawObjects();
+	
+	//glTranslatef(50, 0, 0);
+	//glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
+	//m_sun->draw();
+	
+	//glLoadIdentity();
+	//glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	
@@ -232,18 +244,18 @@ void Pony48Engine::draw()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);
 	
 	//Draw object
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	//glScalef(1.25,1.25,1.25);
-	glEnable(GL_NORMALIZE);
-	glRotatef(fPlanetRotAmt, 0.0f, 1.0f, 0.0f);
+	//glRotatef(fPlanetRotAmt, 0.0f, 1.0f, 0.0f);
 	
 	//glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_CULL_FACE);	//Only draw the front faces of 3D objects (faster)
-	testObj->render();
-	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
+	//glEnable(GL_CULL_FACE);	//Only draw the front faces of 3D objects (faster)
+	//testObj->render(getImage("res/3d/uvtest.png"));
+	//glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
 	glDisable(GL_LIGHTING);
 	
 	//Draw lattice test thingy
@@ -255,10 +267,10 @@ void Pony48Engine::draw()
 	//	m_lTest->renderDebug();
 	//glPopMatrix();
 	
-	glLoadIdentity();
-	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+	//glLoadIdentity();
+	//glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	
-	drawFg();
+	drawAll();
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -314,19 +326,19 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	//m_lAnimTest->init();
 	//Image* im = new Image();
 	
-	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/uvtest.png"));
+	testObj = getObject("res/3d/dome.tiny3d");//, getImage("res/3d/uvtest.png"));
 	
 	Rect r = getCameraView();
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < 2; i++)
 	{
 		physSegment* seg = new physSegment();
 		seg->img = new Image("res/3d/noisetest.xml");
-		seg->size.x = r.width()*(5+i);
-		seg->size.y = r.height()*(5+i);
-		seg->depth = i * -10.0f;
+		seg->size.x = r.width()*(10+i);
+		seg->size.y = r.height()*(10+i);
+		seg->depth = (i+1) * -50.0f;
 		addScenery(seg);
 	}
-	for(int i = 0; i < 2; i++)
+	/*for(int i = 0; i < 3; i++)
 	{
 		physSegment* seg = new physSegment();
 		seg->img = new Image("res/3d/noisetest.xml");
@@ -334,12 +346,92 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 		seg->size.y = r.height()*(5+i);
 		seg->depth = i * 10.0f;
 		addScenery(seg);
-	}
+	}*/
 	
 	physSegment* seg = new physSegment();
 	seg->img = getImage("res/examplebg.png");
-	seg->size.x = seg->size.y = r.width()*15;
-	seg->depth = -200.0f;
+	seg->size.x = seg->size.y = r.width()*40;
+	seg->depth = -400.0f;
+	addScenery(seg);
+	
+	m_sun = new physSegment();
+	m_sun->img = getImage("res/3d/sun.png");
+	m_sun->size.x = m_sun->size.y = 20;
+	addScenery(m_sun);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/mercury.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 0.765f;
+	seg->pos.x = -12;
+	seg->pos.y = 2;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/venus.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 1.899;
+	seg->pos.x = -6;
+	seg->pos.y = -0.3;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/earth.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 2;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/moon.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 0.5;
+	seg->pos.x = 2;
+	seg->pos.y = 0.2;
+	seg->depth = 2.0f;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/mars.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 1.06;
+	seg->pos.x = 6;
+	seg->pos.y = -4;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/jupiter.tif");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 22;	//ohman this planet is huge
+	seg->pos.x = -25;
+	seg->pos.y = 8;
+	seg->depth = -70;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/saturn.jpg");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");	//TODO: Rings
+	seg->size.x = seg->size.y = 18.28;
+	seg->pos.x = 15;
+	seg->pos.y = -12;
+	seg->depth = -100;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/uranus.png");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");	//TODO: Rings
+	seg->size.x = seg->size.y = 7.96;
+	seg->pos.x = 55;
+	seg->pos.y = -20;
+	seg->depth = -130;
+	addScenery(seg);
+	
+	seg = new physSegment();
+	seg->img = getImage("res/3d/neptune.jpg");
+	seg->obj3D = getObject("res/3d/dome.tiny3d");
+	seg->size.x = seg->size.y = 7.729;
+	seg->pos.x = 80;
+	seg->pos.y = -10;
+	seg->depth = -150;
 	addScenery(seg);
 }
 

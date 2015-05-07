@@ -8,7 +8,7 @@
 
 #include "globaldefs.h"
 #include "Image.h"
-
+#include "3DObject.h"
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -28,6 +28,7 @@ public:
 	lattice*		lat;		//Lattice to apply to image
 	latticeAnim*	latanim;	//Animation to apply to lattice
 	obj* 			parent;		//Parent object
+	Object3D*		obj3D;		//3D object
 	
 	Point pos;		//Offset (after rotation)
 	Point center;	//Center of rotation (Offset before rotation)

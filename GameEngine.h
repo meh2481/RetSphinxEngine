@@ -76,6 +76,7 @@ private:
 	
 	//Testing stuff!
 	Object3D* testObj;
+	physSegment* m_sun;
 
 protected:
 	void frame(float32 dt);

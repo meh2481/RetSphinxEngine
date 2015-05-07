@@ -11,3 +11,9 @@ _gfxbase/*
 *.blend1
 *.blend2
 gmon.out
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.obj

@@ -142,6 +142,7 @@ physSegment::physSegment()
 	parent = NULL;
 	lat = NULL;
 	latanim = NULL;
+	obj3D = NULL;
 	
 	pos.SetZero();
 	center.SetZero();
@@ -172,10 +173,22 @@ void physSegment::draw()
 		glTranslatef(center.x, center.y, 0.0f);
 		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
-		if(lat)
-			img->renderLattice(lat, size);
+		if(obj3D)
+		{
+			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care
+			glEnable(GL_CULL_FACE);
+			glEnable(GL_LIGHTING);
+			obj3D->render(img);
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_LIGHTING);
+		}
 		else
-			img->render(size);
+		{
+			if(lat)
+				img->renderLattice(lat, size);
+			else
+				img->render(size);
+		}
 	}
 	else
 	{
@@ -185,10 +198,22 @@ void physSegment::draw()
 		glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
 		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
-		if(lat)
-			img->renderLattice(lat, size);
+		if(obj3D)
+		{
+			glScalef(size.x, size.y, size.x);
+			glEnable(GL_CULL_FACE);
+			glEnable(GL_LIGHTING);
+			obj3D->render(img);
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_LIGHTING);
+		}
 		else
-			img->render(size);
+		{
+			if(lat)
+				img->renderLattice(lat, size);
+			else
+				img->render(size);
+		}
 	}
 	glPopMatrix();
 	glColor4f(1.0f,1.0f,1.0f,1.0f);

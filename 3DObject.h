@@ -34,8 +34,12 @@ class Object3D
 {
 protected:
     GLuint m_obj;   //The object in 3D memory
-	Image* mImg;
+	//Image* mImg;
     string m_sObjFilename;
+	
+	
+    void _fromOBJFile(string sFilename);
+	void _fromTiny3DFile(string sFilename);
 
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
@@ -43,15 +47,13 @@ public:
     
     void _reload();  //Reload memory associated with this object
 
-    Object3D(string sOBJFile, Image* sImg);
+    Object3D(string sOBJFile);//, Image* sImg);
     Object3D();
     ~Object3D();
 
-    void fromOBJFile(string sFilename);
-	void fromTiny3DFile(string sFilename);
-    void setTexture(Image* sImg);
+    //void setTexture(Image* sImg);
 
-    void render();
+    void render(Image* img);
 	
 	//Accessor methods
 	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
@@ -62,6 +64,9 @@ public:
 void reload3DObjects();
 void _add3DObjReload(Object3D* obj);
 void _remove3DObjReload(Object3D* obj);
+
+Object3D* getObject(string sFilename);
+void clearObjects();
 
 
 

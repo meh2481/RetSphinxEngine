@@ -11,16 +11,16 @@
 using namespace std;
 using namespace tiny3d;
 
-Object3D::Object3D(string sOBJFile, Image* sImg)
+Object3D::Object3D(string sOBJFile) //, Image* sImg)
 {
-	mImg = NULL;
+	//mImg = NULL;
     m_obj = 0;
-    setTexture(sImg);
+    //setTexture(sImg);
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
-		fromOBJFile(sOBJFile);
+		_fromOBJFile(sOBJFile);
 	else
-		fromTiny3DFile(sOBJFile);
+		_fromTiny3DFile(sOBJFile);
     m_sObjFilename = sOBJFile;
     _add3DObjReload(this);
 	wireframe = false;
@@ -30,7 +30,7 @@ Object3D::Object3D(string sOBJFile, Image* sImg)
 Object3D::Object3D()
 {
   m_obj = 0;
-  mImg = NULL;
+  //mImg = NULL;
   _add3DObjReload(this);
   wireframe = false;
   shaded = true;
@@ -44,7 +44,7 @@ Object3D::~Object3D()
 		glDeleteLists(m_obj, 1);
 }
 
-void Object3D::fromOBJFile(string sFilename)
+void Object3D::_fromOBJFile(string sFilename)
 {
     m_sObjFilename = sFilename;
     errlog << "Loading 3D object: " << sFilename << endl;
@@ -191,7 +191,7 @@ void Object3D::fromOBJFile(string sFilename)
 
 //Fall back on pure C functions for speed
 //TODO: On *nix systems, I ought to be able to mmap() to load even faster
-void Object3D::fromTiny3DFile(string sFilename)
+void Object3D::_fromTiny3DFile(string sFilename)
 {
 	FILE* fp = fopen(sFilename.c_str(), "rb");
 	if(fp == NULL)
@@ -287,19 +287,19 @@ void Object3D::fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-void Object3D::setTexture(Image* sImg)
-{
-	mImg = sImg;
-}
+//void Object3D::setTexture(Image* sImg)
+//{
+//	mImg = sImg;
+//}
 
-void Object3D::render()
+void Object3D::render(Image* img)
 {
 	if(!shaded)
 		glDisable(GL_LIGHTING);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if(mImg != NULL)
-		glBindTexture(GL_TEXTURE_2D, mImg->_getTex());
+	if(img != NULL)
+		glBindTexture(GL_TEXTURE_2D, img->_getTex());
     glCallList(m_obj);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
@@ -309,11 +309,11 @@ void Object3D::render()
 
 void Object3D::_reload()
 {
-  fromOBJFile(m_sObjFilename);
+  //fromOBJFile(m_sObjFilename);
   if(m_sObjFilename.find(".obj", m_sObjFilename.size()-4) != string::npos)
-    fromOBJFile(m_sObjFilename);
+    _fromOBJFile(m_sObjFilename);
   else
-    fromTiny3DFile(m_sObjFilename);
+    _fromTiny3DFile(m_sObjFilename);
 }
 
 static set<Object3D*> sg_objs;
@@ -336,3 +336,24 @@ void _remove3DObjReload(Object3D* obj)
   sg_objs.erase(obj);
 }
 
+static map<string, Object3D*> g_mObj;
+Object3D* getObject(string sFilename)
+{
+	if(sFilename == "model_none") return NULL;
+	
+	map<string, Object3D*>::iterator i = g_mObj.find(sFilename);
+	if(i == g_mObj.end())   //This model isn't here; load it
+	{
+		Object3D* img = new Object3D(sFilename);
+		g_mObj[sFilename] = img; //Add to the map
+		return img;
+	}
+	return i->second; //Return it
+}
+
+void clearObjects()
+{
+	for(map<string, Object3D*>::iterator i = g_mObj.begin(); i != g_mObj.end(); i++)
+		delete (i->second);    //Delete every object
+	g_mObj.clear();
+}

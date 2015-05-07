@@ -255,6 +255,7 @@ Engine::~Engine()
 	//Clean up our image map
 	errlog << "Clearing images" << endl;
 	clearImages();
+	clearObjects();
 
 	//Clean up our sound effects
 	if(!m_bSoundDied)
@@ -925,6 +926,19 @@ void Engine::addObject(obj* o)
 {
 	if(o != NULL)
 		m_lObjects.push_back(o);
+}
+
+void Engine::updateSceneryLayer(physSegment* seg)
+{
+	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)
+	{
+		if((*layer) == seg)
+		{
+			m_lScenery.erase(layer);
+			break;
+		}
+	}
+	m_lScenery.insert(seg);
 }
 
 void Engine::drawAll()
