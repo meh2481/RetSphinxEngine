@@ -362,7 +362,7 @@ float32 wrapAngle(float32 fAngle)
 SimplexNoise1234 noiseGen;
 
 //Code modified from https://cmaher.github.io/posts/working-with-simplex-noise/
-float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high)
+float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high, float freqinc)
 {
     float maxAmp = 0;
     float amp = 1;
@@ -376,8 +376,8 @@ float sumOcatave(int num_iterations, float x, float y, float persistence, float 
         noise += noiseGen.noise(x * freqx, y * freqy) * amp;
         maxAmp += amp;
         amp *= persistence;
-        freqx *= 2;
-        freqy *= 2;
+        freqx *= freqinc;
+        freqy *= freqinc;
 	}
 
     //take the average value of the iterations

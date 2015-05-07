@@ -162,6 +162,11 @@ void Image::_loadNoise(string sXMLFilename)
 	float32 sizey = 10.0f;
 	float32 xoffset = randFloat(0, 5000);	//By default, use random position in noise function
 	float32 yoffset = randFloat(0, 5000);
+	uint32_t iterations = 5;
+	float32 persistence = 0.5f;
+	float32 minval = -1.0f;
+	float32 maxval = 1.0f;
+	float32 freqinc = 2.0f;
 	
 	root->QueryUnsignedAttribute("width", &width);
 	root->QueryUnsignedAttribute("height", &height);
@@ -169,6 +174,11 @@ void Image::_loadNoise(string sXMLFilename)
 	root->QueryFloatAttribute("sizey", &sizey);
 	root->QueryFloatAttribute("xoffset", &xoffset);
 	root->QueryFloatAttribute("yoffset", &yoffset);
+	root->QueryUnsignedAttribute("iterations", &iterations);
+	root->QueryFloatAttribute("persistence", &persistence);
+	root->QueryFloatAttribute("min", &minval);
+	root->QueryFloatAttribute("max", &maxval);
+	root->QueryFloatAttribute("freqinc", &freqinc);
 	
 	Gradient g;
 	const char* cGradFile = root->Attribute("gradient");
@@ -193,8 +203,8 @@ void Image::_loadNoise(string sXMLFilename)
 	{
 		for(uint32_t w = 0; w < width; w++)
 		{
-			//val should be range [-1, 1]
-			float val = sumOcatave(16, (float(w+1)/float(width)) + xoffset,(float(h+1)/float(height)) + yoffset, 0.5, sizex, sizey, -1, 1);//noiseGen.noise();
+			//Grab noise value for this pixel from our noise summation function
+			float val = sumOcatave(iterations, (float(w+1)/float(width)) + xoffset,(float(h+1)/float(height)) + yoffset, persistence, sizex, sizey, minval, maxval, freqinc);
 			Color c = g.getVal(val);
 			
 			*ptr++ = (unsigned char)(c.r * 255.0f);
