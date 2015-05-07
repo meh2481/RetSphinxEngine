@@ -189,6 +189,7 @@ void Pony48Engine::draw()
 	}
 	glColor4f(1,1,1,1);
 	
+	drawBg();
 	drawObjects();
 	
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
@@ -239,7 +240,7 @@ void Pony48Engine::draw()
 	glEnable(GL_NORMALIZE);
 	glRotatef(fPlanetRotAmt, 0.0f, 1.0f, 0.0f);
 	
-	glClear(GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);	//Only draw the front faces of 3D objects (faster)
 	testObj->render();
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
@@ -256,6 +257,8 @@ void Pony48Engine::draw()
 	
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+	
+	drawFg();
 }
 
 void Pony48Engine::init(list<commandlineArg> sArgs)
@@ -314,13 +317,22 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/uvtest.png"));
 	
 	Rect r = getCameraView();
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 3; i++)
 	{
 		physSegment* seg = new physSegment();
 		seg->img = new Image("res/3d/noisetest.xml");
 		seg->size.x = r.width()*(5+i);
 		seg->size.y = r.height()*(5+i);
 		seg->depth = i * -10.0f;
+		addScenery(seg);
+	}
+	for(int i = 0; i < 2; i++)
+	{
+		physSegment* seg = new physSegment();
+		seg->img = new Image("res/3d/noisetest.xml");
+		seg->size.x = r.width()*(5+i);
+		seg->size.y = r.height()*(5+i);
+		seg->depth = i * 10.0f;
 		addScenery(seg);
 	}
 	

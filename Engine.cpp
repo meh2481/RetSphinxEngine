@@ -927,7 +927,7 @@ void Engine::addObject(obj* o)
 		m_lObjects.push_back(o);
 }
 
-void Engine::drawObjects()
+void Engine::drawAll()
 {
 	multiset<physSegment*>::iterator layer;
 	for(layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw bg layers
@@ -940,6 +940,31 @@ void Engine::drawObjects()
 		(*i)->draw();
 	for(; layer != m_lScenery.end(); layer++)	//Draw fg layers
 		(*layer)->draw();
+}
+
+void Engine::drawBg()
+{
+	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw bg layers
+	{
+		if((*layer)->depth > 0)
+			break;
+		(*layer)->draw();
+	}
+}
+
+void Engine::drawFg()
+{
+	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw fg layers
+	{
+		if((*layer)->depth > 0)
+			(*layer)->draw();
+	}
+}
+
+void Engine::drawObjects()
+{
+	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Draw objects
+		(*i)->draw();
 }
 
 void Engine::cleanupObjects()
