@@ -166,4 +166,6 @@ float32 distanceBetween(Vec3 vec1, Vec3 vec2);				//Get the distance between two
 Color HsvToRgb(int h, int s, int v);		//Convert HSV values to RGB
 float32 wrapAngle(float32 fAngle);
 
+float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high);
+
 #endif

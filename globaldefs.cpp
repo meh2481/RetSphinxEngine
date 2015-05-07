@@ -5,6 +5,7 @@
 
 #include "globaldefs.h"
 #include "mtrand.h"
+#include "simplexnoise1234.h"
 
 MTRand_int32 irand;
 MTRand drand;
@@ -356,4 +357,34 @@ float32 wrapAngle(float32 fAngle)
 	if(fAngle < 0)
 		return fAngle + 360; 
 	return fAngle;
+}
+
+SimplexNoise1234 noiseGen;
+
+//Code modified from https://cmaher.github.io/posts/working-with-simplex-noise/
+float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high)
+{
+    float maxAmp = 0;
+    float amp = 1;
+    float freqx = scalex;
+    float freqy = scaley;
+    float noise = 0;
+
+    //add successively smaller, higher-frequency terms
+    for(int i = 0; i < num_iterations; ++i)
+	{
+        noise += noiseGen.noise(x * freqx, y * freqy) * amp;
+        maxAmp += amp;
+        amp *= persistence;
+        freqx *= 2;
+        freqy *= 2;
+	}
+
+    //take the average value of the iterations
+    noise /= maxAmp;
+
+    //normalize the result
+    noise = noise * (high - low) / 2 + (high + low) / 2;
+
+    return noise;
 }

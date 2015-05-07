@@ -4,7 +4,6 @@
 */
 
 #include "Image.h"
-#include "simplexnoise1234.h"
 #include "Gradient.h"
 #include <set>
 
@@ -188,7 +187,6 @@ void Image::_loadNoise(string sXMLFilename)
 	m_iHeight = height;
 	
 	//Generate noise
-	SimplexNoise1234 noiseGen;
 	unsigned char* bits = new unsigned char[width*height*4];
 	unsigned char* ptr = bits;
 	for(uint32_t h = 0; h < height; h++)
@@ -196,7 +194,7 @@ void Image::_loadNoise(string sXMLFilename)
 		for(uint32_t w = 0; w < width; w++)
 		{
 			//val should be range [-1, 1]
-			float val = noiseGen.noise((float(w+1)/float(width))*sizex + xoffset,(float(h+1)/float(height))*sizey + yoffset);
+			float val = sumOcatave(16, (float(w+1)/float(width)) + xoffset,(float(h+1)/float(height)) + yoffset, 0.5, sizex, sizey, -1, 1);//noiseGen.noise();
 			Color c = g.getVal(val);
 			
 			*ptr++ = (unsigned char)(c.r * 255.0f);

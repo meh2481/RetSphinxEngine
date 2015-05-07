@@ -313,18 +313,21 @@ void Pony48Engine::init(list<commandlineArg> sArgs)
 	
 	testObj = new Object3D("res/3d/dome.tiny3d", getImage("res/3d/uvtest.png"));
 	
-	physSegment* seg = new physSegment();
-	seg->img = getImage("res/3d/noisetest.xml");
 	Rect r = getCameraView();
-	seg->size.x = r.width()*5;
-	seg->size.y = r.height()*5;
-	seg->depth = -10.0f;
-	addScenery(seg);
+	for(int i = 0; i < 1; i++)
+	{
+		physSegment* seg = new physSegment();
+		seg->img = new Image("res/3d/noisetest.xml");
+		seg->size.x = r.width()*(5+i);
+		seg->size.y = r.height()*(5+i);
+		seg->depth = i * -10.0f;
+		addScenery(seg);
+	}
 	
-	seg = new physSegment();
+	physSegment* seg = new physSegment();
 	seg->img = getImage("res/examplebg.png");
-	seg->size.x = seg->size.y = r.width()*5;
-	seg->depth = -20.0f;
+	seg->size.x = seg->size.y = r.width()*15;
+	seg->depth = -200.0f;
 	addScenery(seg);
 }
 
