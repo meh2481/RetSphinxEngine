@@ -1,5 +1,5 @@
 /*
-    Pony48 header - bg.h
+    GameEngine header - bg.h
     Defines classes for different background types
     Copyright (c) 2014 Mark Hutcheson
 */

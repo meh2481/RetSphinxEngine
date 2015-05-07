@@ -1,3 +1,4 @@
 - Tile images
-- make 3DObject list to only load 3D models as needed - multiple objects should be able to share the same geometry
-- Plug 3D objects into physsegments somehow
+- Scene editor / XML exporter
+- Images should be able to save to file
+- Noise-generated image handler?

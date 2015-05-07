@@ -1,5 +1,5 @@
 /*
-	Pony48 source - Text.h
+	GameEngine header - Text.h
 	Class for ease of drawing bitmapped fonts
 	Copyright (c) 2014 Mark Hutcheson
 */

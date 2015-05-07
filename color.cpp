@@ -15,7 +15,7 @@ float myAbs(float v)
 	return v;
 }
 
-void Pony48Engine::updateColors(float32 dt)
+void GameEngine::updateColors(float32 dt)
 {
 	//Update our colors that are phasing into one another
 	for(list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
@@ -73,7 +73,7 @@ void Pony48Engine::updateColors(float32 dt)
 	}
 }
 	
-void Pony48Engine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
+void GameEngine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
 {
 	ColorPhase cp;
 	cp.pingpong = bPingPong;
@@ -102,7 +102,7 @@ void Pony48Engine::phaseColor(Color* src, Color dest, float time, bool bPingPong
 		m_ColorsChanging.push_back(cp);
 }
 
-void Pony48Engine::clearColors()
+void GameEngine::clearColors()
 {
 	for(list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
 	{

@@ -1,5 +1,5 @@
 /*
-    Pony48 header - cursor.h
+    GameEngine header - cursor.h
     Defines a class for mouse cursor handling
     Copyright (c) 2014 Mark Hutcheson
 */

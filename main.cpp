@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	LuaInterface Lua("res/lua/init.lua", argc, argv);
 	Lua.Init();
 	
-	Pony48Engine* eng = new Pony48Engine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "GameEngine", "GameEngine", ICONNAME, true); //Create our engine
+	GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "GameEngine", "GameEngine", ICONNAME, true); //Create our engine
 	eng->setLua(&Lua);
 	list<string> lCommandLine;
 	

@@ -1,5 +1,5 @@
 /*
- Pony48 source - Image.h
+ GameEngine header - Image.h
  Copyright (c) 2014 Mark Hutcheson
 */
 #ifndef IMAGE_H

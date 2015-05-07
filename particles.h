@@ -1,5 +1,5 @@
 /*
-    Pony48 header - particles.h
+    GameEngine header - particles.h
     Copyright (c) 2014 Mark Hutcheson
 */
 

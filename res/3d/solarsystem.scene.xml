@@ -1,0 +1,21 @@
+<scene>
+	<!-- Star bg -->
+	<layer img="res/examplebg.png" size="700, 700" depth="-400" />
+	
+	<!-- Cloudy noise stuff -->
+	<layer img="res/3d/noisetest.xml" size="300, 290" depth="-100" />
+	<layer img="res/3d/noisetest.xml" size="330, 300" depth="-150" />
+	
+	<!-- Planets -->
+	<layer img="res/3d/mercury.png" size="0.765, 0.765" pos="-12, 2" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/venus.png" size="1.899, 1.899" pos="-6, -0.3" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/earth.png" size="2, 2" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/moon.png" size="0.5, 0.5" pos="2, 0.2" depth="2" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/mars.png" size="1.06, 1.06" pos="6, -4" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/jupiter.tif" size="22, 22" pos="-25, 8" depth="-70" obj="res/3d/sphere.tiny3d" />
+	<layer img="res/3d/saturn.jpg" size="18.28, 18.28" pos="15, -12" depth="-100" obj="res/3d/sphere.tiny3d" /> <!-- TODO: Rings -->
+	<layer img="res/3d/uranus.png" size="7.96, 7.96" pos="55, -20" depth="-130" obj="res/3d/sphere.tiny3d" /> <!-- TODO: Rings -->
+	<layer img="res/3d/neptune.jpg" size="7.729, 7.729" pos="80, -10" depth="-150" obj="res/3d/sphere.tiny3d" />
+	<!-- TODO: Pluto and moons -->
+	
+</scene>	

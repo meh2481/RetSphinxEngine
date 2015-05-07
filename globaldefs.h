@@ -1,5 +1,5 @@
 /*
-	Pony48 source - globaldefs.h
+	GameEngine header - globaldefs.h
 	Global definitions for data types
 	Copyright (c) 2014 Mark Hutcheson
 */

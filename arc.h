@@ -1,5 +1,5 @@
 /*
-    Pony48 source - arc.h
+    GameEngine header - arc.h
     Class for creating electric-looking arcs between two points
     Copyright (c) 2014 Mark Hutcheson
 */

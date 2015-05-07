@@ -1,9 +1,9 @@
 /*
-	Pony48 source - Pony48.h
+	GameEngine source - GameEngine.h
 	Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef PONY48ENGINE_H
-#define PONY48ENGINE_H
+#ifndef GAMEENGINE_H
+#define GAMEENGINE_H
 
 #include "Engine.h"
 #include "bg.h"
@@ -55,7 +55,7 @@ public:
 	bool dir;
 };
 
-class Pony48Engine : public Engine
+class GameEngine : public Engine
 {
 	friend class PonyLua;
 private:
@@ -75,8 +75,8 @@ private:
 	myCursor* m_Cursor;
 	
 	//Testing stuff!
-	Object3D* testObj;
-	physSegment* m_sun;
+	//Object3D* testObj;
+	//physSegment* m_sun;
 
 protected:
 	void frame(float32 dt);
@@ -87,9 +87,9 @@ protected:
 	void resume();
 
 public:
-	//Pony48.cpp functions - fairly generic 
-	Pony48Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable = false);
-	~Pony48Engine();
+	//GameEngine.cpp functions - fairly generic 
+	GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable = false);
+	~GameEngine();
 	
 	void setLua(LuaInterface* l)	{Lua = l;};
 	
@@ -104,11 +104,12 @@ public:
 	bool loadConfig(string sFilename);
 	void saveConfig(string sFilename);
 	
-	//Other stuff in Pony48.cpp
+	//Other stuff in GameEngine.cpp
 	obj* objFromXML(string sXMLFilename, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	Rect getCameraView();		//Return the rectangle, in world position z=0, that the camera can see
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
+	void loadScene(string sXMLFilename);	//Load scene from file
 	
 	//color.cpp functions
 	void updateColors(float32 dt);

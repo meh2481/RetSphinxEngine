@@ -1,5 +1,5 @@
 /*
- Pony48 source - globaldefs.cpp
+ GameEngine source - globaldefs.cpp
  Copyright (c) 2014 Mark Hutcheson
 */
 

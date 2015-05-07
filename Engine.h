@@ -1,5 +1,5 @@
 /*
-	Pony48 source - Engine.h
+	GameEngine header - Engine.h
 	Copyright (c) 2014 Mark Hutcheson
 */
 

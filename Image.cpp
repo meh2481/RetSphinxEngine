@@ -1,5 +1,5 @@
 /*
- Pony48 source - Image.cpp
+ GameEngine source - Image.cpp
  Copyright (c) 2014 Mark Hutcheson
 */
 

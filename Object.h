@@ -1,5 +1,5 @@
 /*
-    Pony48 source - Object.h
+    GameEngine header - Object.h
     Copyright (c) 2014 Mark Hutcheson
 */
 

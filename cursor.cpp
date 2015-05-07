@@ -1,5 +1,5 @@
 /*
-    Pony48 source - cursor.cpp
+    GameEngine source - cursor.cpp
     Copyright (c) 2014 Mark Hutcheson
 */
 #include "cursor.h"

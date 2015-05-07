@@ -2,9 +2,9 @@
 #include "luainterface.h"
 #include "GameEngine.h"
 
-extern Pony48Engine* g_pGlobalEngine;
+extern GameEngine* g_pGlobalEngine;
 
-//Class for interfacing between Pony48Engine and Lua
+//Class for interfacing between GameEngine and Lua
 //(defined here instead of inside header because of weird cross-inclusion stuff)
 class PonyLua
 {

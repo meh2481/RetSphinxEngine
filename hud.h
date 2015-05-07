@@ -1,5 +1,5 @@
 /*
- Pony48 source - hud.h
+ GameEngine header - hud.h
  Copyright (c) 2014 Mark Hutcheson
 */
 

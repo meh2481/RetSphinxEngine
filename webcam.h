@@ -1,5 +1,5 @@
 /*
-    Pony48 header - webcam.h
+    GameEngine header - webcam.h
     Copyright (c) 2014 Mark Hutcheson
 */
 

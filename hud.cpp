@@ -9,7 +9,7 @@
 
 extern int screenDrawWidth;
 extern int screenDrawHeight;
-extern Pony48Engine* g_pGlobalEngine;
+extern GameEngine* g_pGlobalEngine;
 
 //-------------------------------------------------------------------------------------
 // HUDItem class functions

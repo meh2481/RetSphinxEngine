@@ -1,5 +1,5 @@
 /*
-    Pony48 source - bg.cpp
+    GameEngine source - bg.cpp
     Copyright (c) 2014 Mark Hutcheson
 */
 #include "bg.h"
