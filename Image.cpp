@@ -282,10 +282,10 @@ void Image::renderLattice(lattice* l, Point size)
 // Shear is straightforward. To shear left/right, simply subtract from the x texel coordinates for the top part of the image,
 // and add to the x texel coordinates for the bottom part of the image. Similarly, to shear up/down, add to the left side
 // (move left side up) and subtract from the right side (move right side down) by the same amount. 
-void Image::render(Point size, Point shear)
-{
+//void Image::render(Point size, Point shear)
+//{
 	//TODO: Do I even care?
-	render(size);
+	//render(size);
 	/*
 	float maxx, maxy;
 #ifdef __BIG_ENDIAN__
@@ -332,7 +332,7 @@ void Image::render(Point size, Point shear)
 
 	glEnd();*/
   
-}
+//}
 
 void Image::render(Point size, Rect rcImg)
 {
