@@ -8,6 +8,7 @@
 #include <float.h>
 #include <sstream>
 #include <iomanip>
+#include <ctime>
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
@@ -194,7 +195,7 @@ void GameEngine::draw()
 	}
 	glColor4f(1,1,1,1);
 	
-	m_Cursor->pos = worldPosFromCursor(getCursorPos());
+	
 	
 	//Rotate sun point around planet
 	glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
@@ -240,6 +241,10 @@ void GameEngine::draw()
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	glDisable(GL_LIGHTING);
 	drawAll();
+	
+	glLoadIdentity();
+	glTranslatef(-CameraPos.x, -CameraPos.y, CameraPos.z);	//Translate back to put cursor in correct location on screen
+	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 }
 
 void GameEngine::init(list<commandlineArg> sArgs)
@@ -333,6 +338,35 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_ESCAPE:
 					quit();
 					break;
+					
+				case SDL_SCANCODE_PRINTSCREEN:
+				{
+					time_t t = time(0);   // get time now
+					struct tm * now = localtime(&t);
+				
+					ostringstream ssfile;
+					ssfile << getSaveLocation() << "/screenshots/";
+					ttvfs::CreateDirRec(ssfile.str().c_str());
+					ssfile << "Screenshot " << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
+					       << now->tm_hour << '.' << setw(2) << setfill('0') << now->tm_min << '.' << setw(2) << setfill('0') << now->tm_sec << ".png";
+				
+					uint16_t width = getWidth();
+					uint16_t height = getHeight();
+					
+					//Make the BYTE array, factor of 3 because it's RBG.
+					BYTE* pixels = new BYTE[3 * width * height];
+
+					glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+
+					//Convert to FreeImage format & save to file
+					FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
+					FreeImage_Save(FIF_PNG, image, ssfile.str().c_str(), 0);
+
+					//Free resources
+					FreeImage_Unload(image);
+					delete [] pixels;
+					break;
+				}
 			}
 			break;
 		
