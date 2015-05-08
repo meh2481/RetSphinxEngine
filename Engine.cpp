@@ -183,6 +183,10 @@ void Engine::_render()
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
+	//Create save folder
+	string sFileLoc = getSaveLocation() + "/screenshots/";
+	ttvfs::CreateDirRec(sFileLoc.c_str());
+	
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
 	errlog.open((getSaveLocation() + "err.log").c_str());
@@ -1011,7 +1015,6 @@ string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir
 {
 	string s = ttvfs::GetAppDir(m_sAppName.c_str());
 	s += "/";
-	ttvfs::CreateDirRec(s.c_str());
 	return s;
 }
 

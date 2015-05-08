@@ -341,26 +341,25 @@ void GameEngine::handleEvent(SDL_Event event)
 					
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
+					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
 					time_t t = time(0);   // get time now
 					struct tm * now = localtime(&t);
 				
+					//Create filename that we'll save this as
 					ostringstream ssfile;
-					ssfile << getSaveLocation() << "/screenshots/";
-					ttvfs::CreateDirRec(ssfile.str().c_str());
-					ssfile << "Screenshot " << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
+					ssfile << getSaveLocation() << "/screenshots/" << "Screenshot " 
+					       << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
 					       << now->tm_hour << '.' << setw(2) << setfill('0') << now->tm_min << '.' << setw(2) << setfill('0') << now->tm_sec << ".png";
 				
 					uint16_t width = getWidth();
 					uint16_t height = getHeight();
 					
-					//Make the BYTE array, factor of 3 because it's RBG.
 					BYTE* pixels = new BYTE[3 * width * height];
-
 					glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
 
 					//Convert to FreeImage format & save to file
 					FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
-					FreeImage_Save(FIF_PNG, image, ssfile.str().c_str(), 0);
+					FreeImage_Save(FIF_PNG, image, ssfile.str().c_str(), PNG_Z_BEST_SPEED);
 
 					//Free resources
 					FreeImage_Unload(image);
