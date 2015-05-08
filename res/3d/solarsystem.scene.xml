@@ -1,6 +1,6 @@
 <scene>
 	<!-- Star bg -->
-	<layer img="res/examplebg.png" size="700, 700" depth="-400" />
+	<layer img="res/examplebg.png" size="700, 700" depth="-400" tile="2.5,2.5"/>
 	
 	<!-- Cloudy noise stuff -->
 	<layer img="res/3d/noisetest.xml" size="300, 290" depth="-100" />

@@ -42,7 +42,7 @@ public:
 	string getFilename()    {return m_sFilename;};
 	
 	//Drawing methods for texel-based coordinates
-	void render(Point size);				//Render at 0,0 with specified texel size
+	void render(Point size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
 	void renderLattice(lattice* l, Point size);	//Render at 0,0 with specified lattice
 	void render(Point size, Rect rcImg);
 	void render(Point size, Point shear);	//Render at 0,0 with specified size and shear amount

@@ -33,6 +33,7 @@ public:
 	Point pos;		//Offset (after rotation)
 	Point center;	//Center of rotation (Offset before rotation)
 	Point shear;	//Shear for drawing the image
+	Point tile;		//tile image in x and y
 	float32 rot;
 	float32 depth;	//Z-position
 	Point size;	//Actual texel size; not pixels

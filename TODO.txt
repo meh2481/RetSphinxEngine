@@ -1,4 +1,3 @@
-- Tile images
 - Scene editor / XML exporter
-- Images should be able to save to file
+- Images should be able to save to file?
 - Noise-generated image handler?

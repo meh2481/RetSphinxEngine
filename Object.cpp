@@ -148,7 +148,7 @@ physSegment::physSegment()
 	center.SetZero();
 	//shear.SetZero();
 	rot = depth = 0.0f;
-	size.x = size.y = 1.0f;
+	size.x = size.y = tile.x = tile.y = 1.0f;
 	show = true;
 }
 
@@ -187,7 +187,7 @@ void physSegment::draw()
 			if(lat)
 				img->renderLattice(lat, size);
 			else
-				img->render(size);
+				img->render(size, tile.x, tile.y);
 		}
 	}
 	else
@@ -212,7 +212,7 @@ void physSegment::draw()
 			if(lat)
 				img->renderLattice(lat, size);
 			else
-				img->render(size);
+				img->render(size, tile.x, tile.y);
 		}
 	}
 	glPopMatrix();

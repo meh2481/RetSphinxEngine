@@ -239,10 +239,34 @@ Image::~Image()
 <fgenesis> also have a look at glOrtho() and glMatrixMode(), you'll need those
 */
 
-void Image::render(Point size)
+void Image::render(Point size, float tilex, float tiley)
 {
-	Rect rc(0,0,m_iWidth,m_iHeight);
-	render(size, rc);
+	//rcImg.left = 0;
+	//rcImg.right = tilex;
+	//rcImg.top = tiley;
+	//rcImg.bottom = 0;
+	
+	// tell opengl to use the generated texture
+	glBindTexture(GL_TEXTURE_2D, m_hTex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
+	const GLfloat vertexData[] =
+    {
+        -size.x/2.0, size.y/2.0, // upper left
+        size.x/2.0, size.y/2.0, // upper right
+        -size.x/2.0, -size.y/2.0, // lower left
+        size.x/2.0, -size.y/2.0, // lower right
+    };
+    const GLfloat texCoords[] =
+    {
+        0, tiley, // upper left
+        tilex, tiley, // upper right
+        0, 0, // lower left
+        tilex, 0, // lower right
+    };
+    glVertexPointer(2, GL_FLOAT, 0, &vertexData);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void Image::renderLattice(lattice* l, Point size)
@@ -260,6 +284,7 @@ void Image::renderLattice(lattice* l, Point size)
 // (move left side up) and subtract from the right side (move right side down) by the same amount. 
 void Image::render(Point size, Point shear)
 {
+	//TODO: Do I even care?
 	render(size);
 	/*
 	float maxx, maxy;
@@ -349,25 +374,7 @@ void Image::render(Point size, Rect rcImg)
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  
-	// make a rectangle
-	/*glBegin(GL_QUADS);
-	// top left
-	glTexCoord2f(rcImg.left, rcImg.top);
-	glVertex3f(-size.x/2.0, size.y/2.0, 0.0);
-	// bottom left
-	glTexCoord2f(rcImg.left, rcImg.bottom);
-	glVertex3f(-size.x/2.0, -size.y/2.0, 0.0);
-	// bottom right
-	glTexCoord2f(rcImg.right, rcImg.bottom);
-	glVertex3f(size.x/2.0, -size.y/2.0, 0.0);
-	// top right
-	glTexCoord2f(rcImg.right, rcImg.top);
-	glVertex3f(size.x/2.0, size.y/2.0, 0.0);
-
-	glEnd();*/
-  
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
 }
 
 void Image::render4V(Point ul, Point ur, Point bl, Point br)
