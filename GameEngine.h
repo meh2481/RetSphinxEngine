@@ -111,6 +111,7 @@ public:
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void loadScene(string sXMLFilename);	//Load scene from file
+	void updateShip();
 	
 	//color.cpp functions
 	void updateColors(float32 dt);

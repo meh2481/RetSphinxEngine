@@ -146,28 +146,13 @@ float fPlanetRotAmt = 0;
 
 void GameEngine::frame(float32 dt)
 {
+	handleKeys();
 	stepPhysics(dt);
 	updateParticles(dt);
 	updateObjects(dt);
+	updateShip();
 	//m_lAnimTest->update(dt);
-	if(keyDown(SDL_SCANCODE_A))
-		fSunRotAmt -= dt * 50;
-	else if(keyDown(SDL_SCANCODE_D))
-		fSunRotAmt += dt * 50;
-		
-	if(keyDown(SDL_SCANCODE_LEFT))
-		fPlanetRotAmt -= dt * 100;
-	else if(keyDown(SDL_SCANCODE_RIGHT))
-		fPlanetRotAmt += dt * 100;
 	
-	if(keyDown(SDL_SCANCODE_I))
-		CameraPos.y -= dt * 5;
-	else if(keyDown(SDL_SCANCODE_K))
-		CameraPos.y += dt * 5;
-	if(keyDown(SDL_SCANCODE_J))
-		CameraPos.x += dt * 5;
-	else if(keyDown(SDL_SCANCODE_L))
-		CameraPos.x -= dt * 5;
 	
 	//m_sun->pos.x = cos(DEG2RAD*fSunRotAmt) * 50;
 	//m_sun->depth = -sin(DEG2RAD*fSunRotAmt) * 50;
@@ -938,7 +923,61 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 
 void GameEngine::handleKeys()
 {
+	float dt = 1.0/getFramerate();
+	if(keyDown(SDL_SCANCODE_A))
+		fSunRotAmt -= dt * 50;
+	else if(keyDown(SDL_SCANCODE_D))
+		fSunRotAmt += dt * 50;
+		
+	if(keyDown(SDL_SCANCODE_LEFT))
+		fPlanetRotAmt -= dt * 100;
+	else if(keyDown(SDL_SCANCODE_RIGHT))
+		fPlanetRotAmt += dt * 100;
 	
+	if(ship != NULL && ship->getBody() != NULL)
+	{
+		//cout << "Vel" << endl;
+		Point v = ship->getBody()->GetLinearVelocity();
+		
+		if(keyDown(SDL_SCANCODE_I))
+			v.y += dt * 5;
+		if(keyDown(SDL_SCANCODE_K))
+			v.y -= dt * 5;
+		if(keyDown(SDL_SCANCODE_J))
+			v.x -= dt * 5;
+		if(keyDown(SDL_SCANCODE_L))
+			v.x += dt * 5;
+			
+		ship->getBody()->SetLinearVelocity(v);
+	}
+	//TODO: Control camera with this
+	/*if(keyDown(SDL_SCANCODE_I))
+		CameraPos.y -= dt * 5;
+	else if(keyDown(SDL_SCANCODE_K))
+		CameraPos.y += dt * 5;
+	if(keyDown(SDL_SCANCODE_J))
+		CameraPos.x += dt * 5;
+	else if(keyDown(SDL_SCANCODE_L))
+		CameraPos.x -= dt * 5;*/
+}
+
+void GameEngine::updateShip()
+{
+	if(ship != NULL)
+	{
+		//cout << "Not null" << endl;
+		b2Body* b = ship->getBody();
+		if(b != NULL)
+		{
+			//cout << "not null 2" << endl;
+			Point p = b->GetPosition();
+			Point v = b->GetLinearVelocity();
+			float32 r = getAngle(v);
+			b->SetTransform(p, r);
+			CameraPos.x = -p.x;
+			CameraPos.y = -p.y;
+		}
+	}
 }
 
 void GameEngine::rumbleController(float32 strength, float32 sec, bool priority)
@@ -1023,6 +1062,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(o != NULL && cName != NULL)
 			{
 				string s = cName;
+				cout << s << endl;
 				if(s == "ship")
 					ship = o;
 			}

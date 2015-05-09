@@ -97,6 +97,7 @@ public:
 	void addFrame(objframe* f, string s)	{frames[s] = f; f->parent = this;};
 	void setFrame(string sName);
 	void hideFrames();
+	b2Body* getBody();
 };
 
 //Anim types

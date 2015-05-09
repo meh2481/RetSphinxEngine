@@ -388,3 +388,8 @@ float sumOcatave(int num_iterations, float x, float y, float persistence, float 
 
     return noise;
 }
+
+float32 getAngle(const Point& p)
+{
+	return atan2(p.y, p.x);
+}
