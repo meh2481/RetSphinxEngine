@@ -17,3 +17,6 @@ gmon.out
 *.tif
 *.tiff
 *.obj
+*.tiny3d
+Planet.cpp
+Planet.h

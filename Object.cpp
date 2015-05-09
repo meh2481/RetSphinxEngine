@@ -225,6 +225,44 @@ void physSegment::update(float32 dt)
 		latanim->update(dt);
 }
 
+void physSegment::fromXML(XMLElement* layer)
+{
+	const char* cLayerFilename = layer->Attribute("img");
+	if(cLayerFilename != NULL)
+		img = getImage(cLayerFilename);
+		
+	const char* cSegPos = layer->Attribute("pos");
+	if(cSegPos != NULL)
+		pos = pointFromString(cSegPos);
+	
+	const char* cSegCenter = layer->Attribute("center");
+	if(cSegCenter != NULL)
+		center = pointFromString(cSegCenter);
+	
+	const char* cSegShear = layer->Attribute("shear");
+	if(cSegShear != NULL)
+		shear = pointFromString(cSegShear);
+		
+	const char* cSegTile = layer->Attribute("tile");
+	if(cSegTile != NULL)
+		tile = pointFromString(cSegTile);
+	
+	layer->QueryFloatAttribute("rot", &rot);
+	layer->QueryFloatAttribute("depth", &depth);
+	
+	const char* cSegSz = layer->Attribute("size");
+	if(cSegSz != NULL)
+		size = pointFromString(cSegSz);
+	
+	const char* cSegCol = layer->Attribute("col");
+	if(cSegCol != NULL)
+		col = colorFromString(cSegCol);
+	
+	const char* cSegObj = layer->Attribute("obj");
+	if(cSegObj != NULL)
+		obj3D = getObject(cSegObj);
+}
+
 //----------------------------------------------------------------------------------------------------
 // anim class
 //----------------------------------------------------------------------------------------------------

@@ -1,0 +1,8 @@
+<object>
+	<segment>
+		<body name="center" pos="0,0" type="dynamic">
+			<fixture type="circle" radius=".25" density="2" friction="0" />
+		</body>
+		<layer img="res/3d/spaceship.png" size=".25,.25" obj="res/3d/spaceship2.tiny3d"/>
+	</segment>
+</object>

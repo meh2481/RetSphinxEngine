@@ -45,7 +45,7 @@ public:
 	
 	void draw();
 	void update(float32 dt);
-
+	void fromXML(XMLElement* layer);
 };
 
 //Helper class for objects having multiple "frames", or states of animation

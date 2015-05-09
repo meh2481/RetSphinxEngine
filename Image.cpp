@@ -241,11 +241,6 @@ Image::~Image()
 
 void Image::render(Point size, float tilex, float tiley)
 {
-	//rcImg.left = 0;
-	//rcImg.right = tilex;
-	//rcImg.top = tiley;
-	//rcImg.bottom = 0;
-	
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

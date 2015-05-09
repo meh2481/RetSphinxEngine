@@ -77,6 +77,7 @@ private:
 	//Testing stuff!
 	//Object3D* testObj;
 	//physSegment* m_sun;
+	obj* ship;
 
 protected:
 	void frame(float32 dt);

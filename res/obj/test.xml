@@ -3,26 +3,26 @@
 		<body name="center" pos="0,0" type="dynamic">
 			<fixture type="circle" radius=".25" density="2" friction="0" />
 		</body>
-		<image path="res/gfx/rock.png" size=".25,.25"/>
+		<layer img="res/gfx/rock.png" size=".25,.25"/>
 	</segment>
 	
 	<segment>
 		<body name="seg1" pos="0,.5" type="dynamic">
 			<fixture type="circle" radius=".75" density="1" friction=".2" />
 		</body>
-		<image path="res/gfx/rock.png" size="1.5,1.5"/>
+		<layer img="res/gfx/rock.png" size="1.5,1.5"/>
 	</segment>
 	<segment>
 		<body name="seg2" pos=".5,-.3" type="dynamic">
 			<fixture type="circle" radius=".75" density="1" friction=".2" />
 		</body>
-		<image path="res/gfx/rock.png" size="1.5,1.5"/>
+		<layer img="res/gfx/rock.png" size="1.5,1.5"/>
 	</segment>
 	<segment>
 		<body name="seg3" pos="-.5,-.3" type="dynamic">
 			<fixture type="circle" radius=".75" density="1" friction=".2" />
 		</body>
-		<image path="res/gfx/rock.png" size="1.5,1.5"/>
+		<layer img="res/gfx/rock.png" size="1.5,1.5"/>
 	</segment>
 	<joint type="distance" bodyA="seg1" bodyB="seg2" frequencyHz="4.5" dampingRatio="0" anchorA="0,0" anchorB="0,0" />
 	<joint type="distance" bodyA="seg2" bodyB="seg3" frequencyHz="4.5" dampingRatio="0"/>

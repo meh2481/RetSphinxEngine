@@ -144,20 +144,6 @@ void Engine::_render()
 	// Game-specific drawing
 	draw();
 	
-	// Draw physics debug stuff
-	if(m_bDebugDraw)
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		m_physicsWorld->DrawDebugData();
-		glColor4f(1,1,1,1);
-	}
-	
-	//Draw cursor over everything
-	glClear(GL_DEPTH_BUFFER_BIT);
-	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
-		m_cursor->draw();
-	
 	//Draw gamma/brightness overlay on top of everything else
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -179,6 +165,26 @@ void Engine::_render()
 	
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
+}
+
+void Engine::drawDebug()
+{
+	// Draw physics debug stuff
+	if(m_bDebugDraw)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		m_physicsWorld->DrawDebugData();
+		glColor4f(1,1,1,1);
+	}
+}
+
+void Engine::drawCursor()
+{
+	//Draw cursor over everything
+	glClear(GL_DEPTH_BUFFER_BIT);
+	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
+		m_cursor->draw();
 }
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)

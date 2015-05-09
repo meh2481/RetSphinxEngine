@@ -16,6 +16,9 @@
 	<layer img="res/3d/saturn.jpg" size="18.28, 18.28" pos="15, -12" depth="-100" obj="res/3d/sphere.tiny3d" /> <!-- TODO: Rings -->
 	<layer img="res/3d/uranus.png" size="7.96, 7.96" pos="55, -20" depth="-130" obj="res/3d/sphere.tiny3d" /> <!-- TODO: Rings -->
 	<layer img="res/3d/neptune.jpg" size="7.729, 7.729" pos="80, -10" depth="-150" obj="res/3d/sphere.tiny3d" />
-	<!-- TODO: Pluto and moons -->
+	<!-- TODO: Pluto and moons and such -->
+	
+	
+	<object name="ship" file="res/obj/spaceship.xml" pos="-4, 4" vel="2,2"/>
 	
 </scene>	

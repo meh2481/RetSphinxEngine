@@ -77,6 +77,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	
 	m_joy = NULL;
 	m_rumble = NULL;
+	ship = NULL;
 	
 	//Keybinding stuff!
 	JOY_AXIS_HORIZ = 0;
@@ -241,10 +242,12 @@ void GameEngine::draw()
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	glDisable(GL_LIGHTING);
 	drawAll();
+	drawDebug();
 	
-	glLoadIdentity();
-	glTranslatef(-CameraPos.x, -CameraPos.y, CameraPos.z);	//Translate back to put cursor in correct location on screen
+	glTranslatef(-CameraPos.x*2, -CameraPos.y*2, 0);		//translate back to put cursor in the right position
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
+	drawCursor();
+	
 }
 
 void GameEngine::init(list<commandlineArg> sArgs)
@@ -257,37 +260,8 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	loadConfig(getSaveLocation() + "config.xml");
 	
 	//Set gravity to about normal
-	getWorld()->SetGravity(b2Vec2(0,-9.8));
-	
-	//Create test object thingy
-	
-	//Straight from the hello world example
-	// Define the ground body.
-	/*b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(0.0f, -10.0f);
-
-	// Call the body factory which allocates memory for the ground body
-	// from a pool and creates the ground box shape (also from a pool).
-	// The body is also added to the world.
-	b2Body* groundBody = getWorld()->CreateBody(&groundBodyDef);
-
-	// Define the ground box shape.
-	b2PolygonShape groundBox;
-
-	// The extents are the half-widths of the box.
-	groundBox.SetAsBox(50.0f, 10.0f);
-
-	// Add the ground fixture to the ground body.
-	groundBody->CreateFixture(&groundBox, 0.0f);
-	
-	physSegment* seg = new physSegment;
-	seg->body = groundBody;
-	seg->img = getImage("res/gfx/metalwall.png");
-	seg->size.x = 100.0;
-	seg->size.y = 20.0;
-	addScenery(seg);
-	
-	addObject(objFromXML("res/obj/test.xml"));*/
+	//getWorld()->SetGravity(b2Vec2(0,-9.8));
+	getWorld()->SetGravity(b2Vec2(0,0));
 	
 	//m_lTest = new lattice(20,20);
 	//m_lAnimTest = new sinLatticeAnim(m_lTest);
@@ -327,8 +301,8 @@ void GameEngine::handleEvent(SDL_Event event)
 					//cleanupObjects();
 					//addObject(objFromXML("res/obj/ground.xml"));
 					//addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
-					loadScene("res/3d/solarsystem.scene.xml");
 					reloadImages();
+					loadScene("res/3d/solarsystem.scene.xml");
 					break;
 					
 				case SDL_SCANCODE_V:
@@ -878,16 +852,17 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 				bod->CreateFixture(&fixtureDef);
 			}
 		}
-		XMLElement* image = segment->FirstChildElement("image");
-		if(image != NULL)
+		XMLElement* layer = segment->FirstChildElement("layer");
+		if(layer != NULL)
 		{
-			const char* cImgPath = image->Attribute("path");
+			seg->fromXML(layer);
+			/*const char* cImgPath = image->Attribute("img");
 			if(cImgPath)
 				seg->img = getImage(cImgPath);
 				
 			const char* cImgSize = image->Attribute("size");
 			if(cImgSize)
-				seg->size = pointFromString(cImgSize);
+				seg->size = pointFromString(cImgSize);*/
 		}
 		o->addSegment(seg);
 	}
@@ -993,7 +968,7 @@ void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
 void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
-	
+	ship = NULL;
 	errlog << "Loading scene " << sXMLFilename << endl;
 	
 	XMLDocument* doc = new XMLDocument;
@@ -1016,51 +991,89 @@ void GameEngine::loadScene(string sXMLFilename)
 	
 	//TODO Scene boundaries
 	
+	//Load layers for the scene
 	for(XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
-		const char* cLayerFilename = layer->Attribute("img");
-		if(cLayerFilename != NULL)
+		physSegment* seg = new physSegment();
+		seg->fromXML(layer);
+		
+		addScenery(seg);
+	}
+	
+	//Load objects
+	for(XMLElement* object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object"))
+	{
+		const char* cFilename = object->Attribute("file");
+		const char* cName = object->Attribute("name");
+		const char* cPos = object->Attribute("pos");
+		const char* cVel = object->Attribute("vel");
+		if(cFilename != NULL)
 		{
-			physSegment* seg = new physSegment();
-			seg->img = getImage(cLayerFilename);
+			Point pos(0,0);
+			Point vel(0,0);
 			
-			const char* cSegPos = layer->Attribute("pos");
-			if(cSegPos != NULL)
-				seg->pos = pointFromString(cSegPos);
+			if(cPos != NULL)
+				pos = pointFromString(cPos);
 			
-			const char* cSegCenter = layer->Attribute("center");
-			if(cSegCenter != NULL)
-				seg->center = pointFromString(cSegCenter);
+			if(cVel != NULL)
+				vel = pointFromString(cVel);
 			
-			const char* cSegShear = layer->Attribute("shear");
-			if(cSegShear != NULL)
-				seg->shear = pointFromString(cSegShear);
-				
-			const char* cSegTile = layer->Attribute("tile");
-			if(cSegTile != NULL)
-				seg->tile = pointFromString(cSegTile);
+			obj* o = objFromXML(cFilename, pos, vel);
 			
-			layer->QueryFloatAttribute("rot", &seg->rot);
-			layer->QueryFloatAttribute("depth", &seg->depth);
+			if(o != NULL && cName != NULL)
+			{
+				string s = cName;
+				if(s == "ship")
+					ship = o;
+			}
 			
-			const char* cSegSz = layer->Attribute("size");
-			if(cSegSz != NULL)
-				seg->size = pointFromString(cSegSz);
-			
-			const char* cSegCol = layer->Attribute("col");
-			if(cSegCol != NULL)
-				seg->col = colorFromString(cSegCol);
-			
-			const char* cSegObj = layer->Attribute("obj");
-			if(cSegObj != NULL)
-				seg->obj3D = getObject(cSegObj);
-			
-			addScenery(seg);
+			addObject(o);
 		}
 	}
+	
 	//TODO: Load other things
 	
 	delete doc;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//Create test object thingy
+	
+	//Straight from the hello world example
+	// Define the ground body.
+	b2BodyDef groundBodyDef;
+	groundBodyDef.position.Set(0.0f, -10.0f);
+
+	// Call the body factory which allocates memory for the ground body
+	// from a pool and creates the ground box shape (also from a pool).
+	// The body is also added to the world.
+	b2Body* groundBody = getWorld()->CreateBody(&groundBodyDef);
+
+	// Define the ground box shape.
+	b2PolygonShape groundBox;
+
+	// The extents are the half-widths of the box.
+	groundBox.SetAsBox(50.0f, 10.0f);
+
+	// Add the ground fixture to the ground body.
+	groundBody->CreateFixture(&groundBox, 0.0f);
+	
+	physSegment* seg = new physSegment;
+	seg->body = groundBody;
+	seg->img = getImage("res/gfx/metalwall.png");
+	seg->size.x = 100.0;
+	seg->size.y = 20.0;
+	addScenery(seg);
+	
+	addObject(objFromXML("res/obj/test.xml", Point(0, 3)));
 }
 
 
