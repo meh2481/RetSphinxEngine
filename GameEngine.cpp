@@ -921,6 +921,9 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	return o;
 }
 
+#define MAX_SHIP_SPEED 8
+#define SHIP_ACCEL 50
+
 void GameEngine::handleKeys()
 {
 	float dt = 1.0/getFramerate();
@@ -940,13 +943,19 @@ void GameEngine::handleKeys()
 		Point v = ship->getBody()->GetLinearVelocity();
 		
 		if(keyDown(SDL_SCANCODE_I))
-			v.y += dt * 5;
+			v.y += dt * SHIP_ACCEL;
 		if(keyDown(SDL_SCANCODE_K))
-			v.y -= dt * 5;
+			v.y -= dt * SHIP_ACCEL;
 		if(keyDown(SDL_SCANCODE_J))
-			v.x -= dt * 5;
+			v.x -= dt * SHIP_ACCEL;
 		if(keyDown(SDL_SCANCODE_L))
-			v.x += dt * 5;
+			v.x += dt * SHIP_ACCEL;
+			
+		if(v.Length() > MAX_SHIP_SPEED)
+		{
+			v.Normalize();
+			v *= MAX_SHIP_SPEED;
+		}
 			
 		ship->getBody()->SetLinearVelocity(v);
 	}
@@ -1062,7 +1071,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(o != NULL && cName != NULL)
 			{
 				string s = cName;
-				cout << s << endl;
+				//cout << s << endl;
 				if(s == "ship")
 					ship = o;
 			}
