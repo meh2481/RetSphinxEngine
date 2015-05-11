@@ -921,8 +921,9 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	return o;
 }
 
-#define MAX_SHIP_SPEED 8
-#define SHIP_ACCEL 50
+#define MAX_SHIP_SPEED 10
+#define SHIP_ACCEL 70
+#define SHIP_SLOW_FAC 0.985;
 
 void GameEngine::handleKeys()
 {
@@ -941,20 +942,41 @@ void GameEngine::handleKeys()
 	{
 		//cout << "Vel" << endl;
 		Point v = ship->getBody()->GetLinearVelocity();
+		bool accel = false;
 		
 		if(keyDown(SDL_SCANCODE_I))
+		{
 			v.y += dt * SHIP_ACCEL;
+			accel = true;
+		}
 		if(keyDown(SDL_SCANCODE_K))
+		{
 			v.y -= dt * SHIP_ACCEL;
+			accel = true;
+		}
 		if(keyDown(SDL_SCANCODE_J))
+		{
 			v.x -= dt * SHIP_ACCEL;
+			accel = true;
+		}
 		if(keyDown(SDL_SCANCODE_L))
+		{
 			v.x += dt * SHIP_ACCEL;
+			accel = true;
+		}
 			
 		if(v.Length() > MAX_SHIP_SPEED)
 		{
 			v.Normalize();
 			v *= MAX_SHIP_SPEED;
+		}
+		
+		if(!accel)
+		{
+			float f = v.Length();
+			v.Normalize();
+			f *= SHIP_SLOW_FAC;
+			v *= f;
 		}
 			
 		ship->getBody()->SetLinearVelocity(v);
@@ -1071,9 +1093,24 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(o != NULL && cName != NULL)
 			{
 				string s = cName;
-				//cout << s << endl;
 				if(s == "ship")
+				{
 					ship = o;
+					//list<physSegment*>::iterator segiter = o->segments.begin();
+					//if(segiter != o->segments.end())
+					//{
+					//	physSegment* sg = *segiter;
+					//	if(sg->obj3D != NULL)
+					//	{
+							//sg->obj3D->shaded = false;
+							//sg->obj3D->useGlobalLight = false;
+							//sg->obj3D->lightPos[0] = 0.0f;
+							//sg->obj3D->lightPos[1] = 0.0f;
+							//sg->obj3D->lightPos[2] = 3.0f;
+							//sg->obj3D->lightPos[3] = 1.0f;
+					//	}
+					//}
+				}
 			}
 			
 			addObject(o);
@@ -1093,7 +1130,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	
 	
 	
-	
+	/*
 	//Create test object thingy
 	
 	//Straight from the hello world example
@@ -1123,6 +1160,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	addScenery(seg);
 	
 	addObject(objFromXML("res/obj/test.xml", Point(0, 3)));
+	*/
 }
 
 

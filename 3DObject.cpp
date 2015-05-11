@@ -11,11 +11,10 @@
 using namespace std;
 using namespace tiny3d;
 
-Object3D::Object3D(string sOBJFile) //, Image* sImg)
+Object3D::Object3D(string sOBJFile)
 {
-	//mImg = NULL;
+	//useGlobalLight = true;
     m_obj = 0;
-    //setTexture(sImg);
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
 		_fromOBJFile(sOBJFile);
@@ -30,7 +29,6 @@ Object3D::Object3D(string sOBJFile) //, Image* sImg)
 Object3D::Object3D()
 {
   m_obj = 0;
-  //mImg = NULL;
   _add3DObjReload(this);
   wireframe = false;
   shaded = true;
@@ -287,13 +285,15 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-//void Object3D::setTexture(Image* sImg)
-//{
-//	mImg = sImg;
-//}
-
 void Object3D::render(Image* img)
 {
+	//glRotatef(45, 1.0f, 0.0f, 0.0f);
+	//GLfloat saveLight[4];
+	//if(!useGlobalLight)
+	//{
+	//	glGetLightfv(GL_LIGHT0, GL_POSITION, saveLight);
+	//	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	//}
 	if(!shaded)
 		glDisable(GL_LIGHTING);
 	if(wireframe)
@@ -303,13 +303,14 @@ void Object3D::render(Image* img)
     glCallList(m_obj);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
+	//if(!useGlobalLight)
+	//	glLightfv(GL_LIGHT0, GL_POSITION, saveLight);
 	if(!shaded)
 		glEnable(GL_LIGHTING);
 }
 
 void Object3D::_reload()
 {
-  //fromOBJFile(m_sObjFilename);
   if(m_sObjFilename.find(".obj", m_sObjFilename.size()-4) != string::npos)
     _fromOBJFile(m_sObjFilename);
   else
