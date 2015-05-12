@@ -141,7 +141,7 @@ GameEngine::~GameEngine()
 
 const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
 
-float fSunRotAmt = 0;
+//float fSunRotAmt = 0;
 float fPlanetRotAmt = 0;
 
 void GameEngine::frame(float32 dt)
@@ -184,10 +184,10 @@ void GameEngine::draw()
 	
 	
 	//Rotate sun point around planet
-	glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
+	//glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
 	
 	//Set up OpenGL lights
-	GLfloat lightPosition[] = {50.0, 0.0, 0.0, 1.0};
+	GLfloat lightPosition[] = {0.0, 0.0, 0.0, 1.0};
 	GLfloat lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 	GLfloat lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
 	GLfloat lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -244,7 +244,8 @@ void GameEngine::draw()
 	drawAll();
 	drawDebug();
 	
-	glTranslatef(-CameraPos.x*2, -CameraPos.y*2, 0);		//translate back to put cursor in the right position
+	glLoadIdentity();
+	glTranslatef(-CameraPos.x, -CameraPos.y, CameraPos.z);		//translate back to put cursor in the right position
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	drawCursor();
 	
@@ -951,10 +952,10 @@ void GameEngine::handleKeys()
 	}
 
 	float dt = 1.0/getFramerate();
-	if(keyDown(SDL_SCANCODE_A))
-		fSunRotAmt -= dt * 50;
-	else if(keyDown(SDL_SCANCODE_D))
-		fSunRotAmt += dt * 50;
+	//if(keyDown(SDL_SCANCODE_A))
+	//	fSunRotAmt -= dt * 50;
+	//else if(keyDown(SDL_SCANCODE_D))
+	//	fSunRotAmt += dt * 50;
 		
 	if(keyDown(SDL_SCANCODE_LEFT))
 		fPlanetRotAmt -= dt * 100;
@@ -963,27 +964,26 @@ void GameEngine::handleKeys()
 	
 	if(ship != NULL && ship->getBody() != NULL)
 	{
-		//cout << "Vel" << endl;
 		Point v(0,0);
 		Point shipVel = ship->getBody()->GetLinearVelocity();
 		bool accel = false;
 		
-		if(keyDown(SDL_SCANCODE_I))
+		if(keyDown(KEY_UP1))
 		{
 			v.y += dt * ship_accel;
 			accel = true;
 		}
-		if(keyDown(SDL_SCANCODE_K))
+		if(keyDown(KEY_DOWN1))
 		{
 			v.y -= dt * ship_accel;
 			accel = true;
 		}
-		if(keyDown(SDL_SCANCODE_J))
+		if(keyDown(KEY_LEFT1))
 		{
 			v.x -= dt * ship_accel;
 			accel = true;
 		}
-		if(keyDown(SDL_SCANCODE_L))
+		if(keyDown(KEY_RIGHT1))
 		{
 			v.x += dt * ship_accel;
 			accel = true;
