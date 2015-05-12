@@ -13,7 +13,12 @@ using namespace tiny3d;
 
 Object3D::Object3D(string sOBJFile)
 {
-	//useGlobalLight = true;
+	useGlobalLight = true;
+	//rot[0] = 0.0f;
+	//rot[1] = 0.0f;
+	//rot[2] = 0.0f;
+	//rot[3] = 1.0f;
+	
     m_obj = 0;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
@@ -289,24 +294,25 @@ void Object3D::render(Image* img)
 {
 	//glRotatef(45, 1.0f, 0.0f, 0.0f);
 	//GLfloat saveLight[4];
-	//if(!useGlobalLight)
-	//{
-	//	glGetLightfv(GL_LIGHT0, GL_POSITION, saveLight);
-	//	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-	//}
-	if(!shaded)
-		glDisable(GL_LIGHTING);
+	if(!useGlobalLight)
+	{
+		glEnable(GL_LIGHT1);
+		glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
+	}
+	if(shaded)
+		glEnable(GL_LIGHTING);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(img != NULL)
 		glBindTexture(GL_TEXTURE_2D, img->_getTex());
+	//glRotatef(rot[0],rot[1],rot[2],rot[3]);
     glCallList(m_obj);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
-	//if(!useGlobalLight)
-	//	glLightfv(GL_LIGHT0, GL_POSITION, saveLight);
+	if(!useGlobalLight)
+		glDisable(GL_LIGHT1);
 	if(!shaded)
-		glEnable(GL_LIGHTING);
+		glDisable(GL_LIGHTING);
 }
 
 void Object3D::_reload()

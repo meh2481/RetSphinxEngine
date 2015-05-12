@@ -198,6 +198,9 @@ void GameEngine::draw()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
 	
 	
 	//Set up OpenGL materials
@@ -927,6 +930,14 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 
 void GameEngine::handleKeys()
 {
+	float max_ship_vel = MAX_SHIP_SPEED;
+	float ship_accel = SHIP_ACCEL;
+	if(keyDown(SDL_SCANCODE_SPACE))
+	{
+		max_ship_vel *= 2.0f;
+		ship_accel *= 2.0f;
+	}
+
 	float dt = 1.0/getFramerate();
 	if(keyDown(SDL_SCANCODE_A))
 		fSunRotAmt -= dt * 50;
@@ -941,34 +952,52 @@ void GameEngine::handleKeys()
 	if(ship != NULL && ship->getBody() != NULL)
 	{
 		//cout << "Vel" << endl;
-		Point v = ship->getBody()->GetLinearVelocity();
+		Point v(0,0);
+		Point shipVel = ship->getBody()->GetLinearVelocity();
 		bool accel = false;
 		
 		if(keyDown(SDL_SCANCODE_I))
 		{
-			v.y += dt * SHIP_ACCEL;
+			v.y += dt * ship_accel;
 			accel = true;
 		}
 		if(keyDown(SDL_SCANCODE_K))
 		{
-			v.y -= dt * SHIP_ACCEL;
+			v.y -= dt * ship_accel;
 			accel = true;
 		}
 		if(keyDown(SDL_SCANCODE_J))
 		{
-			v.x -= dt * SHIP_ACCEL;
+			v.x -= dt * ship_accel;
 			accel = true;
 		}
 		if(keyDown(SDL_SCANCODE_L))
 		{
-			v.x += dt * SHIP_ACCEL;
+			v.x += dt * ship_accel;
 			accel = true;
 		}
 			
-		if(v.Length() > MAX_SHIP_SPEED)
+		/*/TODO: Ship rotation calculations
+		list<physSegment*>::iterator segiter = ship->segments.begin();
+		if(segiter != ship->segments.end())
+		{
+			physSegment* sg = *segiter;
+			if(sg->obj3D != NULL)
+			{
+				float fAngleBetween = (getAngle(v) - getAngle(shipVel))*RAD2DEG;
+				sg->obj3D->rot[0] = max(min(fAngleBetween, 45.0f), -45.0f);
+				sg->obj3D->rot[1] = 1.0f;
+				sg->obj3D->rot[2] = 0.0f;
+				sg->obj3D->rot[3] = 0.0f;
+			}
+		}*/
+		
+		
+		v += shipVel;			
+		if(v.Length() > max_ship_vel)
 		{
 			v.Normalize();
-			v *= MAX_SHIP_SPEED;
+			v *= max_ship_vel;
 		}
 		
 		if(!accel)
@@ -1003,8 +1032,11 @@ void GameEngine::updateShip()
 			//cout << "not null 2" << endl;
 			Point p = b->GetPosition();
 			Point v = b->GetLinearVelocity();
-			float32 r = getAngle(v);
-			b->SetTransform(p, r);
+			if(v.x != 0.0f || v.y != 0.0f)	//Don't rotate if not moving (prevents snap on stop)
+			{
+				float32 r = getAngle(v);
+				b->SetTransform(p, r);
+			}
 			CameraPos.x = -p.x;
 			CameraPos.y = -p.y;
 		}
@@ -1096,20 +1128,20 @@ void GameEngine::loadScene(string sXMLFilename)
 				if(s == "ship")
 				{
 					ship = o;
-					//list<physSegment*>::iterator segiter = o->segments.begin();
-					//if(segiter != o->segments.end())
-					//{
-					//	physSegment* sg = *segiter;
-					//	if(sg->obj3D != NULL)
-					//	{
+					list<physSegment*>::iterator segiter = o->segments.begin();
+					if(segiter != o->segments.end())
+					{
+						physSegment* sg = *segiter;
+						if(sg->obj3D != NULL)
+						{
 							//sg->obj3D->shaded = false;
-							//sg->obj3D->useGlobalLight = false;
-							//sg->obj3D->lightPos[0] = 0.0f;
-							//sg->obj3D->lightPos[1] = 0.0f;
-							//sg->obj3D->lightPos[2] = 3.0f;
-							//sg->obj3D->lightPos[3] = 1.0f;
-					//	}
-					//}
+							sg->obj3D->useGlobalLight = false;
+							sg->obj3D->lightPos[0] = 0.0f;
+							sg->obj3D->lightPos[1] = 0.0f;
+							sg->obj3D->lightPos[2] = 3.0f;
+							sg->obj3D->lightPos[3] = 1.0f;
+						}
+					}
 				}
 			}
 			
