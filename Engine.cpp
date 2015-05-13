@@ -953,17 +953,20 @@ void Engine::updateSceneryLayer(physSegment* seg)
 
 void Engine::drawAll()
 {
-	multiset<physSegment*>::iterator layer;
-	for(layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw bg layers
-	{
-		if((*layer)->depth > 0)
-			break;
-		(*layer)->draw();
-	}
+	multimap<float, Drawable*> drawList;
+
+	for(multiset<physSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)	//Draw bg layers
+		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
+		
 	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Draw objects
-		(*i)->draw();
-	for(; layer != m_lScenery.end(); layer++)	//Draw fg layers
-		(*layer)->draw();
+		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
+		
+	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
+		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
+		
+	//Draw everything in one pass
+	for(multimap<float, Drawable*>::iterator i = drawList.begin(); i != drawList.end(); i++)
+		i->second->draw();
 }
 
 void Engine::drawBg()

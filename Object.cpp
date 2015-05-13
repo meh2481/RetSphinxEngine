@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------
 // obj class
 //----------------------------------------------------------------------------------------------------
-obj::obj()
+obj::obj() : Drawable()
 {
   usr = NULL;
   body = NULL;
@@ -142,7 +142,7 @@ b2Body* obj::getBody()
 //----------------------------------------------------------------------------------------------------
 // physSegment class
 //----------------------------------------------------------------------------------------------------
-physSegment::physSegment()
+physSegment::physSegment() : Drawable()
 {
     body = NULL;
     img = NULL;
@@ -154,7 +154,7 @@ physSegment::physSegment()
 	pos.SetZero();
 	center.SetZero();
 	//shear.SetZero();
-	rot = depth = 0.0f;
+	rot = 0.0f;
 	size.x = size.y = tile.x = tile.y = 1.0f;
 	show = true;
 }

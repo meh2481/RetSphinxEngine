@@ -1,3 +1,6 @@
+#ifndef GRADIENT_H
+#define GRADIENT_H
+
 #include "globaldefs.h"
 #include <map>
 
@@ -21,3 +24,4 @@ public:
 	
 };
 
+#endif

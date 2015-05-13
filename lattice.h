@@ -1,3 +1,6 @@
+#ifndef LATTICE_H
+#define LATTICE_H
+
 #include "globaldefs.h"
 
 #define NUMLATTICEPOINTS(x)		x*12
@@ -120,3 +123,5 @@ public:
 	
 	void addBody(b2Body* b, bool bCenter = false);
 };
+
+#endif

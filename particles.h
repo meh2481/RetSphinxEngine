@@ -8,6 +8,7 @@
 
 #include "globaldefs.h"
 #include "Image.h"
+#include "Drawable.h"
 
 #ifndef PARTICLES_H
 #define PARICLES_H
@@ -21,7 +22,7 @@ typedef enum
 	SUBTRACTIVE,
 } particleBlendType;
 
-class ParticleSystem
+class ParticleSystem : public Drawable
 {
 protected:
 	//Arrays of particle fields (structure-of-array format rather than array-of structure for speed)

@@ -9,6 +9,7 @@
 #include "globaldefs.h"
 #include "Image.h"
 #include "3DObject.h"
+#include "Drawable.h"
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -20,7 +21,7 @@ class anim;
 class frame;
 
 //Physical segments of objects - be they actual physics bodies or just images
-class physSegment
+class physSegment : public Drawable
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
@@ -35,7 +36,6 @@ public:
 	Point shear;	//Shear for drawing the image
 	Point tile;		//tile image in x and y
 	float32 rot;
-	float32 depth;	//Z-position
 	Point size;	//Actual texel size; not pixels
 	Color col;
 	bool show;
@@ -73,7 +73,7 @@ public:
 };
 
 //Collections of the above all stuffed into one object for ease of use.
-class obj
+class obj : public Drawable
 {
 	objframe* curFrame;
 public:

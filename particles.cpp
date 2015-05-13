@@ -5,7 +5,7 @@
 
 #include "particles.h"
 
-ParticleSystem::ParticleSystem()
+ParticleSystem::ParticleSystem() : Drawable()
 {
 	m_imgRect = NULL;
 	m_pos = NULL;

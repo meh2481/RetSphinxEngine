@@ -28,6 +28,9 @@
  * Replacing the "float" type with "double" can actually make this run faster
  * on some platforms. A templatized version of SimplexNoise1234 could be useful.
  */
+ 
+ #ifndef SIMPLEXNOISE1234_H
+ #define SIMPLEXNOISE1234_H
 
 class SimplexNoise1234 {
 
@@ -57,3 +60,5 @@ class SimplexNoise1234 {
     static float  grad( int hash, float x, float y, float z, float t );
 
 };
+
+#endif
