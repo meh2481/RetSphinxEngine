@@ -21,3 +21,4 @@ gmon.out
 *.mtl
 Planet.cpp
 Planet.h
+res/*

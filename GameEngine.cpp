@@ -160,6 +160,8 @@ void GameEngine::frame(float32 dt)
 	
 }
 
+#define CAMERA_ANGLE_RAD 1.152572
+
 void GameEngine::draw()
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
@@ -236,7 +238,8 @@ void GameEngine::draw()
 			Point p = b->GetPosition();
 			CameraPos.x = -p.x;
 			CameraPos.y = -p.y;
-			gluLookAt(p.x, p.y-8, -CameraPos.z+2, p.x, p.y, 0.0f, 0, 0, 1);
+			gluLookAt(p.x, p.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, p.x, p.y, 0.0f, 0, 0, 1);
+			//gluLookAt(p.x, p.y-8, -CameraPos.z+2, p.x, p.y, 0.0f, 0, 0, 1);
 		}
 	}
 	
@@ -245,7 +248,7 @@ void GameEngine::draw()
 	drawDebug();
 	
 	glLoadIdentity();
-	glTranslatef(-CameraPos.x, -CameraPos.y, CameraPos.z);		//translate back to put cursor in the right position
+	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	drawCursor();
 	
@@ -358,15 +361,15 @@ void GameEngine::handleEvent(SDL_Event event)
 		break;
 			
 		case SDL_MOUSEWHEEL:
-			/*if(event.wheel.y > 0)
+			if(event.wheel.y > 0)
 			{
-				CameraPos.z = min(CameraPos.z + 1.5, -5.0);
+				CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
 			}
 			else
 			{
-				CameraPos.z = max(CameraPos.z - 1.5, -3000.0);
+				CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
 			}
-			cameraBounds();*/
+			//cameraBounds();
 			break;
 
 		case SDL_MOUSEBUTTONUP:
