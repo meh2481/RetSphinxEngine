@@ -50,7 +50,7 @@ Object3D::~Object3D()
 void Object3D::_fromOBJFile(string sFilename)
 {
     m_sObjFilename = sFilename;
-    errlog << "Loading 3D object: " << sFilename << endl;
+    errlog << "Loading 3D object " << sFilename << endl;
     vector<Vertex> vVerts;
     vector<Vertex> vNormals;
     vector<UV> vUVs;
@@ -196,6 +196,7 @@ void Object3D::_fromOBJFile(string sFilename)
 //TODO: On *nix systems, I ought to be able to mmap() to load even faster
 void Object3D::_fromTiny3DFile(string sFilename)
 {
+	errlog << "Loading 3D object " << sFilename << endl;
 	FILE* fp = fopen(sFilename.c_str(), "rb");
 	if(fp == NULL)
 	{

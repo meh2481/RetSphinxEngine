@@ -250,6 +250,7 @@ void ParticleSystem::_initValues()
 
 void ParticleSystem::update(float32 dt)
 {
+	//cout << "Update particles " << dt << " " << firing << " " << startedFiring << endl;
 	if(!show) return;
 	curTime += dt;
 	if(startedFiring)
@@ -268,6 +269,7 @@ void ParticleSystem::update(float32 dt)
 	emitFrom.offset(emissionVel.x * dt, emissionVel.y * dt);	//Move our emission point as needed
 	
 	spawnCounter += dt * rate * g_fParticleFac;
+	//cout << "Spawn: " << spawnCounter << endl;
 	int iSpawnAmt = floor(spawnCounter);
 	spawnCounter -= iSpawnAmt;
 	for(int i = 0; i < iSpawnAmt; i++)
@@ -334,6 +336,7 @@ void ParticleSystem::update(float32 dt)
 
 void ParticleSystem::draw()
 {
+	//cout << "Draw particles " << m_num << endl;
 	if(img == NULL) return;
 	if(!show) return;
 	
@@ -373,7 +376,7 @@ void ParticleSystem::draw()
 		drawsz.y = (m_sizeEnd[i].y - m_sizeStart[i].y) * fLifeFac + m_sizeStart[i].y;
 		glPushMatrix();
 		glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);
-		glTranslatef(m_pos[i].x, m_pos[i].y, 0);
+		glTranslatef(m_pos[i].x, m_pos[i].y, depth);
 		if(!velRotate)
 		{
 			glRotatef(m_rot[i], m_rotAxis[i].x, m_rotAxis[i].y, m_rotAxis[i].z);
@@ -421,6 +424,7 @@ void ParticleSystem::init()
 
 void ParticleSystem::fromXML(string sXMLFilename)
 {
+	errlog << "Loading particle system " << sXMLFilename << endl;
 	_initValues();
 	
 	XMLDocument* doc = new XMLDocument();
@@ -451,6 +455,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 	
 	root->QueryBoolAttribute("fireonstart", &firing);
 	root->QueryBoolAttribute("changecolor", &changeColor);
+	root->QueryFloatAttribute("depth", &depth);
 	
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)

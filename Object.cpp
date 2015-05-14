@@ -44,7 +44,7 @@ void obj::draw()
 			glPushMatrix();
 			Point objpos = body->GetWorldCenter();
 			float32 objrot = body->GetAngle();
-			glTranslatef(objpos.x, objpos.y, 0.0f);
+			glTranslatef(objpos.x, objpos.y, depth);
 			glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 			//Flip on X axis if we should
 			if(curFrame != NULL && body != NULL && curFrame->velflip)
@@ -70,7 +70,7 @@ void obj::draw()
 				Point pos = seg->body->GetPosition();
 				//float32 fAngle = seg->body->GetAngle();
 				glPushMatrix();
-				glTranslatef(pos.x, pos.y, 0);
+				glTranslatef(pos.x, pos.y, depth);
 				if(meshLattice)
 					meshImg->renderLattice(meshLattice, meshSize);
 				else

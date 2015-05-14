@@ -78,6 +78,7 @@ private:
 	//Object3D* testObj;
 	//physSegment* m_sun;
 	obj* ship;
+	ParticleSystem* shipTrail;
 
 protected:
 	void frame(float32 dt);

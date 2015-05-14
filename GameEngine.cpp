@@ -78,6 +78,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	m_joy = NULL;
 	m_rumble = NULL;
 	ship = NULL;
+	shipTrail = NULL;
 	
 	//Keybinding stuff!
 	JOY_AXIS_HORIZ = 0;
@@ -125,7 +126,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	JOY_AXIS2_VERT = 4;
 	JOY_AXIS_LT = 2;
 #endif
-	
+	g_fParticleFac = 1.0f;
 }
 
 GameEngine::~GameEngine()
@@ -148,7 +149,8 @@ void GameEngine::frame(float32 dt)
 {
 	handleKeys();
 	stepPhysics(dt);
-	updateParticles(dt);
+	//for(int i = 0; i < 5; i++)
+		updateParticles(dt);
 	updateObjects(dt);
 	updateShip();
 	//m_lAnimTest->update(dt);
@@ -172,7 +174,7 @@ void GameEngine::draw()
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	
-	drawParticles();	//Draw engine particles here
+	//drawParticles();	//Draw engine particles here
 	
 	//Set mouse cursor to proper location
 	for(map<string, myCursor*>::iterator i = m_mCursors.begin(); i != m_mCursors.end(); i++)
@@ -252,6 +254,9 @@ void GameEngine::draw()
 	m_Cursor->pos = worldPosFromCursor(getCursorPos());
 	drawCursor();
 	
+	glTranslatef(0, 0, m_fDefCameraZ);
+	//drawParticles();
+	
 }
 
 void GameEngine::init(list<commandlineArg> sArgs)
@@ -267,23 +272,6 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	//getWorld()->SetGravity(b2Vec2(0,-9.8));
 	getWorld()->SetGravity(b2Vec2(0,0));
 	
-	//m_lTest = new lattice(20,20);
-	//m_lAnimTest = new sinLatticeAnim(m_lTest);
-	//m_lAnimTest->amp = 0.05;
-	/*m_lAnimTest->distvar = 0.0075;
-	m_lAnimTest->speed = 1.3;
-	m_lAnimTest->hfac = 1.3;
-	m_lAnimTest->vfac = 0.3;
-	//m_lAnimTest->anglevar = PI;*/
-	//m_lAnimTest->init();
-	//Image* im = new Image();
-	
-	//testObj = getObject("res/3d/dome.tiny3d");//, getImage("res/3d/uvtest.png"));
-	
-	//m_sun = new physSegment();
-	//m_sun->img = getImage("res/3d/sun.png");
-	//m_sun->size.x = m_sun->size.y = 20;
-	//addScenery(m_sun);
 	loadScene("res/3d/solarsystem.scene.xml");
 }
 
@@ -480,12 +468,12 @@ void GameEngine::handleEvent(SDL_Event event)
 
 void GameEngine::pause()
 {
-	//pauseMusic();
+	pauseMusic();
 }
 
 void GameEngine::resume()
 {
-	//resumeMusic();
+	resumeMusic();
 }
 
 Rect GameEngine::getCameraView()
@@ -860,13 +848,6 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 		if(layer != NULL)
 		{
 			seg->fromXML(layer);
-			/*const char* cImgPath = image->Attribute("img");
-			if(cImgPath)
-				seg->img = getImage(cImgPath);
-				
-			const char* cImgSize = image->Attribute("size");
-			if(cImgSize)
-				seg->size = pointFromString(cImgSize);*/
 		}
 		o->addSegment(seg);
 	}
@@ -1054,6 +1035,12 @@ void GameEngine::updateShip()
 			}
 			CameraPos.x = -p.x;
 			CameraPos.y = -p.y;
+			
+			if(shipTrail != NULL)
+			{
+				shipTrail->emitFrom.centerOn(p);
+				//shipTrail->emitFrom.offset(0,1);
+			}
 		}
 	}
 }
@@ -1085,7 +1072,9 @@ void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
 void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
+	cleanupParticles();
 	ship = NULL;
+	shipTrail = NULL;
 	errlog << "Loading scene " << sXMLFilename << endl;
 	
 	XMLDocument* doc = new XMLDocument;
@@ -1161,6 +1150,25 @@ void GameEngine::loadScene(string sXMLFilename)
 			}
 			
 			addObject(o);
+		}
+	}
+	
+	//Load particles
+	for(XMLElement* particles = root->FirstChildElement("particles"); particles != NULL; particles = particles->NextSiblingElement("particles"))
+	{
+		const char* cFilename = particles->Attribute("file");
+		const char* cName = particles->Attribute("name");
+		if(cFilename != NULL)
+		{
+			ParticleSystem* pSys = new ParticleSystem();
+			pSys->fromXML(cFilename);
+			addParticles(pSys);
+			if(cName != NULL)
+			{
+				string s = cName;
+				if(s == "shiptrail")
+					shipTrail = pSys;
+			}
 		}
 	}
 	
