@@ -1,4 +1,5 @@
 - Scene editor / XML exporter
 - Images should be able to save to file?
-- Noise-generated image handler?
 - Do something to make more nebula-looking noise
+- Fix ship trails
+- Controller support -- vector-based movement

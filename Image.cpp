@@ -11,6 +11,7 @@ bool g_imageBlur = true;
 
 Image::Image(string sFilename)
 {
+	m_bReloadEachTime = false;
 	m_hTex = 0;
 	m_sFilename = sFilename;
 	if(sFilename.find(".xml", sFilename.size()-4) != string::npos)
@@ -139,6 +140,7 @@ void Image::_load(string sFilename)
 
 void Image::_loadNoise(string sXMLFilename)
 {
+	m_bReloadEachTime = true;
 	XMLDocument* doc = new XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
@@ -429,16 +431,17 @@ void _removeImgReload(Image* img)
 	sg_images.erase(img);
 }
 
-static map<string, Image*> g_mImages;  //Image handler
+static multimap<string, Image*> g_mImages;  //Image handler
 Image* getImage(string sFilename)
 {
 	if(sFilename == "image_none") return NULL;
 	
-	map<string, Image*>::iterator i = g_mImages.find(sFilename);
-	if(i == g_mImages.end())   //This image isn't here; load it
+	multimap<string, Image*>::iterator i = g_mImages.find(sFilename);
+	if(i == g_mImages.end() || i->second->reloadEachTime())   //This image isn't here; load it
 	{
 		Image* img = new Image(sFilename);   //Create this image
-		g_mImages[sFilename] = img; //Add to the map
+		//g_mImages[sFilename] = img; //Add to the map
+		g_mImages.insert(std::pair<string, Image*>(sFilename,img));
 		return img;
 	}
 	return i->second; //Return this image
@@ -446,7 +449,7 @@ Image* getImage(string sFilename)
 
 void clearImages()
 {
-	for(map<string, Image*>::iterator i = g_mImages.begin(); i != g_mImages.end(); i++)
+	for(multimap<string, Image*>::iterator i = g_mImages.begin(); i != g_mImages.end(); i++)
 		delete (i->second);    //Delete each image
 	g_mImages.clear();
 }

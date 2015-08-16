@@ -17,6 +17,8 @@ private:
 	string     	m_sFilename;
 	uint32_t 	m_iWidth, m_iHeight;			// width and height of original image
 	
+	bool m_bReloadEachTime;						// If we should reload the image each time we try to create it
+	
 #ifdef BIG_ENDIAN
 	uint32_t m_iRealWidth, m_iRealHeight;
 #endif
@@ -40,6 +42,7 @@ public:
 	uint32_t getWidth()     {return m_iWidth;};
 	uint32_t getHeight()    {return m_iHeight;};
 	string getFilename()    {return m_sFilename;};
+	bool reloadEachTime()	{return m_bReloadEachTime;};
 	
 	//Drawing methods for texel-based coordinates
 	void render(Point size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
