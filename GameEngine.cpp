@@ -162,7 +162,7 @@ void GameEngine::frame(float32 dt)
 	
 }
 
-#define CAMERA_ANGLE_RAD 1.152572
+#define CAMERA_ANGLE_RAD PI/2.0//1.152572
 
 void GameEngine::draw()
 {
@@ -921,8 +921,8 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	return o;
 }
 
-#define MAX_SHIP_SPEED 10
-#define SHIP_ACCEL 70
+#define MAX_SHIP_SPEED 10.0
+#define SHIP_ACCEL 70.0
 #define SHIP_SLOW_FAC 0.985;
 
 void GameEngine::handleKeys()
@@ -931,8 +931,8 @@ void GameEngine::handleKeys()
 	float ship_accel = SHIP_ACCEL;
 	if(keyDown(SDL_SCANCODE_SPACE))
 	{
-		max_ship_vel *= 2.0f;
-		ship_accel *= 2.0f;
+		max_ship_vel *= 2.25f;
+		ship_accel *= 2.1f;
 	}
 
 	float dt = 1.0/getFramerate();
@@ -1039,6 +1039,9 @@ void GameEngine::updateShip()
 			if(shipTrail != NULL)
 			{
 				shipTrail->emitFrom.centerOn(p);
+				shipTrail->emitFrom.offset(-v.x*1.0f/getFramerate()/4.0f, -v.y*1.0f/getFramerate()/4.0f);
+				shipTrail->emissionVel = v;
+				shipTrail->curRate = min((v.Length()*v.Length()*v.Length()) / (MAX_SHIP_SPEED*MAX_SHIP_SPEED*MAX_SHIP_SPEED), 2.0);
 				//shipTrail->emitFrom.offset(0,1);
 			}
 		}

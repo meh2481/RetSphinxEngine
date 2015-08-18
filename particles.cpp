@@ -30,6 +30,7 @@ ParticleSystem::ParticleSystem() : Drawable()
 	
 	curTime = 0;
 	spawnCounter = 0;
+	curRate = 1.0f;
 }
 
 ParticleSystem::~ParticleSystem()
@@ -235,6 +236,7 @@ void ParticleSystem::_initValues()
 	img = NULL;
 	max = 100;
 	rate = 25;
+	curRate = 1.0f;
 	emitFrom = Rect(0,0,0,0);
 	blend = ADDITIVE;
 	emissionAngle = 0;
@@ -266,14 +268,17 @@ void ParticleSystem::update(float32 dt)
 	else if(firing)
 		startedFiring = curTime;
 	
-	emitFrom.offset(emissionVel.x * dt, emissionVel.y * dt);	//Move our emission point as needed
-	
-	spawnCounter += dt * rate * g_fParticleFac;
+	spawnCounter += dt * rate * curRate * g_fParticleFac;
 	//cout << "Spawn: " << spawnCounter << endl;
 	int iSpawnAmt = floor(spawnCounter);
 	spawnCounter -= iSpawnAmt;
+	if(!iSpawnAmt)
+		emitFrom.offset(emissionVel.x * dt, emissionVel.y * dt);	//Move our emission point as needed
 	for(int i = 0; i < iSpawnAmt; i++)
+	{
+		emitFrom.offset(emissionVel.x * ((float32)1.0f/(float32)iSpawnAmt) * dt, emissionVel.y * ((float32)1.0f/(float32)iSpawnAmt) * dt);	//Move our emission point for each particle
 		_newParticle();
+	}
 	
 	//Update particle fields (In separate for loops to cut down on cache thrashing)
 	Point* ptPos = m_pos;

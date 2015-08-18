@@ -96,6 +96,7 @@ public:
 	vector<Rect>		imgRect;			//Possible positions in this image to use for each particle
 	uint32_t 			max;				//Max # of particles
 	float32 			rate;				//How many particles to emit per second
+	float32				curRate;			//[0,1.0] Factor for how many particles we spawn per second
 	Rect 				emitFrom;			//Where particles are created
 	particleBlendType 	blend;				//Blend type for how particles are drawn
 	float32 			emissionAngle;		//Angle particles are emitted at (degrees)
