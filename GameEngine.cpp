@@ -445,6 +445,9 @@ void GameEngine::handleEvent(SDL_Event event)
 #ifdef DEBUG_INPUT
 			cout << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button << endl;
 #endif
+			if(event.jbutton.button == JOY_BUTTON_BACK)
+				quit();
+				
 			break;
 			
 		case SDL_JOYBUTTONUP:
@@ -1152,7 +1155,11 @@ void GameEngine::loadScene(string sXMLFilename)
 			{
 				string s = cName;
 				if(s == "shiptrail")
+				{
 					shipTrail = pSys;
+					pSys->curRate = 0;
+					pSys->firing = true;
+				}
 			}
 		}
 	}

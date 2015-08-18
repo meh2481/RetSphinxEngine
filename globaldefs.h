@@ -62,7 +62,7 @@ extern SDL_Scancode KEY_RIGHT1;
 extern SDL_Scancode KEY_RIGHT2;
 extern SDL_Scancode KEY_ENTER1;
 extern SDL_Scancode KEY_ENTER2;
-#define JOY_MINMOVE_TRIP	3000
+#define JOY_MINMOVE_TRIP	6500
 #define MOUSE_MOVE_TRIP_AMT	20
 
 

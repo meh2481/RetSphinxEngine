@@ -1,3 +1,2 @@
 - Scene editor / XML exporter
 - Images should be able to save to file?
-- Fix small spurt of particles when ship first spawns
