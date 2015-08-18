@@ -19,31 +19,6 @@
 
 #define DEFAULT_TIMESCALE	1.0
 
-//const variables
-#define BOARD_WIDTH	4
-#define BOARD_HEIGHT 4
-
-#define TILE_WIDTH 2.0
-#define TILE_HEIGHT 2.0
-#define TILE_SPACING 0.25
-
-#define GAMEOVER_KEY_DELAY 0.5
-#define GAMEOVER_FREEZE_CAM_TIME	0.7f
-
-#define MAX_TILE_VALUE	4096	//Above this, the game would crash, so cap it here
-#define WIN_TILE_VALUE	2048
-
-#define INTRO_FADEIN_TIME		2.0	//How long the intro fadein takes
-#define INTRO_SIT_THERE_TIME	5.0	//How long we wait for user input before giving up and going to the main menu
-#define INTRO_FADEOUT_TIME		0.5
-#define SONGSEL_FADEIN_TIME		0.5
-
-#define BORED_VOX_TIME		300.0	//5mins until bored sfx
-#define TITLE_DISPLAY_TIME	5.0f
-#define TITLE_FADE_TIME		1.0f
-#define DEV_SCORE			24680
-#define LOW_SCORE			120
-
 class ColorPhase
 {
 public:
@@ -79,6 +54,7 @@ private:
 	//physSegment* m_sun;
 	obj* ship;
 	ParticleSystem* shipTrail;
+	Point shipMoveVec;
 
 protected:
 	void frame(float32 dt);

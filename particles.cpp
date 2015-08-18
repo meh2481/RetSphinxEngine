@@ -100,84 +100,86 @@ void ParticleSystem::_newParticle()
 	if(m_num == m_totalAmt) return;	//Don't create more particles than we can!
 	if(!firing) return;
 	
+	const uint32_t num = m_num;
+	
 	if(!imgRect.size())
 	{
 		if(img != NULL)
-			m_imgRect[m_num] = Rect(0,0,img->getWidth(),img->getHeight());
+			m_imgRect[num] = Rect(0,0,img->getWidth(),img->getHeight());
 		else
-			m_imgRect[m_num] = Rect(0,0,0,0);
+			m_imgRect[num] = Rect(0,0,0,0);
 	}
 	else
-		m_imgRect[m_num] = imgRect[randInt(0, imgRect.size()-1)];
-	m_pos[m_num] = Point(randFloat(emitFrom.left, emitFrom.right),
+		m_imgRect[num] = imgRect[randInt(0, imgRect.size()-1)];
+	m_pos[num] = Point(randFloat(emitFrom.left, emitFrom.right),
 						 randFloat(emitFrom.top, emitFrom.bottom));
 	float32 sizediff = randFloat(-sizeVar,sizeVar);
-	m_sizeStart[m_num].x = sizeStart.x + sizediff;
-	m_sizeStart[m_num].y = sizeStart.y + sizediff;
-	m_sizeEnd[m_num].x = sizeEnd.x + sizediff;
-	m_sizeEnd[m_num].y = sizeEnd.y + sizediff;
+	m_sizeStart[num].x = sizeStart.x + sizediff;
+	m_sizeStart[num].y = sizeStart.y + sizediff;
+	m_sizeEnd[num].x = sizeEnd.x + sizediff;
+	m_sizeEnd[num].y = sizeEnd.y + sizediff;
 	float32 angle = emissionAngle + randFloat(-emissionAngleVar,emissionAngleVar);
 	float32 amt = speed + randFloat(-speedVar,speedVar);
-	m_vel[m_num].x = amt*cos(DEG2RAD*angle);
-	m_vel[m_num].y = amt*sin(DEG2RAD*angle);
-	m_accel[m_num].x = accel.x + randFloat(-accelVar.x,accelVar.x);
-	m_accel[m_num].y = accel.y + randFloat(-accelVar.y,accelVar.y);
-	m_rot[m_num] = rotStart + randFloat(-rotStartVar,rotStartVar);
-	m_rotVel[m_num] = rotVel + randFloat(-rotVelVar,rotVelVar);
-	m_rotAccel[m_num] = rotAccel + randFloat(-rotAccelVar,rotAccelVar);
-	m_colStart[m_num].r = colStart.r + randFloat(-colVar.r,colVar.r);
-	if(m_colStart[m_num].r > 1)
-		m_colStart[m_num].r = 1;
-	if(m_colStart[m_num].r < 0)
-		m_colStart[m_num].r = 0;
-	m_colStart[m_num].g = colStart.g + randFloat(-colVar.g,colVar.g);
-	if(m_colStart[m_num].g > 1)
-		m_colStart[m_num].g = 1;
-	if(m_colStart[m_num].g < 0)
-		m_colStart[m_num].g = 0;
-	m_colStart[m_num].b = colStart.b + randFloat(-colVar.b,colVar.b);
-	if(m_colStart[m_num].b > 1)
-		m_colStart[m_num].b = 1;
-	if(m_colStart[m_num].b < 0)
-		m_colStart[m_num].b = 0;
-	m_colStart[m_num].a = colStart.a + randFloat(-colVar.a,colVar.a);
-	if(m_colStart[m_num].a > 1)
-		m_colStart[m_num].a = 1;
-	if(m_colStart[m_num].a < 0)
-		m_colStart[m_num].a = 0;
-	m_colEnd[m_num].r = colEnd.r + randFloat(-colVar.r,colVar.r);
-	if(m_colEnd[m_num].r > 1)
-		m_colEnd[m_num].r = 1;
-	if(m_colEnd[m_num].r < 0)
-		m_colEnd[m_num].r = 0;
-	m_colEnd[m_num].g = colEnd.g + randFloat(-colVar.g,colVar.g);
-	if(m_colEnd[m_num].g > 1)
-		m_colEnd[m_num].g = 1;
-	if(m_colEnd[m_num].g < 0)
-		m_colEnd[m_num].g = 0;
-	m_colEnd[m_num].b = colEnd.b + randFloat(-colVar.b,colVar.b);
-	if(m_colEnd[m_num].b > 1)
-		m_colEnd[m_num].b = 1;
-	if(m_colEnd[m_num].b < 0)
-		m_colEnd[m_num].b = 0;
-	m_colEnd[m_num].a = colEnd.a + randFloat(-colVar.a,colVar.a);
-	if(m_colEnd[m_num].a > 1)
-		m_colEnd[m_num].a = 1;
-	if(m_colEnd[m_num].a < 0)
-		m_colEnd[m_num].a = 0;
-	m_tangentialAccel[m_num] = tangentialAccel + randFloat(-tangentialAccelVar,tangentialAccelVar);
-	m_normalAccel[m_num] = normalAccel + randFloat(-normalAccelVar,normalAccelVar);
-	m_lifetime[m_num] = lifetime + randFloat(-lifetimeVar,lifetimeVar);
-	m_created[m_num] = curTime;
-	m_lifePreFade[m_num] = lifetimePreFade + randFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
-	m_rotAxis[m_num].x = rotAxis.x + randFloat(-rotAxisVar.x,rotAxisVar.x);
-	m_rotAxis[m_num].y = rotAxis.y + randFloat(-rotAxisVar.y,rotAxisVar.y);
-	m_rotAxis[m_num].z = rotAxis.z + randFloat(-rotAxisVar.z,rotAxisVar.z);
+	m_vel[num].x = amt*cos(DEG2RAD*angle);
+	m_vel[num].y = amt*sin(DEG2RAD*angle);
+	m_accel[num].x = accel.x + randFloat(-accelVar.x,accelVar.x);
+	m_accel[num].y = accel.y + randFloat(-accelVar.y,accelVar.y);
+	m_rot[num] = rotStart + randFloat(-rotStartVar,rotStartVar);
+	m_rotVel[num] = rotVel + randFloat(-rotVelVar,rotVelVar);
+	m_rotAccel[num] = rotAccel + randFloat(-rotAccelVar,rotAccelVar);
+	m_colStart[num].r = colStart.r + randFloat(-colVar.r,colVar.r);
+	if(m_colStart[num].r > 1)
+		m_colStart[num].r = 1;
+	if(m_colStart[num].r < 0)
+		m_colStart[num].r = 0;
+	m_colStart[num].g = colStart.g + randFloat(-colVar.g,colVar.g);
+	if(m_colStart[num].g > 1)
+		m_colStart[num].g = 1;
+	if(m_colStart[num].g < 0)
+		m_colStart[num].g = 0;
+	m_colStart[num].b = colStart.b + randFloat(-colVar.b,colVar.b);
+	if(m_colStart[num].b > 1)
+		m_colStart[num].b = 1;
+	if(m_colStart[num].b < 0)
+		m_colStart[num].b = 0;
+	m_colStart[num].a = colStart.a + randFloat(-colVar.a,colVar.a);
+	if(m_colStart[num].a > 1)
+		m_colStart[num].a = 1;
+	if(m_colStart[num].a < 0)
+		m_colStart[num].a = 0;
+	m_colEnd[num].r = colEnd.r + randFloat(-colVar.r,colVar.r);
+	if(m_colEnd[num].r > 1)
+		m_colEnd[num].r = 1;
+	if(m_colEnd[num].r < 0)
+		m_colEnd[num].r = 0;
+	m_colEnd[num].g = colEnd.g + randFloat(-colVar.g,colVar.g);
+	if(m_colEnd[num].g > 1)
+		m_colEnd[num].g = 1;
+	if(m_colEnd[num].g < 0)
+		m_colEnd[num].g = 0;
+	m_colEnd[num].b = colEnd.b + randFloat(-colVar.b,colVar.b);
+	if(m_colEnd[num].b > 1)
+		m_colEnd[num].b = 1;
+	if(m_colEnd[num].b < 0)
+		m_colEnd[num].b = 0;
+	m_colEnd[num].a = colEnd.a + randFloat(-colVar.a,colVar.a);
+	if(m_colEnd[num].a > 1)
+		m_colEnd[num].a = 1;
+	if(m_colEnd[num].a < 0)
+		m_colEnd[num].a = 0;
+	m_tangentialAccel[num] = tangentialAccel + randFloat(-tangentialAccelVar,tangentialAccelVar);
+	m_normalAccel[num] = normalAccel + randFloat(-normalAccelVar,normalAccelVar);
+	m_lifetime[num] = lifetime + randFloat(-lifetimeVar,lifetimeVar);
+	m_created[num] = curTime;
+	m_lifePreFade[num] = lifetimePreFade + randFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
+	m_rotAxis[num].x = rotAxis.x + randFloat(-rotAxisVar.x,rotAxisVar.x);
+	m_rotAxis[num].y = rotAxis.y + randFloat(-rotAxisVar.y,rotAxisVar.y);
+	m_rotAxis[num].z = rotAxis.z + randFloat(-rotAxisVar.z,rotAxisVar.z);
 	
 	m_num++;
 }
 
-void ParticleSystem::_rmParticle(uint32_t idx)
+void ParticleSystem::_rmParticle(const uint32_t idx)
 {
 	if(particleDeathSpawn && spawnOnDeath.size())
 		spawnNewParticleSystem(spawnOnDeath[randInt(0, spawnOnDeath.size()-1)], m_pos[idx]);

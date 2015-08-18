@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <ctime>
 
+//#define DEBUG_INPUT
+
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
 float32 g_fParticleFac;
@@ -79,6 +81,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	m_rumble = NULL;
 	ship = NULL;
 	shipTrail = NULL;
+	shipMoveVec.SetZero();
 	
 	//Keybinding stuff!
 	JOY_AXIS_HORIZ = 0;
@@ -99,7 +102,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	//Apparently our Xbox drivers for different OS's can't agree on which buttons are which
 #ifdef _WIN32
 	JOY_BUTTON_BACK = 5;
-	JOY_BUTTON_START = 4;	//TODO
+	JOY_BUTTON_START = 4;
 	JOY_BUTTON_X = 12;
 	JOY_BUTTON_Y = 13;
 	JOY_BUTTON_A = 10;
@@ -160,6 +163,7 @@ void GameEngine::frame(float32 dt)
 	//m_sun->depth = -sin(DEG2RAD*fSunRotAmt) * 50;
 	//updateSceneryLayer(m_sun);
 	
+	shipMoveVec.SetZero();	//Reset this for movement next frame
 }
 
 #define CAMERA_ANGLE_RAD PI/2.0//1.152572
@@ -922,112 +926,90 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 }
 
 #define MAX_SHIP_SPEED 10.0
-#define SHIP_ACCEL 70.0
-#define SHIP_SLOW_FAC 0.985;
+#define SHIP_ACCEL 140.0
+#define SHIP_SLOW_FAC 0.985
 
 void GameEngine::handleKeys()
 {
+	//Keyboard movement
+	if(keyDown(KEY_UP1))
+		shipMoveVec.y += 1.0f;
+	if(keyDown(KEY_DOWN1))
+		shipMoveVec.y -= 1.0f;
+	if(keyDown(KEY_LEFT1))
+		shipMoveVec.x -= 1.0f;
+	if(keyDown(KEY_RIGHT1))
+		shipMoveVec.x += 1.0f;
+		
+	//Joystick movement
+	Sint16 axisVal = SDL_JoystickGetAxis(m_joy, JOY_AXIS_HORIZ);	//Horizontal movement
+	if(abs(axisVal) > JOY_MINMOVE_TRIP)
+	{
+		if(axisVal > 0)
+			shipMoveVec.x = (float32)(axisVal - JOY_MINMOVE_TRIP)/(float32)(JOY_AXIS_MAX - JOY_MINMOVE_TRIP);
+		else
+			shipMoveVec.x = -(float32)(axisVal + JOY_MINMOVE_TRIP)/(float32)(JOY_AXIS_MIN + JOY_MINMOVE_TRIP);
+	}
+	
+	axisVal = SDL_JoystickGetAxis(m_joy, JOY_AXIS_VERT);	//Vertical movement
+	if(abs(axisVal) > JOY_MINMOVE_TRIP)
+	{
+		if(axisVal > 0)
+			shipMoveVec.y = -(float32)(axisVal - JOY_MINMOVE_TRIP)/(float32)(JOY_AXIS_MAX - JOY_MINMOVE_TRIP);
+		else
+			shipMoveVec.y = (float32)(axisVal + JOY_MINMOVE_TRIP)/(float32)(JOY_AXIS_MIN + JOY_MINMOVE_TRIP);
+	}
+}
+
+void GameEngine::updateShip()
+{
+	//Update ship velocity based on current input
 	float max_ship_vel = MAX_SHIP_SPEED;
 	float ship_accel = SHIP_ACCEL;
-	if(keyDown(SDL_SCANCODE_SPACE))
+	if(keyDown(SDL_SCANCODE_SPACE) || SDL_JoystickGetButton(m_joy, JOY_BUTTON_B))	//Thrust button
 	{
 		max_ship_vel *= 2.25f;
 		ship_accel *= 2.1f;
 	}
 
 	float dt = 1.0/getFramerate();
-	//if(keyDown(SDL_SCANCODE_A))
-	//	fSunRotAmt -= dt * 50;
-	//else if(keyDown(SDL_SCANCODE_D))
-	//	fSunRotAmt += dt * 50;
-		
-	if(keyDown(SDL_SCANCODE_LEFT))
-		fPlanetRotAmt -= dt * 100;
-	else if(keyDown(SDL_SCANCODE_RIGHT))
-		fPlanetRotAmt += dt * 100;
 	
-	if(ship != NULL && ship->getBody() != NULL)
-	{
-		Point v(0,0);
-		Point shipVel = ship->getBody()->GetLinearVelocity();
-		bool accel = false;
-		
-		if(keyDown(KEY_UP1))
-		{
-			v.y += dt * ship_accel;
-			accel = true;
-		}
-		if(keyDown(KEY_DOWN1))
-		{
-			v.y -= dt * ship_accel;
-			accel = true;
-		}
-		if(keyDown(KEY_LEFT1))
-		{
-			v.x -= dt * ship_accel;
-			accel = true;
-		}
-		if(keyDown(KEY_RIGHT1))
-		{
-			v.x += dt * ship_accel;
-			accel = true;
-		}
-			
-		/*/TODO: Ship rotation calculations
-		list<physSegment*>::iterator segiter = ship->segments.begin();
-		if(segiter != ship->segments.end())
-		{
-			physSegment* sg = *segiter;
-			if(sg->obj3D != NULL)
-			{
-				float fAngleBetween = (getAngle(v) - getAngle(shipVel))*RAD2DEG;
-				sg->obj3D->rot[0] = max(min(fAngleBetween, 45.0f), -45.0f);
-				sg->obj3D->rot[1] = 1.0f;
-				sg->obj3D->rot[2] = 0.0f;
-				sg->obj3D->rot[3] = 0.0f;
-			}
-		}*/
-		
-		
-		v += shipVel;			
-		if(v.Length() > max_ship_vel)
-		{
-			v.Normalize();
-			v *= max_ship_vel;
-		}
-		
-		if(!accel)
-		{
-			float f = v.Length();
-			v.Normalize();
-			f *= SHIP_SLOW_FAC;
-			v *= f;
-		}
-			
-		ship->getBody()->SetLinearVelocity(v);
-	}
-	//TODO: Control camera with this
-	/*if(keyDown(SDL_SCANCODE_I))
-		CameraPos.y -= dt * 5;
-	else if(keyDown(SDL_SCANCODE_K))
-		CameraPos.y += dt * 5;
-	if(keyDown(SDL_SCANCODE_J))
-		CameraPos.x += dt * 5;
-	else if(keyDown(SDL_SCANCODE_L))
-		CameraPos.x -= dt * 5;*/
-}
-
-void GameEngine::updateShip()
-{
+	if(shipMoveVec.Length() > 1.0f)
+		shipMoveVec.Normalize();
+	
 	if(ship != NULL)
 	{
-		//cout << "Not null" << endl;
 		b2Body* b = ship->getBody();
 		if(b != NULL)
 		{
-			//cout << "not null 2" << endl;
-			Point p = b->GetPosition();
+			//Accelerate ship
+			Point none(0,0);
 			Point v = b->GetLinearVelocity();
+			if(shipMoveVec.LengthSquared())
+			{
+				//Ship accelerating
+				none.x += dt * ship_accel * shipMoveVec.x;
+				none.y += dt * ship_accel * shipMoveVec.y;
+			}
+			none += v;
+			if(none.Length() > max_ship_vel)
+			{
+				none.Normalize();
+				none *= max_ship_vel;
+			}
+			if(!shipMoveVec.LengthSquared())
+			{
+				//Ship not accelerating
+				float f = none.Length();
+				none.Normalize();
+				f *= SHIP_SLOW_FAC;
+				none *= f;
+			}
+			b->SetLinearVelocity(none);
+			v = none;
+			
+		
+			Point p = b->GetPosition();
 			if(v.x != 0.0f || v.y != 0.0f)	//Don't rotate if not moving (prevents snap on stop)
 			{
 				float32 r = getAngle(v);
@@ -1039,10 +1021,10 @@ void GameEngine::updateShip()
 			if(shipTrail != NULL)
 			{
 				shipTrail->emitFrom.centerOn(p);
-				shipTrail->emitFrom.offset(-v.x*1.0f/getFramerate()/4.0f, -v.y*1.0f/getFramerate()/4.0f);
+				shipTrail->emitFrom.offset(-v.x*1.0f/getFramerate()/4.0f, -v.y*1.0f/getFramerate()/4.0f);	//Trail behind the ship just a bit
+				
 				shipTrail->emissionVel = v;
-				shipTrail->curRate = min((v.Length()*v.Length()*v.Length()) / (MAX_SHIP_SPEED*MAX_SHIP_SPEED*MAX_SHIP_SPEED), 2.0);
-				//shipTrail->emitFrom.offset(0,1);
+				shipTrail->curRate = min((v.Length()*v.Length()*v.Length()) / (MAX_SHIP_SPEED*MAX_SHIP_SPEED*MAX_SHIP_SPEED), 2.0);	//Exponentially decay as ship slows
 			}
 		}
 	}

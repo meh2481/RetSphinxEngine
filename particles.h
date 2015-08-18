@@ -48,7 +48,7 @@ protected:
 	uint32_t m_totalAmt;			//max times particle factor (i.e. true total max)
 	void _deleteAll();				//Delete all memory associated with particles
 	void _newParticle();			//Create a new particle
-	void _rmParticle(uint32_t idx);	//Delete an expired particle (i.e. copy particle at end of the list to where this one was)
+	void _rmParticle(const uint32_t idx);	//Delete an expired particle (i.e. copy particle at end of the list to where this one was)
 	void _initValues();				//Initialize particle system variables
 	
 	float32 curTime;
