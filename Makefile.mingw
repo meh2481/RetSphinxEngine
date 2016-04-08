@@ -1,28 +1,32 @@
-objects := Image.o engine/Engine.o Object.o Text.o globaldefs.o hud.o main.o engine/tinyxml2.o GameEngine.o opengl-api.o color.o bg.o particles.o luafuncs.o luainterface.o cursor.o arc.o DebugDraw.o lattice.o 3DObject.o mtrand.o simplexnoise1234.o Gradient.o
-libs := -L./lib/Win32/ -L./dep/lua/ -lglu32 -lBox2D -static-libgcc -static-libstdc++ ./lib/Win32/FreeImage.lib -lmingw32 -lSDL2main -lSDL2.dll -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lshell32 -lversion -lvideoInputLib -lddraw -lstrmiids -llua -lz -lfmodex -lole32 -luuid -loleaut32
-HEADER := -I./ -I./include/ -I./include/windows/ -I./dep/lua/ -I./engine/ -I./../
+ENGINE_OBJECTS := objs/Image.o objs/Engine.o objs/Object.o objs/Text.o objs/globaldefs.o objs/hud.o objs/main.o objs/tinyxml2.o objs/opengl-api.o objs/bg.o objs/particles.o objs/luainterface.o objs/cursor.o objs/arc.o objs/DebugDraw.o objs/lattice.o objs/3DObject.o objs/mtrand.o objs/simplexnoise1234.o objs/Gradient.o
+GAME_OBJECTS := objs/GameEngine.o objs/luafuncs.o objs/color.o
+LIBS := -lglu32 -lBox2D -static-libgcc -static-libstdc++ ./lib/Win32/FreeImage.lib -lmingw32 -lSDL2main -lSDL2.dll -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lshell32 -lversion -lvideoInputLib -lddraw -lstrmiids -llua -lz -lfmodex -lole32 -luuid -loleaut32
+INCLUDE := -I./ -I./include/ -I./include/windows/ -I./dep/lua/ -I./engine/include/
+LIBFOLDER := -L./lib/Win32/ -L./dep/lua/
+CFLAGS += -DUSE_VIDEOINPUT -Wno-conversion-null
 
 
 ifeq ($(BUILD),release)  
 # "Release" build - optimization, and no debug symbols
-	CFLAGS += -O2 -Os -s -DNDEBUG -mwindows -DUSE_VIDEOINPUT -Wno-conversion-null
+	CFLAGS += -O2 -Os -s -DNDEBUG -mwindows
 else
 # "Debug" build - no optimization, and debugging symbols
-	CFLAGS += -g -ggdb -DDEBUG -DUSE_VIDEOINPUT -Wno-conversion-null
+	CFLAGS += -g -ggdb -DDEBUG
 endif
 
 all: GameEngine
 
-GameEngine: $(objects) GameEngine.res
-	g++ $(CFLAGS) -o $@ $^ $(libs) 
+GameEngine: $(ENGINE_OBJECTS) $(GAME_OBJECTS) GameEngine.res
+	g++ $(CFLAGS) -o $@ $^ $(LIBS) $(LIBFOLDER)
 
-%.o: %.cpp
-	g++ $(CFLAGS) -c -MMD -o $@ $< $(HEADER)
+objs/%.o: %.cpp
+	g++ $(CFLAGS) -c -o $@ $< $(INCLUDE)
+	
+objs/%.o: engine/%.cpp
+	g++ $(CFLAGS) -c -o $@ $< $(INCLUDE)
 
 %.res: %.rc
 	windres $< -O coff -o $@
 
--include $(objects:.o=.d)
-
 clean:
-	rm -f *.o *.d GameEngine.exe
+	rm -f objs/*.o GameEngine.exe

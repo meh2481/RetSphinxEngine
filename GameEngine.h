@@ -32,7 +32,7 @@ public:
 
 class GameEngine : public Engine
 {
-	friend class PonyLua;
+	friend class GameEngineLua;
 private:
 	//Important general-purpose game variables
 	Vec3 CameraPos;

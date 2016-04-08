@@ -4,12 +4,12 @@
 */
 
 #include "hud.h"
-#include "GameEngine.h"
+//#include "GameEngine.h"
 #include <sstream>
 
 extern int screenDrawWidth;
 extern int screenDrawHeight;
-extern GameEngine* g_pGlobalEngine;
+//extern GameEngine* g_pGlobalEngine;
 
 //-------------------------------------------------------------------------------------
 // HUDItem class functions
@@ -356,7 +356,7 @@ bool HUDMenu::event(SDL_Event event)
 			
 		case SDL_MOUSEMOTION:
 		{
-			Point ptMousePos = g_pGlobalEngine->worldPosFromCursor(Point(event.motion.x, event.motion.y));
+			Point ptMousePos(0,0);//g_pGlobalEngine->worldPosFromCursor(Point(event.motion.x, event.motion.y));	//TODO: Engine should not depend on GameEngine!!!
 			float32 fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
 			float32 fCurY = m_ptPos.y + fTotalY/2.0f;
 			for(list<menuItem>::iterator i = m_menu.begin(); i != m_menu.end(); i++)

@@ -6,7 +6,7 @@ extern GameEngine* g_pGlobalEngine;
 
 //Class for interfacing between GameEngine and Lua
 //(defined here instead of inside header because of weird cross-inclusion stuff)
-class PonyLua
+class GameEngineLua
 {
 public:
 	static void rumble(float32 fAmt, float32 len)
@@ -19,7 +19,7 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 {
 	float32 force = lua_tonumber(L, 1);
 	float32 sec = lua_tonumber(L, 2);
-	PonyLua::rumble(force, sec);
+	GameEngineLua::rumble(force, sec);
 }
 
 
