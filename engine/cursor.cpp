@@ -4,6 +4,7 @@
 */
 #include "cursor.h"
 
+//TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
 myCursor::myCursor()
 {
 	_init();

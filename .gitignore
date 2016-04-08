@@ -1,5 +1,6 @@
 *.d
 *.o
+*.res
 *.exe
 _downloaded/*
 _gfxbase/*

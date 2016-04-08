@@ -31,8 +31,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_physicsWorld->SetDebugDraw(&m_debugDraw);
 	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
 #ifdef DEBUG
+	errlog << "Debug build" << endl;
 	m_bDebugDraw = true;
 #else
+	errlog << "Release build" << endl;
 	m_bDebugDraw = false;
 #endif
 	m_iWidth = iWidth;
@@ -450,6 +452,7 @@ void Engine::setFramerate(float32 fFramerate)
 	m_fTargetTime = 1.0 / m_fFramerate;
 }
 
+//TODO: Split graphics subsystem into its own class?
 void Engine::setup_sdl()
 {
 
@@ -624,6 +627,7 @@ void Engine::setMSAA(int iMSAA)
 	}
 }
 
+//TODO: This needs to be extracted into its own function for loading an SDL_Surface from an image
 void Engine::_loadicon()	//Load icon into SDL window
 {
 	errlog << "Load icon " << m_sIcon << endl;
@@ -769,7 +773,7 @@ void Engine::toggleFullscreen()
 {
 	m_bFullscreen = !m_bFullscreen;
 	if(m_bFullscreen)
-		SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);	//TODO: Does this work?
 	else
 		SDL_SetWindowFullscreen(m_Window, 0);
 }
@@ -778,7 +782,7 @@ void Engine::setFullscreen(bool bFullscreen)
 {
 	if(m_bFullscreen == bFullscreen) 
 		return;
-	toggleFullscreen();
+	toggleFullscreen();	//TODO: WHY DO WE HAVE TWO FUNCTIONS FOR THIS?
 }
 
 Point Engine::getWindowPos()
@@ -791,6 +795,7 @@ Point Engine::getWindowPos()
 	return p;
 }
 
+//TODO: If we used to be fullscreen, and now we're not, we don't want to be in the upper-left corner. We probably don't want to do this altogether.
 void Engine::setWindowPos(Point pos)
 {
 	SDL_SetWindowPosition(m_Window, pos.x, pos.y);
@@ -803,7 +808,8 @@ void Engine::maximizeWindow()
 
 bool Engine::isMaximized()
 {
-#ifdef _WIN32	//Apparently SDL_GetWindowFlags() is completely broken in SDL2 for determining maximization, and nobody seems to care: https://bugzilla.libsdl.org/show_bug.cgi?id=2282
+#ifdef _WIN32	//Apparently SDL_GetWindowFlags() is completely broken in SDL2 for determining maximization. See: https://bugzilla.libsdl.org/show_bug.cgi?id=2282
+				//TODO: This bug has been marked as fixed in SDL 2.0.4, test and see if it is!
 	SDL_SysWMinfo info;
  
 	//Get window handle from SDL
@@ -816,16 +822,16 @@ bool Engine::isMaximized()
 	
 	return IsZoomed(info.info.win.window);
 #else
-	return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);	//TODO: This is borked in Linux, also. Fix or wait for SDL patch
+	return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);	//TODO: Test in Mac/Linux
 #endif
 }
 
 void Engine::setCursorPos(int32_t x, int32_t y)
 {
-	SDL_WarpMouseInWindow(m_Window, x, y);
-//#ifdef __APPLE__
-//	hideCursor(); //TODO: Warping the mouse shows it again in Mac, and this doesn't work. Hermph.
-//#endif
+		SDL_WarpMouseInWindow(m_Window, x, y);
+	//#ifdef __APPLE__
+	//	hideCursor(); //TODO: Warping the mouse shows it again in Mac, and this doesn't work. Debug.
+	//#endif
 }
 
 bool Engine::getCursorDown(int iButtonCode)
@@ -840,7 +846,7 @@ bool Engine::getCursorDown(int iButtonCode)
 		case MMB:
 			return(ms & SDL_BUTTON(SDL_BUTTON_MIDDLE));
 		default:
-			errlog << "Unsupported mouse code: " << iButtonCode << endl;
+			//errlog << "Unsupported mouse code: " << iButtonCode << endl;	//meh
 			break;
 	}
 	return false;
@@ -880,6 +886,7 @@ void Engine::addObject(obj* o)
 		m_lObjects.push_back(o);
 }
 
+//TODO: Where is this even used
 void Engine::updateSceneryLayer(physSegment* seg)
 {
 	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)
@@ -895,15 +902,15 @@ void Engine::updateSceneryLayer(physSegment* seg)
 
 void Engine::drawAll()
 {
-	multimap<float, Drawable*> drawList;
+	multimap<float, Drawable*> drawList;	//Depth matters, and some Drawables will be at different depths, so draw all in one pass
 
-	for(multiset<physSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)	//Draw bg layers
+	for(multiset<physSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)	//Add bg layers
 		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
 		
-	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Draw objects
+	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
 		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
 		
-	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
+	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)	//Add particles
 		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
 		
 	//Draw everything in one pass
@@ -911,6 +918,7 @@ void Engine::drawAll()
 		i->second->draw();
 }
 
+//TODO: Why do we have these separate if we have drawAll() already? Doesn't that make these incorrect because of z-ordering?
 void Engine::drawBg()
 {
 	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw bg layers
