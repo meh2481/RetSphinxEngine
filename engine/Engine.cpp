@@ -12,181 +12,6 @@
 #include "opengl-api.h"
 ofstream errlog;
 
-void PrintEvent(const SDL_Event * event)
-{
-	if (event->type == SDL_WINDOWEVENT) {
-		switch (event->window.event) {
-		case SDL_WINDOWEVENT_SHOWN:
-			printf("Window %d shown\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_HIDDEN:
-			printf("Window %d hidden\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_EXPOSED:
-			printf("Window %d exposed\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_MOVED:
-			printf("Window %d moved to %d,%d\n",
-					event->window.windowID, event->window.data1,
-					event->window.data2);
-			break;
-		case SDL_WINDOWEVENT_RESIZED:
-			printf("Window %d resized to %dx%d\n",
-					event->window.windowID, event->window.data1,
-					event->window.data2);
-			break;
-		case SDL_WINDOWEVENT_MINIMIZED:
-			printf("Window %d minimized\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_MAXIMIZED:
-			printf("Window %d maximized\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_RESTORED:
-			printf("Window %d restored\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_ENTER:
-			printf("Mouse entered window %d\n",
-					event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_LEAVE:
-			printf("Mouse left window %d\n", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_FOCUS_GAINED:
-			printf("Window %d gained keyboard focus\n",
-					event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_FOCUS_LOST:
-			printf("Window %d lost keyboard focus\n",
-					event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_CLOSE:
-			printf("Window %d closed\n", event->window.windowID);
-			break;
-		default:
-			printf("Window %d got unknown event %d\n",
-					event->window.windowID, event->window.event);
-			break;
-		}
-	}
-}
-
-bool Engine::_frame()
-{
-	updateSound();
-	
-	//Handle input events from SDL
-	SDL_Event event;
-	while(SDL_PollEvent(&event))
-	{
-		//PrintEvent(&event);
-		//Update internal cursor position if cursor has moved
-		if(event.type == SDL_MOUSEMOTION)
-		{
-			m_ptCursorPos.x = event.motion.x;
-			m_ptCursorPos.y = event.motion.y;
-		}
-		else if(event.type == SDL_WINDOWEVENT)
-		{
-			if(event.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
-			{
-				m_bPaused = true;
-				pause();
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
-			{
-				m_bPaused = false;
-				resume();
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				if(m_bResizable)
-					changeScreenResolution(event.window.data1, event.window.data2);
-				else
-					errlog << "Error! Resize event generated, but resizable flag not set." << endl;
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_ENTER)
-				m_bCursorOutOfWindow = false;
-			else if(event.window.event == SDL_WINDOWEVENT_LEAVE)
-				m_bCursorOutOfWindow = true;
-		}
-		else if(event.type == SDL_QUIT)
-			return true;
-			
-		//Let final game engine handle it, whatever the case
-		if(!m_bPaused)
-			handleEvent(event);
-	}
-	if(m_bPaused)
-	{
-		SDL_Delay(100);	//Wait 100 ms
-		return m_bQuitting;	//Break out here
-	}
-
-	float32 fCurTime = ((float32)SDL_GetTicks())/1000.0;
-	if(m_fAccumulatedTime <= fCurTime)
-	{
-		m_fAccumulatedTime += m_fTargetTime;
-		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
-		frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
-		_render();
-	}
-
-	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
-		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
-	return m_bQuitting;
-}
-
-void Engine::_render()
-{
-	// Begin rendering by clearing the screen
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	// Game-specific drawing
-	draw();
-	
-	//Draw gamma/brightness overlay on top of everything else
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	Color fillCol;
-	if(m_fGamma > 1.0f)
-	{
-		glBlendFunc(GL_DST_COLOR, GL_ONE);
-		fillCol.set(m_fGamma - 1.0, m_fGamma - 1.0, m_fGamma - 1.0, 1);
-	}
-	else
-	{
-		glBlendFunc( GL_ZERO, GL_SRC_COLOR );
-		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1);
-	}
-	fillScreen(fillCol);
-	
-	//Reset blend func
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	//End rendering and update the screen
-	SDL_GL_SwapWindow(m_Window);
-}
-
-void Engine::drawDebug()
-{
-	// Draw physics debug stuff
-	if(m_bDebugDraw)
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		m_physicsWorld->DrawDebugData();
-		glColor4f(1,1,1,1);
-	}
-}
-
-void Engine::drawCursor()
-{
-	//Draw cursor over everything
-	glClear(GL_DEPTH_BUFFER_BIT);
-	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
-		m_cursor->draw();
-}
-
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
 	//Create save folder
@@ -295,6 +120,123 @@ void Engine::start()
 	while(!_frame());
 }
 
+bool Engine::_frame()
+{
+	updateSound();
+	
+	//Handle input events from SDL
+	SDL_Event event;
+	while(SDL_PollEvent(&event))
+	{
+		//Update internal cursor position if cursor has moved
+		if(event.type == SDL_MOUSEMOTION)
+		{
+			m_ptCursorPos.x = event.motion.x;
+			m_ptCursorPos.y = event.motion.y;
+		}
+		else if(event.type == SDL_WINDOWEVENT)
+		{
+			if(event.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
+			{
+				m_bPaused = true;
+				pause();
+			}
+			else if(event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
+			{
+				m_bPaused = false;
+				resume();
+			}
+			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				if(m_bResizable)
+					changeScreenResolution(event.window.data1, event.window.data2);
+				else
+					errlog << "Error! Resize event generated, but resizable flag not set." << endl;
+			}
+			else if(event.window.event == SDL_WINDOWEVENT_ENTER)
+				m_bCursorOutOfWindow = false;
+			else if(event.window.event == SDL_WINDOWEVENT_LEAVE)
+				m_bCursorOutOfWindow = true;
+		}
+		else if(event.type == SDL_QUIT)
+			return true;
+			
+		//Let final game engine handle it, whatever the case
+		if(!m_bPaused)
+			handleEvent(event);
+	}
+	if(m_bPaused)
+	{
+		SDL_Delay(100);	//Wait 100 ms
+		return m_bQuitting;	//Break out here
+	}
+
+	float32 fCurTime = ((float32)SDL_GetTicks())/1000.0;
+	if(m_fAccumulatedTime <= fCurTime)
+	{
+		m_fAccumulatedTime += m_fTargetTime;
+		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
+		frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+		_render();
+	}
+
+	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
+		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
+	return m_bQuitting;
+}
+
+void Engine::_render()
+{
+	// Begin rendering by clearing the screen
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// Game-specific drawing
+	draw();
+	
+	//Draw gamma/brightness overlay on top of everything else
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	Color fillCol;
+	if(m_fGamma > 1.0f)
+	{
+		glBlendFunc(GL_DST_COLOR, GL_ONE);
+		fillCol.set(m_fGamma - 1.0, m_fGamma - 1.0, m_fGamma - 1.0, 1);
+	}
+	else
+	{
+		glBlendFunc( GL_ZERO, GL_SRC_COLOR );
+		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1);
+	}
+	fillScreen(fillCol);
+	
+	//Reset blend func
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	//End rendering and update the screen
+	SDL_GL_SwapWindow(m_Window);
+}
+
+void Engine::drawDebug()
+{
+	// Draw physics debug stuff
+	if(m_bDebugDraw)
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		m_physicsWorld->DrawDebugData();
+		glColor4f(1,1,1,1);
+	}
+}
+
+void Engine::drawCursor()
+{
+	//Draw cursor over everything
+	glClear(GL_DEPTH_BUFFER_BIT);
+	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
+		m_cursor->draw();
+}
+
+//TODO: Somewhere else. This isn't engine-specific
 void Engine::fillRect(Point p1, Point p2, Color col)
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -308,6 +250,7 @@ void Engine::fillRect(Point p1, Point p2, Color col)
 	glEnd();
 }
 
+//TODO: Somewhere else. This isn't engine-specific
 void Engine::fillScreen(Color col)
 {
 	//Fill whole screen with rect (Example taken from http://yuhasapoint.blogspot.com/2012/07/draw-quad-that-fills-entire-opengl.html on 11/20/13)

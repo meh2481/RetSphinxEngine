@@ -197,7 +197,7 @@ public:
 	void setFramerate(float32 fFramerate);
 	float32 getFramerate()   {return m_fFramerate;};
 	
-	//Object functions
+	//Object management functions
 	void addObject(obj* o);
 	void addScenery(physSegment* seg) 	{m_lScenery.insert(seg);};
 	void updateSceneryLayer(physSegment* seg);
