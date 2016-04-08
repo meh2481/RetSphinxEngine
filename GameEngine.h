@@ -35,7 +35,6 @@ class GameEngine : public Engine
 	friend class PonyLua;
 private:
 	//Important general-purpose game variables
-	ttvfs::VFSHelper vfs;
 	Vec3 CameraPos;
 	HUD* m_hud;
 	bool m_bMouseGrabOnWindowRegain;

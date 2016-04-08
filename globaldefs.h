@@ -13,8 +13,6 @@ using namespace std;
 #include "Box2D.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
-#include "include/VFS.h"
-#include "include/VFSTools.h"
 #ifdef USE_SDL_FRAMEWORK
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -30,6 +28,13 @@ using namespace tinyxml2;
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+
+#include <list>
+#include <map>
+#include <vector>
+#include <iostream>
+#include <set>
+using namespace std;
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768

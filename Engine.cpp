@@ -191,7 +191,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 {
 	//Create save folder
 	string sFileLoc = getSaveLocation() + "/screenshots/";
-	ttvfs::CreateDirRec(sFileLoc.c_str());
 	
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
@@ -1020,10 +1019,15 @@ void Engine::updateObjects(float32 dt)
 	}
 }
 
-string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir
+string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir?
 {
-	string s = ttvfs::GetAppDir(m_sAppName.c_str());
-	s += "/";
+	char* cPath = SDL_GetPrefPath(m_sAppName.c_str(), m_sAppName.c_str());	//TODO: company name & etc
+	string s;
+	if(cPath)
+		s = cPath;
+	else
+		s = "./";	//TODO: Err or such
+	SDL_free(cPath);
 	return s;
 }
 

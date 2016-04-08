@@ -59,7 +59,6 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string 
 Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 {
 	g_pGlobalEngine = this;
-	vfs.Prepare();
 	
 	//Set camera position for this game
 	m_fDefCameraZ = -16;

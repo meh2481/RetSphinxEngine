@@ -14,8 +14,6 @@
 #include "particles.h"
 #include "cursor.h"
 #include <fmod.h>
-#include <map>
-#include <set>
 
 #define LMB	1
 #define RMB	0
