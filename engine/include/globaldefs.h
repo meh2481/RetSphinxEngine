@@ -9,6 +9,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <list>
+#include <map>
+#include <vector>
+#include <iostream>
+#include <set>
 using namespace std;
 #include "Box2D.h"
 #include "tinyxml2.h"
@@ -28,13 +33,7 @@ using namespace tinyxml2;
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-
-#include <list>
-#include <map>
-#include <vector>
-#include <iostream>
-#include <set>
-using namespace std;
+extern ofstream errlog;	//Defined in Engine.cpp
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768
@@ -145,9 +144,8 @@ public:
 	
 };
 
-extern ofstream errlog;
-
-//Helper functions
+//Global Helper functions
+//TODO: Make into class or package or something
 Vec3 crossProduct(Vec3 vec1, Vec3 vec2);	//Cross product of two vectors
 float32 dotProduct(Vec3 vec1, Vec3 vec2);   //Dot product of two vectors
 Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float32 fAngleDeg);	//Rotate one vector around another

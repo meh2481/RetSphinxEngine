@@ -25,7 +25,8 @@ lattice.o \
 3DObject.o \
 mtrand.o \
 simplexnoise1234.o \
-Gradient.o
+Gradient.o \
+EngineContactListener.o
 
 GAME_OBJECTS := \
 GameEngine.o \

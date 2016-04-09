@@ -715,6 +715,7 @@ void GameEngine::saveConfig(string sFilename)
 	delete doc;
 }
 
+//TODO: This should be engine-specific, not game-specific
 obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 {
 	errlog << "Parsing object XML file " << sXMLFilename << endl;
@@ -845,6 +846,7 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 				
 				b2Body* bod = getWorld()->CreateBody(&bodyDef);
 				seg->body = bod;
+				bod->SetUserData((void*)seg);	//Store user data, so when collisions occur we know what segments are colliding
 				
 				mBodyNames[sBodyName] = bod;
 				bod->CreateFixture(&fixtureDef);

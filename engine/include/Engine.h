@@ -13,6 +13,7 @@
 #include "hud.h"
 #include "particles.h"
 #include "cursor.h"
+#include "EngineContactListener.h"
 #include <fmod.h>
 
 #define LMB	1
@@ -36,6 +37,7 @@ public:
 };
 
 //Debug draw class for drawing Box2D stuff -- defined in DebugDraw.cpp
+//TODO: Define in DebugDraw.h, not here.
 class DebugDraw : public b2Draw
 {
 public:
@@ -61,6 +63,7 @@ private:
 	SDL_Window* m_Window;
 	list<commandlineArg> lCommandLine;
 	b2World* m_physicsWorld;
+	EngineContactListener m_clContactListener;
 	DebugDraw m_debugDraw;
 	bool m_bDebugDraw;
 	Point m_ptCursorPos;
