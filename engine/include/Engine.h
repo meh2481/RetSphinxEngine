@@ -15,6 +15,12 @@
 #include "cursor.h"
 #include "EngineContactListener.h"
 #include <fmod.h>
+#ifdef USE_SDL_FRAMEWORK
+#include <SDL_syswm.h>
+#else
+#include <SDL2/SDL_syswm.h>
+#endif
+#include "opengl-api.h"
 
 #define LMB	1
 #define RMB	0
@@ -136,7 +142,7 @@ public:
 	void drawDebug();
 	void drawCursor();
 	
-	//Window functions
+	//Window functions - engine_window.cpp
 	void changeScreenResolution(float32 w, float32 h);  //Change resolution mid-game and reload OpenGL textures as needed
 	void toggleFullscreen();							//Switch between fullscreen/windowed modes
 	void setFullscreen(bool bFullscreen);				//Set fullscreen to true or false as needed
@@ -151,7 +157,7 @@ public:
 	uint16_t getWidth() {return m_iWidth;};
 	uint16_t getHeight() {return m_iHeight;};
 	
-	//Sound functions
+	//Sound functions - engine_sound.cpp
 	void createSound(string sPath, string sName);   //Creates a sound from this name and file path
 	virtual void playSound(string sName, float32 volume = 1.0f, float32 pan = 0.0f, float32 pitch = 1.0f);	 //Play a sound
 	FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
@@ -200,7 +206,7 @@ public:
 	void setFramerate(float32 fFramerate);
 	float32 getFramerate()   {return m_fFramerate;};
 	
-	//Object management functions
+	//Object management functions - engine_obj.cpp
 	void addObject(obj* o);
 	void addScenery(physSegment* seg) 	{m_lScenery.insert(seg);};
 	void updateSceneryLayer(physSegment* seg);
@@ -223,7 +229,7 @@ public:
 	void setGamma(float32 fGamma)	{m_fGamma = fGamma;};
 	float32 getGamma()				{return m_fGamma;};
 	
-	//Particle functions
+	//Particle functions - engine_particle.cpp
 	void addParticles(ParticleSystem* sys)	{if(sys)m_particles.push_back(sys);};
 	void cleanupParticles();
 	void drawParticles();

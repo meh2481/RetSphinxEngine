@@ -59,9 +59,11 @@ protected:
 	void frame(float32 dt);
 	void draw();
 	void init(list<commandlineArg> sArgs);
-	void handleEvent(SDL_Event event);
 	void pause();
 	void resume();
+	
+	//Defined in GameEngine_events.cpp
+	void handleEvent(SDL_Event event);
 
 public:
 	//GameEngine.cpp functions - fairly generic 
@@ -77,19 +79,19 @@ public:
 	Point worldPosFromCursor(Point cursorpos);	//Get the worldspace position of the given mouse cursor position
 	Point worldMovement(Point cursormove);		//Get the worldspace transform of the given mouse transformation
 	
-	//Functions dealing with program defaults
+	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
 	bool loadConfig(string sFilename);
 	void saveConfig(string sFilename);
+	obj* objFromXML(string sXMLFilename, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
+	void loadScene(string sXMLFilename);	//Load scene from file
 	
 	//Other stuff in GameEngine.cpp
-	obj* objFromXML(string sXMLFilename, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	Rect getCameraView();		//Return the rectangle, in world position z=0, that the camera can see
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
-	void loadScene(string sXMLFilename);	//Load scene from file
 	void updateShip();
 	
-	//color.cpp functions
+	//GameEngine_color.cpp functions
 	void updateColors(float32 dt);
 	void phaseColor(Color* src, Color dest, float time, bool bPingPong = false);
 	void clearColors();

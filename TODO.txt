@@ -1,2 +1,37 @@
 - Scene editor / XML exporter
 - Images should be able to save to file?
+- Add ImGUI - super-simple GUI for editing
+- Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+notes from talk with fg:
+- if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
+	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
+	-- gontext)forward_compatible_flag | sdl_gl_context debug_flag
+	--SDL_GL_SHARE_WITH_CURRENT_CONTEXT
+	
+-GLM for math
+	- mat4 for transformations
+	v' = mat4 * (x,y,z,0) --> transform vector
+	v' = mat4 * (x,y,z,1) --> transforms point (translate)
+	m = scale * translate * rot --> rotate first, then translate, then scale
+	projmat = cameramat * objmat (can be recursive by passing proj to child objects)
