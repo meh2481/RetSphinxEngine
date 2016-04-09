@@ -57,3 +57,9 @@ collision EngineContactListener::getCollision(b2Contact* c)
 	
 	return cResult;
 }
+
+void EngineContactListener::clearFrameContacts() 
+{
+	frameContacts.clear();
+	m_tmpFrameContacts.clear();
+}

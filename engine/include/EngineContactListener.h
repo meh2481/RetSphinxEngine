@@ -23,9 +23,9 @@ public:
 	virtual void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
 	
 	//Helper functions for my use
-	static collision getCollision(b2Contact* c);
-	static obj* getObj(b2Fixture* fix);
-	void clearFrameContacts() {frameContacts.clear();m_tmpFrameContacts.clear();};
+	static collision getCollision(b2Contact* c);	//Get two objects that are colliding on this fixture (either one can be NULL)
+	static obj* getObj(b2Fixture* fix);				//Get the object (or NULL) this fixture is associated with
+	void clearFrameContacts();						//Call every frame to wipe temporary (hit and leave) contacts for that frame
 };
 
 

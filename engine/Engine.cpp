@@ -969,23 +969,6 @@ void Engine::updateObjects(float32 dt)
 		objFromXML(*((string*)(*i)->userData), (*i)->position, (*i)->linearVelocity);
 		delete (*i);	//Free up memory
 	}
-	
-	//Update collisions
-	set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
-	//Set join the short contacts that fired and also quit this frame
-	for(set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
-		contacts.insert(*i);
-	
-	//Iterate over all thse
-	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
-	{
-		collision c = m_clContactListener.getCollision(*i);
-		if(c.objA && c.objB)	//If these collisions have objects associated with them
-		{						//TODO: Handle things hitting walls
-			//TODO: Activate collision between these two
-		}
-	}
-	m_clContactListener.clearFrameContacts();	//Erase all these now that we've handled them
 }
 
 string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir?
@@ -1047,7 +1030,36 @@ void Engine::updateParticles(float32 dt)
 	}
 }
 
-
+void Engine::stepPhysics(float32 dt)
+{
+	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
+	
+	//Update collisions
+	set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
+	//Set join the short contacts that fired and also quit this frame
+	for(set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
+		contacts.insert(*i);
+	
+	//Iterate over all these
+	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
+	{
+		collision c = m_clContactListener.getCollision(*i);
+		if(c.objA && c.objB)
+		{
+			//TODO: Activate collision between these two by calling Lua stuff
+		}
+		else if(c.objA)
+		{
+			//TODO: Call wall collision on A
+		}
+		else if(c.objB)
+		{
+			//TODO: Call wall collision on B
+		}
+		//Don't care about two non-object fixtures colliding
+	}
+	m_clContactListener.clearFrameContacts();	//Erase all these now that we've handled them
+}
 
 
 

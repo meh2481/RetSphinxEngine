@@ -176,7 +176,7 @@ public:
 	b2Body* createBody(b2BodyDef* bdef) {return m_physicsWorld->CreateBody(bdef);};
 	void setGravity(Point ptGravity)	{m_physicsWorld->SetGravity(ptGravity);};
 	void setGravity(float32 x, float32 y)   {setGravity(Point(x,y));};
-	void stepPhysics(float32 dt)	{m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);};
+	void stepPhysics(float32 dt);	//Update our physics world and handle collisions
 	void setDebugDraw(bool b) {m_bDebugDraw = b;};
 	bool getDebugDraw() {return m_bDebugDraw;};
 	void toggleDebugDraw() {m_bDebugDraw = !m_bDebugDraw;};

@@ -142,11 +142,6 @@ GameEngine::~GameEngine()
 	//delete testObj;
 }
 
-const float32 MUSIC_SCRUBIN_SPEED = soundFreqDefault * 2.0f;
-
-//float fSunRotAmt = 0;
-float fPlanetRotAmt = 0;
-
 void GameEngine::frame(float32 dt)
 {
 	handleKeys();
@@ -176,8 +171,6 @@ void GameEngine::draw()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
-	
-	//drawParticles();	//Draw engine particles here
 	
 	//Set mouse cursor to proper location
 	for(map<string, myCursor*>::iterator i = m_mCursors.begin(); i != m_mCursors.end(); i++)
@@ -258,7 +251,6 @@ void GameEngine::draw()
 	drawCursor();
 	
 	glTranslatef(0, 0, m_fDefCameraZ);
-	//drawParticles();
 	
 }
 
@@ -335,6 +327,11 @@ void GameEngine::handleEvent(SDL_Event event)
 					delete [] pixels;
 					break;
 				}
+				
+				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
+					if(keyDown(SDL_SCANCODE_ALT))
+						toggleFullscreen();
+					break;
 			}
 			break;
 		
