@@ -7,8 +7,7 @@
 #include <sstream>
 
 static int the_panic (lua_State *L) {
-    luai_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
-        lua_tostring(L, -1));
+    errlog << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1) << endl;
     return 0;  /* return to Lua to abort */
 }
 

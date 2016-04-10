@@ -2,7 +2,7 @@
 OBJECTS = $(shell ls -1 *.c | sed 's/\.c/\.o/')
 TARGET = liblua.a
 CFLAGS = 
-CC = cc
+CC = gcc
 
 all: $(TARGET)
 
