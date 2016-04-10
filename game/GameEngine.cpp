@@ -169,13 +169,13 @@ void GameEngine::draw()
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 	
-	//Set mouse cursor to proper location
+	/*/Set mouse cursor to proper location
 	for(map<string, myCursor*>::iterator i = m_mCursors.begin(); i != m_mCursors.end(); i++)
 	{
-		i->second->pos = worldPosFromCursor(getCursorPos());
+		//i->second->pos = worldPosFromCursor(getCursorPos());
 		if(i->first == "dir")
 			i->second->rot = -RAD2DEG * atan2(i->second->pos.x, i->second->pos.y) + 90;
-	}
+	}*/
 	glColor4f(1,1,1,1);
 	
 	
@@ -233,6 +233,35 @@ void GameEngine::draw()
 			Point p = b->GetPosition();
 			CameraPos.x = -p.x;
 			CameraPos.y = -p.y;
+			
+			//Keep camera within camera bounds
+			if(rcSceneBounds.area())	//If it's not unset
+			{
+				Rect rcCam = getCameraView(CameraPos);
+				if(rcCam.left < rcSceneBounds.left)
+				{
+					CameraPos.x += rcSceneBounds.left - rcCam.left;
+					rcCam = getCameraView(CameraPos);
+				}
+				if(rcCam.right > rcSceneBounds.right)
+				{
+					CameraPos.x -= rcCam.right - rcSceneBounds.right;
+					rcCam = getCameraView(CameraPos);
+				}
+				if(rcCam.top < rcSceneBounds.top)
+				{
+					CameraPos.y += rcSceneBounds.top - rcCam.top;
+					rcCam = getCameraView(CameraPos);
+				}
+				if(rcCam.bottom > rcSceneBounds.bottom)
+				{
+					CameraPos.y -= rcCam.bottom - rcSceneBounds.bottom;
+					rcCam = getCameraView(CameraPos);
+				}
+			}
+			p.x = -CameraPos.x;
+			p.y = -CameraPos.y;
+			
 			gluLookAt(p.x, p.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, p.x, p.y, 0.0f, 0, 0, 1);
 			//gluLookAt(p.x, p.y-8, -CameraPos.z+2, p.x, p.y, 0.0f, 0, 0, 1);
 		}
@@ -244,7 +273,8 @@ void GameEngine::draw()
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
-	m_Cursor->pos = worldPosFromCursor(getCursorPos());
+	Vec3 cam(CameraPos.x, CameraPos.y, m_fDefCameraZ);
+	m_Cursor->pos = worldPosFromCursor(getCursorPos(), cam);
 	drawCursor();
 	
 	glTranslatef(0, 0, m_fDefCameraZ);
@@ -281,50 +311,6 @@ void GameEngine::pause()
 void GameEngine::resume()
 {
 	resumeMusic();
-}
-
-//TODO: Shouldn't be GameEngine - specific
-Rect GameEngine::getCameraView()
-{
-	Rect rcCamera;
-	const float32 tan45_2 = tan(DEG2RAD*45/2);
-	const float32 fAspect = (float32)getWidth() / (float32)getHeight();
-	rcCamera.bottom = (tan45_2 * m_fDefCameraZ);
-	rcCamera.top = -(tan45_2 * m_fDefCameraZ);
-	rcCamera.left = rcCamera.bottom * fAspect;
-	rcCamera.right = rcCamera.top * fAspect;
-	rcCamera.offset(CameraPos.x, CameraPos.y);
-	return rcCamera;
-}
-
-//TODO: Shouldn't be GameEngine - specific
-Point GameEngine::worldMovement(Point cursormove)
-{
-	cursormove.x /= (float32)getWidth();
-	cursormove.y /= (float32)getHeight();
-	
-	Rect rcCamera = getCameraView();
-	cursormove.x *= rcCamera.width();
-	cursormove.y *= -rcCamera.height();	//Flip y
-	
-	return cursormove;
-}
-
-//TODO: Shouldn't be GameEngine - specific
-Point GameEngine::worldPosFromCursor(Point cursorpos)
-{
-	//Rectangle that the camera can see in world space
-	Rect rcCamera = getCameraView();
-	
-	//Our relative position in window rect space (in rage 0-1)
-	cursorpos.x /= (float32)getWidth();
-	cursorpos.y /= (float32)getHeight();
-	
-	//Multiply this by the size of the world rect to get the relative cursor pos
-	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
-	cursorpos.y = cursorpos.y * rcCamera.height() + rcCamera.top;	//Flip on y axis
-	
-	return cursorpos;
 }
 
 #define MAX_SHIP_SPEED 10.0
@@ -417,8 +403,8 @@ void GameEngine::updateShip()
 				float32 r = getAngle(v);
 				b->SetTransform(p, r);
 			}
-			CameraPos.x = -p.x;
-			CameraPos.y = -p.y;
+			//CameraPos.x = -p.x;
+			//CameraPos.y = -p.y;
 			
 			if(shipTrail != NULL)
 			{

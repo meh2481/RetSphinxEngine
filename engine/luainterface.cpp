@@ -16,10 +16,11 @@ LuaInterface::LuaInterface(const char *script, int argc, const char * const *arg
  : script(script), argc(argc), argv(argv), _lua(NULL)
 {
 #ifdef DEBUG
-	puts("LuaInterface: Using " LUA_RELEASE);
+	cout
 #else
-	errlog << "LuaInterface: Using " << LUA_RELEASE << endl;
+	errlog
 #endif
+	<< "LuaInterface: Using " << LUA_RELEASE << endl;
 }
 
 LuaInterface::~LuaInterface()

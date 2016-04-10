@@ -42,7 +42,6 @@ private:
 	list<ColorPhase> m_ColorsChanging;
 	SDL_Joystick *m_joy;
 	SDL_Haptic* m_rumble;
-	map<string, myCursor*> m_mCursors;
 	
 	//Game stuff!
 	LuaInterface* Lua;
@@ -54,6 +53,7 @@ private:
 	obj* ship;
 	ParticleSystem* shipTrail;
 	Point shipMoveVec;
+	Rect rcSceneBounds;
 
 protected:
 	void frame(float32 dt);
@@ -76,8 +76,6 @@ public:
 
 	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
-	Point worldPosFromCursor(Point cursorpos);	//Get the worldspace position of the given mouse cursor position
-	Point worldMovement(Point cursormove);		//Get the worldspace transform of the given mouse transformation
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
 	bool loadConfig(string sFilename);
@@ -86,7 +84,6 @@ public:
 	void loadScene(string sXMLFilename);	//Load scene from file
 	
 	//Other stuff in GameEngine.cpp
-	Rect getCameraView();		//Return the rectangle, in world position z=0, that the camera can see
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void updateShip();

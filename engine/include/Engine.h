@@ -134,6 +134,9 @@ public:
 	void start();   //Runs engine and doesn't exit until the engine ends
 	void quit() {m_bQuitting = true;};  //Stop the engine and quit nicely
 	string getSaveLocation();		//Get good location to save config files/save files
+	Rect getCameraView(Vec3 Camera);		//Return the rectangle, in world position z=0, that the camera can see
+	Point worldPosFromCursor(Point cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
+	Point worldMovement(Point cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
 	
 	//Drawing functions
 	void fillRect(Point p1, Point p2, Color col);

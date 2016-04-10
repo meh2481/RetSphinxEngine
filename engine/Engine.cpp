@@ -413,6 +413,47 @@ string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir?
 	return s;
 }
 
+Rect Engine::getCameraView(Vec3 Camera)
+{
+	Rect rcCamera;
+	const float32 tan45_2 = tan(DEG2RAD*45.0f/2.0f);
+	const float32 fAspect = (float32)getWidth() / (float32)getHeight();
+	rcCamera.bottom = (tan45_2 * Camera.z);
+	rcCamera.top = -(tan45_2 * Camera.z);
+	rcCamera.left = rcCamera.bottom * fAspect;
+	rcCamera.right = rcCamera.top * fAspect;
+	rcCamera.offset(Camera.x, Camera.y);
+	return rcCamera;
+}
+
+Point Engine::worldMovement(Point cursormove, Vec3 Camera)
+{
+	cursormove.x /= (float32)getWidth();
+	cursormove.y /= (float32)getHeight();
+	
+	Rect rcCamera = getCameraView(Camera);
+	cursormove.x *= rcCamera.width();
+	cursormove.y *= -rcCamera.height();	//Flip y
+	
+	return cursormove;
+}
+
+Point Engine::worldPosFromCursor(Point cursorpos, Vec3 Camera)
+{
+	//Rectangle that the camera can see in world space
+	Rect rcCamera = getCameraView(Camera);
+	
+	//Our relative position in window rect space (in rage 0-1)
+	cursorpos.x /= (float32)getWidth();
+	cursorpos.y /= (float32)getHeight();
+	
+	//Multiply this by the size of the world rect to get the relative cursor pos
+	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
+	cursorpos.y = cursorpos.y * rcCamera.height() + rcCamera.top;	//Flip on y axis
+	
+	return cursorpos;
+}
+
 void Engine::stepPhysics(float32 dt)
 {
 	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);

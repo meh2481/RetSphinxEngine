@@ -446,7 +446,10 @@ void GameEngine::loadScene(string sXMLFilename)
 		return;
 	}
 	
-	//TODO Scene boundaries
+	//Scene boundaries
+	const char* cCamBounds = root->Attribute("camerabounds");
+	if(cCamBounds != NULL)
+		rcSceneBounds = rectFromString(cCamBounds);
 	
 	//Load layers for the scene
 	for(XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))

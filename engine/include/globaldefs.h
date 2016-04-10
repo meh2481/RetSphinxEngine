@@ -131,12 +131,13 @@ public:
 	
 	//Constructor
 	Vec3();
+	Vec3(float32 fx, float32 fy, float32 fz)	{x=fx;y=fy;z=fz;};
 
 	void set(float32 fx, float32 fy, float32 fz)	{x=fx;y=fy;z=fz;};
 	void setZero()  {set(0,0,0);};
 
 	//Helpful math functions
-	void normalize();
+	void normalize();	//Normalizes self
 	Vec3 normalized();  //Doesn't modify original vector, returns normalized version
 
 	//Operators for easy use
@@ -146,6 +147,7 @@ public:
 
 //Global Helper functions
 //TODO: Make into class or package or something
+//TODO: Some of these might not even be used. Check and see.
 Vec3 crossProduct(Vec3 vec1, Vec3 vec2);	//Cross product of two vectors
 float32 dotProduct(Vec3 vec1, Vec3 vec2);   //Dot product of two vectors
 Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float32 fAngleDeg);	//Rotate one vector around another
