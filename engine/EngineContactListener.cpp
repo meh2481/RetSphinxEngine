@@ -46,11 +46,19 @@ obj* EngineContactListener::getObj(b2Fixture* fix)
 
 collision EngineContactListener::getCollision(b2Contact* c)
 {
-	collision cResult = {NULL, NULL};
+	collision cResult = {NULL, NULL, NULL, NULL};
 	if(!c->IsTouching()) return cResult;
 	
 	b2Fixture* fixA = c->GetFixtureA();
 	b2Fixture* fixB = c->GetFixtureB();
+	
+	void* fixAUser = fixA->GetUserData();
+	void* fixBUser = fixB->GetUserData();
+	
+	if(fixAUser)
+		cResult.nodeA = (Node*)fixAUser;
+	if(fixBUser)
+		cResult.nodeB = (Node*)fixBUser;
 	
 	cResult.objA = getObj(fixA);
 	cResult.objB = getObj(fixB);

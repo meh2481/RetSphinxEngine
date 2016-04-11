@@ -31,7 +31,8 @@ engine_window.o \
 engine_sound.o \
 engine_obj.o \
 engine_particle.o \
-engine_gl.o 
+engine_gl.o \
+Node.o
 
 GAME_OBJECTS := \
 GameEngine.o \

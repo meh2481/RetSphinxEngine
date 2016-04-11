@@ -14,6 +14,7 @@
 #include "particles.h"
 #include "cursor.h"
 #include "EngineContactListener.h"
+#include "Node.h"
 #include <fmod.h>
 #ifdef USE_SDL_FRAMEWORK
 #include <SDL_syswm.h>
@@ -95,6 +96,7 @@ private:
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
 	list<ParticleSystem*> m_particles;
+	list<Node*> m_nodes;
 	
 	multimap<string, FMOD_CHANNEL*> m_channels;
 	map<string, FMOD_SOUND*> m_sounds;
@@ -219,6 +221,7 @@ public:
 	void drawAll();
 	void cleanupObjects();
 	void updateObjects(float32 dt);
+	void addNode(Node* n);
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered)	{SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);};

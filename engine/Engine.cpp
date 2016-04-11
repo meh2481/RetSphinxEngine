@@ -57,7 +57,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fTimeScale = 1.0f;
 
 	errlog << "Initializing FMOD..." << endl;
-	if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
+	m_bSoundDied = true;
+	//TODO: Fix FMOD
+	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
 	{
 		errlog << "Failed to init FMOD." << std::endl;
 		m_bSoundDied = true;
@@ -76,7 +78,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 			FMOD_System_GetRecordDriverInfo(m_audioSystem, i, driverInfoStr, DRIVER_INFO_STR_SIZE, NULL);
 			errlog << "Driver " << i << ": " << driverInfoStr << endl;
 		}
-	}
+	}*/
 }
 
 //TODO: Figure out what's segfaulting on exit
@@ -481,6 +483,16 @@ void Engine::stepPhysics(float32 dt)
 			//TODO: Call wall collision on B
 		}
 		//Don't care about two non-object fixtures colliding
+		
+		//Node collisions
+		if(c.nodeA && c.objB)
+		{
+			c.nodeA->collided(c.objB);
+		}
+		else if(c.nodeB && c.objA)
+		{
+			c.nodeB->collided(c.objA);
+		}
 	}
 	m_clContactListener.clearFrameContacts();	//Erase all these now that we've handled them
 }

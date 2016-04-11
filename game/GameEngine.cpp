@@ -235,6 +235,7 @@ void GameEngine::draw()
 			CameraPos.y = -p.y;
 			
 			//Keep camera within camera bounds
+			//TODO: This messes up with vertical camera position when zooming out. Fix.
 			if(rcSceneBounds.area())	//If it's not unset
 			{
 				Rect rcCam = getCameraView(CameraPos);

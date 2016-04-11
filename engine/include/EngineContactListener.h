@@ -3,10 +3,13 @@
 
 #include "Box2D/Dynamics/b2WorldCallbacks.h"
 #include "Object.h"
+#include "Node.h"
 
 typedef struct {
 	obj* objA;
 	obj* objB;
+	Node* nodeA;
+	Node* nodeB;
 }collision;
 	
 class EngineContactListener : public b2ContactListener

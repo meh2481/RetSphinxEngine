@@ -294,51 +294,19 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 				bodyDef.type = b2_staticBody;
 			bodyDef.position = pos;
 			
+			//Fixed rotation (true for sprites, false for physical objects)
+			bodyDef.fixedRotation = false;
+			body->QueryBoolAttribute("fixedrot", &bodyDef.fixedRotation);
+			
+			//Create body now
+			b2Body* bod = getWorld()->CreateBody(&bodyDef);
+			seg->body = bod;
+			bod->SetUserData((void*)seg);	//Store user data, so when collisions occur we know what segments are colliding
+			mBodyNames[sBodyName] = bod;
 			
 			//Create body fixtures
 			for(XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
-			{
-				b2FixtureDef fixtureDef;
-				b2PolygonShape dynamicBox;
-				b2CircleShape dynamicCircle;
-				
-				const char* cFixType = fixture->Attribute("type");
-				if(!cFixType) continue;
-				string sFixType = cFixType;
-				if(sFixType == "box")
-				{
-					const char* cBoxSize = fixture->Attribute("size");
-					if(!cBoxSize) continue;
-					
-					Point pBoxSize = pointFromString(cBoxSize);
-					dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
-					fixtureDef.shape = &dynamicBox;
-				}
-				else if(sFixType == "circle")
-				{
-					const char* cCircPos = fixture->Attribute("pos");
-					if(cCircPos)
-						dynamicCircle.m_p = pointFromString(cCircPos);
-					bodyDef.fixedRotation = true;
-						
-					dynamicCircle.m_radius = 1.0f;
-					fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
-					fixtureDef.shape = &dynamicCircle;
-				}
-				//else TODO
-				
-				fixtureDef.density = 1.0f;
-				fixtureDef.friction = 0.3f;
-				fixture->QueryFloatAttribute("friction", &fixtureDef.friction);
-				fixture->QueryFloatAttribute("density", &fixtureDef.density);
-				
-				b2Body* bod = getWorld()->CreateBody(&bodyDef);
-				seg->body = bod;
-				bod->SetUserData((void*)seg);	//Store user data, so when collisions occur we know what segments are colliding
-				
-				mBodyNames[sBodyName] = bod;
-				bod->CreateFixture(&fixtureDef);
-			}
+				readFixture(fixture, bod);
 		}
 		XMLElement* layer = segment->FirstChildElement("layer");
 		if(layer != NULL)
@@ -446,10 +414,33 @@ void GameEngine::loadScene(string sXMLFilename)
 		return;
 	}
 	
+	//Create ground body, for adding map geometry to
+	b2BodyDef groundBodyDef;
+	groundBodyDef.type = b2_staticBody;
+	groundBodyDef.position.SetZero();
+	b2Body* groundBody = getWorld()->CreateBody(&groundBodyDef);
+	
 	//Scene boundaries
-	const char* cCamBounds = root->Attribute("camerabounds");
+	const char* cCamBounds = root->Attribute("bounds");
 	if(cCamBounds != NULL)
+	{
+		//Save bounds for camera
 		rcSceneBounds = rectFromString(cCamBounds);
+		
+		//Create boundary lines in physics
+		b2FixtureDef fixtureDef;
+		fixtureDef.density = 1.0f;
+		fixtureDef.friction = 0.3f;
+		b2ChainShape boundShape;
+		b2Vec2 verts[4];
+		verts[0].Set(rcSceneBounds.left, rcSceneBounds.top);
+		verts[1].Set(rcSceneBounds.right, rcSceneBounds.top);
+		verts[2].Set(rcSceneBounds.right, rcSceneBounds.bottom);
+		verts[3].Set(rcSceneBounds.left, rcSceneBounds.bottom);
+		boundShape.CreateLoop(verts, 4);
+		fixtureDef.shape = &boundShape;
+		groundBody->CreateFixture(&fixtureDef);
+	}
 	
 	//Load layers for the scene
 	for(XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
@@ -530,6 +521,12 @@ void GameEngine::loadScene(string sXMLFilename)
 		}
 	}
 	
+	//Load nodes
+	for(XMLElement* node = root->FirstChildElement("node"); node != NULL; node = node->NextSiblingElement("node"))
+	{
+		readFixture(node, groundBody);
+	}
+	
 	//TODO: Load other things
 	
 	delete doc;
@@ -574,4 +571,66 @@ void GameEngine::loadScene(string sXMLFilename)
 	
 	addObject(objFromXML("res/obj/test.xml", Point(0, 3)));
 	*/
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+// Load Box2D fixture from XML
+//---------------------------------------------------------------------------------------------------------------------------
+void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
+{
+	b2FixtureDef fixtureDef;
+	b2PolygonShape dynamicBox;
+	b2CircleShape dynamicCircle;
+	
+	const char* cFixType = fixture->Attribute("type");
+	if(!cFixType)
+	{
+		errlog << "readFixture ERR: No fixture type" << endl;
+		return;
+	}
+	string sFixType = cFixType;
+	if(sFixType == "box")
+	{
+		const char* cBoxSize = fixture->Attribute("size");
+		if(!cBoxSize)
+		{
+			errlog << "readFixture ERR: No box size" << endl;
+			return;
+		}
+		
+		//TODO: Box offset
+		Point pBoxSize = pointFromString(cBoxSize);
+		dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
+		fixtureDef.shape = &dynamicBox;
+	}
+	else if(sFixType == "circle")
+	{
+		const char* cCircPos = fixture->Attribute("pos");
+		if(cCircPos)
+			dynamicCircle.m_p = pointFromString(cCircPos);
+			
+		dynamicCircle.m_radius = 1.0f;
+		fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
+		fixtureDef.shape = &dynamicCircle;
+	}
+	//else TODO
+	
+	fixtureDef.density = 1.0f;
+	fixtureDef.friction = 0.3f;
+	fixtureDef.isSensor = false;
+	fixture->QueryFloatAttribute("friction", &fixtureDef.friction);
+	fixture->QueryFloatAttribute("density", &fixtureDef.density);
+	fixture->QueryBoolAttribute("sensor", &fixtureDef.isSensor);
+	
+	//Create node if this is one
+	const char* cLua = fixture->Attribute("luafile");
+	if(cLua)
+	{
+		Node* n = new Node();
+		n->luaFile = cLua;
+		addNode(n);
+		fixtureDef.userData = (void*)n;
+	}
+	
+	bod->CreateFixture(&fixtureDef);
 }

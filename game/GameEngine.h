@@ -82,6 +82,7 @@ public:
 	void saveConfig(string sFilename);
 	obj* objFromXML(string sXMLFilename, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	void loadScene(string sXMLFilename);	//Load scene from file
+	void readFixture(XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met

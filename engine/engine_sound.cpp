@@ -108,6 +108,7 @@ void Engine::seekMusic(float32 fTime)
 
 float32 Engine::getMusicPos()
 {
+	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
 	{
 		FMOD_CHANNEL* mus = getChannel("music");
@@ -120,6 +121,7 @@ float32 Engine::getMusicPos()
 
 void Engine::volumeMusic(float32 fVol)
 {
+	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 	{
 		FMOD_CHANNEL* mus = getChannel("music");
@@ -129,12 +131,14 @@ void Engine::volumeMusic(float32 fVol)
 
 void Engine::setMusicFrequency(float32 freq)
 {
+	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 		FMOD_Channel_SetFrequency(getChannel("music"), freq);
 }
 
 float32 Engine::getMusicFrequency()
 {
+	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
 	{
 		float freq;
