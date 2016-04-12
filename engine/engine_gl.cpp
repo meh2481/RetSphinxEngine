@@ -122,6 +122,10 @@ void Engine::setup_sdl()
 	
 	_loadicon();	//Load our window icon
 	
+	const char *ver = (const char*)glGetString(GL_VERSION);
+    errlog << "GL version: " << ver << endl;
+    const char *ven = (const char*)glGetString(GL_VENDOR);
+    errlog << "GL vendor: " << ven << endl;
 }
 
 //Set up OpenGL

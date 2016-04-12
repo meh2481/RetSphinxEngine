@@ -22,6 +22,8 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 	GameEngineLua::rumble(force, sec);
 }
 
+//TODO: lua call node to get properties (Node::values<> map)
+
 
 static LuaFunctions s_functab[] =
 {

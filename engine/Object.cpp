@@ -161,7 +161,7 @@ void obj::collideWall(Point ptNormal)
 {
 	if(lua)
 	{
-		//TODO: Call Lua collide(ptWallNormal)
+		//TODO: Call Lua collidewall(ptNormal.x, ptNormal.y)
 	}
 }
 
@@ -169,7 +169,7 @@ void obj::initLua()
 {
 	if(lua)
 	{
-		//TODO: Call Lua init()
+		//TODO: Call Lua init() function in file defined by luaFile
 	}
 }
 
