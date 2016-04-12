@@ -243,6 +243,7 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	if(cLuaFile)
 		o->luaFile = cLuaFile;
 	
+	//TODO: Yuck leftover soft body stuff. Fix or get rid
 	string sMeshCenterObj = "";
 	Point pMeshSize(10,10);
 	

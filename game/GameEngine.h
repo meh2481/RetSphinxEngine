@@ -85,7 +85,7 @@ public:
 	void readFixture(XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
-	void rumbleController(float32 strength, float32 sec, bool priority = false);	//Rumble the controller, if certain conditions are met
+	void rumbleController(float32 strength, float32 sec, int priority = 0);	//Rumble the controller
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void updateShip();
 	

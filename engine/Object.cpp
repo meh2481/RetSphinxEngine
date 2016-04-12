@@ -169,6 +169,10 @@ void obj::initLua()
 {
 	if(lua)
 	{
+		lua_State* L = lua->getState();
+		
+		
+		//Call lua->whatever() for lua_setmetatable() and stuff
 		//TODO: Call Lua init() function in file defined by luaFile
 	}
 }

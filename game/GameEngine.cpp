@@ -421,13 +421,17 @@ void GameEngine::updateShip()
 }
 
 //TODO: Controller haptic shouldn't be game specific? Or is this too closely tied to controller input in general?
-void GameEngine::rumbleController(float32 strength, float32 sec, bool priority)
+void GameEngine::rumbleController(float32 strength, float32 sec, int priority)
 {
 	static float32 fLastRumble = 0.0f;
-	if(priority)
-		fLastRumble = getSeconds() + sec;
-	else if(getSeconds() < fLastRumble)
+	static int prevPriority = 0;
+	
+	//Too low priority to rumble here; another higher-priority rumble is currently going on
+	if(getSeconds() < fLastRumble && priority < prevPriority)
 		return;
+	
+	fLastRumble = getSeconds() + sec;
+	prevPriority = priority;
 	strength = max(strength, 0.0f);
 	strength = min(strength, 1.0f);
 	if(m_rumble != NULL)

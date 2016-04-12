@@ -36,6 +36,6 @@ void Node::collided(obj* o)
 {
 	if(lua)
 	{
-		//TODO: Call Lua collide(other)
+		//TODO: Call Lua collide(obj)
 	}
 }
