@@ -470,22 +470,25 @@ void Engine::stepPhysics(float32 dt)
 	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
 	{
 		collision c = m_clContactListener.getCollision(*i);
+		b2WorldManifold worldManifold;
+		(*i)->GetWorldManifold(&worldManifold);
 		if(c.objA && c.objB)
 		{
-			//TODO: See if we should also call B->A collision
+			//TODO: Decide if we should also call B->A collision
 			c.objA->collide(c.objB);
 		}
 		else if(c.objA)
 		{
-			c.objA->collideWall();	//TODO: More info so it knows to flip, etc etc
+			b2Vec2 pt = -worldManifold.normal;	//Flip this, since a Box2D normal is defined from A->B, and we want a wall->obj normal
+			c.objA->collideWall(pt);
 		}
 		else if(c.objB)
 		{
-			c.objB->collideWall();
+			c.objB->collideWall(worldManifold.normal);
 		}
 		//Don't care about two non-object fixtures colliding
 		
-		//Node collisions
+		//Test for objects entering nodes (sensors)
 		if(c.nodeA && c.objB)
 		{
 			c.nodeA->collided(c.objB);

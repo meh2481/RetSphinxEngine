@@ -50,6 +50,7 @@ public:
 };
 
 //Helper class for objects having multiple "frames", or states of animation
+//TODO: Fix or rip out
 class objframe
 {
 	float32 curTime;
@@ -89,6 +90,7 @@ public:
     void* usr;
 	string frame;
 	LuaInterface* lua;
+	string luaFile;
     
     obj();
     ~obj();
@@ -101,7 +103,7 @@ public:
 	void hideFrames();
 	b2Body* getBody();
 	void collide(obj* other);
-	void collideWall();
+	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
 };
 
@@ -116,6 +118,7 @@ public:
 #define ANIM_SHEAR		64
 
 //Animations for physical objects.
+//TODO: Fix or rip out
 class anim
 {
 protected:

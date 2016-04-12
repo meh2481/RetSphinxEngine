@@ -21,6 +21,10 @@ obj::obj() : Drawable()
 
 obj::~obj()
 {
+	if(lua)
+	{
+		//TODO: Call Lua destroy()
+	}
     for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
 	for(list<anim*>::iterator i = animations.begin(); i != animations.end(); i++)
@@ -111,7 +115,7 @@ b2BodyDef* obj::update(float32 dt)
 	
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua update(dt)
 	}
 	
 	return def;
@@ -149,15 +153,15 @@ void obj::collide(obj* other)
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua collide(other)
 	}
 }
 
-void obj::collideWall()
+void obj::collideWall(Point ptNormal)
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua collide(ptWallNormal)
 	}
 }
 
@@ -165,7 +169,7 @@ void obj::initLua()
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua init()
 	}
 }
 

@@ -239,6 +239,10 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	bool makeMesh = false;
 	root->QueryBoolAttribute("softbody", &makeMesh);
 	
+	const char* cLuaFile = root->Attribute("luafile");
+	if(cLuaFile)
+		o->luaFile = cLuaFile;
+	
 	string sMeshCenterObj = "";
 	Point pMeshSize(10,10);
 	
@@ -598,9 +602,19 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 			return;
 		}
 		
-		//TODO: Box offset
+		//Get position (center of box)
+		Point p(0,0);
+		const char* cPos = fixture->Attribute("pos");
+		if(cPos)
+			p = pointFromString(cPos);
+		
+		//Get rotation (angle) of box
+		float32 fRot = 0.0f;
+		fixture->QueryFloatAttribute("rot", &fRot);
+			
+		//Create box
 		Point pBoxSize = pointFromString(cBoxSize);
-		dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
+		dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, p, fRot);
 		fixtureDef.shape = &dynamicBox;
 	}
 	else if(sFixType == "circle")
@@ -629,6 +643,11 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		Node* n = new Node();
 		n->luaFile = cLua;
 		n->lua = Lua;
+		
+		//Populate this node with ALL THE INFO in case Lua wants it
+		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
+			n->values[attrib->Name()] = attrib->Value();
+		
 		addNode(n);
 		fixtureDef.userData = (void*)n;
 	}

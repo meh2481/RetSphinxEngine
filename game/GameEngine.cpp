@@ -350,6 +350,7 @@ void GameEngine::handleKeys()
 	}
 }
 
+//TODO: This doesn't belong in C++. Rip it out and stick it in Lua.
 void GameEngine::updateShip()
 {
 	//Update ship velocity based on current input

@@ -12,7 +12,10 @@ void Engine::addNode(Node* n)
 void Engine::addObject(obj* o)
 {
 	if(o != NULL)
+	{
 		m_lObjects.push_back(o);
+		o->initLua();
+	}
 }
 
 //TODO: Where is this even used
@@ -84,6 +87,14 @@ void Engine::cleanupObjects()
 	m_lScenery.clear();
 	m_lObjects.clear();
 	m_nodes.clear();
+	
+	//Wipe Box2D physics data that's left over
+	list<b2Body*> bodies;
+	for(b2Body* bod = m_physicsWorld->GetBodyList(); bod != NULL; bod = bod->GetNext())
+		bodies.push_back(bod);
+	
+	for(list<b2Body*>::iterator i = bodies.begin(); i != bodies.end(); i++)
+		m_physicsWorld->DestroyBody(*i);
 }
 
 void Engine::updateObjects(float32 dt)

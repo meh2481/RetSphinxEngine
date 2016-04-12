@@ -7,6 +7,7 @@ class Node {
 public:
 	string luaFile;
 	LuaInterface* lua;
+	map<string, string> values;	//TODO: These can be populated by XML and called from Lua! For userdata and such
 	
 	Node();
 	~Node();

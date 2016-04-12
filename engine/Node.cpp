@@ -7,7 +7,10 @@ Node::Node()
 
 Node::~Node()
 {
-	
+	if(lua)
+	{
+		//TODO: Call Lua destroy()
+	}	
 }
 
 //Node creation
@@ -15,7 +18,7 @@ void Node::init()
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua init()
 	}
 }
 
@@ -24,7 +27,7 @@ void Node::update(float32 dt)
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua update(dt)
 	}
 }
 
@@ -33,6 +36,6 @@ void Node::collided(obj* o)
 {
 	if(lua)
 	{
-		//TODO: Call Lua
+		//TODO: Call Lua collide(other)
 	}
 }
