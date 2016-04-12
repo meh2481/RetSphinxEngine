@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "lauxlib.h"
 
 Node::Node()
 {
@@ -16,8 +17,14 @@ Node::~Node()
 //Node creation
 void Node::init()
 {
-	if(lua)
+	if(lua && luaFile.length())
 	{
+		lua_State* L = lua->getState();
+		
+		//Parse this lua file first
+		luaL_dofile(L, luaFile.c_str());
+		
+		
 		//TODO: Call Lua init()
 	}
 }

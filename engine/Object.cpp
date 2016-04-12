@@ -4,6 +4,7 @@
 */
 
 #include "Object.h"
+#include "lauxlib.h"
 
 //----------------------------------------------------------------------------------------------------
 // obj class
@@ -167,9 +168,13 @@ void obj::collideWall(Point ptNormal)
 
 void obj::initLua()
 {
-	if(lua)
+	if(lua && luaFile.length())
 	{
 		lua_State* L = lua->getState();
+		
+		//Parse this lua file first
+		luaL_dofile(L, luaFile.c_str());
+		
 		
 		
 		//Call lua->whatever() for lua_setmetatable() and stuff

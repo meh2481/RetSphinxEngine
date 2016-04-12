@@ -10,19 +10,20 @@ struct lua_State;
 enum ObjMainType
 {
 	OT_IMAGE,
-	OT_RENDERER,
-	OT_CAM,
-	OT_WORLD,
-	OT_FILM,
-	OT_LIGHT,
-	OT_MATERIAL,
-	OT_TEXTURE,
-	OT_PRIMITIVE,
-	OT_INTEGRATOR,
-	OT_FOG,
-	OT_COORDMAPPER,
-	OT_MATLIB,
-	OT_BSPLINE,
+	OT_OBJECT,
+	OT_B2BODY,
+	OT_ARC,
+	OT_BG,
+	OT_CURSOR,
+	OT_ENGINE,
+	OT_GAMEENGINE,
+	OT_HUD,
+	OT_LATTICE,
+	OT_NODE,
+	OT_PARTICLESYSTEM,
+	OT_TEXT,
+	OT_TINYXML2,
+	//TODO: Figure out what we should have, and add moar / remove some
 };
 
 struct LuaFunctions
