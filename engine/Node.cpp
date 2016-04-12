@@ -1,19 +1,38 @@
 #include "Node.h"
 
+Node::Node()
+{
+	 lua = NULL;
+}
+
+Node::~Node()
+{
+	
+}
+
 //Node creation
 void Node::init()
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }
 
 //Update the node
 void Node::update(float32 dt)
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }
 
 //Collided with an object
 void Node::collided(obj* o)
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }

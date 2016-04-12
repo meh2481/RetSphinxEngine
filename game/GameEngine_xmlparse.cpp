@@ -521,10 +521,10 @@ void GameEngine::loadScene(string sXMLFilename)
 		}
 	}
 	
-	//Load nodes
-	for(XMLElement* node = root->FirstChildElement("node"); node != NULL; node = node->NextSiblingElement("node"))
+	//Load level geometry
+	for(XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
 	{
-		readFixture(node, groundBody);
+		readFixture(geom, groundBody);
 	}
 	
 	//TODO: Load other things

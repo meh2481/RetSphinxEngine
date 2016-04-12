@@ -16,6 +16,7 @@ obj::obj() : Drawable()
   meshImg = NULL;
   meshLattice = NULL;
   meshAnim = NULL;
+  lua = NULL;
 }
 
 obj::~obj()
@@ -108,7 +109,10 @@ b2BodyDef* obj::update(float32 dt)
 	//	}
 	//}
 	
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 	
 	return def;
 }
@@ -143,17 +147,26 @@ b2Body* obj::getBody()
 
 void obj::collide(obj* other)
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }
 
 void obj::collideWall()
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }
 
 void obj::initLua()
 {
-	//TODO: Call Lua
+	if(lua)
+	{
+		//TODO: Call Lua
+	}
 }
 
 //----------------------------------------------------------------------------------------------------
