@@ -472,15 +472,16 @@ void Engine::stepPhysics(float32 dt)
 		collision c = m_clContactListener.getCollision(*i);
 		if(c.objA && c.objB)
 		{
-			//TODO: Activate collision between these two by calling Lua stuff
+			//TODO: See if we should also call B->A collision
+			c.objA->collide(c.objB);
 		}
 		else if(c.objA)
 		{
-			//TODO: Call wall collision on A
+			c.objA->collideWall();	//TODO: More info so it knows to flip, etc etc
 		}
 		else if(c.objB)
 		{
-			//TODO: Call wall collision on B
+			c.objB->collideWall();
 		}
 		//Don't care about two non-object fixtures colliding
 		

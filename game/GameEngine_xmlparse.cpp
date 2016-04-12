@@ -493,7 +493,7 @@ void GameEngine::loadScene(string sXMLFilename)
 					}
 				}
 			}
-			
+			o->lua = Lua;
 			addObject(o);
 		}
 	}
@@ -628,6 +628,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	{
 		Node* n = new Node();
 		n->luaFile = cLua;
+		n->lua = Lua;
 		addNode(n);
 		fixtureDef.userData = (void*)n;
 	}

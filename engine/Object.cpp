@@ -108,6 +108,8 @@ b2BodyDef* obj::update(float32 dt)
 	//	}
 	//}
 	
+	//TODO: Call Lua
+	
 	return def;
 }
 
@@ -137,6 +139,21 @@ b2Body* obj::getBody()
 	if(segments.size())
 		return (*segments.begin())->body;
 	return NULL;
+}
+
+void obj::collide(obj* other)
+{
+	//TODO: Call Lua
+}
+
+void obj::collideWall()
+{
+	//TODO: Call Lua
+}
+
+void obj::initLua()
+{
+	//TODO: Call Lua
 }
 
 //----------------------------------------------------------------------------------------------------

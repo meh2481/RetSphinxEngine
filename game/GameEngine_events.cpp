@@ -12,8 +12,6 @@ void GameEngine::handleEvent(SDL_Event event)
 			{
 				case SDL_SCANCODE_F5:
 					//cleanupObjects();
-					//addObject(objFromXML("res/obj/ground.xml"));
-					//addObject(objFromXML("res/obj/test.xml", Point(0, 5.5)));
 					reloadImages();
 					loadScene("res/3d/solarsystem.scene.xml");
 					break;
@@ -70,7 +68,7 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		case SDL_MOUSEBUTTONDOWN:
 		{
-			//addObject(objFromXML("res/obj/test.xml", worldPosFromCursor(getCursorPos())));
+			
 		}
 		break;
 			
@@ -83,7 +81,6 @@ void GameEngine::handleEvent(SDL_Event event)
 			{
 				CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
 			}
-			//cameraBounds();
 			break;
 
 		case SDL_MOUSEBUTTONUP:

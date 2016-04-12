@@ -6,6 +6,7 @@
 class Node {
 public:
 	string luaFile;
+	LuaInterface* lua;
 	
 	void update(float32 dt);	//Update the node
 	void collided(obj* o);		//Collided with an object

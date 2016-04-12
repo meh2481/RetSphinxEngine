@@ -10,6 +10,7 @@
 #include "Image.h"
 #include "3DObject.h"
 #include "Drawable.h"
+#include "LuaInterface.h"
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -87,6 +88,7 @@ public:
 	Point			meshSize;
     void* usr;
 	string frame;
+	LuaInterface* lua;
     
     obj();
     ~obj();
@@ -98,6 +100,9 @@ public:
 	void setFrame(string sName);
 	void hideFrames();
 	b2Body* getBody();
+	void collide(obj* other);
+	void collideWall();
+	void initLua();	
 };
 
 //Anim types
