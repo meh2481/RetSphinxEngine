@@ -1,5 +1,5 @@
 #include "Node.h"
-#include "lauxlib.h"
+#include "lua.hpp"
 
 Node::Node()
 {
@@ -22,7 +22,7 @@ void Node::init()
 		lua_State* L = lua->getState();
 		
 		//Parse this lua file first
-		luaL_dofile(L, luaFile.c_str());
+		//luaL_loadfile(L, luaFile.c_str());
 		
 		
 		//TODO: Call Lua init()

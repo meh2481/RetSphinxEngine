@@ -5,9 +5,11 @@
 
 #include <assert.h>
 #include <sstream>
+#include <new>
 
 static int the_panic (lua_State *L) {
     errlog << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1) << endl;
+	assert(false);
     return 0;  /* return to Lua to abort */
 }
 
@@ -65,7 +67,12 @@ bool LuaInterface::Init()
 	}
 
 	if(luaL_loadfile(_lua, script) != LUA_OK)
+	{
+		const char *err = lua_tostring(_lua, -1);
+		if(err)
+			puts(err);
 		return false;
+	}
 
 	// push args
 	for(int i = 0; i < argc; ++i)
@@ -116,6 +123,42 @@ void LuaInterface::lookupFunc(const char *f)
     lua_getglobal(_lua, f);
 }
 
+void LuaInterface::lookupMethod(void *o, const char *func)
+{
+    int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, o);
+#ifdef DEBUG
+	assert(lty == LUA_TUSERDATA);
+#endif
+    // now [Lglue]
+    lty = lua_getfield(_lua, -1, func);
+#ifdef DEBUG
+	assert(lty == LUA_TFUNCTION);
+#endif
+    // now [Lglue][func]
+    lua_insert(_lua, -2);
+    // now [func][Lglue]
+}
+
+LuaObjGlue *LuaInterface::createObject(void *o, unsigned ty, const char *classname)
+{
+	LuaObjGlue *glue = new(lua_newuserdata(_lua, sizeof(LuaObjGlue))) LuaObjGlue(o, ty);
+	// [Lglue] // Lua glue object - not the same as the glue pointer
+	luaL_getmetatable(_lua, classname);
+	// [Lglue][mt]
+	lua_setmetatable(_lua, -2);
+	// [Lglue]
+	lua_rawsetp(_lua, LUA_REGISTRYINDEX, o); // REG[o] = Lglue // Now we can access Lglue given o
+	// []
+	return glue;
+}
+
+void LuaInterface::deleteObject(LuaObjGlue *glue)
+{
+	lua_pushnil(_lua);
+    lua_rawsetp(_lua, LUA_REGISTRYINDEX, glue->obj);
+	glue->obj = NULL;
+}
+
 bool LuaInterface::doCall(int nparams, int nrets /* = 0 */)
 {
     if(lua_pcall(_lua, nparams, nrets, 0) != LUA_OK)
@@ -125,6 +168,12 @@ bool LuaInterface::doCall(int nparams, int nrets /* = 0 */)
         return false;
     }
     return true;
+}
+
+bool LuaInterface::callMethod(void *o, const char *func)
+{
+    lookupMethod(o, func);
+    return doCall(0+1); // first parameter is self (aka o)
 }
 
 bool LuaInterface::call(const char *func)

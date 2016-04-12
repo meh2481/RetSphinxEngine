@@ -3,6 +3,8 @@
 
 struct lua_State;
 
+class LuaObjGlue;
+
 class LuaInterface
 {
 public:
@@ -14,6 +16,9 @@ public:
     void Shutdown();
     void GC();
     unsigned int MemUsed();
+	
+	LuaObjGlue *createObject(void *o, unsigned ty, const char *classname);
+	void deleteObject(LuaObjGlue *glue);
 
     bool call(const char *f);
     bool call(const char *f, const char *);
@@ -25,6 +30,7 @@ public:
 	bool call(const char *func, int a, int b, int c, int d, int e);
 	bool call(const char *func, const char *a, const char *b, const char *c, const char *d, const char *e);
 	bool call(const char *func, const char *a, const char *b, const char *c, const char *d);
+	bool callMethod(void *o, const char *func);
 	
 	//TODO: Add functions that call luaL_newmetatable() and all that, rather than just getState()
 	lua_State* getState() {return _lua;};
@@ -32,6 +38,8 @@ public:
 protected:
 
     void lookupFunc(const char *f);
+	void lookupObject(void *o); // push Lua representation of an object
+	void lookupMethod(void *o, const char *func); // Push object and its method as function
     bool doCall(int nparams, int nrets = 0);
 
 	const char *script;
@@ -39,6 +47,18 @@ protected:
 	const char *const *argv;
 
     lua_State *_lua;
+};
+
+class LuaObjGlue
+{
+	friend class LuaInterface;
+public:
+	LuaObjGlue(void *p, unsigned ty) : obj(p), type(ty) {}
+	void *obj; // read-only
+	const unsigned type;
+	
+private:
+	LuaObjGlue(const LuaObjGlue&); // non-copyable
 };
 
 #endif

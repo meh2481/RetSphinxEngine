@@ -1,1 +1,1 @@
-make &&  gdb ./GameEngine.exe -ex r -ex q
+make -j5 &&  gdb ./GameEngine.exe -ex r -ex q

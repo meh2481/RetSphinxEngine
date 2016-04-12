@@ -4,7 +4,8 @@
 */
 
 #include "Object.h"
-#include "lauxlib.h"
+//#include "lua.hpp"
+#include "luafuncs.h"
 
 //----------------------------------------------------------------------------------------------------
 // obj class
@@ -25,6 +26,9 @@ obj::~obj()
 	if(lua)
 	{
 		//TODO: Call Lua destroy()
+		lua->callMethod(this, "destroy");
+		
+		lua->deleteObject(glueObj);
 	}
     for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
@@ -173,9 +177,11 @@ void obj::initLua()
 		lua_State* L = lua->getState();
 		
 		//Parse this lua file first
-		luaL_dofile(L, luaFile.c_str());
+		//luaL_loadfile(L, luaFile.c_str());
+		glueObj = lua->createObject(this, OT_OBJECT, "spaceship");	//TODO: ADD CLASSNAME & GLUE OBJ
 		
 		
+		lua->callMethod(this, "init");
 		
 		//Call lua->whatever() for lua_setmetatable() and stuff
 		//TODO: Call Lua init() function in file defined by luaFile

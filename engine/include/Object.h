@@ -78,6 +78,7 @@ public:
 class obj : public Drawable
 {
 	objframe* curFrame;
+	LuaObjGlue* glueObj;
 public:
     list<physSegment*> segments;
 	list<anim*> animations;

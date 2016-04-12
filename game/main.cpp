@@ -20,7 +20,8 @@ int main(int argc, char** argv)
 	FreeImage_Initialise();
 	
 	LuaInterface Lua("res/lua/init.lua", argc, argv);
-	Lua.Init();
+	
+	if(!Lua.Init()) return 1;
 	
 	GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "GameEngine", "GameEngine", ICONNAME, true); //Create our engine
 	eng->setLua(&Lua);
