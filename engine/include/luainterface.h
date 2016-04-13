@@ -36,6 +36,7 @@ public:
 	bool callMethod(void *o, const char *func);
 	bool callMethod(void *o, const char *func, float a);
 	bool callMethod(void *o, const char *func, float a, float b);
+	bool callMethod(void *o, const char *func, void* other);
 	
 	//TODO: Add functions that call luaL_newmetatable() and all that, rather than just getState()
 	lua_State* getState() {return _lua;};

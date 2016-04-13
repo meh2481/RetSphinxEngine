@@ -189,6 +189,16 @@ bool LuaInterface::callMethod(void *o, const char *func)
     return doCall(0+1); // first parameter is self (aka o)
 }
 
+bool LuaInterface::callMethod(void *o, const char *func, void* other)
+{
+    lookupMethod(o, func);
+	int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, other);
+#ifdef DEBUG
+	assert(lty == LUA_TUSERDATA);
+#endif
+    return doCall(1+1); // first parameter is self (aka o)
+}
+
 bool LuaInterface::callMethod(void *o, const char *func, float a, float b)
 {
     lookupMethod(o, func);

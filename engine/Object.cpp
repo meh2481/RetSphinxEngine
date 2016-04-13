@@ -4,7 +4,6 @@
 */
 
 #include "Object.h"
-//#include "lua.hpp"
 #include "luafuncs.h"
 
 //----------------------------------------------------------------------------------------------------
@@ -121,10 +120,7 @@ b2BodyDef* obj::update(float32 dt)
 	//}
 	
 	if(lua)
-	{
-		//Call Lua update(dt)
 		lua->callMethod(this, "update", dt);
-	}
 	
 	return def;
 }
@@ -160,18 +156,13 @@ b2Body* obj::getBody()
 void obj::collide(obj* other)
 {
 	if(lua)
-	{
-		//TODO: Call Lua collide(other)
-	}
+		lua->callMethod(this, "collide", other);
 }
 
 void obj::collideWall(Point ptNormal)
 {
 	if(lua)
-	{
-		//Call Lua collidewall(ptNormal.x, ptNormal.y)
 		lua->callMethod(this, "collidewall", ptNormal.x, ptNormal.y);
-	}
 }
 
 void obj::initLua()
@@ -179,6 +170,7 @@ void obj::initLua()
 	if(lua && luaClass.length())
 	{
 		lua_State* L = lua->getState();
+		lua->call("loadclass_test", luaClass.c_str());	//Create this class if it hasn't been created already
 		
 		//Parse this lua object first
 		glueObj = lua->createObject(this, TYPE, luaClass.c_str());

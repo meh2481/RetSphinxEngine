@@ -20,6 +20,7 @@ using namespace std;
 #define luaReturnInt(x) {lua_pushinteger(L, x); return 1; }
 #define luaReturnBool(x) { lua_pushboolean(L, x); return 1; }
 #define luaReturnStr(x) { lua_pushstring(L, x); return 1; }
+#define luaReturnString(x) { lua_pushstring(L, x.c_str()); return 1; }
 #define luaReturn2Strings(x,y) { lua_pushstring(L, x); lua_pushstring(L, y); return 2; }
 #define luaReturn3Strings(x,y,z) { lua_pushstring(L, x); lua_pushstring(L, y);  lua_pushstring(L, z); return 3; }
 #define luaReturnPtr(x) { luaPushPointer(L, x); return 1; }

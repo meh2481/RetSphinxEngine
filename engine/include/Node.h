@@ -4,10 +4,12 @@
 #include "Object.h"
 
 class Node {
+	LuaObjGlue* glueObj;
 public:
-	string luaFile;
+	enum { TYPE = OT_NODE };
+	string luaClass;
 	LuaInterface* lua;
-	map<string, string> values;	//This can be populated by XML and called from Lua! For userdata and such
+	map<string, string> propertyValues;	//This can be populated by XML and called from Lua! For userdata and such
 	
 	Node();
 	~Node();

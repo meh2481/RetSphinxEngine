@@ -136,10 +136,10 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 // Object functions
 //-----------------------------------------------------------------------------------------------------------
 
-luaFunc(obj_setVelocity)
+luaFunc(obj_setVelocity)	//TODO REMOVE OR IMPLEMENT
 {
 	obj *o = getObj<obj>(L);
-	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TIODO WROTEI ME
+	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TODO WRITE ME
 	//cout << o->luaClass << endl;
 	luaReturnNil();
 }
@@ -147,12 +147,13 @@ luaFunc(obj_setVelocity)
 luaFunc(obj_getPos)
 {
 	obj *o = getObj<obj>(L);
-	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TIODO WROTEI ME
-	//cout << o->luaClass << endl;
 	Point pt(0,0);
-	b2Body* bod = o->getBody();
-	if(bod != NULL)
-		pt = bod->GetPosition();
+	if(o)
+	{
+		b2Body* bod = o->getBody();
+		if(bod != NULL)
+			pt = bod->GetPosition();
+	}
 	luaReturnVec2(pt.x, pt.y);
 }
 
@@ -167,6 +168,36 @@ luaFunc(camera_centerOnXY)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Node functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(node_getProperty)
+{
+	string s;
+	Node* n = getObj<Node>(L);
+	if(n)
+	{
+		string sProp = lua_tostring(L, 2);
+		if(n->propertyValues.count(sProp))
+			s = n->propertyValues[sProp];
+	}
+	luaReturnString(s);
+}
+
+luaFunc(node_getPos)
+{
+	string s;
+	Node* n = getObj<Node>(L);
+	if(n)
+	{
+		string sProp = "pos";
+		if(n->propertyValues.count(sProp))
+			s = n->propertyValues[sProp];
+	}
+	Point pos = pointFromString(s);
+	luaReturnVec2(pos.x, pos.y);
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua function registerer
 //-----------------------------------------------------------------------------------------------------------
 
@@ -176,6 +207,8 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getPos),
 	luaRegister(camera_centerOnXY),
+	luaRegister(node_getProperty),
+	luaRegister(node_getPos),
 	//luaRegister(),
 	{NULL, NULL}
 };

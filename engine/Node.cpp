@@ -9,23 +9,18 @@ Node::Node()
 Node::~Node()
 {
 	if(lua)
-	{
-		//TODO: Call Lua destroy()
-	}	
+		lua->callMethod(this, "destroy");
 }
 
 //Node creation
 void Node::init()
 {
-	if(lua && luaFile.length())
+	if(lua && luaClass.length())
 	{
 		lua_State* L = lua->getState();
-		
-		//Parse this lua file first
-		//luaL_loadfile(L, luaFile.c_str());
-		
-		
-		//TODO: Call Lua init()
+		lua->call("loadclass_test", luaClass.c_str());
+		glueObj = lua->createObject(this, TYPE, luaClass.c_str());
+		lua->callMethod(this, "init");
 	}
 }
 
@@ -33,16 +28,12 @@ void Node::init()
 void Node::update(float32 dt)
 {
 	if(lua)
-	{
-		//TODO: Call Lua update(dt)
-	}
+		lua->callMethod(this, "update", dt);
 }
 
 //Collided with an object
 void Node::collided(obj* o)
 {
 	if(lua)
-	{
-		//TODO: Call Lua collide(obj)
-	}
+		lua->callMethod(this, "collide", o);
 }

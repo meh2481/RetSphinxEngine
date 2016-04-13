@@ -638,19 +638,19 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	fixture->QueryBoolAttribute("sensor", &fixtureDef.isSensor);
 	
 	//Create node if this is one
-	const char* cLua = fixture->Attribute("luafile");
+	const char* cLua = fixture->Attribute("luaclass");
 	if(cLua)
 	{
 		Node* n = new Node();
-		n->luaFile = cLua;
-		n->lua = Lua;
+		n->luaClass = cLua;
+		n->lua = Lua;			//TODO: Better handling of node/object Lua stuff
 		
 		//Populate this node with ALL THE INFO in case Lua wants it
 		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
-			n->values[attrib->Name()] = attrib->Value();
+			n->propertyValues[attrib->Name()] = attrib->Value();
 		
 		addNode(n);
-		fixtureDef.userData = (void*)n;
+		fixtureDef.userData = (void*)n;	//TODO: Use heavy userdata
 	}
 	
 	bod->CreateFixture(&fixtureDef);
