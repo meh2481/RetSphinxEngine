@@ -477,12 +477,12 @@ void Engine::stepPhysics(float32 dt)
 			//TODO: Decide if we should also call B->A collision
 			c.objA->collide(c.objB);
 		}
-		else if(c.objA)
+		else if(c.objA && !c.nodeB)
 		{
 			b2Vec2 pt = -worldManifold.normal;	//Flip this, since a Box2D normal is defined from A->B, and we want a wall->obj normal
 			c.objA->collideWall(pt);
 		}
-		else if(c.objB)
+		else if(c.objB && !c.nodeA)
 		{
 			c.objB->collideWall(worldManifold.normal);
 		}

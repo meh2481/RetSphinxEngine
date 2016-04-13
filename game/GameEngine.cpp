@@ -225,14 +225,14 @@ void GameEngine::draw()
 	//Draw objects
 	glLoadIdentity();
 	//glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
-	if(ship != NULL)
-	{
-		b2Body* b = ship->getBody();
-		if(b != NULL)
-		{
-			Point p = b->GetPosition();
-			CameraPos.x = -p.x;
-			CameraPos.y = -p.y;
+	//if(ship != NULL)
+	//{
+		//b2Body* b = ship->getBody();
+		//if(b != NULL)
+		//{
+			Point p;// = b->GetPosition();
+			//CameraPos.x = -p.x;
+			//CameraPos.y = -p.y;
 			
 			//Keep camera within camera bounds
 			//TODO: This messes up with vertical camera position when zooming out. Fix.
@@ -265,8 +265,8 @@ void GameEngine::draw()
 			
 			gluLookAt(p.x, p.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, p.x, p.y, 0.0f, 0, 0, 1);
 			//gluLookAt(p.x, p.y-8, -CameraPos.z+2, p.x, p.y, 0.0f, 0, 0, 1);
-		}
-	}
+		//}
+	//}
 	
 	glDisable(GL_LIGHTING);
 	drawAll();

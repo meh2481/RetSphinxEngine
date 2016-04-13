@@ -94,6 +94,7 @@ void obj::draw()
 
 void obj::addSegment(physSegment* seg)
 {
+	if(seg == NULL) return;
     segments.push_back(seg);
 	seg->parent = this;
 }

@@ -16,6 +16,11 @@ public:
 	{
 		g_pGlobalEngine->rumbleController(fAmt, len, priority);
 	}
+	static void camera_centerOnXY(Point pt)
+	{
+		g_pGlobalEngine->CameraPos.x = -pt.x;
+		g_pGlobalEngine->CameraPos.y = -pt.y;
+	}
 };
 
 
@@ -25,7 +30,7 @@ public:
 // Lua->C++ casting functions and such
 //-----------------------------------------------------------------------------------------------------------
 
-struct ObjGlue
+/*struct ObjGlue
 {
 	void *ptr;
 	ObjMainType maintype;
@@ -96,14 +101,24 @@ void pushObjPtr(ObjMainType ty, lua_State *L, void *ptr)
 		lua_pushnil(L);
 }
 
-//Functions for casting object types from Lua->C++
+/Functions for casting object types from Lua->C++
 static Image *getImage(lua_State *L, int idx = 1, bool allowNil = false)
 {
 	return getObjPtr<Image>(OT_IMAGE, L, idx, allowNil);
-}
+}*/
 
 //TODO: Other functions for casting
 
+
+
+//TODO: lua call node to get properties (Node::values<> map)
+
+template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
+{
+	LuaObjGlue *glue = (LuaObjGlue*)lua_touserdata(L, pos);
+	void *p = T::TYPE == glue->type ? glue->obj : NULL; // TODO ALSO ERROR CHECKS
+	return (T*)p;
+}
 
 //-----------------------------------------------------------------------------------------------------------
 // Lua interface functions (can be called from lua)
@@ -117,24 +132,39 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 	GameEngineLua::rumble(force, sec, priority);
 }
 
-//TODO: lua call node to get properties (Node::values<> map)
-
-template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
-{
-	LuaObjGlue *glue = (LuaObjGlue*)lua_touserdata(L, pos);
-	void *p = T::TYPE == glue->type ? glue->obj : NULL; // TODO ALSO ERROR CHECKS
-	return (T*)p;
-}
+//-----------------------------------------------------------------------------------------------------------
+// Object functions
+//-----------------------------------------------------------------------------------------------------------
 
 luaFunc(obj_setVelocity)
 {
 	obj *o = getObj<obj>(L);
 	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TIODO WROTEI ME
-	luaReturnSelf();
+	//cout << o->luaClass << endl;
+	luaReturnNil();
 }
 
+luaFunc(obj_getPos)
+{
+	obj *o = getObj<obj>(L);
+	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TIODO WROTEI ME
+	//cout << o->luaClass << endl;
+	Point pt(0,0);
+	b2Body* bod = o->getBody();
+	if(bod != NULL)
+		pt = bod->GetPosition();
+	luaReturnVec2(pt.x, pt.y);
+}
 
-
+//-----------------------------------------------------------------------------------------------------------
+// Camera functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(camera_centerOnXY)
+{
+	Point pt(lua_tonumber(L, 1), lua_tonumber(L, 2));
+	GameEngineLua::camera_centerOnXY(pt);
+	luaReturnNil();
+}
 
 //-----------------------------------------------------------------------------------------------------------
 // Lua function registerer
@@ -143,6 +173,9 @@ luaFunc(obj_setVelocity)
 static LuaFunctions s_functab[] =
 {
 	luaRegister(rumblecontroller),
+	luaRegister(obj_setVelocity),
+	luaRegister(obj_getPos),
+	luaRegister(camera_centerOnXY),
 	//luaRegister(),
 	{NULL, NULL}
 };
