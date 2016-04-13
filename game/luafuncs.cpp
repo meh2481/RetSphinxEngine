@@ -119,8 +119,19 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 
 //TODO: lua call node to get properties (Node::values<> map)
 
+template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
+{
+	LuaObjGlue *glue = (LuaObjGlue*)lua_touserdata(L, pos);
+	void *p = T::TYPE == glue->type ? glue->obj : NULL; // TODO ALSO ERROR CHECKS
+	return (T*)p;
+}
 
-
+luaFunc(obj_setVelocity)
+{
+	obj *o = getObj<obj>(L);
+	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TIODO WROTEI ME
+	luaReturnSelf();
+}
 
 
 

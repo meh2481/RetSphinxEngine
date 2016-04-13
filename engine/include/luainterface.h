@@ -38,7 +38,7 @@ public:
 protected:
 
     void lookupFunc(const char *f);
-	void lookupObject(void *o); // push Lua representation of an object
+	//void lookupObject(void *o); // push Lua representation of an object
 	void lookupMethod(void *o, const char *func); // Push object and its method as function
     bool doCall(int nparams, int nrets = 0);
 

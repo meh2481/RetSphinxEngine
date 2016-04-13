@@ -11,6 +11,7 @@
 #include "3DObject.h"
 #include "Drawable.h"
 #include "LuaInterface.h"
+#include "luafuncs.h"
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -80,6 +81,7 @@ class obj : public Drawable
 	objframe* curFrame;
 	LuaObjGlue* glueObj;
 public:
+	enum { TYPE = OT_OBJECT };
     list<physSegment*> segments;
 	list<anim*> animations;
 	map<string, objframe*> frames;

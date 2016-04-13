@@ -178,7 +178,7 @@ void obj::initLua()
 		
 		//Parse this lua file first
 		//luaL_loadfile(L, luaFile.c_str());
-		glueObj = lua->createObject(this, OT_OBJECT, "spaceship");	//TODO: ADD CLASSNAME & GLUE OBJ
+		glueObj = lua->createObject(this, TYPE, "spaceship");	//TODO: ADD CLASSNAME & GLUE OBJ
 		
 		
 		lua->callMethod(this, "init");
