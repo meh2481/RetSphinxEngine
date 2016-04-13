@@ -3,7 +3,7 @@
 - Add ImGUI - super-simple GUI for editing
 - Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
 - Go through and find if globaldefs.h can be non-included in some header files
-
+- Unify log, so messages go to console & errlog file
 
 
 

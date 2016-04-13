@@ -86,7 +86,7 @@ public:
     list<physSegment*> segments;
 	list<anim*> animations;
 	map<string, objframe*> frames;
-    b2Body*         body;
+    b2Body*         body;				//TODO: is this ever even used?
 	Image*			meshImg;
 	lattice*		meshLattice;
 	latticeAnim*	meshAnim;

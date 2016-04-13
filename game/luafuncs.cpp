@@ -21,6 +21,14 @@ public:
 		g_pGlobalEngine->CameraPos.x = -pt.x;
 		g_pGlobalEngine->CameraPos.y = -pt.y;
 	}
+	static obj* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
+	{
+		return g_pGlobalEngine->objFromXML(sClassName, ptOffset, ptVel);
+	}
+	static void addObject(obj* o)
+	{
+		g_pGlobalEngine->addAfterUpdate(o);
+	}
 };
 
 
@@ -144,7 +152,7 @@ luaFunc(obj_setVelocity)	//TODO REMOVE OR IMPLEMENT
 	luaReturnNil();
 }
 
-luaFunc(obj_getPos)
+luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 {
 	obj *o = getObj<obj>(L);
 	Point pt(0,0);
@@ -157,10 +165,37 @@ luaFunc(obj_getPos)
 	luaReturnVec2(pt.x, pt.y);
 }
 
+luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, float xvel, float yvel)
+{
+	if(!lua_isstring(L,1)) luaReturnNil();
+	
+	ostringstream oss;
+	oss << "res/obj/" << lua_tostring(L, 1) << ".xml";
+	
+	Point ptPos(0,0);
+	Point ptVel(0,0);
+	if(lua_isnumber(L, 2))
+		ptPos.x = lua_tonumber(L, 2);
+	if(lua_isnumber(L, 3))
+		ptPos.y = lua_tonumber(L, 3);
+	if(lua_isnumber(L, 4))
+		ptVel.x = lua_tonumber(L, 4);
+	if(lua_isnumber(L, 5))
+		ptVel.y = lua_tonumber(L, 5);
+	obj* o = GameEngineLua::xmlParseObj(oss.str().c_str(), ptPos, ptVel);
+	if(o)
+	{
+		GameEngineLua::addObject(o);
+		lua_rawgetp(L, LUA_REGISTRYINDEX, o);
+		return 1;
+	}
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Camera functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(camera_centerOnXY)
+luaFunc(camera_centerOnXY)	//camera_centerOnXY(float x, float y)
 {
 	Point pt(lua_tonumber(L, 1), lua_tonumber(L, 2));
 	GameEngineLua::camera_centerOnXY(pt);
@@ -170,7 +205,7 @@ luaFunc(camera_centerOnXY)
 //-----------------------------------------------------------------------------------------------------------
 // Node functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(node_getProperty)
+luaFunc(node_getProperty)	//string node_getProperty(Node* n, string propName)
 {
 	string s;
 	Node* n = getObj<Node>(L);
@@ -183,17 +218,12 @@ luaFunc(node_getProperty)
 	luaReturnString(s);
 }
 
-luaFunc(node_getPos)
+luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 {
-	string s;
+	Point pos(0,0);
 	Node* n = getObj<Node>(L);
 	if(n)
-	{
-		string sProp = "pos";
-		if(n->propertyValues.count(sProp))
-			s = n->propertyValues[sProp];
-	}
-	Point pos = pointFromString(s);
+		pos = n->pos;
 	luaReturnVec2(pos.x, pos.y);
 }
 
@@ -206,6 +236,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(rumblecontroller),
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getPos),
+	luaRegister(obj_create),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getPos),

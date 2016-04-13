@@ -242,6 +242,12 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	const char* cLuaFile = root->Attribute("luaclass");
 	if(cLuaFile)
 		o->luaClass = cLuaFile;
+	else
+	{
+		delete o;
+		errlog << "Unable to register Lua class for object " << sXMLFilename << endl;
+		return NULL;
+	}
 	
 	//TODO: Yuck leftover soft body stuff. Fix or get rid
 	string sMeshCenterObj = "";
@@ -387,6 +393,7 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	}
 	
 	delete doc;
+	o->lua = Lua;
 	return o;
 }
 
@@ -498,7 +505,6 @@ void GameEngine::loadScene(string sXMLFilename)
 					}
 				}
 			}
-			o->lua = Lua;
 			addObject(o);
 		}
 	}
@@ -587,6 +593,8 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	b2PolygonShape dynamicBox;
 	b2CircleShape dynamicCircle;
 	
+	Point pos;
+	
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
 	{
@@ -607,7 +615,10 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		Point p(0,0);
 		const char* cPos = fixture->Attribute("pos");
 		if(cPos)
+		{
 			p = pointFromString(cPos);
+			pos = p;
+		}
 		
 		//Get rotation (angle) of box
 		float32 fRot = 0.0f;
@@ -622,7 +633,10 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	{
 		const char* cCircPos = fixture->Attribute("pos");
 		if(cCircPos)
+		{
 			dynamicCircle.m_p = pointFromString(cCircPos);
+			pos = dynamicCircle.m_p;
+		}
 			
 		dynamicCircle.m_radius = 1.0f;
 		fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
@@ -644,6 +658,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		Node* n = new Node();
 		n->luaClass = cLua;
 		n->lua = Lua;			//TODO: Better handling of node/object Lua stuff
+		n->pos = pos;
 		
 		//Populate this node with ALL THE INFO in case Lua wants it
 		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())

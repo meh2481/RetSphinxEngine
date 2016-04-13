@@ -40,6 +40,7 @@ private:
 	bool m_bMouseGrabOnWindowRegain;
 	float32 m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
+	list<obj*> m_lAddLater;
 	SDL_Joystick *m_joy;
 	SDL_Haptic* m_rumble;
 	
@@ -88,6 +89,7 @@ public:
 	void rumbleController(float32 strength, float32 sec, int priority = 0);	//Rumble the controller
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void updateShip();
+	void addAfterUpdate(obj* o) {m_lAddLater.push_back(o);};	//Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float32 dt);

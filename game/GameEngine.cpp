@@ -143,9 +143,14 @@ void GameEngine::frame(float32 dt)
 {
 	handleKeys();
 	stepPhysics(dt);
-	//for(int i = 0; i < 5; i++)
-		updateParticles(dt);
+	updateParticles(dt);
 	updateObjects(dt);
+	
+	//Add any objects created during updating this frame
+	for(list<obj*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
+		addObject(*i);
+	m_lAddLater.clear();
+	
 	updateShip();
 	//m_lAnimTest->update(dt);
 	
