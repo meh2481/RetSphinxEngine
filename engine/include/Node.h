@@ -11,6 +11,7 @@ public:
 	LuaInterface* lua;
 	map<string, string> propertyValues;	//This can be populated by XML and called from Lua! For userdata and such
 	Point pos;
+	string name;
 	
 	Node();
 	~Node();

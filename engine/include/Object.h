@@ -109,6 +109,7 @@ public:
 	void collide(obj* other);
 	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
+	void setPosition(Point p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
 };
 
 //Anim types

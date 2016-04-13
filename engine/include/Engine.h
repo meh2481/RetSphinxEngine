@@ -222,6 +222,7 @@ public:
 	void cleanupObjects();
 	void updateObjects(float32 dt);
 	void addNode(Node* n);
+	Node* getNode(string sNodeName);
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered)	{SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);};

@@ -119,3 +119,13 @@ void Engine::updateObjects(float32 dt)
 		(*i)->update(dt);
 	}
 }
+
+Node* Engine::getNode(string sNodeName)
+{
+	for(list<Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
+	{
+		if((*i)->name == sNodeName)
+			return (*i);
+	}
+	return NULL;
+}

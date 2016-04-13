@@ -55,6 +55,8 @@ private:
 	ParticleSystem* shipTrail;
 	Point shipMoveVec;
 	Rect rcSceneBounds;
+	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
+	string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 
 protected:
 	void frame(float32 dt);
@@ -90,6 +92,7 @@ public:
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void updateShip();
 	void addAfterUpdate(obj* o) {m_lAddLater.push_back(o);};	//Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
+	void warpObjectToNode(obj* o, Node* n);
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float32 dt);

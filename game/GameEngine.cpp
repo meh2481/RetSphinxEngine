@@ -160,6 +160,22 @@ void GameEngine::frame(float32 dt)
 	//updateSceneryLayer(m_sun);
 	
 	shipMoveVec.SetZero();	//Reset this for movement next frame
+	
+	//Load a new scene after updating if we've been told to
+	if(m_sLoadScene.size())
+	{
+		//cout << "Load scene " << m_sLoadScene << ", " << m_sLoadNode << endl;
+		reloadImages();
+		loadScene(m_sLoadScene);
+		m_sLoadScene.clear();
+		if(m_sLoadNode.size())
+		{
+			//cout << "warp to node " << m_sLoadNode << endl;
+			//Warp to node on map
+			warpObjectToNode(ship, getNode(m_sLoadNode));
+			m_sLoadNode.clear();
+		}
+	}
 }
 
 #define CAMERA_ANGLE_RAD PI/2.0//1.152572
@@ -454,7 +470,11 @@ void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
 	addParticles(pSys);
 }
 
-
+void GameEngine::warpObjectToNode(obj* o, Node* n)
+{
+	if(o && n)
+		o->setPosition(n->pos);
+}
 
 
 

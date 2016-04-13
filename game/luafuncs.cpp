@@ -16,18 +16,32 @@ public:
 	{
 		g_pGlobalEngine->rumbleController(fAmt, len, priority);
 	}
+	
 	static void camera_centerOnXY(Point pt)
 	{
 		g_pGlobalEngine->CameraPos.x = -pt.x;
 		g_pGlobalEngine->CameraPos.y = -pt.y;
 	}
+	
 	static obj* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
 	{
 		return g_pGlobalEngine->objFromXML(sClassName, ptOffset, ptVel);
 	}
+	
 	static void addObject(obj* o)
 	{
 		g_pGlobalEngine->addAfterUpdate(o);
+	}
+	
+	static obj* getPlayerObject()
+	{
+		return g_pGlobalEngine->ship;
+	}
+	
+	static void loadMap(string sMap, string sNode = "")
+	{
+		g_pGlobalEngine->m_sLoadScene = sMap;
+		g_pGlobalEngine->m_sLoadNode = sNode;
 	}
 };
 
@@ -37,90 +51,6 @@ public:
 //-----------------------------------------------------------------------------------------------------------
 // Lua->C++ casting functions and such
 //-----------------------------------------------------------------------------------------------------------
-
-/*struct ObjGlue
-{
-	void *ptr;
-	ObjMainType maintype;
-};
-
-class LuaStackCheck
-{
-public:
-	LuaStackCheck(lua_State *L, int offs = 0) : _L(L), _top(lua_gettop(L)), _offs(offs) {}
-	~LuaStackCheck() 
-	{ 
-		int top = lua_gettop(_L);
-		if(top != _top+_offs)
-			errlog << "Uh, oh, lua stack baaaaaad times " << top << ", " << _top+_offs << endl;
-#ifdef DEBUG
-		assert(top == _top+_offs);
-#endif
-		//UNUSED(top);
-	}
-private:
-	lua_State *_L;
-	int _top;
-	int _offs;
-};
-
-
-//Glue helper functions from fg
-template <typename T1> T1* getObjPtr(ObjMainType ty, lua_State *L, int idx = 1, bool allowNil = false)
-{
-	ObjGlue *glue = static_cast<ObjGlue*>(lua_touserdata(L, idx));
-	if(!glue)
-	{
-		if(allowNil && lua_isnoneornil(L, idx))
-			return NULL;
-		const char *tyname = lua_typename(L, lua_type(L, idx));
-		lua_pushfstring(L, "Invalid userdata! Got type: %s", tyname);
-		lua_error(L);
-		//UNREACHABLE;
-	}
-	if(glue->maintype != ty)
-	{
-		lua_pushliteral(L, "Unexpected object type!");
-		lua_error(L);
-	}
-	return static_cast<T1*>(glue->ptr);
-}
-
-// creates glue object and leaves it on the stack
-// TODO: Improve this function or get new version from fgenesis
-void pushObjPtr(ObjMainType ty, lua_State *L, void *ptr)
-{
-	LuaStackCheck chk(L, 1);
-
-	ObjGlue *glue = NULL;
-	if(ptr)
-	{
-		glue = static_cast<ObjGlue*>(lua_newuserdata(L, sizeof(ObjGlue))); // [glue]
-		glue->ptr = ptr;
-		glue->maintype = ty;
-
-		// Create reverse mapping so that the userdata can be looked up given ptr only.
-		lua_getfield(L, LUA_REGISTRYINDEX, "_objects");   // [glue][_objects]
-		lua_pushvalue(L, -2);                             // [glue][_objects][glue]
-		lua_rawsetp(L, -2, ptr);                          // [glue][_objects]   ; _objects[ptr] = glue
-		lua_pop(L, 1);                                    // [glue]
-	}
-	else
-		lua_pushnil(L);
-}
-
-/Functions for casting object types from Lua->C++
-static Image *getImage(lua_State *L, int idx = 1, bool allowNil = false)
-{
-	return getObjPtr<Image>(OT_IMAGE, L, idx, allowNil);
-}*/
-
-//TODO: Other functions for casting
-
-
-
-//TODO: lua call node to get properties (Node::values<> map)
-
 template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 {
 	LuaObjGlue *glue = (LuaObjGlue*)lua_touserdata(L, pos);
@@ -138,6 +68,14 @@ luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is 
 	float32 sec = lua_tonumber(L, 2);
 	int priority = lua_tointeger(L, 3);
 	GameEngineLua::rumble(force, sec, priority);
+}
+
+luaFunc(map_load)
+{
+	if(lua_isstring(L, 2))
+		GameEngineLua::loadMap(lua_tostring(L, 1), lua_tostring(L, 2));
+	else
+		GameEngineLua::loadMap(lua_tostring(L, 1));
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -196,6 +134,17 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 	if(o)
 	{
 		GameEngineLua::addObject(o);
+		lua_rawgetp(L, LUA_REGISTRYINDEX, o);
+		return 1;
+	}
+	luaReturnNil();
+}
+
+luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
+{
+	obj* o = GameEngineLua::getPlayerObject();
+	if(o)
+	{
 		lua_rawgetp(L, LUA_REGISTRYINDEX, o);
 		return 1;
 	}
@@ -261,10 +210,12 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getPos),
 	luaRegister(obj_create),
 	luaRegister(obj_applyForce),
+	luaRegister(obj_getPlayer),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
+	luaRegister(map_load),
 	//luaRegister(),
 	{NULL, NULL}
 };

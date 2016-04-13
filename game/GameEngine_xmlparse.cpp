@@ -656,6 +656,10 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
 		n->pos = pos;
 		
+		const char* cName = fixture->Attribute("name");
+		if(cName)
+			n->name = cName;
+		
 		//Populate this node with ALL THE INFO in case Lua wants it
 		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
 			n->propertyValues[attrib->Name()] = attrib->Value();
