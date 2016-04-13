@@ -204,8 +204,12 @@ void GameEngine::saveConfig(string sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 
 //TODO: This should be engine-specific, not game-specific
-obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
+obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 {
+	ostringstream oss;
+	oss << "res/obj/" << sType << ".xml";
+	string sXMLFilename = oss.str();
+	
 	errlog << "Parsing object XML file " << sXMLFilename << endl;
 	//Open file
 	XMLDocument* doc = new XMLDocument;
@@ -239,15 +243,7 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	bool makeMesh = false;
 	root->QueryBoolAttribute("softbody", &makeMesh);
 	
-	const char* cLuaFile = root->Attribute("luaclass");
-	if(cLuaFile)
-		o->luaClass = cLuaFile;
-	else
-	{
-		delete o;
-		errlog << "Unable to register Lua class for object " << sXMLFilename << endl;
-		return NULL;
-	}
+	o->luaClass = sType;
 	
 	//TODO: Yuck leftover soft body stuff. Fix or get rid
 	string sMeshCenterObj = "";
@@ -466,11 +462,11 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load objects
 	for(XMLElement* object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object"))
 	{
-		const char* cFilename = object->Attribute("file");
+		const char* cObjType = object->Attribute("type");
 		const char* cName = object->Attribute("name");
 		const char* cPos = object->Attribute("pos");
 		const char* cVel = object->Attribute("vel");
-		if(cFilename != NULL)
+		if(cObjType != NULL)
 		{
 			Point pos(0,0);
 			Point vel(0,0);
@@ -481,7 +477,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(cVel != NULL)
 				vel = pointFromString(cVel);
 			
-			obj* o = objFromXML(cFilename, pos, vel);
+			obj* o = objFromXML(cObjType, pos, vel);
 			
 			if(o != NULL && cName != NULL)
 			{
@@ -657,7 +653,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	{
 		Node* n = new Node();
 		n->luaClass = cLua;
-		n->lua = Lua;			//TODO: Better handling of node/object Lua stuff
+		n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
 		n->pos = pos;
 		
 		//Populate this node with ALL THE INFO in case Lua wants it

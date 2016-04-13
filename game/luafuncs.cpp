@@ -152,6 +152,19 @@ luaFunc(obj_setVelocity)	//TODO REMOVE OR IMPLEMENT
 	luaReturnNil();
 }
 
+luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
+{
+	obj *o = getObj<obj>(L);
+	Point pForce(lua_tonumber(L,2),lua_tonumber(L, 3));
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+			b->ApplyForceToCenter(pForce, true);
+	}
+	luaReturnNil();
+}
+
 luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 {
 	obj *o = getObj<obj>(L);
@@ -169,9 +182,6 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 {
 	if(!lua_isstring(L,1)) luaReturnNil();
 	
-	ostringstream oss;
-	oss << "res/obj/" << lua_tostring(L, 1) << ".xml";
-	
 	Point ptPos(0,0);
 	Point ptVel(0,0);
 	if(lua_isnumber(L, 2))
@@ -182,7 +192,7 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 		ptVel.x = lua_tonumber(L, 4);
 	if(lua_isnumber(L, 5))
 		ptVel.y = lua_tonumber(L, 5);
-	obj* o = GameEngineLua::xmlParseObj(oss.str().c_str(), ptPos, ptVel);
+	obj* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
 	if(o)
 	{
 		GameEngineLua::addObject(o);
@@ -218,6 +228,19 @@ luaFunc(node_getProperty)	//string node_getProperty(Node* n, string propName)
 	luaReturnString(s);
 }
 
+luaFunc(node_getVec2Property)	//float x, float y node_getVec2Property(Node* n, string propName)
+{
+	Point pt(0,0);
+	Node* n = getObj<Node>(L);
+	if(n)
+	{
+		string sProp = lua_tostring(L, 2);
+		if(n->propertyValues.count(sProp))
+			pt = pointFromString(n->propertyValues[sProp]);
+	}
+	luaReturnVec2(pt.x, pt.y);
+}
+
 luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 {
 	Point pos(0,0);
@@ -237,8 +260,10 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getPos),
 	luaRegister(obj_create),
+	luaRegister(obj_applyForce),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
+	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
 	//luaRegister(),
 	{NULL, NULL}
