@@ -189,6 +189,21 @@ bool LuaInterface::callMethod(void *o, const char *func)
     return doCall(0+1); // first parameter is self (aka o)
 }
 
+bool LuaInterface::callMethod(void *o, const char *func, float a, float b)
+{
+    lookupMethod(o, func);
+	lua_pushnumber(_lua, a);
+	lua_pushnumber(_lua, b);
+    return doCall(2+1); // first parameter is self (aka o)
+}
+
+bool LuaInterface::callMethod(void *o, const char *func, float a)
+{
+    lookupMethod(o, func);
+	lua_pushnumber(_lua, a);
+    return doCall(1+1); // first parameter is self (aka o)
+}
+
 bool LuaInterface::call(const char *func)
 {
     lookupFunc(func);

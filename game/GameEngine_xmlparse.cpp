@@ -239,9 +239,9 @@ obj* GameEngine::objFromXML(string sXMLFilename, Point ptOffset, Point ptVel)
 	bool makeMesh = false;
 	root->QueryBoolAttribute("softbody", &makeMesh);
 	
-	const char* cLuaFile = root->Attribute("luafile");
+	const char* cLuaFile = root->Attribute("luaclass");
 	if(cLuaFile)
-		o->luaFile = cLuaFile;
+		o->luaClass = cLuaFile;
 	
 	//TODO: Yuck leftover soft body stuff. Fix or get rid
 	string sMeshCenterObj = "";

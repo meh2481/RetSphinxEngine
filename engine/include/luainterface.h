@@ -20,6 +20,7 @@ public:
 	LuaObjGlue *createObject(void *o, unsigned ty, const char *classname);
 	void deleteObject(LuaObjGlue *glue);
 
+	//Direct method calls
     bool call(const char *f);
     bool call(const char *f, const char *);
     bool call(const char *f, const char *a, const char *b);
@@ -30,7 +31,11 @@ public:
 	bool call(const char *func, int a, int b, int c, int d, int e);
 	bool call(const char *func, const char *a, const char *b, const char *c, const char *d, const char *e);
 	bool call(const char *func, const char *a, const char *b, const char *c, const char *d);
+	
+	//Method calls on classes
 	bool callMethod(void *o, const char *func);
+	bool callMethod(void *o, const char *func, float a);
+	bool callMethod(void *o, const char *func, float a, float b);
 	
 	//TODO: Add functions that call luaL_newmetatable() and all that, rather than just getState()
 	lua_State* getState() {return _lua;};

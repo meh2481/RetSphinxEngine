@@ -88,7 +88,7 @@ GameEngine: $(ENGINE_OBJECTS) $(GAME_OBJECTS) $(RESOURCE_OBJECTS)
 	g++ $(CFLAGS) -o $@ $^ $(LIBS) $(LIBFOLDER)
 
 $(OBJ_PREFIX)%.o: game/%.cpp
-	g++ $(CFLAGS) -c -o $@ $< $(INCLUDE)
+	g++ $(CFLAGS) -c -MMD -o $@ $< $(INCLUDE)
 	
 $(OBJ_PREFIX)%.o: engine/%.cpp
 	g++ $(CFLAGS) -c -o $@ $< $(INCLUDE)
@@ -96,8 +96,10 @@ $(OBJ_PREFIX)%.o: engine/%.cpp
 $(OBJ_PREFIX)%.res: game/%.rc
 	windres $< -O coff -o $@
 
+-include $(objects:.o=.d)
+
 clean:
-	rm -f $(OBJ_PREFIX)*.o GameEngine.exe
+	rm -f $(OBJ_PREFIX)*.o $(OBJ_PREFIX)*.d GameEngine.exe
 
 objfolder:
 	$(MKDIR) $(OBJ_PREFIX)

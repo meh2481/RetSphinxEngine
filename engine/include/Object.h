@@ -76,6 +76,7 @@ public:
 };
 
 //Collections of the above all stuffed into one object for ease of use.
+//TODO: Rename from 'obj' to something more intelligent
 class obj : public Drawable
 {
 	objframe* curFrame;
@@ -93,7 +94,7 @@ public:
     void* usr;
 	string frame;
 	LuaInterface* lua;
-	string luaFile;
+	string luaClass;
     
     obj();
     ~obj();
