@@ -400,8 +400,7 @@ void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
 	cleanupParticles();
-	ship = NULL;
-	shipTrail = NULL;
+	player = NULL;
 	errlog << "Loading scene " << sXMLFilename << endl;
 	
 	XMLDocument* doc = new XMLDocument;
@@ -484,7 +483,6 @@ void GameEngine::loadScene(string sXMLFilename)
 				string s = cName;
 				if(s == "ship")
 				{
-					ship = o;
 					list<physSegment*>::iterator segiter = o->segments.begin();
 					if(segiter != o->segments.end())
 					{

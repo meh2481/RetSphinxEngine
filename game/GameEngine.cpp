@@ -75,9 +75,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	
 	m_joy = NULL;
 	m_rumble = NULL;
-	ship = NULL;
-	shipTrail = NULL;
-	shipMoveVec.SetZero();
+	player = NULL;
 	
 	//Keybinding stuff!
 	JOY_AXIS_HORIZ = 0;
@@ -152,15 +150,12 @@ void GameEngine::frame(float32 dt)
 		addObject(*i);
 	m_lAddLater.clear();
 	
-	updateShip();
 	//m_lAnimTest->update(dt);
 	
 	
 	//m_sun->pos.x = cos(DEG2RAD*fSunRotAmt) * 50;
 	//m_sun->depth = -sin(DEG2RAD*fSunRotAmt) * 50;
 	//updateSceneryLayer(m_sun);
-	
-	shipMoveVec.SetZero();	//Reset this for movement next frame
 	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
@@ -173,7 +168,7 @@ void GameEngine::frame(float32 dt)
 		{
 			//cout << "warp to node " << m_sLoadNode << endl;
 			//Warp to node on map
-			warpObjectToNode(ship, getNode(m_sLoadNode));
+			warpObjectToNode(player, getNode(m_sLoadNode));
 			m_sLoadNode.clear();
 		}
 	}

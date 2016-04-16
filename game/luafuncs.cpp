@@ -35,7 +35,12 @@ public:
 	
 	static obj* getPlayerObject()
 	{
-		return g_pGlobalEngine->ship;
+		return g_pGlobalEngine->player;
+	}
+	
+	static void setPlayerObject(obj* o)
+	{
+		g_pGlobalEngine->player = o;
 	}
 	
 	static void loadMap(string sMap, string sNode = "")
@@ -99,7 +104,7 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 // Lua interface functions (can be called from lua)
 //-----------------------------------------------------------------------------------------------------------
 
-luaFunc(rumblecontroller)	//void rumblecontroller(float force, float sec) --force is range [0,1]
+luaFunc(rumblecontroller)	//void rumblecontroller(float force, float sec) --force is range [0,1]	//TODO Proper capitalization
 {
 	float32 force = lua_tonumber(L, 1);
 	float32 sec = lua_tonumber(L, 2);
@@ -117,7 +122,7 @@ luaFunc(map_load)	//void map_load(string sFilename, string sNodeToPlacePlayerAt 
 	luaReturnNil();
 }
 
-luaFunc(getframerate)	//float getframerate()
+luaFunc(getframerate)	//float getframerate()	//TODO Proper capitalization
 {
 	luaReturnNum(GameEngineLua::getframerate());
 }
@@ -253,6 +258,14 @@ luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
 	luaReturnNil();
 }
 
+luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
+{
+	obj *o = getObj<obj>(L);
+	if(o)
+		GameEngineLua::setPlayerObject(o);
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Camera functions
 //-----------------------------------------------------------------------------------------------------------
@@ -310,13 +323,11 @@ luaFunc(particles_create)	//ParticleSystem* particles_create(string sXMLFile)
 	
 	ParticleSystem* ps = GameEngineLua::createParticles(lua_tostring(L, 1));
 	LuaInterface* LI = GameEngineLua::getLua();
-	ps->lua = LI;
-	LI->call("loadclass", "test");
-	ps->glue = LI->createObject(ps, ps->TYPE, "test");
+	ps->glue = LI->createObject(ps, ps->TYPE, NULL);
 	luaReturnObj(ps);
 }
 
-luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool fire)
+luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool fire)	//TODO Proper capitalization
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -324,7 +335,7 @@ luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool 
 	luaReturnNil();
 }
 
-luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, float rate [0..1+])
+luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, float rate [0..1+])	//TODO Proper capitalization
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -332,7 +343,7 @@ luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, f
 	luaReturnNil();
 }
 
-luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, float x, float y)
+luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, float x, float y)	//TODO Proper capitalization
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -340,7 +351,7 @@ luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, flo
 	luaReturnNil();
 }
 
-luaFunc(particles_setemitvel)	//void particles_setemitvel(ParticleSystem* p, float x, float y)
+luaFunc(particles_setemitvel)	//void particles_setemitvel(ParticleSystem* p, float x, float y)	//TODO Proper capitalization
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -383,6 +394,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_create),
 	luaRegister(obj_applyForce),
 	luaRegister(obj_getPlayer),
+	luaRegister(obj_registerPlayer),
 	luaRegister(obj_setAngle),
 	luaRegister(obj_getAngle),
 	luaRegister(camera_centerOnXY),

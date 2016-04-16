@@ -82,9 +82,7 @@ private:
 	//Testing stuff!
 	//Object3D* testObj;
 	//physSegment* m_sun;
-	obj* ship;
-	ParticleSystem* shipTrail;
-	Point shipMoveVec;
+	obj* player;
 	Rect rcSceneBounds;
 	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
 	string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
@@ -109,9 +107,8 @@ public:
 	bool _shouldSelect(b2Fixture* fix);
 
 	//Functions dealing with input and user IO - GameEngine_events.cpp
-	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD
+	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD //TODO Rip out or fix
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
-	void updateShip();
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
 	bool loadConfig(string sFilename);
