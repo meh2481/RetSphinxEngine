@@ -215,14 +215,7 @@ luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
 	obj *o = getObj<obj>(L);
 	Point p(lua_tonumber(L,2), lua_tonumber(L,3));
 	if(o)
-	{
-		b2Body* b = o->getBody();
-		if(b)
-		{
-			float f = b->GetAngle();
-			b->SetTransform(p, f);
-		}
-	}
+		o->setPosition(p);
 	luaReturnNil();
 }
 

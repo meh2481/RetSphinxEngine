@@ -183,11 +183,19 @@ void obj::initLua()
 void obj::setPosition(Point p)
 {
 	b2Body* b = getBody();
-	//cout << "move to " << pointToString(p) << endl;
-	if(b != NULL && segments.size() <= 1)	//Physics could go nuts if we have multiple bodies jointed together here...
-		b->SetTransform(p, b->GetAngle());	//TODO: Calculate relative offsets of all child bodies, iterate through, and set all to proper locations
-	//else
-	//	cout << "no movey " << segments.size() << endl;
+	if(b != NULL)
+	{
+		Point ptDiff = b->GetPosition();	//Get relative offset for all bodies
+		ptDiff = p - ptDiff;
+		for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+		{
+			if((*i)->body != NULL)
+			{
+				Point ptNew = (*i)->body->GetPosition() + ptDiff;
+				(*i)->body->SetTransform(ptNew, (*i)->body->GetAngle());
+			}
+		}
+	}
 }
 
 //----------------------------------------------------------------------------------------------------
