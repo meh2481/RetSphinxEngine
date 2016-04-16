@@ -18,7 +18,7 @@ void Engine::addObject(obj* o)
 	}
 }
 
-//TODO: Where is this even used
+/*/ This seems like a bad idea overall
 void Engine::updateSceneryLayer(physSegment* seg)
 {
 	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)
@@ -30,33 +30,7 @@ void Engine::updateSceneryLayer(physSegment* seg)
 		}
 	}
 	m_lScenery.insert(seg);
-}
-
-//TODO: Why do we have these separate if we have drawAll() already? Doesn't that make these incorrect because of z-ordering?
-void Engine::drawBg()
-{
-	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw bg layers
-	{
-		if((*layer)->depth > 0)
-			break;
-		(*layer)->draw();
-	}
-}
-
-void Engine::drawObjects()
-{
-	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Draw objects
-		(*i)->draw();
-}
-
-void Engine::drawFg()
-{
-	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)	//Draw fg layers
-	{
-		if((*layer)->depth > 0)
-			(*layer)->draw();
-	}
-}
+}*/
 
 void Engine::drawAll()
 {

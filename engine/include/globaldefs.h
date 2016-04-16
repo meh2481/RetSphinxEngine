@@ -174,4 +174,7 @@ float32 getAngle(const Point& p);	//Get angle of a vector
 
 float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high, float freqinc);
 
+void fillRect(Point p1, Point p2, Color col);
+void fillScreen(Color col);
+
 #endif

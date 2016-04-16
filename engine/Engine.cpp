@@ -81,7 +81,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	}*/
 }
 
-//TODO: Figure out what's segfaulting on exit
 Engine::~Engine()
 {
 	SDL_DestroyWindow(m_Window);
@@ -403,7 +402,7 @@ void Engine::commandline(list<string> argv)
 	}
 }
 
-string Engine::getSaveLocation()	//TODO: Allow for user-specified save dir?
+string Engine::getSaveLocation()
 {
 	char* cPath = SDL_GetPrefPath(m_sAppName.c_str(), m_sAppName.c_str());	//TODO: company name & etc
 	string s;
@@ -420,10 +419,10 @@ Rect Engine::getCameraView(Vec3 Camera)
 	Rect rcCamera;
 	const float32 tan45_2 = tan(DEG2RAD*45.0f/2.0f);
 	const float32 fAspect = (float32)getWidth() / (float32)getHeight();
-	rcCamera.bottom = (tan45_2 * Camera.z);
-	rcCamera.top = -(tan45_2 * Camera.z);
-	rcCamera.left = rcCamera.bottom * fAspect;
-	rcCamera.right = rcCamera.top * fAspect;
+	rcCamera.top = (tan45_2 * Camera.z);
+	rcCamera.bottom = -(tan45_2 * Camera.z);
+	rcCamera.left = rcCamera.top * fAspect;
+	rcCamera.right = rcCamera.bottom * fAspect;
 	rcCamera.offset(Camera.x, Camera.y);
 	return rcCamera;
 }
@@ -435,7 +434,7 @@ Point Engine::worldMovement(Point cursormove, Vec3 Camera)
 	
 	Rect rcCamera = getCameraView(Camera);
 	cursormove.x *= rcCamera.width();
-	cursormove.y *= -rcCamera.height();	//Flip y
+	cursormove.y *= rcCamera.height();
 	
 	return cursormove;
 }
@@ -451,7 +450,7 @@ Point Engine::worldPosFromCursor(Point cursorpos, Vec3 Camera)
 	
 	//Multiply this by the size of the world rect to get the relative cursor pos
 	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
-	cursorpos.y = cursorpos.y * rcCamera.height() + rcCamera.top;	//Flip on y axis
+	cursorpos.y = cursorpos.y * -rcCamera.height() + rcCamera.bottom;	//Flip on y axis
 	
 	return cursorpos;
 }
@@ -474,8 +473,9 @@ void Engine::stepPhysics(float32 dt)
 		(*i)->GetWorldManifold(&worldManifold);
 		if(c.objA && c.objB)
 		{
-			//TODO: Decide if we should also call B->A collision
+			//Let both scripts handle colliding, for more generic collision in both
 			c.objA->collide(c.objB);
+			c.objB->collide(c.objA);
 		}
 		else if(c.objA && !c.nodeB)
 		{

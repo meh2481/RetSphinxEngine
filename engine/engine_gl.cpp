@@ -1,44 +1,5 @@
 #include "Engine.h"
 
-//TODO: Somewhere else. This isn't engine-specific
-void Engine::fillRect(Point p1, Point p2, Color col)
-{
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 0.0);
-	glColor4f(col.r,col.g,col.b,col.a);
-	glVertex3f(p1.x, p1.y, 0.0);
-	glVertex3f(p2.x, p1.y, 0.0);
-	glVertex3f(p2.x, p2.y, 0.0);
-	glVertex3f(p1.x, p2.y, 0.0);
-	glEnd();
-}
-
-//TODO: Somewhere else. This isn't engine-specific
-void Engine::fillScreen(Color col)
-{
-	//Fill whole screen with rect (Example taken from http://yuhasapoint.blogspot.com/2012/07/draw-quad-that-fills-entire-opengl.html on 11/20/13)
-	glColor4f(col.r, col.g, col.b, col.a);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glBegin(GL_QUADS);
-	glVertex3i(-1, -1, -1);
-	glVertex3i(1, -1, -1);
-	glVertex3i(1, 1, -1);
-	glVertex3i(-1, 1, -1);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glColor4f(1.0, 1.0, 1.0, 1.0);
-}
-
-//TODO: Split graphics subsystem into its own class?
 void Engine::setup_sdl()
 {
 

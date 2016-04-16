@@ -53,7 +53,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
 					if(keyDown(SDL_SCANCODE_ALT))
-						toggleFullscreen();
+						setFullscreen(!isFullscreen());
 					break;
 			}
 			break;
@@ -101,6 +101,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEMOTION:
+			//cout << "Mouse moved to " << event.motion.x << ", " << event.motion.y << endl;
 			break;
 		
 		case SDL_WINDOWEVENT:

@@ -371,7 +371,6 @@ void anim::reset()
 			*destpt = orig;
 		}
 	}
-	//TODO Other anim types
 }
 
 void anim::update(float32 dt)
@@ -699,7 +698,7 @@ bool anim::fromXMLElement(XMLElement* elem)
 		if(cPath == NULL) return false;
 		return fromXML(cPath);	//Create animation from XML. We can get crazy recursive here if we want to design everything that stupid.
 	}
-	//else if(sName == "")	//TODO: Support more animation types
+	//else if(sName == "")
 	else return false;
 	
 	return true;

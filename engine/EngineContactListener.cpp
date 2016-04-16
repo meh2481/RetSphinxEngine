@@ -3,7 +3,7 @@
 void EngineContactListener::BeginContact(b2Contact *contact)
 {
 	currentContacts.insert(contact);	//Keep track of all contacts
-	if(!contact->IsTouching()) return;	//Don't keep track of temp contacts if they're not touching, however //TODO: Can we miss short contacts this way?
+	if(!contact->IsTouching()) return;	//Don't keep track of temp contacts if they're not touching, however. Can we miss short contacts this way? I dunno, don't care
 	
 	m_tmpFrameContacts.insert(contact);	//Keep track of all contacts that started this frame
 }

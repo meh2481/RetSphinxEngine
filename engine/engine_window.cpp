@@ -83,20 +83,15 @@ void Engine::changeScreenResolution(float32 w, float32 h)
 #endif
 }
 
-void Engine::toggleFullscreen()
+void Engine::setFullscreen(bool bFullscreen)
 {
+	if(m_bFullscreen == bFullscreen) 
+		return;
 	m_bFullscreen = !m_bFullscreen;
 	if(m_bFullscreen)
 		SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);	//TODO: Does this work?
 	else
 		SDL_SetWindowFullscreen(m_Window, 0);
-}
-
-void Engine::setFullscreen(bool bFullscreen)
-{
-	if(m_bFullscreen == bFullscreen) 
-		return;
-	toggleFullscreen();	//TODO: WHY DO WE HAVE TWO FUNCTIONS FOR THIS?
 }
 
 bool Engine::isMaximized()
@@ -129,10 +124,13 @@ Point Engine::getWindowPos()
 	return p;
 }
 
-//TODO: If we used to be fullscreen, and now we're not, we don't want to be in the upper-left corner. We probably don't want to do this altogether.
+//If we used to be fullscreen, and now we're not, we don't want to be in the upper-left corner.
 void Engine::setWindowPos(Point pos)
 {
-	SDL_SetWindowPosition(m_Window, pos.x, pos.y);
+	if(pos.x > 0 && pos.y > 0)
+		SDL_SetWindowPosition(m_Window, pos.x, pos.y);
+	else
+		SDL_SetWindowPosition(m_Window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);	//Center if we're upper-left corner or above or some such.
 }
 
 void Engine::maximizeWindow()

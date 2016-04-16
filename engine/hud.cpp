@@ -59,7 +59,7 @@ void HUDItem::addChild(HUDItem* hiChild)
 {
     if(hiChild == NULL)
         return;
-    hiChild->setSignalHandler(m_signalHandler);	//TODO: Why not?
+    hiChild->setSignalHandler(m_signalHandler);
     m_lChildren.push_back(hiChild);
 }
 

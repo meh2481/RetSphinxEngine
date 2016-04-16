@@ -277,61 +277,6 @@ void Image::renderLattice(lattice* l, Point size)
 	glPopMatrix();
 }
 
-// Shear is straightforward. To shear left/right, simply subtract from the x texel coordinates for the top part of the image,
-// and add to the x texel coordinates for the bottom part of the image. Similarly, to shear up/down, add to the left side
-// (move left side up) and subtract from the right side (move right side down) by the same amount. 
-//void Image::render(Point size, Point shear)
-//{
-	//TODO: Do I even care?
-	//render(size);
-	/*
-	float maxx, maxy;
-#ifdef __BIG_ENDIAN__
-	maxx = (float)m_iWidth/(float)m_iRealWidth;
-	maxy = (float)m_iHeight/(float)m_iRealHeight;
-#else
-	maxx = maxy = 1.0;
-#endif
-	// tell opengl to use the generated texture
-	glBindTexture(GL_TEXTURE_2D, m_hTex);
-	
-	const GLfloat vertexData[] =
-    {
-        -size.x/2.0 - shear.x, size.y/2.0 + shear.y, // upper left
-        size.x/2.0 - shear.x, size.y/2.0 - shear.y, // upper right
-        -size.x/2.0 + shear.x, -size.y/2.0 + shear.y, // lower left
-        size.x/2.0 + shear.x, -size.y/2.0 - shear.y, // lower right
-    };
-    const GLfloat texCoords[] =
-    {
-        0.0, maxy, // upper left
-        maxx, maxy, // upper right
-        0.0, 0.0, // lower left
-        maxx, 0.0, // lower right
-    };
-    glVertexPointer(2, GL_FLOAT, 0, &vertexData);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  
-	// make a rectangle
-	/*glBegin(GL_QUADS);
-	// top left
-	glTexCoord2f(0.0, maxy);	//Our real image is in the upper-left corner of memory, flipped vertically. Compensate.
-	glVertex3f(-size.x/2.0 - shear.x, size.y/2.0 + shear.y, 0.0);
-	// bottom left
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(-size.x/2.0 + shear.x, -size.y/2.0 + shear.y, 0.0);
-	// bottom right
-	glTexCoord2f(maxx, 0.0);
-	glVertex3f(size.x/2.0 + shear.x, -size.y/2.0 - shear.y, 0.0);
-	// top right
-	glTexCoord2f(maxx, maxy);
-	glVertex3f(size.x/2.0 - shear.x, size.y/2.0 - shear.y, 0.0);
-
-	glEnd();*/
-  
-//}
-
 void Image::render(Point size, Rect rcImg)
 {
 #ifdef __BIG_ENDIAN__

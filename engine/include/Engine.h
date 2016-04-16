@@ -15,6 +15,7 @@
 #include "cursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
+#include "DebugDraw.h"
 #include <fmod.h>
 #ifdef USE_SDL_FRAMEWORK
 #include <SDL_syswm.h>
@@ -41,23 +42,6 @@ public:
 	{
 		return s1->depth < s2->depth;
 	}
-};
-
-//Debug draw class for drawing Box2D stuff -- defined in DebugDraw.cpp
-//TODO: Define in DebugDraw.h, not here.
-class DebugDraw : public b2Draw
-{
-public:
-	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
-	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
-	void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color);
-	void DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color);
-	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
-	void DrawTransform(const b2Transform& xf);
-    void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
-    void DrawString(int x, int y, const char* string, ...); 
-    void DrawString(const b2Vec2& p, const char* string, ...);
-    void DrawAABB(b2AABB* aabb, const b2Color& color);
 };
 
 class Engine
@@ -141,15 +125,13 @@ public:
 	Point worldMovement(Point cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
 	
 	//Drawing functions
-	void fillRect(Point p1, Point p2, Color col);
-	void fillScreen(Color col);		//Fill entire screen rect with color
 	Rect getScreenRect()	{Rect rc(0,0,getWidth(),getHeight()); return rc;};
 	void drawDebug();
 	void drawCursor();
 	
 	//Window functions - engine_window.cpp
 	void changeScreenResolution(float32 w, float32 h);  //Change resolution mid-game and reload OpenGL textures as needed
-	void toggleFullscreen();							//Switch between fullscreen/windowed modes
+	//void toggleFullscreen();							//Switch between fullscreen/windowed modes
 	void setFullscreen(bool bFullscreen);				//Set fullscreen to true or false as needed
 	void setInitialFullscreen() {SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);};
 	bool isFullscreen()	{return m_bFullscreen;};
@@ -214,10 +196,7 @@ public:
 	//Object management functions - engine_obj.cpp
 	void addObject(obj* o);
 	void addScenery(physSegment* seg) 	{m_lScenery.insert(seg);};
-	void updateSceneryLayer(physSegment* seg);
-	void drawBg();
-	void drawObjects();
-	void drawFg();
+	//void updateSceneryLayer(physSegment* seg);
 	void drawAll();
 	void cleanupObjects();
 	void updateObjects(float32 dt);
