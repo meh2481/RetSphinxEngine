@@ -25,6 +25,8 @@ ParticleSystem::ParticleSystem() : Drawable()
 	m_lifePreFade = NULL;
 	m_rotAxis = NULL;
 	m_num = 0;
+	glue = NULL;
+	lua = NULL;
 	
 	_initValues();
 	
@@ -36,6 +38,10 @@ ParticleSystem::ParticleSystem() : Drawable()
 ParticleSystem::~ParticleSystem()
 {
 	_deleteAll();
+	if(glue && lua)
+	{
+		lua->deleteObject(glue);
+	}
 }
 
 void ParticleSystem::_deleteAll()

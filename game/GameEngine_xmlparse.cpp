@@ -509,22 +509,11 @@ void GameEngine::loadScene(string sXMLFilename)
 	for(XMLElement* particles = root->FirstChildElement("particles"); particles != NULL; particles = particles->NextSiblingElement("particles"))
 	{
 		const char* cFilename = particles->Attribute("file");
-		const char* cName = particles->Attribute("name");
 		if(cFilename != NULL)
 		{
 			ParticleSystem* pSys = new ParticleSystem();
 			pSys->fromXML(cFilename);
 			addParticles(pSys);
-			if(cName != NULL)
-			{
-				string s = cName;
-				if(s == "shiptrail")
-				{
-					shipTrail = pSys;
-					pSys->curRate = 0;
-					pSys->firing = true;
-				}
-			}
 		}
 	}
 	

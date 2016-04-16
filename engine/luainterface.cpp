@@ -154,10 +154,13 @@ LuaObjGlue *LuaInterface::createObject(void *o, unsigned ty, const char *classna
 	// [Lglue][t][t]
 	lua_setfield(_lua, -2, "__newindex"); // t.__newindex = t
 	// [Lglue][t]
-	int lty = luaL_getmetatable(_lua, classname); // cls = REG[classname]
-	assert(lty == LUA_TTABLE);
-	// [Lglue][t][cls]
-	lua_setmetatable(_lua, -2); // setmetatable(t, cls)
+	if(classname)
+	{
+		int lty = luaL_getmetatable(_lua, classname); // cls = REG[classname]
+		assert(lty == LUA_TTABLE);
+		// [Lglue][t][cls]
+		lua_setmetatable(_lua, -2); // setmetatable(t, cls)
+	}
 	// [Lglue][t]
 	lua_setmetatable(_lua, -2); // setmetatable(Lglue, t)
 	// [Lglue]

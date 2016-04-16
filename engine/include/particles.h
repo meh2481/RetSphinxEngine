@@ -9,6 +9,8 @@
 #include "globaldefs.h"
 #include "Image.h"
 #include "Drawable.h"
+#include "luafuncs.h"
+#include "luainterface.h"
 
 #ifndef PARTICLES_H
 #define PARICLES_H
@@ -58,6 +60,9 @@ protected:
 	string m_sXMLFrom;	//So we know what XML file we should reload from
 	
 public:
+	enum { TYPE = OT_PARTICLESYSTEM };
+	LuaObjGlue *glue;
+	LuaInterface* lua;
 	
 	ParticleSystem();
 	~ParticleSystem();

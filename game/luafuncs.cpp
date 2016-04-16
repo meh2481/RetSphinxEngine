@@ -51,12 +51,34 @@ public:
 	
 	static bool joyDown(int button)
 	{
-		return (SDL_JoystickGetButton(g_pGlobalEngine->m_joy, button) > 0);
+		if(g_pGlobalEngine->m_joy)
+			return (SDL_JoystickGetButton(g_pGlobalEngine->m_joy, button) > 0);
+		return false;
 	}
 	
 	static int joyAxis(int axis)
 	{
-		return SDL_JoystickGetAxis(g_pGlobalEngine->m_joy, axis);
+		if(g_pGlobalEngine->m_joy)
+			return SDL_JoystickGetAxis(g_pGlobalEngine->m_joy, axis);
+		return 0;
+	}
+	
+	static ParticleSystem* createParticles(string sName)
+	{
+		ParticleSystem* pSys = new ParticleSystem();
+		pSys->fromXML(sName);
+		g_pGlobalEngine->addParticles(pSys);
+		return pSys;
+	}
+	
+	static LuaInterface* getLua()
+	{
+		return g_pGlobalEngine->Lua;
+	}
+	
+	static float getframerate()
+	{
+		return g_pGlobalEngine->getFramerate();
 	}
 };
 
@@ -77,20 +99,27 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 // Lua interface functions (can be called from lua)
 //-----------------------------------------------------------------------------------------------------------
 
-luaFunc(rumblecontroller)	//rumblecontroller(float force, float sec) --force is range [0,1]
+luaFunc(rumblecontroller)	//void rumblecontroller(float force, float sec) --force is range [0,1]
 {
 	float32 force = lua_tonumber(L, 1);
 	float32 sec = lua_tonumber(L, 2);
 	int priority = lua_tointeger(L, 3);
 	GameEngineLua::rumble(force, sec, priority);
+	luaReturnNil();
 }
 
-luaFunc(map_load)
+luaFunc(map_load)	//void map_load(string sFilename, string sNodeToPlacePlayerAt = "")
 {
 	if(lua_isstring(L, 2))
 		GameEngineLua::loadMap(lua_tostring(L, 1), lua_tostring(L, 2));
 	else
 		GameEngineLua::loadMap(lua_tostring(L, 1));
+	luaReturnNil();
+}
+
+luaFunc(getframerate)	//float getframerate()
+{
+	luaReturnNum(GameEngineLua::getframerate());
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -273,6 +302,56 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Particles functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(particles_create)	//ParticleSystem* particles_create(string sXMLFile)
+{
+	if(!lua_isstring(L,1)) luaReturnNil();
+	
+	ParticleSystem* ps = GameEngineLua::createParticles(lua_tostring(L, 1));
+	LuaInterface* LI = GameEngineLua::getLua();
+	ps->lua = LI;
+	LI->call("loadclass", "test");
+	ps->glue = LI->createObject(ps, ps->TYPE, "test");
+	luaReturnObj(ps);
+}
+
+luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool fire)
+{
+	ParticleSystem* ps = getObj<ParticleSystem>(L);
+	if(ps)
+		ps->firing = lua_toboolean(L, 2);
+	luaReturnNil();
+}
+
+luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, float rate [0..1+])
+{
+	ParticleSystem* ps = getObj<ParticleSystem>(L);
+	if(ps)
+		ps->curRate = lua_tonumber(L, 2);
+	luaReturnNil();
+}
+
+luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, float x, float y)
+{
+	ParticleSystem* ps = getObj<ParticleSystem>(L);
+	if(ps)
+		ps->emitFrom.centerOn(Point(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+	luaReturnNil();
+}
+
+luaFunc(particles_setemitvel)	//void particles_setemitvel(ParticleSystem* p, float x, float y)
+{
+	ParticleSystem* ps = getObj<ParticleSystem>(L);
+	if(ps)
+	{
+		ps->emissionVel.x = lua_tonumber(L, 2);
+		ps->emissionVel.y = lua_tonumber(L, 3);
+	}
+	luaReturnNil();
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
@@ -296,6 +375,7 @@ luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 static LuaFunctions s_functab[] =
 {
 	luaRegister(rumblecontroller),
+	luaRegister(getframerate),
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getVelocity),
 	luaRegister(obj_getPos),
@@ -310,6 +390,11 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
 	luaRegister(map_load),
+	luaRegister(particles_create),
+	luaRegister(particles_setfiring),
+	luaRegister(particles_setfirerate),
+	luaRegister(particles_setemitpos),
+	luaRegister(particles_setemitvel),
 	luaRegister(key_isDown),
 	luaRegister(joy_isDown),
 	luaRegister(joy_getAxis),
