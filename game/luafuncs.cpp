@@ -2,8 +2,7 @@
 #include "luainterface.h"
 #include "GameEngine.h"
 
-//TODO Would love to get rid of this
-extern GameEngine* g_pGlobalEngine;
+extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 
 //-----------------------------------------------------------------------------------------------------------
 //Class for interfacing between GameEngine and Lua
@@ -81,7 +80,7 @@ public:
 		return g_pGlobalEngine->Lua;
 	}
 	
-	static float getframerate()
+	static float getFramerate()
 	{
 		return g_pGlobalEngine->getFramerate();
 	}
@@ -104,7 +103,7 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 // Lua interface functions (can be called from lua)
 //-----------------------------------------------------------------------------------------------------------
 
-luaFunc(rumblecontroller)	//void rumblecontroller(float force, float sec) --force is range [0,1]	//TODO Proper capitalization
+luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --force is range [0,1]
 {
 	float32 force = lua_tonumber(L, 1);
 	float32 sec = lua_tonumber(L, 2);
@@ -122,9 +121,9 @@ luaFunc(map_load)	//void map_load(string sFilename, string sNodeToPlacePlayerAt 
 	luaReturnNil();
 }
 
-luaFunc(getframerate)	//float getframerate()	//TODO Proper capitalization
+luaFunc(getFramerate)	//float getFramerate()
 {
-	luaReturnNum(GameEngineLua::getframerate());
+	luaReturnNum(GameEngineLua::getFramerate());
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -327,7 +326,7 @@ luaFunc(particles_create)	//ParticleSystem* particles_create(string sXMLFile)
 	luaReturnObj(ps);
 }
 
-luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool fire)	//TODO Proper capitalization
+luaFunc(particles_setFiring)	//void particles_setFiring(ParticleSystem* p, bool fire)
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -335,7 +334,7 @@ luaFunc(particles_setfiring)	//void particles_setfiring(ParticleSystem* p, bool 
 	luaReturnNil();
 }
 
-luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, float rate [0..1+])	//TODO Proper capitalization
+luaFunc(particles_setFireRate)	//void particles_setFirerate(ParticleSystem* p, float rate [0..1+])
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -343,7 +342,7 @@ luaFunc(particles_setfirerate)	//void particles_setfirerate(ParticleSystem* p, f
 	luaReturnNil();
 }
 
-luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, float x, float y)	//TODO Proper capitalization
+luaFunc(particles_setEmitPos)	//void particles_setEmitPos(ParticleSystem* p, float x, float y)
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -351,7 +350,7 @@ luaFunc(particles_setemitpos)	//void particles_setemitpos(ParticleSystem* p, flo
 	luaReturnNil();
 }
 
-luaFunc(particles_setemitvel)	//void particles_setemitvel(ParticleSystem* p, float x, float y)	//TODO Proper capitalization
+luaFunc(particles_setEmitVel)	//void particles_setEmitVel(ParticleSystem* p, float x, float y)
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
@@ -385,8 +384,8 @@ luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
 {
-	luaRegister(rumblecontroller),
-	luaRegister(getframerate),
+	luaRegister(controller_rumble),
+	luaRegister(getFramerate),
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getVelocity),
 	luaRegister(obj_getPos),
@@ -403,10 +402,10 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_getPos),
 	luaRegister(map_load),
 	luaRegister(particles_create),
-	luaRegister(particles_setfiring),
-	luaRegister(particles_setfirerate),
-	luaRegister(particles_setemitpos),
-	luaRegister(particles_setemitvel),
+	luaRegister(particles_setFiring),
+	luaRegister(particles_setFireRate),
+	luaRegister(particles_setEmitPos),
+	luaRegister(particles_setEmitVel),
 	luaRegister(key_isDown),
 	luaRegister(joy_isDown),
 	luaRegister(joy_getAxis),
@@ -417,41 +416,13 @@ static const struct {
 	const char *name;
 	int value;
 } luaConstantTable[] = {
-
-	//Keys
-	//TODO: Update these on user key config
-	/*luaConstant(KEY_UP1),
-	luaConstant(KEY_UP2),
-    luaConstant(KEY_DOWN1),
-    luaConstant(KEY_DOWN2),
-    luaConstant(KEY_LEFT1),
-    luaConstant(KEY_LEFT2),
-    luaConstant(KEY_RIGHT1),
-    luaConstant(KEY_RIGHT2),
-    luaConstant(KEY_ENTER1),
-    luaConstant(KEY_ENTER2),*/
 	
 	//Joystick
 	luaConstant(JOY_MIN),
 	luaConstant(JOY_MAX),
-	/*/TODO: Update these when user joystick config
-    luaConstant(JOY_BUTTON_BACK),
-    luaConstant(JOY_BUTTON_START),
-    luaConstant(JOY_BUTTON_X),
-    luaConstant(JOY_BUTTON_Y),
-    luaConstant(JOY_BUTTON_A),
-    luaConstant(JOY_BUTTON_B),
-    luaConstant(JOY_BUTTON_LB),
-    luaConstant(JOY_BUTTON_RB),
-    luaConstant(JOY_BUTTON_LSTICK),
-    luaConstant(JOY_BUTTON_RSTICK),
-    luaConstant(JOY_AXIS_HORIZ),
-    luaConstant(JOY_AXIS_VERT),
-    luaConstant(JOY_AXIS2_HORIZ),
-    luaConstant(JOY_AXIS2_VERT),
-    luaConstant(JOY_AXIS_LT),
-    luaConstant(JOY_AXIS_RT),
-    luaConstant(JOY_AXIS_TRIP),*/
+	
+	//Keyboard
+	luaConstant(SDL_SCANCODE_SPACE),
 };
 
 void lua_register_all(lua_State *L)

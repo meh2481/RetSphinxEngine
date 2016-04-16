@@ -240,11 +240,10 @@ void GameEngine::draw()
 	glEnable(GL_NORMALIZE);
 	
 	//Keep camera within camera bounds
-	//TODO: This messes up with vertical camera position when zooming out. Fix.
 	if(rcSceneBounds.area())	//If it's not unset
 	{
 		Rect rcCam = getCameraView(CameraPos);
-		cout << "camera view: " << rectToString(rcCam) << endl;
+		//cout << "camera view: " << rectToString(rcCam) << endl;
 		if(rcCam.left < rcSceneBounds.left)
 		{
 			CameraPos.x += rcSceneBounds.left - rcCam.left;
@@ -298,6 +297,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	
 	//Have to do this manually because non-constants?
 	//TODO: Fix/move from here
+	//TODO: Also update these on user key/joystick config
 	luaSetGlobal(JOY_BUTTON_BACK);
 	luaSetGlobal(JOY_BUTTON_START);
 	luaSetGlobal(JOY_BUTTON_X);

@@ -156,6 +156,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				errlog << "Couldn't open Joystick " << (int)event.jdevice.which << endl;
 			break;
 			
+		//TODO: Test if this is working now
 		case SDL_JOYDEVICEREMOVED:
 			errlog << "Joystick " << (int)event.jdevice.which << " disconnected." << endl;
 			break;
