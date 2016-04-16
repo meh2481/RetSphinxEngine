@@ -70,7 +70,7 @@ private:
 	float32 m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
 	list<obj*> m_lAddLater;
-	SDL_Joystick *m_joy;
+	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time
 	SDL_Haptic* m_rumble;
 	
 	//Game stuff!

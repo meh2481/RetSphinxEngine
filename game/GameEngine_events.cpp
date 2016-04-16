@@ -231,6 +231,7 @@ void GameEngine::handleKeys()
 //TODO: This doesn't belong in C++. Rip it out and stick it in Lua.
 void GameEngine::updateShip()
 {
+	return;
 	//Update ship velocity based on current input
 	float max_ship_vel = MAX_SHIP_SPEED;
 	float ship_accel = SHIP_ACCEL;

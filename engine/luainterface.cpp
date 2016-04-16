@@ -80,6 +80,7 @@ bool LuaInterface::Init()
 
 	return doCall(argc);
 }
+
 static std::string luaFormatStackInfo(lua_State *L, int level = 1)
 {
     lua_Debug ar;

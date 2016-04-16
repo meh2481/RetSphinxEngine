@@ -2,7 +2,7 @@
 #include "luainterface.h"
 #include "GameEngine.h"
 
-
+//TODO Would love to get rid of this
 extern GameEngine* g_pGlobalEngine;
 
 //-----------------------------------------------------------------------------------------------------------
@@ -43,6 +43,21 @@ public:
 		g_pGlobalEngine->m_sLoadScene = sMap;
 		g_pGlobalEngine->m_sLoadNode = sNode;
 	}
+	
+	static bool keyDown(int key)
+	{
+		return g_pGlobalEngine->keyDown(key);
+	}
+	
+	static bool joyDown(int button)
+	{
+		return (SDL_JoystickGetButton(g_pGlobalEngine->m_joy, button) > 0);
+	}
+	
+	static int joyAxis(int axis)
+	{
+		return SDL_JoystickGetAxis(g_pGlobalEngine->m_joy, axis);
+	}
 };
 
 
@@ -82,12 +97,29 @@ luaFunc(map_load)
 // Object functions
 //-----------------------------------------------------------------------------------------------------------
 
-luaFunc(obj_setVelocity)	//TODO REMOVE OR IMPLEMENT
+luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
 	obj *o = getObj<obj>(L);
-	//o->setVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3)); // TODO WRITE ME
-	//cout << o->luaClass << endl;
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+			b->SetLinearVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3));
+	}
 	luaReturnNil();
+}
+
+luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
+{
+	Point p(0,0);
+	obj *o = getObj<obj>(L);
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+			p = b->GetLinearVelocity();
+	}
+	luaReturnVec2(p.x, p.y);
 }
 
 luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
@@ -143,10 +175,7 @@ luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
 {
 	obj* o = GameEngineLua::getPlayerObject();
 	if(o)
-	{
-		lua_rawgetp(L, LUA_REGISTRYINDEX, o);
-		return 1;
-	}
+		luaReturnObj(o);
 	luaReturnNil();
 }
 
@@ -199,16 +228,54 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Input functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
+{
+	luaReturnBool(GameEngineLua::keyDown(lua_tointeger(L, 1)));
+}
+
+luaFunc(joy_isDown) //bool joy_isDown(int button)
+{
+	luaReturnBool(GameEngineLua::joyDown(lua_tointeger(L, 1)));
+}
+
+luaFunc(joy_getAxis) //int joy_getAxis(int axis)
+{
+	luaReturnInt(GameEngineLua::joyAxis(lua_tointeger(L, 1)));
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
+static LuaFunctions s_functab[] =
+{
+	luaRegister(rumblecontroller),
+	luaRegister(obj_setVelocity),
+	luaRegister(obj_getVelocity),
+	luaRegister(obj_getPos),
+	luaRegister(obj_create),
+	luaRegister(obj_applyForce),
+	luaRegister(obj_getPlayer),
+	luaRegister(camera_centerOnXY),
+	luaRegister(node_getProperty),
+	luaRegister(node_getVec2Property),
+	luaRegister(node_getPos),
+	luaRegister(map_load),
+	luaRegister(key_isDown),
+	luaRegister(joy_isDown),
+	luaRegister(joy_getAxis),
+	{NULL, NULL}
+};
+
 static const struct {
 	const char *name;
-	lua_Number value;
+	int value;
 } luaConstantTable[] = {
 
 	//Keys
 	//TODO: Update these on user key config
-	luaConstant(KEY_UP1),
+	/*luaConstant(KEY_UP1),
 	luaConstant(KEY_UP2),
     luaConstant(KEY_DOWN1),
     luaConstant(KEY_DOWN2),
@@ -237,23 +304,7 @@ static const struct {
     luaConstant(JOY_AXIS2_VERT),
     luaConstant(JOY_AXIS_LT),
     luaConstant(JOY_AXIS_RT),
-    luaConstant(JOY_AXIS_TRIP),
-};
-
-static LuaFunctions s_functab[] =
-{
-	luaRegister(rumblecontroller),
-	luaRegister(obj_setVelocity),
-	luaRegister(obj_getPos),
-	luaRegister(obj_create),
-	luaRegister(obj_applyForce),
-	luaRegister(obj_getPlayer),
-	luaRegister(camera_centerOnXY),
-	luaRegister(node_getProperty),
-	luaRegister(node_getVec2Property),
-	luaRegister(node_getPos),
-	luaRegister(map_load),
-	{NULL, NULL}
+    luaConstant(JOY_AXIS_TRIP),*/
 };
 
 void lua_register_all(lua_State *L)
@@ -265,7 +316,7 @@ void lua_register_all(lua_State *L)
 	//Register constants
 	for (unsigned int i = 0; i < sizeof(luaConstantTable)/sizeof(*luaConstantTable); i++)
 	{
-		lua_pushnumber(L, luaConstantTable[i].value);
+		lua_pushinteger(L, luaConstantTable[i].value);
 		lua_setglobal(L, luaConstantTable[i].name);
 	}
 }

@@ -96,7 +96,8 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	KEY_ENTER2 = SDL_SCANCODE_RETURN;
 	
 	//Apparently our Xbox drivers for different OS's can't agree on which buttons are which
-#ifdef _WIN32
+	//TODO This doesn't seem to apply to me now in Win10. Check what was going on there.
+/*#ifdef _WIN32
 	JOY_BUTTON_BACK = 5;
 	JOY_BUTTON_START = 4;
 	JOY_BUTTON_X = 12;
@@ -110,7 +111,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	JOY_AXIS2_HORIZ = 2;
 	JOY_AXIS2_VERT = 3;
 	JOY_AXIS_LT = 4;
-#else
+#else*/
 	JOY_BUTTON_BACK = 6;
 	JOY_BUTTON_START = 7;
 	JOY_BUTTON_X = 2;
@@ -124,7 +125,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	JOY_AXIS2_HORIZ = 3;
 	JOY_AXIS2_VERT = 4;
 	JOY_AXIS_LT = 2;
-#endif
+//#endif
 	g_fParticleFac = 1.0f;
 }
 
@@ -311,6 +312,38 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		
 	//Load our last screen position and such
 	loadConfig(getSaveLocation() + "config.xml");
+	
+	lua_State* L = Lua->getState();
+	
+	//Have to do this manually because non-constants?
+	//TODO: Fix/move from here
+	luaSetGlobal(JOY_BUTTON_BACK);
+	luaSetGlobal(JOY_BUTTON_START);
+	luaSetGlobal(JOY_BUTTON_X);
+	luaSetGlobal(JOY_BUTTON_Y);
+	luaSetGlobal(JOY_BUTTON_A);
+	luaSetGlobal(JOY_BUTTON_B);
+	luaSetGlobal(JOY_BUTTON_LB);
+	luaSetGlobal(JOY_BUTTON_RB);
+	luaSetGlobal(JOY_BUTTON_LSTICK);
+	luaSetGlobal(JOY_BUTTON_RSTICK);
+	luaSetGlobal(JOY_AXIS_HORIZ);
+	luaSetGlobal(JOY_AXIS_VERT);
+	luaSetGlobal(JOY_AXIS2_HORIZ);
+	luaSetGlobal(JOY_AXIS2_VERT);
+	luaSetGlobal(JOY_AXIS_LT);
+	luaSetGlobal(JOY_AXIS_RT);
+	luaSetGlobal(JOY_AXIS_TRIP);
+	luaSetGlobal(KEY_UP1);
+	luaSetGlobal(KEY_UP2);
+	luaSetGlobal(KEY_DOWN1);
+	luaSetGlobal(KEY_DOWN2);
+	luaSetGlobal(KEY_LEFT1);
+	luaSetGlobal(KEY_LEFT2);
+	luaSetGlobal(KEY_RIGHT1);
+	luaSetGlobal(KEY_RIGHT2);
+	luaSetGlobal(KEY_ENTER1);
+	luaSetGlobal(KEY_ENTER2);
 	
 	//Set gravity to about normal
 	//getWorld()->SetGravity(b2Vec2(0,-9.8));

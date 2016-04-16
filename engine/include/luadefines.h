@@ -13,6 +13,7 @@ using namespace std;
 
 #define luaConstant(x) {#x, x}
 #define luaConstantFromClass(name,class)	{#name, class::name}
+#define luaSetGlobal(x) {lua_pushinteger(L, x); lua_setglobal(L, #x); }
 
 #define luaReturnNil() { return 0; }
 #define luaReturnNum(x) { lua_pushnumber(L, x); return 1; }
