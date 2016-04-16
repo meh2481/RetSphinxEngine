@@ -96,6 +96,34 @@ luaFunc(map_load)
 //-----------------------------------------------------------------------------------------------------------
 // Object functions
 //-----------------------------------------------------------------------------------------------------------
+luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
+{
+	obj *o = getObj<obj>(L);
+	float f = lua_tonumber(L,2);
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+		{
+			Point p = b->GetPosition();
+			b->SetTransform(p, f);
+		}
+	}
+	luaReturnNil();
+}
+
+luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
+{
+	obj *o = getObj<obj>(L);
+	float f = 0.0f;
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+			f = b->GetAngle();
+	}
+	luaReturnNum(f);
+}
 
 luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
@@ -147,6 +175,22 @@ luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 			pt = bod->GetPosition();
 	}
 	luaReturnVec2(pt.x, pt.y);
+}
+
+luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
+{
+	obj *o = getObj<obj>(L);
+	Point p(lua_tonumber(L,2), lua_tonumber(L,3));
+	if(o)
+	{
+		b2Body* b = o->getBody();
+		if(b)
+		{
+			float f = b->GetAngle();
+			b->SetTransform(p, f);
+		}
+	}
+	luaReturnNil();
 }
 
 luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, float xvel, float yvel)
@@ -255,9 +299,12 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getVelocity),
 	luaRegister(obj_getPos),
+	luaRegister(obj_setPos),
 	luaRegister(obj_create),
 	luaRegister(obj_applyForce),
 	luaRegister(obj_getPlayer),
+	luaRegister(obj_setAngle),
+	luaRegister(obj_getAngle),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
@@ -285,10 +332,12 @@ static const struct {
     luaConstant(KEY_RIGHT1),
     luaConstant(KEY_RIGHT2),
     luaConstant(KEY_ENTER1),
-    luaConstant(KEY_ENTER2),
+    luaConstant(KEY_ENTER2),*/
 	
 	//Joystick
-	//TODO: Update these when user joystick config
+	luaConstant(JOY_MIN),
+	luaConstant(JOY_MAX),
+	/*/TODO: Update these when user joystick config
     luaConstant(JOY_BUTTON_BACK),
     luaConstant(JOY_BUTTON_START),
     luaConstant(JOY_BUTTON_X),

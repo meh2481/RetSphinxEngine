@@ -37,6 +37,8 @@ extern uint32_t JOY_AXIS2_VERT;
 extern uint32_t JOY_AXIS_LT;
 extern uint32_t JOY_AXIS_RT;
 extern int32_t JOY_AXIS_TRIP;
+#define JOY_MAX 32767
+#define JOY_MIN -32768
 extern SDL_Scancode KEY_UP1;
 extern SDL_Scancode KEY_UP2;
 extern SDL_Scancode KEY_DOWN1;
