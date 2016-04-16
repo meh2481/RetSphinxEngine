@@ -100,11 +100,12 @@ luaFunc(map_load)
 luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
 	obj *o = getObj<obj>(L);
+	Point p(lua_tonumber(L,2),lua_tonumber(L, 3));
 	if(o)
 	{
 		b2Body* b = o->getBody();
 		if(b)
-			b->SetLinearVelocity(lua_tonumber(L, 2), lua_tonumber(L, 3));
+			b->SetLinearVelocity(p);
 	}
 	luaReturnNil();
 }

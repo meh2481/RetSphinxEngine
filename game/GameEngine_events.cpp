@@ -11,7 +11,6 @@ void GameEngine::handleEvent(SDL_Event event)
 			switch(event.key.keysym.scancode)
 			{
 				case SDL_SCANCODE_F5:
-					//cleanupObjects();
 					reloadImages();
 					loadScene("res/3d/solarsystem.scene.xml");
 					break;
@@ -192,10 +191,6 @@ void GameEngine::handleEvent(SDL_Event event)
 	}
 }
 
-#define MAX_SHIP_SPEED 10.0
-#define SHIP_ACCEL 140.0
-#define SHIP_SLOW_FAC 0.985
-
 void GameEngine::handleKeys()
 {
 	//Keyboard movement
@@ -231,8 +226,9 @@ void GameEngine::handleKeys()
 //TODO: This doesn't belong in C++. Rip it out and stick it in Lua.
 void GameEngine::updateShip()
 {
-	return;
-	//Update ship velocity based on current input
+	return;	//TODO: In the process of moving to Lua....
+	
+	/*/Update ship velocity based on current input
 	float max_ship_vel = MAX_SHIP_SPEED;
 	float ship_accel = SHIP_ACCEL;
 	if(keyDown(SDL_SCANCODE_SPACE) || SDL_JoystickGetButton(m_joy, JOY_BUTTON_B))	//Thrust button
@@ -296,7 +292,7 @@ void GameEngine::updateShip()
 				shipTrail->curRate = min((v.Length()*v.Length()*v.Length()) / (MAX_SHIP_SPEED*MAX_SHIP_SPEED*MAX_SHIP_SPEED), 2.0);	//Exponentially decay as ship slows
 			}
 		}
-	}
+	}*/
 }
 
 //TODO: Controller haptic shouldn't be game specific? Or is this too closely tied to controller input in general?
