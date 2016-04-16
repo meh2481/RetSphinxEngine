@@ -1,4 +1,5 @@
 #include "Gradient.h"
+//#include <iostream>
 
 Gradient::Gradient(string sXMLFilename)
 {
@@ -15,7 +16,7 @@ void Gradient::insert(float fVal, int32_t r, int32_t g, int32_t b, int32_t a)
 	c.from256(r, g, b, a);
 	m_colorMap[fVal] = c;
 }
-#include <iostream>
+
 Color Gradient::getVal(float fVal)
 {
 	for(map<float, Color>::iterator i = m_colorMap.begin(); i != m_colorMap.end(); i++)

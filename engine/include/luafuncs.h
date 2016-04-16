@@ -32,7 +32,7 @@ struct LuaFunctions
     lua_CFunction func;
 };
 
-void lua_register_enginefuncs(lua_State *);
+void lua_register_all(lua_State *);
 void pushObjPtr(ObjMainType ty, lua_State *L, void *ptr);	//TODO: Do we need this here?
 
 #endif

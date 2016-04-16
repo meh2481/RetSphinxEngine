@@ -19,6 +19,35 @@
 
 #define DEFAULT_TIMESCALE	1.0
 
+//Keybinding stuff!
+extern uint32_t JOY_BUTTON_BACK;
+extern uint32_t JOY_BUTTON_START;
+extern uint32_t JOY_BUTTON_X;
+extern uint32_t JOY_BUTTON_Y;
+extern uint32_t JOY_BUTTON_A;
+extern uint32_t JOY_BUTTON_B;
+extern uint32_t JOY_BUTTON_LB;
+extern uint32_t JOY_BUTTON_RB;
+extern uint32_t JOY_BUTTON_LSTICK;
+extern uint32_t JOY_BUTTON_RSTICK;
+extern uint32_t JOY_AXIS_HORIZ;
+extern uint32_t JOY_AXIS_VERT;
+extern uint32_t JOY_AXIS2_HORIZ;
+extern uint32_t JOY_AXIS2_VERT;
+extern uint32_t JOY_AXIS_LT;
+extern uint32_t JOY_AXIS_RT;
+extern int32_t JOY_AXIS_TRIP;
+extern SDL_Scancode KEY_UP1;
+extern SDL_Scancode KEY_UP2;
+extern SDL_Scancode KEY_DOWN1;
+extern SDL_Scancode KEY_DOWN2;
+extern SDL_Scancode KEY_LEFT1;
+extern SDL_Scancode KEY_LEFT2;
+extern SDL_Scancode KEY_RIGHT1;
+extern SDL_Scancode KEY_RIGHT2;
+extern SDL_Scancode KEY_ENTER1;
+extern SDL_Scancode KEY_ENTER2;
+
 class ColorPhase
 {
 public:
@@ -77,8 +106,10 @@ public:
 	
 	bool _shouldSelect(b2Fixture* fix);
 
+	//Functions dealing with input and user IO - GameEngine_events.cpp
 	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
+	void updateShip();
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
 	bool loadConfig(string sFilename);
@@ -90,7 +121,6 @@ public:
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float32 strength, float32 sec, int priority = 0);	//Rumble the controller
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
-	void updateShip();
 	void addAfterUpdate(obj* o) {m_lAddLater.push_back(o);};	//Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
 	void warpObjectToNode(obj* o, Node* n);
 	

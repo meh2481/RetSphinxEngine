@@ -138,6 +138,7 @@ void Image::_load(string sFilename)
 	FreeImage_Unload(dib);
 }
 
+//TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
 void Image::_loadNoise(string sXMLFilename)
 {
 	m_bReloadEachTime = true;

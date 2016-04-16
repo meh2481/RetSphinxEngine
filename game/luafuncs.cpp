@@ -134,8 +134,7 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 	if(o)
 	{
 		GameEngineLua::addObject(o);
-		lua_rawgetp(L, LUA_REGISTRYINDEX, o);
-		return 1;
+		luaReturnObj(o);
 	}
 	luaReturnNil();
 }
@@ -200,8 +199,46 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 }
 
 //-----------------------------------------------------------------------------------------------------------
-// Lua function registerer
+// Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
+static const struct {
+	const char *name;
+	lua_Number value;
+} luaConstantTable[] = {
+
+	//Keys
+	//TODO: Update these on user key config
+	luaConstant(KEY_UP1),
+	luaConstant(KEY_UP2),
+    luaConstant(KEY_DOWN1),
+    luaConstant(KEY_DOWN2),
+    luaConstant(KEY_LEFT1),
+    luaConstant(KEY_LEFT2),
+    luaConstant(KEY_RIGHT1),
+    luaConstant(KEY_RIGHT2),
+    luaConstant(KEY_ENTER1),
+    luaConstant(KEY_ENTER2),
+	
+	//Joystick
+	//TODO: Update these when user joystick config
+    luaConstant(JOY_BUTTON_BACK),
+    luaConstant(JOY_BUTTON_START),
+    luaConstant(JOY_BUTTON_X),
+    luaConstant(JOY_BUTTON_Y),
+    luaConstant(JOY_BUTTON_A),
+    luaConstant(JOY_BUTTON_B),
+    luaConstant(JOY_BUTTON_LB),
+    luaConstant(JOY_BUTTON_RB),
+    luaConstant(JOY_BUTTON_LSTICK),
+    luaConstant(JOY_BUTTON_RSTICK),
+    luaConstant(JOY_AXIS_HORIZ),
+    luaConstant(JOY_AXIS_VERT),
+    luaConstant(JOY_AXIS2_HORIZ),
+    luaConstant(JOY_AXIS2_VERT),
+    luaConstant(JOY_AXIS_LT),
+    luaConstant(JOY_AXIS_RT),
+    luaConstant(JOY_AXIS_TRIP),
+};
 
 static LuaFunctions s_functab[] =
 {
@@ -216,12 +253,19 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
 	luaRegister(map_load),
-	//luaRegister(),
 	{NULL, NULL}
 };
 
-void lua_register_enginefuncs(lua_State *L)
+void lua_register_all(lua_State *L)
 {	
+	//Register functions
 	for(unsigned int i = 0; s_functab[i].name; ++i)
 		lua_register(L, s_functab[i].name, s_functab[i].func);
+	
+	//Register constants
+	for (unsigned int i = 0; i < sizeof(luaConstantTable)/sizeof(*luaConstantTable); i++)
+	{
+		lua_pushnumber(L, luaConstantTable[i].value);
+		lua_setglobal(L, luaConstantTable[i].name);
+	}
 }

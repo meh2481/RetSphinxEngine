@@ -12,6 +12,7 @@ using namespace std;
 #define luaClassMethod(name, func) {"" name, l_##func}
 
 #define luaConstant(x) {#x, x}
+#define luaConstantFromClass(name,class)	{#name, class::name}
 
 #define luaReturnNil() { return 0; }
 #define luaReturnNum(x) { lua_pushnumber(L, x); return 1; }
@@ -23,7 +24,7 @@ using namespace std;
 #define luaReturnString(x) { lua_pushstring(L, x.c_str()); return 1; }
 #define luaReturn2Strings(x,y) { lua_pushstring(L, x); lua_pushstring(L, y); return 2; }
 #define luaReturn3Strings(x,y,z) { lua_pushstring(L, x); lua_pushstring(L, y);  lua_pushstring(L, z); return 3; }
-#define luaReturnPtr(x) { luaPushPointer(L, x); return 1; }
+#define luaReturnObj(x) { lua_rawgetp(L, LUA_REGISTRYINDEX, x); return 1; }
 #define luaReturnVec2(x, y) { lua_pushnumber(L, x); lua_pushnumber(L, y); return 2; }
 #define luaReturnVec3(x, y, z) { lua_pushnumber(L, x); lua_pushnumber(L, y); lua_pushnumber(L, z); return 3; }
 #define luaReturnVec4(x, y, z, w) { lua_pushnumber(L, x); lua_pushnumber(L, y); lua_pushnumber(L, z); lua_pushnumber(L, w); return 4; }

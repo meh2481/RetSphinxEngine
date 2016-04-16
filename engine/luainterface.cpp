@@ -63,7 +63,7 @@ bool LuaInterface::Init()
 		luaL_openlibs(_lua);
 
 		// Own functions.
-		lua_register_enginefuncs(_lua);
+		lua_register_all(_lua);
 	}
 
 	if(luaL_loadfile(_lua, script) != LUA_OK)
