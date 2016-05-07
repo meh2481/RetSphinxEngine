@@ -17,6 +17,7 @@ class obj;
 class physSegment;
 
 //Physical segments of objects - be they actual physics bodies or just images
+//TODO: Why would they just be images unless they're scenery? Make second class for scenery?
 class physSegment : public Drawable
 {
 public:

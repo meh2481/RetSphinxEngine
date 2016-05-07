@@ -398,7 +398,7 @@ void ParticleSystem::draw()
 		}
 		else
 			glRotatef(RAD2DEG*atan2(m_vel[i].y, m_vel[i].x), 0, 0, 1);
-		img->render(drawsz, m_imgRect[i]);
+		img->render(drawsz, m_imgRect[i]);	//TODO: NO NO NO NO NO this should generate a list of vertices and draw them all in one opengl call!
 		glPopMatrix();
 	}
 	

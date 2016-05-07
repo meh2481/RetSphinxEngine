@@ -205,6 +205,7 @@ public:
 	void updateObjects(float32 dt);
 	void addNode(Node* n);
 	Node* getNode(string sNodeName);
+	obj* getObject(Point p);	//Get first object at this point
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered)	{SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);};

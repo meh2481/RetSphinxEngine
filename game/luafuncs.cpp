@@ -67,6 +67,21 @@ public:
 		return 0;
 	}
 	
+	static Point getMousePos()
+	{
+		return g_pGlobalEngine->getCursorPos();
+	}
+	
+	static bool getMouseDown(int button)
+	{
+		return g_pGlobalEngine->getCursorDown(button);
+	}
+	
+	static Point getWorldMousePos(Point p)
+	{
+		return g_pGlobalEngine->worldPosFromCursor(p, g_pGlobalEngine->CameraPos);
+	}
+	
 	static ParticleSystem* createParticles(string sName)
 	{
 		ParticleSystem* pSys = new ParticleSystem();
@@ -83,6 +98,11 @@ public:
 	static float getFramerate()
 	{
 		return g_pGlobalEngine->getFramerate();
+	}
+	
+	static obj* getObjAtPoint(Point p)
+	{
+		return g_pGlobalEngine->getObject(p);
 	}
 };
 
@@ -258,6 +278,15 @@ luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
 	luaReturnNil();
 }
 
+luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
+{
+	Point p(lua_tonumber(L,1), lua_tonumber(L,2));
+	obj* o = GameEngineLua::getObjAtPoint(p);
+	if(o == NULL)
+		luaReturnNil();
+	luaReturnObj(o);
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Camera functions
 //-----------------------------------------------------------------------------------------------------------
@@ -372,6 +401,26 @@ luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 	luaReturnInt(GameEngineLua::joyAxis(lua_tointeger(L, 1)));
 }
 
+luaFunc(mouse_getPos) //int x, int y mouse_getPos()
+{
+	Point p = GameEngineLua::getMousePos();
+	luaReturnVec2(p.x, p.y);
+}
+
+luaFunc(mouse_isDown) //bool mouse_isDown(int button)
+{
+	if(!lua_isinteger(L, 1))
+		luaReturnBool(GameEngineLua::getMouseDown(LMB));
+	luaReturnBool(GameEngineLua::getMouseDown(lua_tointeger(L, 1)));
+}
+
+luaFunc(mouse_transformToWorld) // float x, float y mouse_transformToWorld(int x, int y)
+{
+	Point pMouse(lua_tointeger(L, 1), lua_tointeger(L, 2));
+	Point p = GameEngineLua::getWorldMousePos(pMouse);
+	luaReturnVec2(p.x, p.y);
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
@@ -389,6 +438,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_registerPlayer),
 	luaRegister(obj_setAngle),
 	luaRegister(obj_getAngle),
+	luaRegister(obj_getFromPoint),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
@@ -402,6 +452,9 @@ static LuaFunctions s_functab[] =
 	luaRegister(key_isDown),
 	luaRegister(joy_isDown),
 	luaRegister(joy_getAxis),
+	luaRegister(mouse_isDown),
+	luaRegister(mouse_getPos),
+	luaRegister(mouse_transformToWorld),
 	{NULL, NULL}
 };
 
@@ -413,6 +466,11 @@ static const struct {
 	//Joystick
 	luaConstant(JOY_MIN),
 	luaConstant(JOY_MAX),
+	
+	//Mouse
+	luaConstant(LMB),
+	luaConstant(RMB),
+	luaConstant(MMB),
 	
 	//Keyboard
 	luaConstant(SDL_SCANCODE_SPACE),

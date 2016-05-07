@@ -402,7 +402,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	cleanupParticles();
 	player = NULL;
 	errlog << "Loading scene " << sXMLFilename << endl;
-	
+	CameraPos.set(0,0,m_fDefCameraZ);	//Reset camera
 	XMLDocument* doc = new XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
@@ -525,7 +525,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	
 	delete doc;
 	
-	
+	m_sLastScene = sXMLFilename;
 	
 	
 	
@@ -575,6 +575,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	b2FixtureDef fixtureDef;
 	b2PolygonShape dynamicBox;
 	b2CircleShape dynamicCircle;
+	b2ChainShape dynamicChain;
 	
 	Point pos;
 	
@@ -606,14 +607,32 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		//Get rotation (angle) of box
 		float32 fRot = 0.0f;
 		fixture->QueryFloatAttribute("rot", &fRot);
-			
-		//Create box
+		
+		bool bHollow = false;
+		fixture->QueryBoolAttribute("hollow", &bHollow);
+		
 		Point pBoxSize = pointFromString(cBoxSize);
-		dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, p, fRot);
-		fixtureDef.shape = &dynamicBox;
+		if(bHollow)
+		{
+			//Create hollow box
+			b2Vec2 verts[4];
+			verts[0].Set(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
+			verts[1].Set(-pBoxSize.x/2.0f, pBoxSize.y/2.0f);
+			verts[2].Set(-pBoxSize.x/2.0f, -pBoxSize.y/2.0f);
+			verts[3].Set(pBoxSize.x/2.0f, -pBoxSize.y/2.0f);
+			dynamicChain.CreateLoop(verts, 4);
+			fixtureDef.shape = &dynamicChain;
+		}
+		else
+		{
+			//Create box
+			dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, p, fRot);
+			fixtureDef.shape = &dynamicBox;
+		}
 	}
 	else if(sFixType == "circle")
 	{
+		dynamicCircle.m_p.SetZero();
 		const char* cCircPos = fixture->Attribute("pos");
 		if(cCircPos)
 		{

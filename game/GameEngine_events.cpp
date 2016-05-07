@@ -12,7 +12,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			{
 				case SDL_SCANCODE_F5:
 					reloadImages();
-					loadScene("res/3d/solarsystem.scene.xml");
+					loadScene(m_sLastScene);	//Reload current scene
 					break;
 					
 				case SDL_SCANCODE_V:
