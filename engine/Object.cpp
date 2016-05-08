@@ -17,6 +17,7 @@ obj::obj() : Drawable()
   meshLattice = NULL;
   meshAnim = NULL;
   lua = NULL;
+  glueObj = NULL;
 }
 
 obj::~obj()
@@ -120,7 +121,7 @@ void obj::collideWall(Point ptNormal)
 
 void obj::initLua()
 {
-	if(lua && luaClass.length())
+	if(lua && luaClass.length() && glueObj == NULL)
 	{
 		lua_State* L = lua->getState();
 		lua->call("loadclass", luaClass.c_str());	//Create this class if it hasn't been created already

@@ -30,6 +30,7 @@ public:
 	static void addObject(obj* o)
 	{
 		g_pGlobalEngine->addAfterUpdate(o);
+		o->initLua();	//Need to init this now so the glue ptr gets initialized properly
 	}
 	
 	static obj* getPlayerObject()
@@ -287,6 +288,20 @@ luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 	luaReturnObj(o);
 }
 
+//Set physics off or on for an object's body
+luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
+{
+	obj *o = getObj<obj>(L);
+	bool b = lua_toboolean(L, 2);
+	if(o != NULL)
+	{
+		b2Body* bod = o->getBody();
+		if(bod != NULL)
+			bod->SetActive(b);
+	}
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Camera functions
 //-----------------------------------------------------------------------------------------------------------
@@ -439,6 +454,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_setAngle),
 	luaRegister(obj_getAngle),
 	luaRegister(obj_getFromPoint),
+	luaRegister(obj_setActive),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),

@@ -644,6 +644,18 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
 		fixtureDef.shape = &dynamicCircle;
 	}
+	else if(sFixType == "line")
+	{
+		float fLen = 1.0f;
+		fixture->QueryFloatAttribute("length", &fLen);
+		
+		b2Vec2 verts[2];
+		verts[0].Set(0, fLen/2.0f);
+		verts[1].Set(0, -fLen/2.0f);
+		
+		dynamicChain.CreateChain(verts, 2);
+		fixtureDef.shape = &dynamicChain;
+	}
 	//else TODO
 	
 	fixtureDef.density = 1.0f;
