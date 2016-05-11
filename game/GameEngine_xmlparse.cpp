@@ -301,6 +301,9 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				bodyDef.type = b2_staticBody;
 			bodyDef.position = pos;
 			
+			bodyDef.linearDamping = 0;
+			body->QueryFloatAttribute("linearDamping", &bodyDef.linearDamping);
+			
 			//Fixed rotation (true for sprites, false for physical objects)
 			bodyDef.fixedRotation = false;
 			body->QueryBoolAttribute("fixedrot", &bodyDef.fixedRotation);
@@ -481,7 +484,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(o != NULL && cName != NULL)
 			{
 				string s = cName;
-				if(s == "ship")
+				if(s == "ship")	//TODO: Remove & move logic elsewhere
 				{
 					list<physSegment*>::iterator segiter = o->segments.begin();
 					if(segiter != o->segments.end())

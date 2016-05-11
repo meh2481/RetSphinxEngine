@@ -105,6 +105,21 @@ public:
 	{
 		return g_pGlobalEngine->getObject(p);
 	}
+	
+	static Node* getNodeAtPoint(Point p)
+	{
+		return g_pGlobalEngine->getNode(p);
+	}
+	
+	static b2World* getPhysWorld()
+	{
+		return g_pGlobalEngine->getWorld();
+	}
+	
+	static Node* getNode(string sNodeName)
+	{
+		return g_pGlobalEngine->getNode(sNodeName);
+	}
 };
 
 
@@ -350,6 +365,67 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 	luaReturnVec2(pos.x, pos.y);
 }
 
+luaFunc(node_getNearestObj) //obj* node_getNearestObj(string sObjName)
+{
+	//TODO
+	luaReturnNil();
+}
+
+//Get a table of all objects colliding with this node
+luaFunc(node_getCollidingObj) //obj[]* node_getCollidingObj(Node* n)
+{
+	Node* n = getObj<Node>(L);
+	lua_newtable(L);	//Create table
+	int cur = 0;
+	if(n)
+	{
+		b2World* world = GameEngineLua::getPhysWorld();
+		if(world != NULL)
+		{
+			for(b2Contact* contact = world->GetContactList(); contact != NULL; contact = contact->GetNext())
+			{
+				collision coll = EngineContactListener::getCollision(contact);
+				if(coll.nodeA == n && coll.objB != NULL)
+				{
+					//Push key/value pairs into table
+					lua_pushnumber(L,cur++);
+					lua_rawgetp(L, LUA_REGISTRYINDEX, coll.objB);
+					lua_settable(L,-3);
+				}
+				if(coll.nodeB == n && coll.objA != NULL)
+				{
+					//Push key/value pairs into table
+					lua_pushnumber(L,cur++);
+					lua_rawgetp(L, LUA_REGISTRYINDEX, coll.objA);
+					lua_settable(L,-3);
+				}
+			}
+		}
+	}
+	return 1;	//return table
+}
+
+luaFunc(node_get)	//Node* node_get(string nodeName)
+{
+	Node* n = GameEngineLua::getNode(lua_tostring(L, 1));
+	if(n)
+		luaReturnObj(n);
+	luaReturnNil();
+}
+
+luaFunc(node_isInside) //bool node_isInside(Node* n, float x, float y)
+{
+	bool bInside = false;
+	Node* n = getObj<Node>(L);
+	if(n)
+	{
+		Node* test = GameEngineLua::getNodeAtPoint(Point(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+		if(test && test == n)
+			bInside = true;
+	}
+	luaReturnBool(bInside);
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Particles functions
 //-----------------------------------------------------------------------------------------------------------
@@ -459,6 +535,10 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
+	luaRegister(node_getCollidingObj),
+	luaRegister(node_getNearestObj),
+	luaRegister(node_get),
+	luaRegister(node_isInside),
 	luaRegister(map_load),
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),

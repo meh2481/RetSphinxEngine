@@ -109,9 +109,6 @@ protected:
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
 	virtual obj* objFromXML(string sXMLFilename, Point ptOffset, Point ptVel) = 0;	//Function called when an object should be created
-	
-	//Helper functions for your own class definition
-	b2World* getWorld() {return m_physicsWorld;};
 
 public:
 	//Constructor/destructor
@@ -176,6 +173,7 @@ public:
 	void setDebugDraw(bool b) {m_bDebugDraw = b;};
 	bool getDebugDraw() {return m_bDebugDraw;};
 	void toggleDebugDraw() {m_bDebugDraw = !m_bDebugDraw;};
+	b2World* getWorld() {return m_physicsWorld;};
 	
 	//Mouse functions
 	Point getCursorPos()	{return m_ptCursorPos;};
@@ -206,6 +204,7 @@ public:
 	void addNode(Node* n);
 	Node* getNode(string sNodeName);
 	obj* getObject(Point p);	//Get first object at this point
+	Node* getNode(Point p);		//Get first node at this point
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered)	{SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);};
