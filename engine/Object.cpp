@@ -107,6 +107,15 @@ b2Body* obj::getBody()
 	return NULL;
 }
 
+Point obj::getPos()
+{
+	Point p(0,0);
+	b2Body* b = getBody();
+	if(b)
+		return b->GetPosition();
+	return p;
+}
+
 void obj::collide(obj* other)
 {
 	if(lua)

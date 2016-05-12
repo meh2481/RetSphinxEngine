@@ -120,6 +120,11 @@ public:
 	{
 		return g_pGlobalEngine->getNode(sNodeName);
 	}
+	
+	static obj* getClosestObject(Point p)
+	{
+		return g_pGlobalEngine->getClosestObject(p);
+	}
 };
 
 
@@ -365,9 +370,15 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 	luaReturnVec2(pos.x, pos.y);
 }
 
-luaFunc(node_getNearestObj) //obj* node_getNearestObj(string sObjName)
+luaFunc(node_getNearestObj) //obj* node_getNearestObj(Node* n/*, string sObjName*/)
 {
-	//TODO
+	Node* n = getObj<Node>(L);
+	if(n)
+	{
+		obj* o = GameEngineLua::getClosestObject(n->pos);
+		if(o)
+			luaReturnObj(o);
+	}
 	luaReturnNil();
 }
 

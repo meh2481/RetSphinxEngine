@@ -4,7 +4,7 @@ void Engine::addNode(Node* n)
 {
 	if(n != NULL)
 	{
-		m_nodes.push_back(n);
+		m_nodes[n->name] = n;
 		n->init();
 	}
 }
@@ -57,8 +57,8 @@ void Engine::cleanupObjects()
 		delete (*i);
 	for(multiset<physSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)
 		delete (*i);
-	for(list<Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
-		delete (*i);
+	for(map<string, Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
+		delete it->second;
 	m_lScenery.clear();
 	m_lObjects.clear();
 	m_nodes.clear();
@@ -91,19 +91,15 @@ void Engine::updateObjects(float32 dt)
 		delete (*i);	//Free up memory
 	}
 	//Update nodes
-	for(list<Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
-	{
-		(*i)->update(dt);
-	}
+	for(map<string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
+		i->second->update(dt);
 }
 
 Node* Engine::getNode(string sNodeName)
 {
-	for(list<Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
-	{
-		if((*i)->name == sNodeName)
-			return (*i);
-	}
+	map<string, Node*>::iterator i = m_nodes.find(sNodeName);
+	if(i != m_nodes.end())
+		return i->second;
 	return NULL;
 }
 
@@ -118,6 +114,23 @@ public:
 		return true;
 	}
 };
+
+obj* Engine::getClosestObject(Point p)
+{
+	obj* closest = NULL;
+	float32 len2 = FLT_MAX;
+	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
+	{
+		Point offset = (*i)->getPos() - p;
+		float32 dist = offset.LengthSquared();
+		if(dist < len2)
+		{
+			closest = *i;
+			len2 = dist;
+		}
+	}
+	return closest;
+}
 
 obj* Engine::getObject(Point p)
 {

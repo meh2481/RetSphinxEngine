@@ -83,7 +83,7 @@ private:
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
 	list<ParticleSystem*> m_particles;
-	list<Node*> m_nodes;
+	map<string, Node*> m_nodes;
 	
 	multimap<string, FMOD_CHANNEL*> m_channels;
 	map<string, FMOD_SOUND*> m_sounds;
@@ -204,6 +204,7 @@ public:
 	void addNode(Node* n);
 	Node* getNode(string sNodeName);
 	obj* getObject(Point p);	//Get first object at this point
+	obj* getClosestObject(Point p);	//Get closest object to this point
 	Node* getNode(Point p);		//Get first node at this point
 
 	//OpenGL methods

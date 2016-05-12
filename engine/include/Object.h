@@ -69,6 +69,7 @@ public:
     void addSegment(physSegment* seg);
 	b2BodyDef* update(float32 dt);
 	b2Body* getBody();
+	Point getPos();	//TODO: Find where we're using body->getPos and replace with this func
 	void collide(obj* other);
 	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
