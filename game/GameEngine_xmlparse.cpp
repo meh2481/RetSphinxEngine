@@ -468,6 +468,7 @@ void GameEngine::loadScene(string sXMLFilename)
 		const char* cName = object->Attribute("name");
 		const char* cPos = object->Attribute("pos");
 		const char* cVel = object->Attribute("vel");
+		const char* cObjID = object->Attribute("id");
 		if(cObjType != NULL)
 		{
 			Point pos(0,0);
@@ -481,28 +482,34 @@ void GameEngine::loadScene(string sXMLFilename)
 			
 			obj* o = objFromXML(cObjType, pos, vel);
 			
-			if(o != NULL && cName != NULL)
+			if(o != NULL)
 			{
-				string s = cName;
-				if(s == "ship")	//TODO: Remove & move logic elsewhere
+				if(cObjID)
+					o->id = cObjID;
+			
+				if(cName != NULL)
 				{
-					list<physSegment*>::iterator segiter = o->segments.begin();
-					if(segiter != o->segments.end())
+					string s = cName;
+					if(s == "ship")	//TODO: Remove & move logic elsewhere
 					{
-						physSegment* sg = *segiter;
-						if(sg->obj3D != NULL)
+						list<physSegment*>::iterator segiter = o->segments.begin();
+						if(segiter != o->segments.end())
 						{
-							//sg->obj3D->shaded = false;
-							sg->obj3D->useGlobalLight = false;
-							sg->obj3D->lightPos[0] = 0.0f;
-							sg->obj3D->lightPos[1] = 0.0f;
-							sg->obj3D->lightPos[2] = 3.0f;
-							sg->obj3D->lightPos[3] = 1.0f;
+							physSegment* sg = *segiter;
+							if(sg->obj3D != NULL)
+							{
+								//sg->obj3D->shaded = false;
+								sg->obj3D->useGlobalLight = false;
+								sg->obj3D->lightPos[0] = 0.0f;
+								sg->obj3D->lightPos[1] = 0.0f;
+								sg->obj3D->lightPos[2] = 3.0f;
+								sg->obj3D->lightPos[3] = 1.0f;
+							}
 						}
 					}
 				}
+				addObject(o);
 			}
-			addObject(o);
 		}
 	}
 	

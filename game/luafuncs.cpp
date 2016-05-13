@@ -322,6 +322,12 @@ luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 	luaReturnNil();
 }
 
+luaFunc(obj_getId)	//string obj_getId(obj* o)
+{
+	obj *o = getObj<obj>(L);
+	luaReturnString(o->id);
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Camera functions
 //-----------------------------------------------------------------------------------------------------------
@@ -542,6 +548,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getAngle),
 	luaRegister(obj_getFromPoint),
 	luaRegister(obj_setActive),
+	luaRegister(obj_getId),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),

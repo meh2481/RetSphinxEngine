@@ -61,6 +61,7 @@ public:
     void* usr;
 	LuaInterface* lua;
 	string luaClass;
+	string id;
     
     obj();
     ~obj();
