@@ -50,19 +50,19 @@ public:
 class obj : public Drawable
 {
 	LuaObjGlue* glueObj;
+	map<string, string> propertyValues;
 public:
 	enum { TYPE = OT_OBJECT };
-    list<physSegment*> segments;
-    b2Body*         body;				//TODO: is this ever even used?
-	Image*			meshImg;
-	lattice*		meshLattice;
-	latticeAnim*	meshAnim;
-	Point			meshSize;
-    void* usr;
-	LuaInterface* lua;
-	string luaClass;
-	string id;
-	map<string, string> propertyValues;	//TODO: Setup so that this can be populated by XML and called from Lua
+    vector<physSegment*> 	segments;
+    b2Body*         		body; //TODO: is this ever even used?
+	Image*					meshImg;
+	lattice*				meshLattice;
+	latticeAnim*			meshAnim;
+	Point					meshSize;
+    void* 					usr;
+	LuaInterface* 			lua;
+	string 					luaClass;
+	bool 					active;
     
     obj();
     ~obj();
@@ -76,6 +76,12 @@ public:
 	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
 	void setPosition(Point p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
+	
+	void setProperty(string prop, string value)	{propertyValues[prop] = value;};
+	void addProperty(string prop, string value) {setProperty(prop, value);};
+	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
+	
+	void setImage(Image* img, uint32_t seg = 0);	//Sets the image of the given physSegment
 };
 
 

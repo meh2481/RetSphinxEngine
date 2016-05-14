@@ -313,19 +313,35 @@ luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 {
 	obj *o = getObj<obj>(L);
 	bool b = lua_toboolean(L, 2);
-	if(o != NULL)
+	if(o)
 	{
 		b2Body* bod = o->getBody();
-		if(bod != NULL)
+		if(bod)
 			bod->SetActive(b);
+		o->active = b;
 	}
 	luaReturnNil();
 }
 
-luaFunc(obj_getId)	//string obj_getId(obj* o)
+luaFunc(obj_getProperty)	//string obj_getProperty(obj* o, string sProp)
+{
+	string s;
+	obj *o = getObj<obj>(L);
+	if(o)
+		s = o->getProperty(lua_tostring(L, 2));
+	luaReturnString(s);
+}
+
+luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 1)
 {
 	obj *o = getObj<obj>(L);
-	luaReturnString(o->id);
+	if(o)
+	{
+		uint32_t seg = 1;
+		if(lua_isinteger(L, 3))
+			seg = lua_tointeger(L, 3);
+		o->setImage(getImage(lua_tostring(L, 2)), seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
+	}
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -346,11 +362,7 @@ luaFunc(node_getProperty)	//string node_getProperty(Node* n, string propName)
 	string s;
 	Node* n = getObj<Node>(L);
 	if(n)
-	{
-		string sProp = lua_tostring(L, 2);
-		if(n->propertyValues.count(sProp))
-			s = n->propertyValues[sProp];
-	}
+		s = n->getProperty(lua_tostring(L, 2));
 	luaReturnString(s);
 }
 
@@ -359,11 +371,7 @@ luaFunc(node_getVec2Property)	//float x, float y node_getVec2Property(Node* n, s
 	Point pt(0,0);
 	Node* n = getObj<Node>(L);
 	if(n)
-	{
-		string sProp = lua_tostring(L, 2);
-		if(n->propertyValues.count(sProp))
-			pt = pointFromString(n->propertyValues[sProp]);
-	}
+		pt = pointFromString(n->getProperty(lua_tostring(L, 2)));
 	luaReturnVec2(pt.x, pt.y);
 }
 
@@ -548,7 +556,8 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getAngle),
 	luaRegister(obj_getFromPoint),
 	luaRegister(obj_setActive),
-	luaRegister(obj_getId),
+	luaRegister(obj_getProperty),
+	luaRegister(obj_setImage),
 	luaRegister(camera_centerOnXY),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),

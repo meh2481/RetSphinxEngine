@@ -330,7 +330,8 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	//getWorld()->SetGravity(b2Vec2(0,-9.8));
 	getWorld()->SetGravity(b2Vec2(0,0));
 	
-	loadScene("res/3d/solarsystem.scene.xml");
+	Lua->call("loadStartingMap");
+	//loadScene("res/3d/solarsystem.scene.xml");
 }
 
 

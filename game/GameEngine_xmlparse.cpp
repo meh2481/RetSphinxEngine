@@ -470,7 +470,6 @@ void GameEngine::loadScene(string sXMLFilename)
 		const char* cName = object->Attribute("name");
 		const char* cPos = object->Attribute("pos");
 		const char* cVel = object->Attribute("vel");
-		const char* cObjID = object->Attribute("id");
 		if(cObjType != NULL)
 		{
 			Point pos(0,0);
@@ -486,21 +485,18 @@ void GameEngine::loadScene(string sXMLFilename)
 			
 			if(o != NULL)
 			{
-				if(cObjID)
-					o->id = cObjID;
 			
 				if(cName != NULL)
 				{
 					string s = cName;
 					if(s == "ship")	//TODO: Remove & move logic elsewhere
 					{
-						list<physSegment*>::iterator segiter = o->segments.begin();
+						vector<physSegment*>::iterator segiter = o->segments.begin();
 						if(segiter != o->segments.end())
 						{
 							physSegment* sg = *segiter;
 							if(sg->obj3D != NULL)
 							{
-								//sg->obj3D->shaded = false;
 								sg->obj3D->useGlobalLight = false;
 								sg->obj3D->lightPos[0] = 0.0f;
 								sg->obj3D->lightPos[1] = 0.0f;
@@ -510,6 +506,11 @@ void GameEngine::loadScene(string sXMLFilename)
 						}
 					}
 				}
+				
+				//Populate this obj with ALL THE INFO in case Lua wants it
+				for(const XMLAttribute* attrib = object->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
+					o->setProperty(attrib->Name(), attrib->Value());
+				
 				addObject(o);
 			}
 		}
@@ -692,7 +693,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		
 		//Populate this node with ALL THE INFO in case Lua wants it
 		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
-			n->propertyValues[attrib->Name()] = attrib->Value();
+			n->setProperty(attrib->Name(), attrib->Value());
 		
 		addNode(n);
 		fixtureDef.userData = (void*)n;	//TODO: Use heavy userdata

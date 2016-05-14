@@ -16,6 +16,10 @@ void GameEngine::handleEvent(SDL_Event event)
 					loadScene(m_sLastScene);	//Reload current scene
 					break;
 					
+				case SDL_SCANCODE_F6:
+					Lua->call("loadStartingMap");	//Start from initial map
+					break;
+					
 				case SDL_SCANCODE_V:
 					toggleDebugDraw();
 					break;

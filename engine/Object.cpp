@@ -19,6 +19,8 @@ obj::obj() : Drawable()
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
+  active = true;
+  segments.reserve(1);	//don't expect very many segments
 }
 
 obj::~obj()
@@ -31,7 +33,7 @@ obj::~obj()
 		//Cleanup Lua glue object
 		lua->deleteObject(glueObj);
 	}
-    for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
 	if(meshLattice)
 		delete meshLattice;
@@ -41,8 +43,11 @@ obj::~obj()
 
 void obj::draw()
 {
+	if(!active)
+		return;
+	
 	//Draw segments of this object
-    for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
 		if(!(*i)->show) continue;	//Skip frames that shouldn't be drawn up front
 		if(body && !(*i)->body)	//Override parenting if the child segments have their own physics already
@@ -61,7 +66,7 @@ void obj::draw()
 	}
 	if(meshImg)
 	{
-		list<physSegment*>::iterator i = segments.begin();
+		vector<physSegment*>::iterator i = segments.begin();
 		if(i != segments.end())
 		{
 			physSegment* seg = *i;
@@ -108,6 +113,12 @@ b2Body* obj::getBody()
 	return NULL;
 }
 
+void obj::setImage(Image* img, uint32_t seg)
+{
+	if(segments.size() > seg)
+		segments[seg]->img = img;
+}
+
 Point obj::getPos()
 {
 	Point p(0,0);
@@ -150,7 +161,7 @@ void obj::setPosition(Point p)
 	{
 		Point ptDiff = b->GetPosition();	//Get relative offset for all bodies
 		ptDiff = p - ptDiff;
-		for(list<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+		for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
 		{
 			if((*i)->body != NULL)
 			{
