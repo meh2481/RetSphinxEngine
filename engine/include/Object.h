@@ -62,6 +62,7 @@ public:
 	LuaInterface* lua;
 	string luaClass;
 	string id;
+	map<string, string> propertyValues;	//TODO: Setup so that this can be populated by XML and called from Lua
     
     obj();
     ~obj();

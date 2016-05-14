@@ -11,6 +11,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			switch(event.key.keysym.scancode)
 			{
 				case SDL_SCANCODE_F5:
+					Lua->call("clearClasses"); //Reload Lua classes
 					reloadImages();
 					loadScene(m_sLastScene);	//Reload current scene
 					break;
