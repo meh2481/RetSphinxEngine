@@ -66,6 +66,7 @@ void obj::draw()
 	}
 	if(meshImg)
 	{
+		//TODO Jeepers this is messy. I totally thought this was a for loop. Make this look sane
 		vector<physSegment*>::iterator i = segments.begin();
 		if(i != segments.end())
 		{
@@ -81,9 +82,9 @@ void obj::draw()
 				else
 					meshImg->render(meshSize);
 				
-				glScalef(meshSize.x, meshSize.y, 1);
-				if(meshLattice)
-					meshLattice->renderDebug();
+				//glScalef(meshSize.x, meshSize.y, 1);
+				//if(meshLattice)
+				//	meshLattice->renderDebug();
 				
 				glPopMatrix();
 			}

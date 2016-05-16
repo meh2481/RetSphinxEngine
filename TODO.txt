@@ -1,9 +1,43 @@
+Overall TODO list (in order):
+- Debug key for toggling lattice render on/off gamewide rather than hardcoded on/off
+- Fix math for softbody lattice anim so it actually works properly
+- Use GLM for math stuff instead of glPushMatrix() and friends
+- Implement newer OpenGL shaders and such
+- Use shaders rather than lattice animations where possible
+
+
+
+Refactoring thoughts:
+- Image class is bloated with too much junk; once shaders are implemented see what can be cropped out
+- lots of classes are in files for other classes; move to own files
+- rename files as needed to match class names
+- use UpperCase for class names to avoid confusion
+- use camelCase for variable names
+
+
+
+Reasoning behind the engine design (aka why not just use Unity or whatever):
+- Robust Lua scripting interface
+- 3D either fleshed out more fully (with sub-objects, object demolition) or ripped out
+	-- Don't want to bother with bones/3D animation; math too complicated. Does this make the 3D too limited?
+	-- How much do I care about 3D eye candy and does that just make the 2D stuff look like crap?
+- Simplified resource managment
+	-- Resources compressed into smaller formats - ZLIB or such
+		--- Images should be readable directly into OpenGL
+			---- Look into OpenGL image compression, or just use ZLIB and throw the decompressed byte buffer into OpenGL directly
+	-- Paged in with memory mapping if intelligent enough for performance gains
+	-- Packaged into larger files, but intelligently; don't want huge Steam updates for small changes because EVERYTHING recompressed
+- XML vs. Lua - when to use one over the other? Can XML be removed intelligently?
+- Optimization and data-driven programming/design where applicable
+
+
+
+Other misc unordered TODO:
 - Scene editor / XML exporter
-- Images should be able to save to file?
 - Add ImGUI - super-simple GUI for editing
 - Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
 - Go through and find if globaldefs.h can be non-included in some header files
-- Unify log, so messages go to console & errlog file
+- Unify log, so messages go to console & errlog file	//What does this even mean?
 
 
 

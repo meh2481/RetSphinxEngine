@@ -64,7 +64,9 @@ public:
 	void init();
 	void update(float32 dt);
 	
-	float32 freq, amp, vtime;
+	float32 freq;
+	float32	amp;
+	float32 vtime;
 	
 };
 

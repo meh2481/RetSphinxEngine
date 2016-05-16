@@ -352,40 +352,80 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	//-----------------------------------------------------------------
 	//TODO Yuck soft body stuff. Fix it so it works properly or get rid
 	
-	const char* cMeshImg = root->Attribute("latticeimg");
-	const char* cBodyRes = root->Attribute("latticeres");
-	const char* cMeshImgSize = root->Attribute("latticesize");
-	const char* cBodyCenter = root->Attribute("softbodycenter");
-	
-	if(cMeshImg)
-		o->meshImg = getImage(cMeshImg);
-	
-	if(cMeshImgSize)
-		o->meshSize = pointFromString(cMeshImgSize);
-	
-	//Default mesh size = 10, 10
-	Point pMeshSize(10,10);
-	
-	if(cMeshImg && cMeshImgSize && cBodyCenter && mBodyNames.count(cBodyCenter))
+	XMLElement* latticeElem = root->FirstChildElement("lattice");
+	if(latticeElem)
 	{
-		//Override default mesh size if we've provided one
-		if(cBodyRes)
-			pMeshSize = pointFromString(cBodyRes);
+		const char* cMeshImg = latticeElem->Attribute("img");
+		const char* cBodyRes = latticeElem->Attribute("resolution");
+		const char* cMeshImgSize = latticeElem->Attribute("size");
 		
-		o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
-		//sinLatticeAnim* manim = new sinLatticeAnim(o->meshLattice);
-		//manim->amp = 0.05;
-		softBodyAnim* manim = new softBodyAnim(o->meshLattice);
-		manim->addBody(mBodyNames[cBodyCenter], true);
-		manim->size = o->meshSize;
-		//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
-		for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+		//Default lattice resolution = 10, 10
+		Point pMeshSize(10,10);
+		
+		if(cMeshImg && cMeshImgSize)
 		{
-			if(i->first != cBodyCenter)
-				manim->addBody(i->second);
+			o->meshImg = getImage(cMeshImg);
+			o->meshSize = pointFromString(cMeshImgSize);
+			
+			const char* cLatticeType = latticeElem->Attribute("type");
+			if(cLatticeType)
+			{
+				if(cBodyRes)
+					pMeshSize = pointFromString(cBodyRes);
+				
+				o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
+				
+				string sLatticeType = cLatticeType;
+				if(sLatticeType == "softbody")
+				{
+					const char* cBodyCenter = latticeElem->Attribute("centerbody");
+					if(cBodyCenter && mBodyNames.count(cBodyCenter))
+					{
+						//Override default mesh size if we've provided one
+						
+						softBodyAnim* manim = new softBodyAnim(o->meshLattice);
+						manim->addBody(mBodyNames[cBodyCenter], true);
+						manim->size = o->meshSize;
+						for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+						{
+							if(i->first != cBodyCenter)
+								manim->addBody(i->second);
+						}
+						manim->init();
+						o->meshAnim = manim;
+						//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
+					}
+				}
+				else if(sLatticeType == "sin")
+				{
+					sinLatticeAnim* manim = new sinLatticeAnim(o->meshLattice);
+					
+					latticeElem->QueryFloatAttribute("amp", &manim->amp);
+					latticeElem->QueryFloatAttribute("freq", &manim->freq);
+					latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
+					
+					manim->init();
+					o->meshAnim = manim;
+				}
+				else if(sLatticeType == "wobble")
+				{
+					wobbleLatticeAnim* manim = new wobbleLatticeAnim(o->meshLattice);
+					
+					latticeElem->QueryFloatAttribute("speed", &manim->speed);
+					latticeElem->QueryFloatAttribute("dist", &manim->startdist);
+					latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
+					latticeElem->QueryFloatAttribute("angle", &manim->startangle);
+					latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
+					latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
+					latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
+					
+					manim->init();
+					o->meshAnim = manim;
+				}
+				//else TODO
+			}
+			
 		}
-		manim->init();
-		o->meshAnim = manim;
 	}
 	
 	
