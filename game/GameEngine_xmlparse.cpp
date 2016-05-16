@@ -232,37 +232,9 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	
 	obj* o = new obj;
 	
-	const char* cMeshImg = root->Attribute("meshimg");
-	if(cMeshImg != NULL)
-		o->meshImg = getImage(cMeshImg);
-	
-	const char* cMeshImgSize = root->Attribute("meshsize");
-	if(cMeshImgSize != NULL)
-		o->meshSize = pointFromString(cMeshImgSize);
-		
-	bool makeMesh = false;
-	root->QueryBoolAttribute("softbody", &makeMesh);
-	
 	const char* cLuaClass = root->Attribute("luaclass");
 	if(cLuaClass != NULL)
 		o->luaClass = cLuaClass;
-	
-	//TODO: Yuck leftover soft body stuff. Fix or get rid
-	string sMeshCenterObj = "";
-	Point pMeshSize(10,10);
-	
-	if(makeMesh)
-	{
-		const char* cBodyRes = root->Attribute("softbodyres");
-		if(cBodyRes != NULL)
-			pMeshSize = pointFromString(cBodyRes);
-			
-		const char* cBodyCenter = root->Attribute("softbodycenter");
-		if(cBodyCenter != NULL)
-			sMeshCenterObj = cBodyCenter;
-		else
-			makeMesh = false;
-	}
 	
 	map<string, b2Body*> mBodyNames;
 	
@@ -374,24 +346,52 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 		}
 	}
 	
-	//Set up mesh animation for object
-	if(makeMesh && mBodyNames.count(sMeshCenterObj))
+	
+	
+	
+	//-----------------------------------------------------------------
+	//TODO Yuck soft body stuff. Fix it so it works properly or get rid
+	
+	const char* cMeshImg = root->Attribute("latticeimg");
+	const char* cBodyRes = root->Attribute("latticeres");
+	const char* cMeshImgSize = root->Attribute("latticesize");
+	const char* cBodyCenter = root->Attribute("softbodycenter");
+	
+	if(cMeshImg)
+		o->meshImg = getImage(cMeshImg);
+	
+	if(cMeshImgSize)
+		o->meshSize = pointFromString(cMeshImgSize);
+	
+	//Default mesh size = 10, 10
+	Point pMeshSize(10,10);
+	
+	if(cMeshImg && cMeshImgSize && cBodyCenter && mBodyNames.count(cBodyCenter))
 	{
+		//Override default mesh size if we've provided one
+		if(cBodyRes)
+			pMeshSize = pointFromString(cBodyRes);
+		
 		o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
 		//sinLatticeAnim* manim = new sinLatticeAnim(o->meshLattice);
 		//manim->amp = 0.05;
 		softBodyAnim* manim = new softBodyAnim(o->meshLattice);
-		manim->addBody(mBodyNames[sMeshCenterObj], true);
+		manim->addBody(mBodyNames[cBodyCenter], true);
 		manim->size = o->meshSize;
 		//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
 		for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
 		{
-			if(i->first != sMeshCenterObj)
+			if(i->first != cBodyCenter)
 				manim->addBody(i->second);
 		}
 		manim->init();
 		o->meshAnim = manim;
 	}
+	
+	
+	
+	//------------------------------------------------------------------------
+	//Done
 	
 	delete doc;
 	o->lua = Lua;
@@ -425,6 +425,12 @@ void GameEngine::loadScene(string sXMLFilename)
 		delete doc;
 		return;
 	}
+	
+	Point pGravity(0, -9.8);
+	const char* cGravity = root->Attribute("gravity");
+	if(cGravity)
+		pGravity = pointFromString(cGravity);
+	setGravity(pGravity);
 	
 	//Create ground body, for adding map geometry to
 	b2BodyDef groundBodyDef;

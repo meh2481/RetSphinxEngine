@@ -80,6 +80,11 @@ void obj::draw()
 					meshImg->renderLattice(meshLattice, meshSize);
 				else
 					meshImg->render(meshSize);
+				
+				glScalef(meshSize.x, meshSize.y, 1);
+				if(meshLattice)
+					meshLattice->renderDebug();
+				
 				glPopMatrix();
 			}
 		}
@@ -167,6 +172,7 @@ void obj::setPosition(Point p)
 			{
 				Point ptNew = (*i)->body->GetPosition() + ptDiff;
 				(*i)->body->SetTransform(ptNew, (*i)->body->GetAngle());
+				(*i)->body->SetAwake(true);
 			}
 		}
 	}
