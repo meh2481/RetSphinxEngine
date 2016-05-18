@@ -82,11 +82,10 @@ void obj::draw(bool bDebugInfo)
 				else
 					meshImg->render(meshSize);
 				
-				if(bDebugInfo)
+				if(bDebugInfo && meshLattice)
 				{
 					glScalef(meshSize.x, meshSize.y, 1);
-					if(meshLattice)
-						meshLattice->renderDebug();
+					meshLattice->renderDebug();
 				}
 				
 				glPopMatrix();

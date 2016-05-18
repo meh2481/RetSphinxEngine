@@ -97,9 +97,12 @@ public:
 struct bodypos
 {
 	b2Body* b;			//Body
-	float32 angle;		//Starting angle
-	float32 dist;		//Starting distance
-	float32* weights;	//Vertex weights
+	Point pos;			//Starting body pos
+	
+	
+	//float32 angle;		//Starting angle
+	//float32 dist;		//Starting distance
+	//float32* weights;	//Vertex weights
 };
 
 class softBodyAnim : public latticeAnim
