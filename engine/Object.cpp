@@ -41,7 +41,7 @@ obj::~obj()
 		delete meshAnim;
 }
 
-void obj::draw()
+void obj::draw(bool bDebugInfo)
 {
 	if(!active)
 		return;
@@ -82,9 +82,12 @@ void obj::draw()
 				else
 					meshImg->render(meshSize);
 				
-				//glScalef(meshSize.x, meshSize.y, 1);
-				//if(meshLattice)
-				//	meshLattice->renderDebug();
+				if(bDebugInfo)
+				{
+					glScalef(meshSize.x, meshSize.y, 1);
+					if(meshLattice)
+						meshLattice->renderDebug();
+				}
 				
 				glPopMatrix();
 			}
@@ -210,7 +213,7 @@ physSegment::~physSegment()
 		delete latanim;
 }
 
-void physSegment::draw()
+void physSegment::draw(bool bDebugInfo)
 {
 	if(img == NULL || !show) return;
 	glColor4f(col.r,col.g,col.b,col.a);

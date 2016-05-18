@@ -40,7 +40,7 @@ public:
     physSegment();
     ~physSegment();
 	
-	void draw();
+	void draw(bool bDebugInfo = false);
 	void update(float32 dt);
 	void fromXML(XMLElement* layer);
 };
@@ -67,7 +67,7 @@ public:
     obj();
     ~obj();
 
-    void draw();
+    void draw(bool bDebugInfo = false);
     void addSegment(physSegment* seg);
 	b2BodyDef* update(float32 dt);
 	b2Body* getBody();

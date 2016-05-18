@@ -347,7 +347,7 @@ void ParticleSystem::update(float32 dt)
 	}
 }
 
-void ParticleSystem::draw()
+void ParticleSystem::draw(bool bDebugInfo)
 {
 	//cout << "Draw particles " << m_num << endl;
 	if(img == NULL) return;

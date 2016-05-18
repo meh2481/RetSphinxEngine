@@ -1,5 +1,5 @@
-Overall TODO list (in order):
-- Debug key for toggling lattice render on/off gamewide rather than hardcoded on/off
+Overall TODO list:
+- Fix noise loading so it's not crazy slow
 - Fix math for softbody lattice anim so it actually works properly
 - Use GLM for math stuff instead of glPushMatrix() and friends
 - Implement newer OpenGL shaders and such

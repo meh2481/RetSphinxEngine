@@ -10,7 +10,7 @@ void Engine::cleanupParticles()
 void Engine::drawParticles()
 {
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
-		(*i)->draw();
+		(*i)->draw(m_bObjDebugDraw);
 }
 
 void Engine::updateParticles(float32 dt)

@@ -48,7 +48,7 @@ void Engine::drawAll()
 		
 	//Draw everything in one pass
 	for(multimap<float, Drawable*>::iterator i = drawList.begin(); i != drawList.end(); i++)
-		i->second->draw();
+		i->second->draw(m_bObjDebugDraw);
 }
 
 void Engine::cleanupObjects()

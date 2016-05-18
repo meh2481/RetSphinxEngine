@@ -115,7 +115,7 @@ public:
 	bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
 	
 	void update(float32 dt);
-	void draw();
+	void draw(bool bDebugInfo);
 	void init();
 	void fromXML(string sXMLFilename);		//Load particle definitions from XML file
 	uint32_t count() {return m_num;};		//How many particles are currently alive (read-only because reasons)

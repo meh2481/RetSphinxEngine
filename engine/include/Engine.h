@@ -60,6 +60,7 @@ private:
 	EngineContactListener m_clContactListener;
 	DebugDraw m_debugDraw;
 	bool m_bDebugDraw;
+	bool m_bObjDebugDraw;
 	Point m_ptCursorPos;
 	bool  m_bShowCursor;
 	float32 m_fFramerate;
@@ -172,7 +173,10 @@ public:
 	void stepPhysics(float32 dt);	//Update our physics world and handle collisions
 	void setDebugDraw(bool b) {m_bDebugDraw = b;};
 	bool getDebugDraw() {return m_bDebugDraw;};
+	void setObjDebugDraw(bool b) {m_bObjDebugDraw = b;};
+	bool getObjDebugDraw() {return m_bObjDebugDraw;};
 	void toggleDebugDraw() {m_bDebugDraw = !m_bDebugDraw;};
+	void toggleObjDebugDraw() {m_bObjDebugDraw = !m_bObjDebugDraw;};
 	b2World* getWorld() {return m_physicsWorld;};
 	
 	//Mouse functions

@@ -10,7 +10,7 @@ public:
 	
 	float depth;
 	
-	virtual void draw() = 0;
+	virtual void draw(bool bDebugInfo) = 0;
 
 };
 

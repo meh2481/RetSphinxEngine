@@ -24,6 +24,10 @@ void GameEngine::handleEvent(SDL_Event event)
 					toggleDebugDraw();
 					break;
 					
+				case SDL_SCANCODE_L:
+					toggleObjDebugDraw();
+					break;
+					
 				case SDL_SCANCODE_ESCAPE:
 					quit();
 					break;

@@ -25,6 +25,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_physicsWorld->SetDebugDraw(&m_debugDraw);
 	m_physicsWorld->SetContactListener(&m_clContactListener);
 	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
+	m_bObjDebugDraw = false;
 #ifdef DEBUG
 	errlog << "Debug build" << endl;
 	m_bDebugDraw = true;
