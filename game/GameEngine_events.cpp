@@ -31,7 +31,16 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_ESCAPE:
 					quit();
 					break;
+#ifdef DEBUG
+				case SDL_SCANCODE_P:
+					playPausePhysics();
+					break;
 					
+				case SDL_SCANCODE_O:
+					pausePhysics();
+					stepPhysics();
+					break;
+#endif
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
 					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)

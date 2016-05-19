@@ -49,7 +49,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_cursor = NULL;
 	m_bCursorShow = true;
 	m_bCursorOutOfWindow = false;
-
+#ifdef DEBUG
+	m_bSteppingPhysics = false;
+	m_bStepFrame = false;
+#endif
+	
 	//Initialize engine stuff
 	m_fAccumulatedTime = 0.0;
 	//m_bFirstMusic = true;
@@ -176,7 +180,15 @@ bool Engine::_frame()
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
-		frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+#ifdef DEBUG
+		if(!m_bSteppingPhysics || m_bStepFrame)
+		{
+			m_bStepFrame = false;
+#endif
+			frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+#ifdef DEBUG
+		}
+#endif
 		_render();
 	}
 
