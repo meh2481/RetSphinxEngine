@@ -111,6 +111,7 @@ protected:
 	list<bodypos> bodies;
 	bodypos center;
 	
+	Point getCenter();
 	void setEffect();
 	Point relOffset(b2Body* b);	//returns angle, dist relative to center body
 	Point distMoved(bodypos* bp);	//returns angle, dist that the body has moved relative to starting pos

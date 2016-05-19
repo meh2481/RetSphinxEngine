@@ -289,7 +289,21 @@ void wobbleLatticeAnim::setEffect()
 
 
 
-
+Point softBodyAnim::getCenter()
+{
+	Point centroid(0,0);
+	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+		centroid = centroid + i->b->GetPosition();
+	
+	centroid.x = centroid.x / bodies.size();
+	centroid.y = centroid.y / bodies.size();
+	//return centroid;
+	centroid = centroid + center.b->GetPosition();
+	centroid.x /= 2.0f;
+	centroid.y /= 2.0f;
+	
+	return centroid;
+}
 
 softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
 {
@@ -320,11 +334,8 @@ void softBodyAnim::setEffect()
 			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Point dist = vertPos - i->pos;
-				totalDist += dist.Length();
+				totalDist += dist.LengthSquared();
 			}
-			
-			Point centerDist = vertPos - center.pos;
-			totalDist += centerDist.Length();
 			
 			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
@@ -332,7 +343,7 @@ void softBodyAnim::setEffect()
 				
 				//Distance between this vertex and this body, in resting position
 				Point diff = vertPos - i->pos;
-				float32 distance = diff.Length();
+				float32 distance = diff.LengthSquared();
 				
 				//Mul fac for moving this point
 				float32 fac = 1.0 - (distance / totalDist);
@@ -348,113 +359,10 @@ void softBodyAnim::setEffect()
 	}
 	m_l->bind();
 }
-	/*
-	//TODO Deform vertices according to how the bodies have moved
-	// Find relative offset (x,y) from polar coords for each body, then multiply by weight to get final position
-	latticeVert* ptr = m_l->vertex;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
-	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
-		{
-			//Point origVertPos = getVertex(ptr);
-			Point vertPos = getVertex(ptr);//origVertPos;
-			
-			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-			{
-				Point pMoved = distMoved(&(*i));
-				
-				//cout << "moved " << pMoved.x << "," << pMoved.y << endl;
-				
-				Point ptOffset;// = rotateAroundPoint(vertPos, pMoved.x, center.b->GetPosition());
-				ptOffset.x += cos(pMoved.x*DEG2RAD)*pMoved.y;
-				ptOffset.y += sin(pMoved.x*DEG2RAD)*pMoved.y;
-				
-				ptOffset *= i->weights[ix+(iy*(m_l->numx+1))];
-				//cout << "offset " << ptOffset.x << "," << ptOffset.y << endl;
-				vertPos += ptOffset;
-				//break;
-			}
-			
-			//vertPos = rotateAroundPoint(vertPos, fAvgAngle, center.b->GetPosition());
-			
-			
-			
-			setVertex(vertPos, ptr);
-			ptr++;
-		}
-	}*/
-	
-	
-	
-	
-	
-	/*float32 fAvgAngle = 0;
-	
-	float32 fLast = 0;
-	int num = 0;
-	
-	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-	{
-		float32 f = distMoved(&(*i)).x;
-		if(num == 0)
-			fLast = f;
-		else
-		{
-			if(fabs(fLast - f) >= 180)
-			{
-				if(f < 0)
-					f += 360;
-				else
-					f -= 360;
-			}
-		}
-		fAvgAngle += f;
-		num++;
-	}
-	
-	fAvgAngle /= num;
-	
-	latticeVert* ptr = m_l->vertex;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
-	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
-		{
-			Point vertPos = getVertex(ptr);
-			vertPos = rotateAroundPoint(vertPos, fAvgAngle, center.b->GetPosition());
-			setVertex(vertPos, ptr);
-			ptr++;
-		}
-	}*/
-	
-	
-	
-	
-	
-	
-	/*
-	m_l->bind();
-}*/
 
 Point softBodyAnim::relOffset(b2Body* b)
 {
-	Point centroid(0,0);
-	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-		centroid = centroid + i->b->GetPosition();
-	
-	Point p(0,0);
-	//if(center.b == NULL || b == NULL || b == center.b)
-	//	return p;
-	
-	centroid = centroid + center.b->GetPosition();
-	centroid.x = centroid.x / (bodies.size() + 1);
-	centroid.y = centroid.y / (bodies.size() + 1);
-		
-	p = b->GetPosition() - centroid;//center.b->GetPosition();
-	//float32 angle = atan2(p.y, p.x) * RAD2DEG;
-	//float32 dist = p.Length();
-	//p.x = angle;
-	//p.y = dist;
-	return p;
+	return b->GetPosition() - getCenter();
 }
 
 Point softBodyAnim::distMoved(bodypos* bp)
@@ -466,56 +374,10 @@ Point softBodyAnim::distMoved(bodypos* bp)
 
 void softBodyAnim::init()
 {
-	//int iBody = 0;
-	//int iNum = m_l->numy / bodies.size();
 	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-	{
 		i->pos = relOffset(i->b);
-	}
+	center.pos = center.b->GetPosition();
 }
-/*
-		i->pos.x = pStart.x;
-		i->dist = pStart.y;
-		i->weights = new float32[(m_l->numx+1)*(m_l->numy+1)];
-		
-		//Set weights
-		latticeVert* ptr = m_l->vertex;
-		float32* wt = i->weights;
-		for(uint32 iy = 0; iy <= m_l->numy; iy++)
-		{
-			for(uint32 ix = 0; ix <= m_l->numx; ix++)
-			{
-				Point vertPos = getVertex(ptr);
-				float32 totalDist = 0;
-				float32 myDist = 0;
-				for(list<bodypos>::iterator j = bodies.begin(); j != bodies.end(); j++)
-				{
-					Point pBodyPos = j->b->GetPosition();
-					pBodyPos = pBodyPos - vertPos;
-					totalDist += pBodyPos.LengthSquared();
-					if(i == j)
-						myDist = pBodyPos.LengthSquared();
-				}
-				
-				//TODO Better formula
-				//fac(i) = (sum(dist^2) - dist(i)^2)/(sum(dist^2)*(num-1)) 
-				//*wt = (totalDist - myDist) / (totalDist * (bodies.size() - 1));
-				if(sqrt(myDist) <= 0.75)//if(iy < (iBody+1) * iNum)
-					*wt = 1;
-				else
-					*wt = 0;
-				
-				//cout << totalDist << "," << myDist << ";" << *wt << " ";
-				
-				ptr++;
-				wt++;
-			}
-			//cout << endl;
-		}
-		//cout << endl << endl;
-		iBody++;
-	}
-}*/
 
 void softBodyAnim::update(float32 dt)
 {
@@ -524,35 +386,28 @@ void softBodyAnim::update(float32 dt)
 
 void softBodyAnim::addBody(b2Body* b, bool bCenter)
 {
-	if(bCenter)
-	{
-		center.b = b;
-		center.pos.SetZero();
-	}
-	else
+	//if(!bCenter)
 	{
 		bodypos bp;
 		bp.b = b;
 		bodies.push_back(bp);
 	}
+	if(bCenter)
+	{
+		center.b = b;
+	}
 }
 
 Point softBodyAnim::getVertex(latticeVert* v)
 {
-	Point p;
-	p.x = v->x;
-	p.y = v->y;
+	Point p(v->x * size.x, v->y * size.y);
 	
-	Point pCenter = center.b->GetPosition();
-	p.x *= size.x;
-	p.y *= size.y;
-	
-	return p + pCenter;
+	return p + getCenter();
 }
 
 void softBodyAnim::setVertex(Point p, latticeVert* v)
 {
-	p = p - center.b->GetPosition();
+	p = p - getCenter();
 	
 	p.x /= size.x;
 	p.y /= size.y;
