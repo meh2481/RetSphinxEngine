@@ -48,6 +48,7 @@ GL_FUNC(void,glPushMatrix,(void),(),)
 GL_FUNC(void,glRotatef,(GLfloat angle, GLfloat x, GLfloat y, GLfloat z),(angle,x,y,z),)
 GL_FUNC(void,glScalef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
 GL_FUNC(void,glTranslatef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
+GL_FUNC(void,glLoadMatrixf,(const GLfloat *m),(m),)
 
 // drawing
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
@@ -60,7 +61,7 @@ GL_FUNC(void,glVertex2f,(GLfloat x, GLfloat y),(x,y),)
 GL_FUNC(void,glPointSize,(GLfloat size),(size),)
 GL_FUNC(void,glNormal3f,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
 GL_FUNC(void,glDeleteLists,(GLuint list, GLsizei range),(list,range),)
-GL_FUNC(GLuint,glGenLists,(GLsizei range),(range),)
+GL_FUNC(GLuint,glGenLists,(GLsizei range),(range),return)
 GL_FUNC(void,glNewList,(GLuint list, GLenum mode),(list,mode),)
 GL_FUNC(void,glTexCoord2f,(GLfloat u, GLfloat v),(u,v),)
 GL_FUNC(void,glEndList,(void),(),)
@@ -80,11 +81,10 @@ GL_FUNC(void,glMaterialf,(GLenum face, GLenum pname, const GLfloat param),(face,
 
 //Win32 context stuff
 #ifdef _WIN32
-#include <windows.h>
-GL_FUNC(HGLRC,wglCreateContext,(HDC hdc),(hdc),)
-GL_FUNC(HGLRC,wglGetCurrentContext,(void),(),)
-GL_FUNC(BOOL,wglShareLists,(HGLRC hglrc1, HGLRC hglrc2),(hglrc1, hglrc2),)
-GL_FUNC(BOOL,wglDeleteContext,(HGLRC hglrc),(hglrc),)
+GL_FUNC(HGLRC,wglCreateContext,(HDC hdc),(hdc),return)
+GL_FUNC(HGLRC,wglGetCurrentContext,(void),(),return)
+GL_FUNC(BOOL,wglShareLists,(HGLRC hglrc1, HGLRC hglrc2),(hglrc1, hglrc2),return)
+GL_FUNC(BOOL,wglDeleteContext,(HGLRC hglrc),(hglrc),return)
 #endif
 
 

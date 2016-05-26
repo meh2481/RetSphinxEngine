@@ -4,7 +4,6 @@
 Node::Node()
 {
 	 lua = NULL;
-	 pos.SetZero();
 }
 
 Node::~Node()
@@ -26,7 +25,7 @@ void Node::init()
 }
 
 //Update the node
-void Node::update(float32 dt)
+void Node::update(float dt)
 {
 	if(lua)
 		lua->callMethod(this, "update", dt);

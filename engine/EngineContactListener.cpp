@@ -1,4 +1,5 @@
 #include "EngineContactListener.h"
+#include <Box2D/Box2D.h>
 
 void EngineContactListener::BeginContact(b2Contact *contact)
 {

@@ -5,6 +5,13 @@
 
 #include "Object.h"
 #include "luafuncs.h"
+#include "lattice.h"
+#include "GLImage.h"
+#include "opengl-api.h"
+
+#include <Box2D/Box2D.h>
+#include "tinyxml2.h"
+using namespace tinyxml2;
 
 //----------------------------------------------------------------------------------------------------
 // obj class
@@ -54,8 +61,8 @@ void obj::draw(bool bDebugInfo)
 		{
 			//Make the children bodies follow the parent
 			glPushMatrix();
-			Point objpos = body->GetWorldCenter();
-			float32 objrot = body->GetAngle();
+			b2Vec2 objpos = body->GetWorldCenter();
+			float objrot = body->GetAngle();
 			glTranslatef(objpos.x, objpos.y, depth);
 			glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 			(*i)->draw();
@@ -73,8 +80,8 @@ void obj::draw(bool bDebugInfo)
 			physSegment* seg = *i;
 			if(seg != NULL && seg->body != NULL)
 			{
-				Point pos = seg->body->GetPosition();
-				//float32 fAngle = seg->body->GetAngle();
+				b2Vec2 pos = seg->body->GetPosition();
+				//float fAngle = seg->body->GetAngle();
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
 				if(meshLattice)
@@ -101,7 +108,7 @@ void obj::addSegment(physSegment* seg)
 	seg->parent = this;
 }
 
-b2BodyDef* obj::update(float32 dt)
+b2BodyDef* obj::update(float dt)
 {
 	b2BodyDef* def = NULL;
 	
@@ -121,7 +128,7 @@ b2Body* obj::getBody()
 	return NULL;
 }
 
-void obj::setImage(Image* img, uint32_t seg)
+void obj::setImage(GLImage* img, int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;
@@ -129,11 +136,9 @@ void obj::setImage(Image* img, uint32_t seg)
 
 Point obj::getPos()
 {
-	Point p(0,0);
 	b2Body* b = getBody();
-	if(b)
-		return b->GetPosition();
-	return p;
+	b2Vec2 p = b ? b->GetPosition() : b2Vec2(0,0);
+	return Point(p.x, p.y);
 }
 
 void obj::collide(obj* other)
@@ -167,13 +172,13 @@ void obj::setPosition(Point p)
 	b2Body* b = getBody();
 	if(b != NULL)
 	{
-		Point ptDiff = b->GetPosition();	//Get relative offset for all bodies
-		ptDiff = p - ptDiff;
+		b2Vec2 ptDiff = b->GetPosition();	//Get relative offset for all bodies
+		ptDiff = b2Vec2(p.x, p.y) - ptDiff;
 		for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
 		{
 			if((*i)->body != NULL)
 			{
-				Point ptNew = (*i)->body->GetPosition() + ptDiff;
+				b2Vec2 ptNew = (*i)->body->GetPosition() + ptDiff;
 				(*i)->body->SetTransform(ptNew, (*i)->body->GetAngle());
 				(*i)->body->SetAwake(true);
 			}
@@ -192,9 +197,7 @@ physSegment::physSegment() : Drawable()
 	lat = NULL;
 	latanim = NULL;
 	obj3D = NULL;
-	
-	pos.SetZero();
-	center.SetZero();
+
 	//shear.SetZero();
 	rot = 0.0f;
 	size.x = size.y = tile.x = tile.y = 1.0f;
@@ -241,8 +244,8 @@ void physSegment::draw(bool bDebugInfo)
 	}
 	else
 	{
-		Point objpos = body->GetWorldCenter();
-		float32 objrot = body->GetAngle();
+		b2Vec2 objpos = body->GetWorldCenter();
+		float objrot = body->GetAngle();
 		glTranslatef(objpos.x, objpos.y, 0.0f);
 		glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
@@ -268,7 +271,7 @@ void physSegment::draw(bool bDebugInfo)
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
-void physSegment::update(float32 dt)
+void physSegment::update(float dt)
 {
 	if(latanim)
 		latanim->update(dt);

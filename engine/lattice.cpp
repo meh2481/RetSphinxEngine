@@ -1,19 +1,22 @@
 #include "lattice.h"
+#include "opengl-api.h"
 
-void lattice::reset(float32 sx, float32 sy)
+#include "Box2D/Box2D.h"
+
+void lattice::reset(float sx, float sy)
 {	
 	latticeVert* ptr = vertex;
 	latticeVert* ptruv = UV;
-	GLfloat segsizex = 1.0f/(GLfloat)(numx);
-	GLfloat segsizey = 1.0f/(GLfloat)(numy);
-	for(uint32 iy = 0; iy <= numy; iy++)
+	float segsizex = 1.0f/(float)(numx);
+	float segsizey = 1.0f/(float)(numy);
+	for(int iy = 0; iy <= numy; iy++)
 	{
-		for(uint32 ix = 0; ix <= numx; ix++)
+		for(int ix = 0; ix <= numx; ix++)
 		{
-			(*ptruv).x = (GLfloat)(ix) * segsizex;
-			(*ptruv).y = (GLfloat)(iy) * segsizey;
-			(*ptr).x = ((GLfloat)(ix) * segsizex - 0.5)*sx;
-			(*ptr).y = ((GLfloat)(iy) * segsizey - 0.5)*sy;
+			(*ptruv).x = (float)(ix) * segsizex;
+			(*ptruv).y = (float)(iy) * segsizey;
+			(*ptr).x = ((float)(ix) * segsizex - 0.5)*sx;
+			(*ptr).y = ((float)(iy) * segsizey - 0.5)*sy;
 			ptr++;
 			ptruv++;
 		}
@@ -22,12 +25,12 @@ void lattice::reset(float32 sx, float32 sy)
 
 void lattice::bind()
 {
-	GLfloat* ptr = m_vertex;
-	GLfloat* ptruv = m_UV;
+	float* ptr = m_vertex;
+	float* ptruv = m_UV;
 	
-	for(uint32 iy = 0; iy < numy; iy++)
+	for(int iy = 0; iy < numy; iy++)
 	{
-		for(uint32 ix = 0; ix < numx; ix++)
+		for(int ix = 0; ix < numx; ix++)
 		{
 			//Tex coords
 			latticeVert* uvul = &UV[ix+iy*(numx+1)];
@@ -80,10 +83,10 @@ void lattice::bind()
 	}
 }
 
-void lattice::setup(uint32 x, uint32 y)
+void lattice::setup(int x, int y)
 {
-	m_vertex = new GLfloat[NUMLATTICEPOINTS(x*y)];
-	m_UV = new GLfloat[NUMLATTICEPOINTS(x*y)];
+	m_vertex = new float[NUMLATTICEPOINTS(x*y)];
+	m_UV = new float[NUMLATTICEPOINTS(x*y)];
 	numx = x;
 	numy = y;
 	
@@ -103,7 +106,7 @@ lattice::~lattice()
 }
 
 //Ultra-fast render pass go!
-void lattice::renderTex(GLuint tex)
+void lattice::renderTex(unsigned tex)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glVertexPointer(2, GL_FLOAT, 0, m_vertex);
@@ -127,9 +130,9 @@ void lattice::renderDebug()
 	//glColor3f(color.r, color.g, color.b);
 	//glBegin(GL_LINES);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	for(uint32 iy = 0; iy < numy; iy++)
+	for(int iy = 0; iy < numy; iy++)
 	{
-		for(uint32 ix = 0; ix < numx; ix++)
+		for(int ix = 0; ix < numx; ix++)
 		{
 			glBegin(GL_LINES);
 			latticeVert* vertul = &vertex[ix+iy*(numx+1)];
@@ -168,7 +171,7 @@ void sinLatticeAnim::init()
 	setEffect();
 }
 
-void sinLatticeAnim::update(float32 dt)
+void sinLatticeAnim::update(float dt)
 {
 	curtime += dt;
 	setEffect();
@@ -178,11 +181,11 @@ void sinLatticeAnim::setEffect()
 {
 	m_l->reset();
 	
-	float32 relTime = curtime;
+	float relTime = curtime;
 	latticeVert* ptr = m_l->vertex;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	for(int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		for(int ix = 0; ix <= m_l->numx; ix++)
 		{
 			(*ptr).x += amp * sin(freq*relTime);
 			ptr++;
@@ -214,14 +217,14 @@ wobbleLatticeAnim::~wobbleLatticeAnim()
 
 void wobbleLatticeAnim::init()
 {
-	angle = new float32[(m_l->numx+1)*(m_l->numy+1)];
-	dist = new float32[(m_l->numx+1)*(m_l->numy+1)];
+	angle = new float[(m_l->numx+1)*(m_l->numy+1)];
+	dist = new float[(m_l->numx+1)*(m_l->numy+1)];
 	
-	float32* angptr = angle;
-	float32* distptr = dist;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	float* angptr = angle;
+	float* distptr = dist;
+	for(int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		for(int ix = 0; ix <= m_l->numx; ix++)
 		{
 			*angptr++ = randFloat(startangle-anglevar, startangle + anglevar);
 			*distptr++ = randFloat(startdist-distvar, startdist+distvar);
@@ -231,12 +234,12 @@ void wobbleLatticeAnim::init()
 	setEffect();
 }
 
-void wobbleLatticeAnim::update(float32 dt)
+void wobbleLatticeAnim::update(float dt)
 {
-	float32* angptr = angle;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	float* angptr = angle;
+	for(int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		for(int ix = 0; ix <= m_l->numx; ix++)
 		{
 			*angptr++ += dt * speed;
 		}
@@ -250,11 +253,11 @@ void wobbleLatticeAnim::setEffect()
 	m_l->reset();
 	
 	latticeVert* ptr = m_l->UV;
-	float32* angptr = angle;
-	float32* distptr = dist;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+	float* angptr = angle;
+	float* distptr = dist;
+	for(int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+		for(int ix = 0; ix <= m_l->numx; ix++)
 		{
 			//X = D * cos(A) and Y = D * sin(A)
 			(*ptr).x += (*distptr * cos(*angptr))*hfac;
@@ -291,7 +294,7 @@ void wobbleLatticeAnim::setEffect()
 
 Point softBodyAnim::getCenter()
 {
-	Point centroid(0,0);
+	b2Vec2 centroid(0,0);
 	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		centroid = centroid + i->b->GetPosition();
 	
@@ -302,13 +305,13 @@ Point softBodyAnim::getCenter()
 	centroid.x /= 2.0f;
 	centroid.y /= 2.0f;
 	
-	return centroid;
+	return Point(centroid.x, centroid.y);
 }
 
 softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
 {
 	center.b = NULL;
-	size.SetZero();
+	size = Point(0, 0);
 }
 
 softBodyAnim::~softBodyAnim()
@@ -330,11 +333,11 @@ void softBodyAnim::setEffect()
 			Point vertPos = getVertex(ptr);
 			
 			//Find total distance between this vertex and all bodies
-			float32 totalDist = 0.0;
+			float totalDist = 0.0;
 			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Point dist = vertPos - i->pos;
-				totalDist += dist.LengthSquared();
+				totalDist += glmx::lensqr(dist);
 			}
 			
 			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
@@ -343,10 +346,10 @@ void softBodyAnim::setEffect()
 				
 				//Distance between this vertex and this body, in resting position
 				Point diff = vertPos - i->pos;
-				float32 distance = diff.LengthSquared();
+				float distance = glmx::lensqr(diff);
 				
 				//Mul fac for moving this point
-				float32 fac = 1.0 - (distance / totalDist);
+				float fac = 1.0 - (distance / totalDist);
 				
 				
 				//TODO Better deformation
@@ -362,7 +365,8 @@ void softBodyAnim::setEffect()
 
 Point softBodyAnim::relOffset(b2Body* b)
 {
-	return b->GetPosition() - getCenter();
+    b2Vec2 p = b->GetPosition();
+	return Point(p.x, p.y) - getCenter();
 }
 
 Point softBodyAnim::distMoved(bodypos* bp)
@@ -376,10 +380,11 @@ void softBodyAnim::init()
 {
 	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		i->pos = relOffset(i->b);
-	center.pos = center.b->GetPosition();
+    b2Vec2 p = center.b->GetPosition();
+	center.pos = Point(p.x, p.y);
 }
 
-void softBodyAnim::update(float32 dt)
+void softBodyAnim::update(float dt)
 {
 	setEffect();
 }

@@ -15,7 +15,7 @@ float myAbs(float v)
 	return v;
 }
 
-void GameEngine::updateColors(float32 dt)
+void GameEngine::updateColors(float dt)
 {
 	//Update our colors that are phasing into one another
 	for(list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)

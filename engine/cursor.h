@@ -3,10 +3,13 @@
     Defines a class for mouse cursor handling
     Copyright (c) 2014 Mark Hutcheson
 */
-#include "Image.h"
 
 #ifndef CURSOR_H
 #define CURSOR_H
+
+#include "globaldefs.h"
+
+class GLImage;
  
 class myCursor
 {
@@ -20,8 +23,8 @@ public:
 	Point pos;
 	Point size;
 	Point hotSpot;
-	Image* img;
-	float32 rot;
+	GLImage* img;
+	float rot;
 	
 	void draw();
 	bool fromXML(string sXMLFilename);

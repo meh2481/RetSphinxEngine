@@ -1,7 +1,7 @@
 #ifndef DEBUG_DRAW_H
 #define DEBUG_DRAW_H
 
-#include "Box2D.h"
+#include "Box2D/Box2D.h"
 
 //Debug draw class for drawing Box2D stuff
 class DebugDraw : public b2Draw
