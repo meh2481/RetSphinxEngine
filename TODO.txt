@@ -5,6 +5,14 @@ Overall TODO list:
 - Implement newer OpenGL shaders and such
 - Use shaders rather than lattice animations where possible
 - IO in separate thread
+- PCG algorithm for random numbers
+- Replace string w/utf-8 compatible things
+- Disable exceptions/rtti?
+- Add ImGUI - super-simple GUI for editing
+- rip out displaylists for 3D objects - vertex buffers are better
+- class predeclaration - don't have to include headers
+- better logfile
+
 
 
 Refactoring thoughts:
@@ -34,7 +42,6 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 
 Other misc unordered TODO:
 - Scene editor / XML exporter
-- Add ImGUI - super-simple GUI for editing
 - Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
 - Go through and find if globaldefs.h can be non-included in some header files
 - Unify log, so messages go to console & errlog file	//What does this even mean?
