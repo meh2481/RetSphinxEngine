@@ -5,14 +5,6 @@
 #include <iostream>
 #include "opengl-api.h"
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define WIN32_NOMINMAX
-#include <windows.h>
-#define GLAPIENTRY __stdcall
-#else
-#define GLAPIENTRY
-#endif
 
 // Populate global namespace with static function pointers pFUNC,
 // and function stubs FUNC that call their associated function pointer

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "GLImage.h"
+#include "opengl-api.h"
 using namespace std;
 using namespace tiny3d;
 
@@ -295,7 +296,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 void Object3D::render(GLImage* img)
 {
 	//glRotatef(45, 1.0f, 0.0f, 0.0f);
-	//GLfloat saveLight[4];
+	//float saveLight[4];
 	if(!useGlobalLight)
 	{
 		glEnable(GL_LIGHT1);

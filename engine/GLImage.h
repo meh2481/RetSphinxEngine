@@ -13,7 +13,7 @@ class GLImage
 private:
 	GLImage(){};  //Default constructor is uncallable
 
-	GLuint   	m_hTex;
+	unsigned   	m_hTex;
 	string     	m_sFilename;
 	uint32_t 	m_iWidth, m_iHeight;			// width and height of original image
 	
@@ -27,7 +27,7 @@ private:
 	void _loadNoise(string sXMLFilename);
 
 public:
-	GLuint _getTex() {return m_hTex;};
+	unsigned _getTex() {return m_hTex;};
 	
 	//Constructor/destructor
 	GLImage(string sFilename);

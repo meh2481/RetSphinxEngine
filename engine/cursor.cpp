@@ -4,9 +4,9 @@
 */
 #include "cursor.h"
 #include "GLImage.h"
+#include "opengl-api.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
-
 
 //TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
 myCursor::myCursor()

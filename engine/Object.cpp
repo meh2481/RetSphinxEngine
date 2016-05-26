@@ -7,6 +7,7 @@
 #include "luafuncs.h"
 #include "lattice.h"
 #include "GLImage.h"
+#include "opengl-api.h"
 
 #include <Box2D/Box2D.h>
 #include "tinyxml2.h"

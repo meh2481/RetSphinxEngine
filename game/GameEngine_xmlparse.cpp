@@ -1,5 +1,9 @@
 #include "GameEngine.h"
 #include "tinyxml2.h"
+using namespace tinyxml2;
+
+#include <Box2D/Box2D.h>
+#include "GLImage.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -273,7 +277,7 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				bodyDef.type = b2_kinematicBody;
 			else
 				bodyDef.type = b2_staticBody;
-			bodyDef.position = pos;
+			bodyDef.position = b2Vec2(pos.x, pos.y);
 			
 			bodyDef.linearDamping = 0;
 			body->QueryFloatAttribute("linearDamping", &bodyDef.linearDamping);
@@ -330,9 +334,15 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				jd.localAnchorA.Set(0,0);
 				jd.localAnchorB.Set(0,0);
 				if(cAnchorA)
-					jd.localAnchorA = pointFromString(cAnchorA);
+                {
+                    Point p = pointFromString(cAnchorA);
+					jd.localAnchorA = b2Vec2(p.x, p.y);
+                }
 				if(cAnchorB)
-					jd.localAnchorB = pointFromString(cAnchorB);
+                {
+                    Point p = pointFromString(cAnchorB);
+					jd.localAnchorB = b2Vec2(p.x, p.y);
+                }
 				
 				b2Vec2 p1, p2, d;
 				p1 = jd.bodyA->GetWorldPoint(jd.localAnchorA);
@@ -447,7 +457,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	cleanupParticles();
 	player = NULL;
 	errlog << "Loading scene " << sXMLFilename << endl;
-	CameraPos.set(0,0,m_fDefCameraZ);	//Reset camera
+	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
 	XMLDocument* doc = new XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
@@ -685,7 +695,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		else
 		{
 			//Create box
-			dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, p, fRot);
+			dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, b2Vec2(p.x, p.y), fRot);
 			fixtureDef.shape = &dynamicBox;
 		}
 	}
@@ -695,8 +705,8 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		const char* cCircPos = fixture->Attribute("pos");
 		if(cCircPos)
 		{
-			dynamicCircle.m_p = pointFromString(cCircPos);
-			pos = dynamicCircle.m_p;
+            pos = pointFromString(cCircPos);
+			dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
 		}
 			
 		dynamicCircle.m_radius = 1.0f;

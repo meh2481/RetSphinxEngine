@@ -34,7 +34,7 @@ struct Face
 class Object3D
 {
 protected:
-    GLuint m_obj;   //The object in 3D memory
+    unsigned m_obj;   //The object in 3D memory
 	//GLImage* mImg;
     string m_sObjFilename;
 	
@@ -46,8 +46,8 @@ public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
 	bool shaded;	//If we're drawing this with OpenGL shading or not
 	
-	GLfloat lightPos[4];
-	//GLfloat rot[4];
+	float lightPos[4];
+	//float rot[4];
 	bool useGlobalLight;	//Use global lighting scheme (set false if we're to use lightPos)
     
     void _reload();  //Reload memory associated with this object

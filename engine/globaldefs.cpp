@@ -6,9 +6,10 @@
 #include "globaldefs.h"
 #include "mtrand.h"
 #include "simplexnoise1234.h"
+#include "opengl-api.h"
 
-MTRand_int32 irand;
-MTRand drand;
+static MTRand_int32 irand;
+static MTRand drand;
 
 float myabs(float x)	//Stupid namespace stuff
 {

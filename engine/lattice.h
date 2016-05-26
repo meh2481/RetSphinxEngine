@@ -9,15 +9,15 @@ class b2Body;
 
 struct latticeVert
 {
-	GLfloat x, y;
+	float x, y;
 };
 
 class lattice
 {
 	void setup(int x, int y);
 	
-	GLfloat* m_vertex;
-	GLfloat* m_UV;
+	float* m_vertex;
+	float* m_UV;
 	
 public:
 	latticeVert* vertex;
@@ -29,7 +29,7 @@ public:
 	lattice() {setup(10,10);};
 	~lattice();
 	
-	void renderTex(GLuint tex);
+	void renderTex(unsigned tex);
 	void renderDebug();
 	void bind();
 	void reset(float sx = 1.0f, float sy = 1.0f);

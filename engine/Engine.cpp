@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "Box2D/Box2D.h"
 #include "GLImage.h"
+#include "opengl-api.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {

@@ -1,4 +1,5 @@
 #include "lattice.h"
+#include "opengl-api.h"
 
 #include "Box2D/Box2D.h"
 
@@ -84,8 +85,8 @@ void lattice::bind()
 
 void lattice::setup(int x, int y)
 {
-	m_vertex = new GLfloat[NUMLATTICEPOINTS(x*y)];
-	m_UV = new GLfloat[NUMLATTICEPOINTS(x*y)];
+	m_vertex = new float[NUMLATTICEPOINTS(x*y)];
+	m_UV = new float[NUMLATTICEPOINTS(x*y)];
 	numx = x;
 	numy = y;
 	
@@ -105,7 +106,7 @@ lattice::~lattice()
 }
 
 //Ultra-fast render pass go!
-void lattice::renderTex(GLuint tex)
+void lattice::renderTex(unsigned tex)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glVertexPointer(2, GL_FLOAT, 0, m_vertex);

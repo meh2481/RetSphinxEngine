@@ -5,6 +5,7 @@
 
 #include "arc.h"
 #include "GLImage.h"
+#include "opengl-api.h"
 
 arc::arc(unsigned number, GLImage* img) : physSegment()
 {

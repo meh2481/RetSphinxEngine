@@ -1,9 +1,9 @@
 #include "Engine.h"
 
-#if 0
 
 void Engine::createSound(string sPath, string sName)
 {
+    /*
 	if(m_bSoundDied || m_sounds.count(sName)) return;	//Don't duplicate sounds or attempt to play sounds if we can't
 	errlog << "Load sound " << sPath << endl;
 	FMOD_SOUND* handle;
@@ -14,10 +14,12 @@ void Engine::createSound(string sPath, string sName)
 #endif
 	if(FMOD_System_CreateSound(m_audioSystem, sPath.c_str(), open_mode, 0, &handle) == FMOD_OK)
 		m_sounds[sName] = handle;
+    */
 }
 
 void Engine::playSound(string sName, float volume, float pan, float pitch)
 {
+    /*
 	if(m_bSoundDied || !m_sounds.count(sName)) return;
 	FMOD_CHANNEL* channel;
 	FMOD_System_PlaySound(m_audioSystem, FMOD_CHANNEL_FREE, m_sounds[sName], false, &channel);
@@ -28,8 +30,10 @@ void Engine::playSound(string sName, float volume, float pan, float pitch)
 	FMOD_Channel_SetPan(channel, pan);
 	FMOD_Channel_SetFrequency(channel, pitch * soundFreqDefault);
 	m_channels.insert(chan);
+    */
 }
 
+/*
 FMOD_CHANNEL* Engine::getChannel(string sSoundName)
 {
 	multimap<string, FMOD_CHANNEL*>::iterator i = m_channels.find(sSoundName);
@@ -37,9 +41,11 @@ FMOD_CHANNEL* Engine::getChannel(string sSoundName)
 		return i->second;
 	return NULL;
 }
+*/
 
 void Engine::playMusic(string sName, float volume, float pan, float pitch)
 {
+    /*
 	if(m_bSoundDied) return;
 	if(m_sounds.count("music"))
 	{
@@ -56,10 +62,12 @@ void Engine::playMusic(string sName, float volume, float pan, float pitch)
 		FMOD_Channel_SetMode(mus, FMOD_LOOP_NORMAL);
 		FMOD_Channel_SetPosition(mus, 0, FMOD_TIMEUNIT_MS);
 	}
+    */
 }
 
 void Engine::musicLoop(float startSec, float endSec)
 {
+    /*
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 	{
@@ -71,45 +79,57 @@ void Engine::musicLoop(float startSec, float endSec)
 		FMOD_Channel_GetPosition(mus, &ms, FMOD_TIMEUNIT_MS);
 		FMOD_Channel_SetPosition(mus, ms, FMOD_TIMEUNIT_MS);
 	}
+    */
 }
 
 void Engine::pauseMusic()
 {
+    /*
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPaused(getChannel("music"), true);
+    */
 }
 
 void Engine::resumeMusic()
 {
+    /*
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPaused(getChannel("music"), false);
+    */
 }
 
 void Engine::restartMusic()
 {
+    /*
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPosition(getChannel("music"), 0, FMOD_TIMEUNIT_MS);
+    */
 }
 
 void Engine::stopMusic()
 {
+    /*
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPaused(getChannel("music"), true);
+    */
 }
 
 void Engine::seekMusic(float fTime)
 {
+    /*
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPosition(getChannel("music"), fTime * 1000.0, FMOD_TIMEUNIT_MS);
+    */
 }
 
 float Engine::getMusicPos()
 {
+    /*
 	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
 	{
@@ -118,28 +138,34 @@ float Engine::getMusicPos()
 		FMOD_Channel_GetPosition(mus, &ms, FMOD_TIMEUNIT_MS);
 		return (float)ms / 1000.0f;
 	}
+    */
 	return -1;
 }
 
 void Engine::volumeMusic(float fVol)
 {
+    /*
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 	{
 		FMOD_CHANNEL* mus = getChannel("music");
 		FMOD_Channel_SetVolume(mus, fVol);
 	}
+    */
 }
 
 void Engine::setMusicFrequency(float freq)
 {
+    /*
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 		FMOD_Channel_SetFrequency(getChannel("music"), freq);
+    */
 }
 
 float Engine::getMusicFrequency()
 {
+    /*
 	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
 	{
@@ -147,19 +173,24 @@ float Engine::getMusicFrequency()
 		FMOD_Channel_GetFrequency(getChannel("music"), &freq);
 		return freq;
 	}
+    */
 	return -1;
 }
 
 bool Engine::hasMic()
 {
+    /*
 	if(m_bSoundDied) return false;
 	int numDrivers = 0;
 	FMOD_System_GetRecordNumDrivers(m_audioSystem, &numDrivers);
 	return numDrivers;
+    */
+    return false;
 }
 
 void Engine::updateSound()
 {
+    /*
 	if(m_bSoundDied) return;
 	
 	//Update FMOD
@@ -176,7 +207,5 @@ void Engine::updateSound()
 			continue;
 		}
 	}
+    */
 }
-
-#endif
-

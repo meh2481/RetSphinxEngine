@@ -6,6 +6,7 @@
 #include "GLImage.h"
 #include "Gradient.h"
 #include <set>
+#include "opengl-api.h"
 
 bool g_imageBlur = true;
 
@@ -248,14 +249,14 @@ void GLImage::render(Point size, float tilex, float tiley)
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	
-	const GLfloat vertexData[] =
+	const float vertexData[] =
     {
         -size.x/2.0, size.y/2.0, // upper left
         size.x/2.0, size.y/2.0, // upper right
         -size.x/2.0, -size.y/2.0, // lower left
         size.x/2.0, -size.y/2.0, // lower right
     };
-    const GLfloat texCoords[] =
+    const float texCoords[] =
     {
         0, tiley, // upper left
         tilex, tiley, // upper right
@@ -294,14 +295,14 @@ void GLImage::render(Point size, Rect rcImg)
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	
-	const GLfloat vertexData[] =
+	const float vertexData[] =
     {
         -size.x/2.0, size.y/2.0, // upper left
         size.x/2.0, size.y/2.0, // upper right
         -size.x/2.0, -size.y/2.0, // lower left
         size.x/2.0, -size.y/2.0, // lower right
     };
-    const GLfloat texCoords[] =
+    const float texCoords[] =
     {
 #ifdef __BIG_ENDIAN__
       rcImg.left, 1.0-rcImg.top, // upper left
@@ -332,14 +333,14 @@ void GLImage::render4V(Point ul, Point ur, Point bl, Point br)
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	
-	const GLfloat vertexData[] =
+	const float vertexData[] =
     {
         ul.x, ul.y, // upper left
         ur.x, ur.y, // upper right
         bl.x, bl.y, // lower left
         br.x, br.y, // lower right
     };
-    const GLfloat texCoords[] =
+    const float texCoords[] =
     {
         0.0, maxy, // upper left
         maxx, maxy, // upper right

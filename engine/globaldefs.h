@@ -17,7 +17,6 @@
 using namespace std;
 #include "glmx.h"
 #include <SDL.h>
-#include <SDL_opengl.h>
 #include "log.h" // from io
 
 //Defined by SDL

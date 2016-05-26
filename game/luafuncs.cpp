@@ -1,6 +1,7 @@
 #include "luafuncs.h"
 #include "luainterface.h"
 #include "GameEngine.h"
+#include "GLImage.h"
 
 extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 
@@ -179,7 +180,7 @@ luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
 		b2Body* b = o->getBody();
 		if(b)
 		{
-			Point p = b->GetPosition();
+			b2Vec2 p = b->GetPosition();
 			b->SetTransform(p, f);
 		}
 	}
@@ -202,7 +203,7 @@ luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
 luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
 	obj *o = getObj<obj>(L);
-	Point p(lua_tonumber(L,2),lua_tonumber(L, 3));
+	b2Vec2 p(lua_tonumber(L,2),lua_tonumber(L, 3));
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -214,7 +215,7 @@ luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 
 luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 {
-	Point p(0,0);
+	b2Vec2 p(0,0);
 	obj *o = getObj<obj>(L);
 	if(o)
 	{
@@ -228,7 +229,7 @@ luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 {
 	obj *o = getObj<obj>(L);
-	Point pForce(lua_tonumber(L,2),lua_tonumber(L, 3));
+	b2Vec2 pForce(lua_tonumber(L,2),lua_tonumber(L, 3));
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -241,7 +242,7 @@ luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 {
 	obj *o = getObj<obj>(L);
-	Point pt(0,0);
+	b2Vec2 pt(0,0);
 	if(o)
 	{
 		b2Body* bod = o->getBody();
@@ -342,6 +343,7 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 			seg = lua_tointeger(L, 3);
 		o->setImage(getImage(lua_tostring(L, 2)), seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
 	}
+    luaReturnNil(); // FG: FIXME: return success?
 }
 
 //-----------------------------------------------------------------------------------------------------------

@@ -51,4 +51,4 @@ tiny3d.h
 )
 
 add_library(engine ${engine_src})
-target_link_libraries(engine lua53 Box2D io)
+target_link_libraries(engine lua53 io ${BOX2D_LIBRARY} ${SDL2_LIBRARY})

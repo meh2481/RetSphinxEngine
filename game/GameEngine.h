@@ -9,10 +9,10 @@
 #include "bg.h"
 #include <vector>
 #include <set>
-#include "webcam.h"
 #include "luainterface.h"
 #include "arc.h"
 #include "3DObject.h"
+#include "tinyxml2.h"
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -116,7 +116,7 @@ public:
 	void saveConfig(string sFilename);
 	obj* objFromXML(string sType, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	void loadScene(string sXMLFilename);	//Load scene from file
-	void readFixture(XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
+	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller

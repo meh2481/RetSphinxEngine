@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "opengl-api.h"
 
 void Engine::setup_sdl()
 {
@@ -92,11 +93,11 @@ void Engine::setup_sdl()
 //Set up OpenGL
 void Engine::setup_opengl()
 {
-	//GLfloat LightAmbient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+	//float LightAmbient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
 	// Diffuse Light Values
-	//GLfloat LightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+	//float LightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
 	// Light Position 
-	//GLfloat LightPosition[] = { 8.0f, 8.0f, -0.15f, 1.0f };
+	//float LightPosition[] = { 8.0f, 8.0f, -0.15f, 1.0f };
 
 	// Make the viewport
 	glViewport(0, 0, m_iWidth, m_iHeight);
@@ -119,9 +120,9 @@ void Engine::setup_opengl()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	//gluPerspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f, 500.0f);
-    //glm::mat4 persp = glm::perspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f, 500.0f);
-    glm::mat4 persp = glm::tweakedInfinitePerspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f); // FG: FIXME: is this ok?
+	//gluPerspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f, 500.0f);
+    //glm::mat4 persp = glm::perspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f, 500.0f);
+    glm::mat4 persp = glm::tweakedInfinitePerspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f); // FG: FIXME: is this ok?
     glLoadMatrixf(glm::value_ptr(persp));
 
 	glMatrixMode(GL_MODELVIEW);

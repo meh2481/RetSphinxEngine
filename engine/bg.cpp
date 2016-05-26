@@ -3,6 +3,7 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 #include "bg.h"
+#include "opengl-api.h"
 
 //-----------------------------------------------------------------------------
 // Pinwheel background functions

@@ -12,6 +12,7 @@ using namespace tinyxml2;
 
 #include "Text.h"
 #include "GLImage.h"
+#include "opengl-api.h"
 
 extern int screenDrawWidth;
 extern int screenDrawHeight;
