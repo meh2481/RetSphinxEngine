@@ -4,6 +4,10 @@
 */
 
 #include "Text.h"
+#include "GLImage.h"
+#include "tinyxml2.h"
+using namespace tinyxml2;
+
 
 Text::Text(string sXMLFilename)
 {
@@ -37,7 +41,7 @@ Text::Text(string sXMLFilename)
 		{
 			const char* cPath = elem->Attribute("path");
 			if(cPath == NULL) return;
-			m_imgFont = new Image(cPath);   //Create image
+			m_imgFont = new GLImage(cPath);   //Create image
 
 		}
 		else if(sName == "char")	//Character
@@ -48,7 +52,7 @@ Text::Text(string sXMLFilename)
 			if(cRect == NULL) return;
 			Rect rc = rectFromString(cRect);
 			m_mRectangles[cChar[0]] = rc;   //Stick this into the list
-			float32 kern = 0.0f;
+			float kern = 0.0f;
 			elem->QueryFloatAttribute("kern", &kern);
 			m_mKerning[cChar[0]] = kern;
 		}
@@ -63,7 +67,7 @@ Text::~Text()
 		delete m_imgFont;
 }
 
-void Text::render(string sText, float32 x, float32 y, float pt)
+void Text::render(string sText, float x, float y, float pt)
 {
 	if(m_imgFont == NULL)
 		return;
@@ -95,9 +99,9 @@ void Text::render(string sText, float32 x, float32 y, float pt)
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
-float32 Text::size(string sText, float pt)
+float Text::size(string sText, float pt)
 {
-	float32 len = 0.0f;
+	float len = 0.0f;
 	for(string::iterator i = sText.begin(); i != sText.end(); i++)
 	{
 		unsigned char c = *i;

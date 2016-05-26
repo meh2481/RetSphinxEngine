@@ -25,10 +25,10 @@ pinwheelBg::~pinwheelBg()
 void pinwheelBg::draw()
 {
 	if(m_lWheel == NULL || !m_iNumSpokes) return;
-	float32 addAngle = 360.0 / m_iNumSpokes;
+	float addAngle = 360.0f / m_iNumSpokes;
 	glPushMatrix();
 	glRotatef(rot, 0, 0, 1);	//Rotate according to current rotation
-	for(int i = 0; i < m_iNumSpokes; i++)
+	for(unsigned i = 0; i < m_iNumSpokes; i++)
 	{
 		glBegin(GL_TRIANGLES);
 		glColor4f(m_lWheel[i].r, m_lWheel[i].g, m_lWheel[i].b, m_lWheel[i].a);
@@ -42,13 +42,13 @@ void pinwheelBg::draw()
 		
 }
 
-void pinwheelBg::update(float32 dt)
+void pinwheelBg::update(float dt)
 {
 	rot += speed * dt;
 	speed += acceleration * dt;
 }
 
-void pinwheelBg::init(uint32_t num)
+void pinwheelBg::init(unsigned num)
 {
 	if(num)
 	{
@@ -59,14 +59,14 @@ void pinwheelBg::init(uint32_t num)
 	}
 }
 
-void pinwheelBg::setWheelCol(uint32_t wheel, Color col)
+void pinwheelBg::setWheelCol(unsigned wheel, Color col)
 {
 	if(m_iNumSpokes <= wheel) return;
 	if(m_lWheel == NULL) return;
 	m_lWheel[wheel] = col;
 }
 
-Color* pinwheelBg::getWheelCol(uint32_t wheel)
+Color* pinwheelBg::getWheelCol(unsigned wheel)
 {
 	if(m_iNumSpokes <= wheel)
 		return NULL;
@@ -81,9 +81,9 @@ starfieldBg::starfieldBg()
 	col.set(1,1,1,1);
 	speed = 15;
 	num = 500;
-	fieldSize.set(40,40,75);
-	starSize.set(0.1,0.1,0);
-	avoidCam.Set(1,1);
+	fieldSize = Vec3(40,40,75);
+	starSize = Vec3(0.1,0.1,0);
+	avoidCam = Point(1,1);
 	type = STARFIELD;
 }
 
@@ -103,7 +103,7 @@ void starfieldBg::draw()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//Draw stars
 	glColor4f(col.r,col.g,col.b,col.a);
-	for(list<Vec3>::iterator i = m_lStars.begin(); i != m_lStars.end(); i++)
+	for(vector<Vec3>::iterator i = m_lStars.begin(); i != m_lStars.end(); i++)
 	{
 		glPushMatrix();
 		glTranslatef(i->x, i->y, -i->z);
@@ -155,10 +155,10 @@ void starfieldBg::draw()
 	glPopMatrix();
 }
 
-void starfieldBg::update(float32 dt)
+void starfieldBg::update(float dt)
 {
 	//Update all the stars here
-	for(list<Vec3>::iterator i = m_lStars.begin(); i != m_lStars.end(); i++)
+	for(vector<Vec3>::iterator i = m_lStars.begin(); i != m_lStars.end(); i++)
 	{
 		i->z -= speed*dt;	//Update position
 		if(i->z < 0 || i->z > fieldSize.z)	//If this particle has gone off the screen either direction
@@ -172,7 +172,7 @@ void starfieldBg::update(float32 dt)
 	}
 }
 
-Vec3 starfieldBg::_place(float32 z)
+Vec3 starfieldBg::_place(float z)
 {
 	Vec3 ret;
 	ret.z = z;

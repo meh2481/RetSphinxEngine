@@ -5,6 +5,8 @@
 
 #define NUMLATTICEPOINTS(x)		x*12
 
+class b2Body;
+
 struct latticeVert
 {
 	GLfloat x, y;
@@ -12,7 +14,7 @@ struct latticeVert
 
 class lattice
 {
-	void setup(uint32 x, uint32 y);
+	void setup(int x, int y);
 	
 	GLfloat* m_vertex;
 	GLfloat* m_UV;
@@ -21,16 +23,16 @@ public:
 	latticeVert* vertex;
 	latticeVert* UV;
 	
-	uint32 numx, numy;
+	int numx, numy;
 	
-	lattice(uint32 x, uint32 y) {setup(x,y);};
+	lattice(int x, int y) {setup(x,y);};
 	lattice() {setup(10,10);};
 	~lattice();
 	
 	void renderTex(GLuint tex);
 	void renderDebug();
 	void bind();
-	void reset(float32 sx = 1.0f, float32 sy = 1.0f);
+	void reset(float sx = 1.0f, float sy = 1.0f);
 	
 	//Point getVertex(uint32 x, uint32 y);
 	//void setVertex(uint32 x, uint32 y);
@@ -47,13 +49,13 @@ public:
 	~latticeAnim(){};
 	
 	virtual void init() = 0;
-	virtual void update(float32 dt) = 0;
+	virtual void update(float dt) = 0;
 };
 
 class sinLatticeAnim : public latticeAnim
 {
 protected:
-	float32 curtime;
+	float curtime;
 	
 	void setEffect();
 	
@@ -62,19 +64,19 @@ public:
 	~sinLatticeAnim(){};
 
 	void init();
-	void update(float32 dt);
+	void update(float dt);
 	
-	float32 freq;
-	float32	amp;
-	float32 vtime;
+	float freq;
+	float	amp;
+	float vtime;
 	
 };
 
 class wobbleLatticeAnim : public latticeAnim
 {
 protected:
-	float32* angle;	//Radians
-	float32* dist;
+	float* angle;	//Radians
+	float* dist;
 	
 	void setEffect();
 	
@@ -83,15 +85,15 @@ public:
 	~wobbleLatticeAnim();
 	
 	void init();
-	void update(float32 dt);
+	void update(float dt);
 	
-	float32 speed;
-	float32 startdist;
-	float32 distvar;
-	float32 startangle;
-	float32 anglevar;
-	float32 hfac;
-	float32 vfac;
+	float speed;
+	float startdist;
+	float distvar;
+	float startangle;
+	float anglevar;
+	float hfac;
+	float vfac;
 };
 
 struct bodypos
@@ -100,9 +102,9 @@ struct bodypos
 	Point pos;			//Starting body pos
 	
 	
-	//float32 angle;		//Starting angle
-	//float32 dist;		//Starting distance
-	//float32* weights;	//Vertex weights
+	//float angle;		//Starting angle
+	//float dist;		//Starting distance
+	//float* weights;	//Vertex weights
 };
 
 class softBodyAnim : public latticeAnim
@@ -125,7 +127,7 @@ public:
 	Point size;
 	
 	void init();
-	void update(float32 dt);
+	void update(float dt);
 	
 	void addBody(b2Body* b, bool bCenter = false);
 };

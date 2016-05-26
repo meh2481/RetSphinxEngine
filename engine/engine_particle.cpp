@@ -13,7 +13,7 @@ void Engine::drawParticles()
 		(*i)->draw(m_bObjDebugDraw);
 }
 
-void Engine::updateParticles(float32 dt)
+void Engine::updateParticles(float dt)
 {
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 	{

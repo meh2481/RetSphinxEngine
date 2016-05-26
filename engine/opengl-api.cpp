@@ -1,20 +1,14 @@
-#ifdef USE_SDL_FRAMEWORK
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 
 #include <iostream>
 #include "opengl-api.h"
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define WIN32_NOMINMAX
+#include <windows.h>
 #define GLAPIENTRY __stdcall
 #else
 #define GLAPIENTRY

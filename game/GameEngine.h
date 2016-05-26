@@ -55,9 +55,9 @@ class ColorPhase
 public:
 	Color* colorToChange;
 	bool pingpong;
-	float32 destr, destg, destb;
-	float32 srcr, srcg, srcb;
-	float32 amtr, amtg, amtb;
+	float destr, destg, destb;
+	float srcr, srcg, srcb;
+	float amtr, amtg, amtb;
 	bool dir;
 };
 
@@ -69,7 +69,7 @@ private:
 	Vec3 CameraPos;
 	HUD* m_hud;
 	bool m_bMouseGrabOnWindowRegain;
-	float32 m_fDefCameraZ;	//Default position of camera on z axis
+	float m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
 	list<obj*> m_lAddLater;
 	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time
@@ -89,7 +89,7 @@ private:
 	string m_sLastScene;
 
 protected:
-	void frame(float32 dt);
+	void frame(float dt);
 	void draw();
 	void init(list<commandlineArg> sArgs);
 	void pause();
@@ -119,13 +119,13 @@ public:
 	void readFixture(XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
-	void rumbleController(float32 strength, float32 sec, int priority = 0);	//Rumble the controller
+	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
 	void addAfterUpdate(obj* o) {m_lAddLater.push_back(o);};	//Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
 	void warpObjectToNode(obj* o, Node* n);
 	
 	//GameEngine_color.cpp functions
-	void updateColors(float32 dt);
+	void updateColors(float dt);
 	void phaseColor(Color* src, Color dest, float time, bool bPingPong = false);
 	void clearColors();
 	

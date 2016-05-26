@@ -5,22 +5,23 @@
 #ifndef _3D_OBJ_H
 #define _3D_OBJ_H
 
-#include "Image.h"
 #include "globaldefs.h"
 
 #define NO_TEXTURE 	"image_none"	//Invalid image
 #define NO_MESH		"mesh_none"		//Invalid 3D mesh
 
+class GLImage;
+
 class Vertex
 {
 public:
-    float32 x, y, z;
+    float x, y, z;
 };
 
 class UV
 {
 public:
-    float32 u, v;
+    float u, v;
 };
 
 struct Face
@@ -34,7 +35,7 @@ class Object3D
 {
 protected:
     GLuint m_obj;   //The object in 3D memory
-	//Image* mImg;
+	//GLImage* mImg;
     string m_sObjFilename;
 	
 	
@@ -51,13 +52,13 @@ public:
     
     void _reload();  //Reload memory associated with this object
 
-    Object3D(string sOBJFile);//, Image* sImg);
+    Object3D(string sOBJFile);//, GLImage* sImg);
     Object3D();
     ~Object3D();
 
-    //void setTexture(Image* sImg);
+    //void setTexture(GLImage* sImg);
 
-    void render(Image* img);
+    void render(GLImage* img);
 	
 	//Accessor methods
 	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};

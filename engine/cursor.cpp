@@ -3,6 +3,10 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 #include "cursor.h"
+#include "GLImage.h"
+#include "tinyxml2.h"
+using namespace tinyxml2;
+
 
 //TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
 myCursor::myCursor()
@@ -17,9 +21,6 @@ myCursor::~myCursor()
 	
 void myCursor::_init()
 {
-	pos.SetZero();
-	size.SetZero();
-	hotSpot.SetZero();
 	img = NULL;
 	rot = 0;
 }
@@ -30,9 +31,9 @@ void myCursor::draw()
 	{
 		Point ptDrawPos = pos;
 		ptDrawPos.x += size.x / 2.0;
-		ptDrawPos.x -= hotSpot.x/(float32)img->getWidth() * size.x;
+		ptDrawPos.x -= hotSpot.x/(float)img->getWidth() * size.x;
 		ptDrawPos.y -= size.y / 2.0;
-		ptDrawPos.y += hotSpot.y/(float32)img->getHeight() * size.y;
+		ptDrawPos.y += hotSpot.y/(float)img->getHeight() * size.y;
 		glPushMatrix();
 		glTranslatef(ptDrawPos.x, ptDrawPos.y, 0.0f);
 		glRotatef(rot, 0, 0, 1);

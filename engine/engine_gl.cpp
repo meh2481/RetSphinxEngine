@@ -119,7 +119,10 @@ void Engine::setup_opengl()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f, 500.0f);
+	//gluPerspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f, 500.0f);
+    //glm::mat4 persp = glm::perspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f, 500.0f);
+    glm::mat4 persp = glm::tweakedInfinitePerspective(45.0f, (GLfloat)m_iWidth/(GLfloat)m_iHeight, 0.1f); // FG: FIXME: is this ok?
+    glLoadMatrixf(glm::value_ptr(persp));
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

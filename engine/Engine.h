@@ -7,7 +7,6 @@
 #define ENGINE_H
 
 #include "globaldefs.h"
-#include "Image.h"
 #include "Object.h"
 #include "Text.h"
 #include "hud.h"
@@ -16,13 +15,11 @@
 #include "EngineContactListener.h"
 #include "Node.h"
 #include "DebugDraw.h"
-#include <fmod.h>
-#ifdef USE_SDL_FRAMEWORK
-#include <SDL_syswm.h>
-#else
-#include <SDL2/SDL_syswm.h>
-#endif
+//#include <fmod.h>
 #include "opengl-api.h"
+
+class b2World;
+class GLImage;
 
 #define LMB	1
 #define RMB	0
@@ -63,19 +60,19 @@ private:
 	bool m_bObjDebugDraw;
 	Point m_ptCursorPos;
 	bool  m_bShowCursor;
-	float32 m_fFramerate;
-	float32 m_fAccumulatedTime;
-	float32 m_fTargetTime;
+	float m_fFramerate;
+	float m_fAccumulatedTime;
+	float m_fTargetTime;
 	list<obj*> m_lObjects;	//Object handler
 	multiset<physSegment*, depthComparator> m_lScenery;
 	bool m_bQuitting;   //Stop the game if this turns true
-	float32 m_fTimeScale;	//So we can scale time if we want
+	float m_fTimeScale;	//So we can scale time if we want
 	uint16_t m_iWidth, m_iHeight;
 	const Uint8 *m_iKeystates;	//Keep track of keys that are pressed/released so we can poll as needed
 	int m_iNumScreenModes;	  //Number of screen modes that are available
 	bool m_bFullscreen;
 	bool m_bResizable;
-	float32 m_fGamma;		//Overall screen brightness
+	float m_fGamma;		//Overall screen brightness
 	bool m_bPaused;			//If the game is paused due to not being focused
 	bool m_bPauseOnKeyboardFocus;	//If the game pauses when keyboard focus is lost
 	bool m_bSoundDied;  //If tyrsound fails to load, don't try to use it
@@ -91,9 +88,9 @@ private:
 #endif
 	
 	
-	multimap<string, FMOD_CHANNEL*> m_channels;
-	map<string, FMOD_SOUND*> m_sounds;
-	FMOD_SYSTEM* m_audioSystem;
+	//multimap<string, FMOD_CHANNEL*> m_channels;
+	//map<string, FMOD_SOUND*> m_sounds;
+	//FMOD_SYSTEM* m_audioSystem;
 
 	//Engine-use function definitions
 	bool _frame();
@@ -108,7 +105,7 @@ private:
 protected:
 
 	//Functions to override in your own class definition
-	virtual void frame(float32 dt) = 0;   //Function that's called every frame
+	virtual void frame(float dt) = 0;   //Function that's called every frame
 	virtual void draw() = 0;	//Actual function that draws stuff
 	virtual void init(list<commandlineArg> sArgs) = 0;	//So we can load all our images and such
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
@@ -136,7 +133,7 @@ public:
 	void drawCursor();
 	
 	//Window functions - engine_window.cpp
-	void changeScreenResolution(float32 w, float32 h);  //Change resolution mid-game and reload OpenGL textures as needed
+	void changeScreenResolution(float w, float h);  //Change resolution mid-game and reload OpenGL textures as needed
 	//void toggleFullscreen();							//Switch between fullscreen/windowed modes
 	void setFullscreen(bool bFullscreen);				//Set fullscreen to true or false as needed
 	void setInitialFullscreen() {SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);};
@@ -152,19 +149,19 @@ public:
 	
 	//Sound functions - engine_sound.cpp
 	void createSound(string sPath, string sName);   //Creates a sound from this name and file path
-	virtual void playSound(string sName, float32 volume = 1.0f, float32 pan = 0.0f, float32 pitch = 1.0f);	 //Play a sound
-	FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
-	void playMusic(string sName, float32 volume = 1.0f, float32 pan = 0.0f, float32 pitch = 1.0f);	 //Play looping music, or resume paused music
-	void musicLoop(float32 startSec, float32 endSec);	//Set the starting and ending loop points for the currently-playing song
+	virtual void playSound(string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play a sound
+	//FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
+	void playMusic(string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play looping music, or resume paused music
+	void musicLoop(float startSec, float endSec);	//Set the starting and ending loop points for the currently-playing song
 	void pauseMusic();									//Pause music that's currently playing
 	void resumeMusic();									//Resume music that was paused
 	void restartMusic();
 	void stopMusic();
-	void seekMusic(float32 fTime);
-	float32 getMusicPos();								//Opposite of seekMusic() -- get where we currently are
-	void volumeMusic(float32 fVol);						//Set the music to a particular volume
-	void setMusicFrequency(float32 freq);
-	float32 getMusicFrequency();
+	void seekMusic(float fTime);
+	float getMusicPos();								//Opposite of seekMusic() -- get where we currently are
+	void volumeMusic(float fVol);						//Set the music to a particular volume
+	void setMusicFrequency(float freq);
+	float getMusicFrequency();
 	bool hasMic();										//If we have some form of mic-like input
 	void updateSound();
 	
@@ -172,10 +169,10 @@ public:
 	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed
 	
 	//Physics functions
-	b2Body* createBody(b2BodyDef* bdef) {return m_physicsWorld->CreateBody(bdef);};
-	void setGravity(Point ptGravity)	{m_physicsWorld->SetGravity(ptGravity);};
-	void setGravity(float32 x, float32 y)   {setGravity(Point(x,y));};
-	void stepPhysics(float32 dt);	//Update our physics world and handle collisions
+	b2Body* createBody(b2BodyDef* bdef);
+	void setGravity(Point ptGravity);
+	void setGravity(float x, float y);
+	void stepPhysics(float dt);	//Update our physics world and handle collisions
 	void setDebugDraw(bool b) {m_bDebugDraw = b;};
 	bool getDebugDraw() {return m_bDebugDraw;};
 	void setObjDebugDraw(bool b) {m_bObjDebugDraw = b;};
@@ -192,21 +189,21 @@ public:
 	//Mouse functions
 	Point getCursorPos()	{return m_ptCursorPos;};
 	void setCursorPos(int32_t x, int32_t y);
-	void setCursorPos(Point ptPos)  {setCursorPos(ptPos.x, ptPos.y);};
+	//void setCursorPos(Point ptPos)  {setCursorPos(ptPos.x, ptPos.y);};
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};
 	void setCursor(myCursor* cur)	{m_cursor = cur;};
-	bool isMouseGrabbed()	{return SDL_GetWindowGrab(m_Window);};
-	void grabMouse(bool bGrab = true) {SDL_SetWindowGrab(m_Window, (SDL_bool)bGrab);};
+	bool isMouseGrabbed();
+	void grabMouse(bool bGrab = true);
 	
 	//Time functions
-	float32 getTimeScale()	{return m_fTimeScale;};
-	void setTimeScale(float32 fScale)	{m_fTimeScale = fScale;};
-	Uint32 getTicks()	{return SDL_GetTicks();};
-	float32 getSeconds()	{return (float32)SDL_GetTicks()/1000.0;};
-	void setFramerate(float32 fFramerate);
-	float32 getFramerate()   {return m_fFramerate;};
+	float getTimeScale()	{return m_fTimeScale;};
+	void setTimeScale(float fScale)	{m_fTimeScale = fScale;};
+	unsigned getTicks();
+	float getSeconds();
+	void setFramerate(float fFramerate);
+	float getFramerate()   {return m_fFramerate;};
 	
 	//Object management functions - engine_obj.cpp
 	void addObject(obj* o);
@@ -214,7 +211,7 @@ public:
 	//void updateSceneryLayer(physSegment* seg);
 	void drawAll();
 	void cleanupObjects();
-	void updateObjects(float32 dt);
+	void updateObjects(float dt);
 	void addNode(Node* n);
 	Node* getNode(string sNodeName);
 	obj* getObject(Point p);	//Get first object at this point
@@ -222,22 +219,22 @@ public:
 	Node* getNode(Point p);		//Get first node at this point
 
 	//OpenGL methods
-	void setDoubleBuffered(bool bDoubleBuffered)	{SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);};
-	bool getDoubleBuffered()	{int val = 1; SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val); return val;};
-	void setVsync(int iVsync)	{SDL_GL_SetSwapInterval(iVsync);};
-	int getVsync()				{return SDL_GL_GetSwapInterval();};
+	void setDoubleBuffered(bool bDoubleBuffered);
+	bool getDoubleBuffered();
+	void setVsync(int iVsync);
+	int getVsync();
 	int getMSAA()				{return m_iMSAA;};
 	void setMSAA(int iMSAA);
-	bool getImgBlur()			{return g_imageBlur;};
-	void setImgBlur(bool b)		{g_imageBlur = b;};
-	void setGamma(float32 fGamma)	{m_fGamma = fGamma;};
-	float32 getGamma()				{return m_fGamma;};
+	bool getImgBlur();
+	void setImgBlur(bool b);
+	void setGamma(float fGamma)	{m_fGamma = fGamma;};
+	float getGamma()				{return m_fGamma;};
 	
 	//Particle functions - engine_particle.cpp
 	void addParticles(ParticleSystem* sys)	{if(sys)m_particles.push_back(sys);};
 	void cleanupParticles();
 	void drawParticles();
-	void updateParticles(float32 dt);
+	void updateParticles(float dt);
 
 };
 

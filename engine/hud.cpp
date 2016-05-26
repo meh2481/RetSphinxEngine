@@ -7,6 +7,12 @@
 //#include "GameEngine.h"
 #include <sstream>
 
+#include "tinyxml2.h"
+using namespace tinyxml2;
+
+#include "Text.h"
+#include "GLImage.h"
+
 extern int screenDrawWidth;
 extern int screenDrawHeight;
 //extern GameEngine* g_pGlobalEngine;
@@ -16,7 +22,6 @@ extern int screenDrawHeight;
 //-------------------------------------------------------------------------------------
 HUDItem::HUDItem(string sName)
 {
-    m_ptPos.SetZero();
     m_sName = sName;
     m_signalHandler = stubSignal;
 	hidden = false;
@@ -38,7 +43,7 @@ bool HUDItem::event(SDL_Event event)
 	return bRet;
 }
 
-void HUDItem::draw(float32 fCurTime)
+void HUDItem::draw(float fCurTime)
 {
 	if(hidden) return;
     //Base class does nothing with this, except pass on
@@ -83,8 +88,6 @@ HUDItem* HUDItem::getChild(string sName)
 HUDImage::HUDImage(string sName) : HUDItem(sName)
 {
     m_img = NULL;
-	pos.SetZero();
-	size.SetZero();
 }
 
 HUDImage::~HUDImage()
@@ -92,7 +95,7 @@ HUDImage::~HUDImage()
 
 }
 
-void HUDImage::draw(float32 fCurTime)
+void HUDImage::draw(float fCurTime)
 {
 	if(hidden) return;
     HUDItem::draw(fCurTime);
@@ -106,7 +109,7 @@ void HUDImage::draw(float32 fCurTime)
     }
 }
 
-void HUDImage::setImage(Image* img)
+void HUDImage::setImage(GLImage* img)
 {
     m_img = img;
 }
@@ -124,7 +127,7 @@ HUDTextbox::~HUDTextbox()
 {
 }
 
-void HUDTextbox::draw(float32 fCurTime)
+void HUDTextbox::draw(float fCurTime)
 {
 	if(hidden) return;
     HUDItem::draw(fCurTime);
@@ -141,6 +144,11 @@ void HUDTextbox::setText(uint32_t iNum)
     ostringstream oss;
     oss << iNum;
     setText(oss.str());
+}
+
+float HUDTextbox::getWidth()
+{
+    return m_txtFont ? m_txtFont->size(m_sValue, pt) : 0.0f;
 }
 
 //-------------------------------------------------------------------------------------
@@ -172,7 +180,7 @@ bool HUDToggle::event(SDL_Event event)
     return bRet;
 }
 
-void HUDToggle::draw(float32 fCurTime)
+void HUDToggle::draw(float fCurTime)
 {
 	if(hidden) return;
     HUDItem::draw(fCurTime);
@@ -195,12 +203,12 @@ void HUDToggle::draw(float32 fCurTime)
     }
 }
 
-void HUDToggle::setEnabledImage(Image* img)
+void HUDToggle::setEnabledImage(GLImage* img)
 {
     m_imgEnabled = img;
 }
 
-void HUDToggle::setDisabledImage(Image* img)
+void HUDToggle::setDisabledImage(GLImage* img)
 {
     m_imgDisabled = img;
 }
@@ -220,7 +228,7 @@ HUDGroup::~HUDGroup()
 
 }
 
-void HUDGroup::draw(float32 fCurTime)
+void HUDGroup::draw(float fCurTime)
 {
 	if(hidden) return;
     if(m_fStartTime == FLT_MIN)
@@ -260,7 +268,7 @@ HUDGeom::~HUDGeom()
 {
 }
 
-void HUDGeom::draw(float32 fCurTime)
+void HUDGeom::draw(float fCurTime)
 {
 	if(hidden) return;
     
@@ -357,11 +365,11 @@ bool HUDMenu::event(SDL_Event event)
 		case SDL_MOUSEMOTION:
 		{
 			Point ptMousePos(0,0);//g_pGlobalEngine->worldPosFromCursor(Point(event.motion.x, event.motion.y));	//TODO: Engine should not depend on GameEngine!!!
-			float32 fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
-			float32 fCurY = m_ptPos.y + fTotalY/2.0f;
+			float fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
+			float fCurY = m_ptPos.y + fTotalY/2.0f;
 			for(list<menuItem>::iterator i = m_menu.begin(); i != m_menu.end(); i++)
 			{
-				float32 fWidth = m_txtFont->size(i->text, pt);
+				float fWidth = m_txtFont->size(i->text, pt);
 				Rect rcTest(m_ptPos.x - fWidth/2.0f, fCurY + pt/2.0f, m_ptPos.x + fWidth/2.0f, fCurY - pt/2.0f);
 				if(rcTest.inside(ptMousePos))
 				{
@@ -428,15 +436,15 @@ bool HUDMenu::event(SDL_Event event)
 	return bRet;
 }
 
-void HUDMenu::draw(float32 fCurTime)
+void HUDMenu::draw(float fCurTime)
 {
 	if(hidden) return;
     HUDItem::draw(fCurTime);
     if(m_txtFont == NULL) return;
-    float32 fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
+    float fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
 	if(m_selected != m_menu.end())
 		fTotalY += selectedpt - pt;
-	float32 fCurY = m_ptPos.y + fTotalY/2.0f;
+	float fCurY = m_ptPos.y + fTotalY/2.0f;
 	selectedY = FLT_MIN;
 	for(list<menuItem>::iterator i = m_menu.begin(); i != m_menu.end(); i++)
 	{
@@ -493,7 +501,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
             string sImgName(cImgName);
             const char* cImgPath = elemImage->Attribute("path");
             if(cImgPath == NULL) continue;
-            Image* img = new Image(cImgPath);   //Load image
+            GLImage* img = new GLImage(cImgPath);   //Load image
             m_mImages[sImgName] = img;          //Stick it into our list
         }
     }
@@ -522,10 +530,10 @@ HUDItem* HUD::_getItem(XMLElement* elem)
         elem->QueryBoolAttribute("defaultenabled", &bDefault);
         if(!bDefault)
             hGroup->hide(); //Hide initially if we should
-        float32 fDelay = FLT_MAX;
+        float fDelay = FLT_MAX;
         elem->QueryFloatAttribute("fadedelay", &fDelay);
         hGroup->setFadeDelay(fDelay);
-        float32 fTime = FLT_MAX;
+        float fTime = FLT_MAX;
         elem->QueryFloatAttribute("fadetime", &fTime);
         hGroup->setFadeTime(fTime);
 
@@ -748,7 +756,7 @@ void HUD::create(string sXMLFilename)
 void HUD::destroy()
 {
   //Delete all images
-  for(map<string, Image*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
+  for(map<string, GLImage*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
     delete i->second;
   
   //And all fonts

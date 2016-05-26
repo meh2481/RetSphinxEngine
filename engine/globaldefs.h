@@ -15,25 +15,10 @@
 #include <iostream>
 #include <set>
 using namespace std;
-#include "Box2D.h"
-#include "tinyxml2.h"
-using namespace tinyxml2;
-#ifdef USE_SDL_FRAMEWORK
+#include "glmx.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
-#else
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#endif
-//#include "FreeImage.h"
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-extern ofstream errlog;	//Defined in Engine.cpp
+#include "log.h" // from io
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768
@@ -69,89 +54,61 @@ extern SDL_Scancode KEY_ENTER2;
 #define JOY_MINMOVE_TRIP	6500
 #define MOUSE_MOVE_TRIP_AMT	20
 
+typedef glm::vec2 Point;	//Our point structure
+typedef glm::vec3 Vec3;
 
-#define Point b2Vec2	//Our point structure
-/*class Point : public b2Vec2
-{
-	//TODO: copy operators and such
-public:
-	Point(float32 x, float32 y) : b2Vec2(x,y) {};
-	Point() {x=y=0;};
-};*/
-#define Vec2 Point
-#define PI 3.1415926535 //Close enough for my calculations
-#define DEG2RAD PI/180.0f  //Convert degrees to radians
-#define RAD2DEG 180.0f/PI  //Convert radians to degrees
+#define PI 3.1415926535f //Close enough for my calculations
+#define DEG2RAD (PI/180.0f)  //Convert degrees to radians
+#define RAD2DEG (180.0f/PI)  //Convert radians to degrees
 #define DIFF_EPSILON 0.0000001	  //HACK: How much different two vectors must be to register as a difference
 #define G 66.7384	//Gravitational constant times one trillion (Becase we aren't exactly on a planetary scale here)
 
 //HACK: SDL scancodes that really should be defined but aren't
-#define SDL_SCANCODE_CTRL	SDL_NUM_SCANCODES
-#define SDL_SCANCODE_SHIFT 	SDL_NUM_SCANCODES+1
-#define SDL_SCANCODE_ALT	SDL_NUM_SCANCODES+2
-#define SDL_SCANCODE_GUI	SDL_NUM_SCANCODES+3
+#define SDL_SCANCODE_CTRL	(SDL_NUM_SCANCODES)
+#define SDL_SCANCODE_SHIFT 	(SDL_NUM_SCANCODES+1)
+#define SDL_SCANCODE_ALT	(SDL_NUM_SCANCODES+2)
+#define SDL_SCANCODE_GUI	(SDL_NUM_SCANCODES+3)
 
 class Color
 {
 public:
-	float32 r,g,b,a;
+	float r,g,b,a;
 	Color();
-	Color(int32_t ir, int32_t ig, int32_t ib) {from256(ir,ig,ib);};
-	Color(float32 fr, float32 fg, float32 fb, float32 fa) {r=fr;g=fg;b=fb;a=fa;};
+	Color(int ir, int ig, int ib) {from256(ir,ig,ib);};
+	Color(float fr, float fg, float fb, float fa) {r=fr;g=fg;b=fb;a=fa;};
 
-	void from256(int32_t ir, int32_t ig, int32_t ib, int32_t a = 255);
+	void from256(int ir, int ig, int ib, int a = 255);
 	void fromHSV(float h, float s, float v, float fa = 1.0f);
-	void set(float32 fr, float32 fg, float32 fb, float32 fa = 1.0) {r=fr;g=fg;b=fb;a=fa;};
+	void set(float fr, float fg, float fb, float fa = 1.0) {r=fr;g=fg;b=fb;a=fa;};
 	void clear()	{r=g=b=a=1.0f;};
 };
 
 class Rect {
 public:
 	Rect() {left=right=top=bottom=0;};
-	Rect(float32 l,float32 t,float32 r,float32 b) {left=l;right=r;top=t;bottom=b;};
-	float32 left,top,right,bottom;
-	float32 width() {return right-left;};
-	float32 height() {return bottom-top;};
-	float32 area()  {return width()*height();};
-	void	offset(float32 x, float32 y)	{left+=x;right+=x;top+=y;bottom+=y;};
+	Rect(float l,float t,float r,float b) {left=l;right=r;top=t;bottom=b;};
+	float left,top,right,bottom;
+	float width() {return right-left;};
+	float height() {return bottom-top;};
+	float area()  {return width()*height();};
+	void	offset(float x, float y)	{left+=x;right+=x;top+=y;bottom+=y;};
 	void	offset(Point pt)				{offset(pt.x,pt.y);};
-	Point	center() {Point pt; pt.x = (right-left)/2.0 + right; pt.y = (bottom-top)/2.0 + top; return pt;};
-	void	center(float32* x, float32* y)	{Point pt = center(); if(x!=NULL)*x = pt.x; if(y!=NULL)*y = pt.y;};
-	void	scale(float32 fScale) {left*=fScale;right*=fScale;top*=fScale;bottom*=fScale;};
-	void	scale(float32 fScalex, float32 fScaley) {left*=fScalex;right*=fScalex;top*=fScaley;bottom*=fScaley;};
-	void	set(float32 fleft,float32 ftop,float32 fright,float32 fbottom)  {left=fleft;top=ftop;right=fright;bottom=fbottom;};
+	Point	center() {Point pt; pt.x = (right-left)*0.5f + right; pt.y = (bottom-top)*0.5f + top; return pt;};
+	void	center(float* x, float* y)	{Point pt = center(); if(x!=NULL)*x = pt.x; if(y!=NULL)*y = pt.y;};
+	void	scale(float fScale) {left*=fScale;right*=fScale;top*=fScale;bottom*=fScale;};
+	void	scale(float fScalex, float fScaley) {left*=fScalex;right*=fScalex;top*=fScaley;bottom*=fScaley;};
+	void	set(float fleft,float ftop,float fright,float fbottom)  {left=fleft;top=ftop;right=fright;bottom=fbottom;};
 	bool	inside(Point p)	{return(p.x >= left && p.x <= right && p.y <= top && p.y >= bottom);};
 	void	centerOn(Point p);
-};
-
-class Vec3
-{
-public:
-	float32 x, y, z;
-	
-	//Constructor
-	Vec3();
-	Vec3(float32 fx, float32 fy, float32 fz)	{x=fx;y=fy;z=fz;};
-
-	void set(float32 fx, float32 fy, float32 fz)	{x=fx;y=fy;z=fz;};
-	void setZero()  {set(0,0,0);};
-
-	//Helpful math functions
-	void normalize();	//Normalizes self
-	Vec3 normalized();  //Doesn't modify original vector, returns normalized version
-
-	//Operators for easy use
-	bool operator!=(const Vec3& v);
-	
 };
 
 //Global Helper functions
 //TODO: Make into class or package or something
 //TODO: Some of these might not even be used. Check and see.
 Vec3 crossProduct(Vec3 vec1, Vec3 vec2);	//Cross product of two vectors
-float32 dotProduct(Vec3 vec1, Vec3 vec2);   //Dot product of two vectors
-Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float32 fAngleDeg);	//Rotate one vector around another
-Point rotateAroundPoint(Point vecToRot, float32 fAngleDeg, Point ptRot = Point(0,0)); //Rotate point around given point (Default: origin)
+float dotProduct(Vec3 vec1, Vec3 vec2);   //Dot product of two vectors
+Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float fAngleDeg);	//Rotate one vector around another
+Point rotateAroundPoint(Point vecToRot, float fAngleDeg, Point ptRot = Point(0,0)); //Rotate point around given point (Default: origin)
 string stripCommas(string s);	   //Strip all the commas from s, leaving spaces in their place
 Rect rectFromString(string s);	  //Get a rectangle from comma-separated values in a string
 string rectToString(Rect r);
@@ -163,14 +120,14 @@ Vec3 vec3FromString(string s);		//Get a 3D point from comma-separated values in 
 string vec3ToString(Vec3 vec);
 int32_t randInt(int32_t min, int32_t max);  		//Get a random integer
 int32_t randInt();									//Get an unbounded random integer
-float32 randFloat(float32 min, float32 max);		//Get a random float32
-float32 randFloat();								//Get an unbounded random float
+float randFloat(float min, float max);		//Get a random float
+float randFloat();								//Get an unbounded random float
 void randSeed(unsigned long s);						//Seed the random number generator
-float32 distanceSquared(Vec3 vec1, Vec3 vec2);		//Get the distance between two vectors squared
-float32 distanceBetween(Vec3 vec1, Vec3 vec2);				//Get the distance between two vectors (slower than above)
+float distanceSquared(Vec3 vec1, Vec3 vec2);		//Get the distance between two vectors squared
+float distanceBetween(Vec3 vec1, Vec3 vec2);				//Get the distance between two vectors (slower than above)
 Color HsvToRgb(int h, int s, int v);		//Convert HSV values to RGB
-float32 wrapAngle(float32 fAngle);
-float32 getAngle(const Point& p);	//Get angle of a vector
+float wrapAngle(float fAngle);
+float getAngle(const Point& p);	//Get angle of a vector
 
 float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high, float freqinc);
 

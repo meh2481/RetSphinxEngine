@@ -72,7 +72,7 @@ void Engine::cleanupObjects()
 		m_physicsWorld->DestroyBody(*i);
 }
 
-void Engine::updateObjects(float32 dt)
+void Engine::updateObjects(float dt)
 {
 	//Update objects
 	//TODO: This whole object returning a b2BodyDef* can be removed
@@ -87,7 +87,9 @@ void Engine::updateObjects(float32 dt)
 	//TODO: Remove
 	for(list<b2BodyDef*>::iterator i = lAddObj.begin(); i != lAddObj.end(); i++)
 	{
-		objFromXML(*((string*)(*i)->userData), (*i)->position, (*i)->linearVelocity);
+        b2Vec2 p = (*i)->position;
+        b2Vec2 v = (*i)->linearVelocity;
+		objFromXML(*((string*)(*i)->userData), Point(p.x, p.y), Point(v.x, v.y));
 		delete (*i);	//Free up memory
 	}
 	//Update nodes
@@ -118,11 +120,11 @@ public:
 obj* Engine::getClosestObject(Point p)
 {
 	obj* closest = NULL;
-	float32 len2 = FLT_MAX;
+	float len2 = FLT_MAX;
 	for(list<obj*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
 	{
 		Point offset = (*i)->getPos() - p;
-		float32 dist = offset.LengthSquared();
+		float dist = glmx::lensqr(offset);
 		if(dist < len2)
 		{
 			closest = *i;
@@ -136,8 +138,8 @@ obj* Engine::getObject(Point p)
 {
 	PointQueryCallback pqc;
 	b2AABB aabb;
-	aabb.lowerBound = p;
-	aabb.upperBound = p;
+	aabb.lowerBound.Set(p.x, p.y);
+	aabb.upperBound.Set(p.x, p.y);
 	m_physicsWorld->QueryAABB(&pqc, aabb);
 	
 	//This returns a list of possible bodies; loop through and check for actual containment
@@ -145,7 +147,7 @@ obj* Engine::getObject(Point p)
 	{
 		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
 		{
-			if(fix->TestPoint(p))	//we have a hit
+			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
 			{
 				void* data = (*i)->GetUserData();
 				if(data)
@@ -165,8 +167,8 @@ Node* Engine::getNode(Point p)
 {
 	PointQueryCallback pqc;
 	b2AABB aabb;
-	aabb.lowerBound = p;
-	aabb.upperBound = p;
+	aabb.lowerBound.Set(p.x, p.y);
+	aabb.upperBound.Set(p.x, p.y);
 	m_physicsWorld->QueryAABB(&pqc, aabb);
 	
 	//This returns a list of possible bodies; loop through and check for actual containment
@@ -174,7 +176,7 @@ Node* Engine::getNode(Point p)
 	{
 		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
 		{
-			if(fix->TestPoint(p))	//we have a hit
+			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
 			{
 				void* data = fix->GetUserData();
 				if(data)

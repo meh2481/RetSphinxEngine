@@ -4,6 +4,9 @@
 */
 
 #include "particles.h"
+#include "GLImage.h"
+#include "tinyxml2.h"
+using namespace tinyxml2;
 
 ParticleSystem::ParticleSystem() : Drawable()
 {
@@ -119,13 +122,13 @@ void ParticleSystem::_newParticle()
 		m_imgRect[num] = imgRect[randInt(0, imgRect.size()-1)];
 	m_pos[num] = Point(randFloat(emitFrom.left, emitFrom.right),
 						 randFloat(emitFrom.top, emitFrom.bottom));
-	float32 sizediff = randFloat(-sizeVar,sizeVar);
+	float sizediff = randFloat(-sizeVar,sizeVar);
 	m_sizeStart[num].x = sizeStart.x + sizediff;
 	m_sizeStart[num].y = sizeStart.y + sizediff;
 	m_sizeEnd[num].x = sizeEnd.x + sizediff;
 	m_sizeEnd[num].y = sizeEnd.y + sizediff;
-	float32 angle = emissionAngle + randFloat(-emissionAngleVar,emissionAngleVar);
-	float32 amt = speed + randFloat(-speedVar,speedVar);
+	float angle = emissionAngle + randFloat(-emissionAngleVar,emissionAngleVar);
+	float amt = speed + randFloat(-speedVar,speedVar);
 	m_vel[num].x = amt*cos(DEG2RAD*angle);
 	m_vel[num].y = amt*sin(DEG2RAD*angle);
 	m_accel[num].x = accel.x + randFloat(-accelVar.x,accelVar.x);
@@ -237,9 +240,7 @@ void ParticleSystem::_initValues()
 	lifetimeVar = 0;
 	decay = FLT_MAX;
 	startedFiring = 0.0f;
-	rotAxis.set(0.0f, 0.0f, 1.0f);
-	rotAxisVar.setZero();
-	emissionVel.SetZero();
+	rotAxis = Vec3(0.0f, 0.0f, 1.0f);
 	
 	img = NULL;
 	max = 100;
@@ -258,7 +259,7 @@ void ParticleSystem::_initValues()
 	particleDeathSpawn = true;
 }
 
-void ParticleSystem::update(float32 dt)
+void ParticleSystem::update(float dt)
 {
 	//cout << "Update particles " << dt << " " << firing << " " << startedFiring << endl;
 	if(!show) return;
@@ -284,7 +285,7 @@ void ParticleSystem::update(float32 dt)
 		emitFrom.offset(emissionVel.x * dt, emissionVel.y * dt);	//Move our emission point as needed
 	for(int i = 0; i < iSpawnAmt; i++)
 	{
-		emitFrom.offset(emissionVel.x * ((float32)1.0f/(float32)iSpawnAmt) * dt, emissionVel.y * ((float32)1.0f/(float32)iSpawnAmt) * dt);	//Move our emission point for each particle
+		emitFrom.offset(emissionVel.x * ((float)1.0f/(float)iSpawnAmt) * dt, emissionVel.y * ((float)1.0f/(float)iSpawnAmt) * dt);	//Move our emission point for each particle
 		_newParticle();
 	}
 	
@@ -299,8 +300,8 @@ void ParticleSystem::update(float32 dt)
 	
 	ptVel = m_vel;
 	Point* ptAccel = m_accel;
-	float32* normAccel = m_normalAccel;
-	float32* tanAccel = m_tangentialAccel;
+	float* normAccel = m_normalAccel;
+	float* tanAccel = m_tangentialAccel;
 	for(int i = 0; i < m_num; i++, ptVel++, ptAccel++, normAccel++, tanAccel++)
 	{
 		ptVel->x += ptAccel->x * dt;
@@ -308,33 +309,31 @@ void ParticleSystem::update(float32 dt)
 		
 		if(*normAccel)
 		{
-			Point ptNorm = m_pos[i] - emitFrom.center();
-			ptNorm.Normalize();
+			Point ptNorm = glm::normalize(m_pos[i] - emitFrom.center());
 			ptNorm *= *normAccel * dt;
 			*ptVel += ptNorm;
 		}
 		if(*tanAccel)
 		{
-			Point ptTan = m_pos[i] - emitFrom.center();
-			ptTan.Normalize();
+			Point ptTan = glm::normalize(m_pos[i] - emitFrom.center());
 			ptTan = rotateAroundPoint(ptTan, 90);
 			ptTan *= *tanAccel * dt;
 			*ptVel += ptTan;
 		}
 	}
 	
-	float32* fRot = m_rot;
-	float32* fRotVel = m_rotVel;
+	float* fRot = m_rot;
+	float* fRotVel = m_rotVel;
 	for(int i = 0; i < m_num; i++, fRot++, fRotVel++)
 		*fRot += *fRotVel * dt;
 	
 	fRotVel = m_rotVel;
-	float32* fRotAccel = m_rotAccel;
+	float* fRotAccel = m_rotAccel;
 	for(int i = 0; i < m_num; i++, fRotAccel++, fRotVel++)
 		*fRotVel += *fRotAccel * dt;
 	
-	float32* created = m_created;
-	float32* life = m_lifetime;
+	float* created = m_created;
+	float* life = m_lifetime;
 	for(int i = 0; i < m_num; i++, created++, life++)
 	{
 		if(curTime - *created > *life)	//time for this particle go bye-bye
@@ -370,7 +369,7 @@ void ParticleSystem::draw(bool bDebugInfo)
 	
 	for(int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
-		float32 fLifeFac = (curTime - m_created[i] - m_lifePreFade[i]) / (m_lifetime[i] - m_lifePreFade[i]);
+		float fLifeFac = (curTime - m_created[i] - m_lifePreFade[i]) / (m_lifetime[i] - m_lifePreFade[i]);
 		if(fLifeFac > 1.0) continue;	//Particle is already dead
 		if(curTime - m_created[i] <= m_lifePreFade[i])	//Particle hasn't started fading yet
 			fLifeFac = 0.0f;
@@ -422,16 +421,16 @@ void ParticleSystem::init()
 	m_sizeEnd = new Point[m_totalAmt];
 	m_vel = new Point[m_totalAmt];
 	m_accel = new Point[m_totalAmt];
-	m_rot = new float32[m_totalAmt];
-	m_rotVel = new float32[m_totalAmt];
-	m_rotAccel = new float32[m_totalAmt];
+	m_rot = new float[m_totalAmt];
+	m_rotVel = new float[m_totalAmt];
+	m_rotAccel = new float[m_totalAmt];
 	m_colStart = new Color[m_totalAmt];
 	m_colEnd = new Color[m_totalAmt];
-	m_tangentialAccel = new float32[m_totalAmt];
-	m_normalAccel = new float32[m_totalAmt];
-	m_lifetime = new float32[m_totalAmt];
-	m_created = new float32[m_totalAmt];
-	m_lifePreFade = new float32[m_totalAmt];
+	m_tangentialAccel = new float[m_totalAmt];
+	m_normalAccel = new float[m_totalAmt];
+	m_lifetime = new float[m_totalAmt];
+	m_created = new float[m_totalAmt];
+	m_lifePreFade = new float[m_totalAmt];
 	m_rotAxis = new Vec3[m_totalAmt];
 }
 
@@ -486,7 +485,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 	root->QueryFloatAttribute("rate", &rate);
 	root->QueryBoolAttribute("velrotate", &velRotate);
 	root->QueryFloatAttribute("decay", &decay);
-	float32 fDecayVar = 0.0f;
+	float fDecayVar = 0.0f;
 	root->QueryFloatAttribute("decayvar", &fDecayVar);
 	decay += randFloat(-fDecayVar, fDecayVar);
 	

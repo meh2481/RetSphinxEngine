@@ -8,6 +8,7 @@
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
+#include "GLImage.h"
 using namespace std;
 using namespace tiny3d;
 
@@ -87,7 +88,7 @@ void Object3D::_fromOBJFile(string sFilename)
                     UV vt;
                     if(!(iss >> vt.u >> vt.v)) continue;
                     //Flip UV coordinates to match up right
-                    vt.v = 1.0 - vt.v;
+                    vt.v = 1.0f - vt.v;
                     vUVs.push_back(vt);
                 }
                 else if(c[1] == 'n')    //"vn" denotes face normal
@@ -257,7 +258,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	
     //Loop through and add faces
     glBegin(GL_TRIANGLES);
-    for(int i = 0; i < header.numFaces; i++)
+    for(unsigned i = 0; i < header.numFaces; i++)
     {
 		vert v = vertices[faces[i].v1];
 		uv UV = uvs[faces[i].uv1];
@@ -291,7 +292,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-void Object3D::render(Image* img)
+void Object3D::render(GLImage* img)
 {
 	//glRotatef(45, 1.0f, 0.0f, 0.0f);
 	//GLfloat saveLight[4];

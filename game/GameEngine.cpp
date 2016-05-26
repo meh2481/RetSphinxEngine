@@ -40,7 +40,7 @@ SDL_Scancode KEY_ENTER2;
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
-float32 g_fParticleFac;
+float g_fParticleFac;
 
 void signalHandler(string sSignal)
 {
@@ -138,7 +138,7 @@ GameEngine::~GameEngine()
 	//delete testObj;
 }
 
-void GameEngine::frame(float32 dt)
+void GameEngine::frame(float dt)
 {
 	handleKeys();
 	stepPhysics(dt);

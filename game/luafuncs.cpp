@@ -11,7 +11,7 @@ extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 class GameEngineLua
 {
 public:
-	static void rumble(float32 fAmt, float32 len, int priority = 0)
+	static void rumble(float fAmt, float len, int priority = 0)
 	{
 		g_pGlobalEngine->rumbleController(fAmt, len, priority);
 	}
@@ -146,8 +146,8 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 
 luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --force is range [0,1]
 {
-	float32 force = lua_tonumber(L, 1);
-	float32 sec = lua_tonumber(L, 2);
+	float force = lua_tonumber(L, 1);
+	float sec = lua_tonumber(L, 2);
 	int priority = lua_tointeger(L, 3);
 	GameEngineLua::rumble(force, sec, priority);
 	luaReturnNil();

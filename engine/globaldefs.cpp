@@ -10,7 +10,7 @@
 MTRand_int32 irand;
 MTRand drand;
 
-float32 myabs(float x)	//Stupid namespace stuff
+float myabs(float x)	//Stupid namespace stuff
 {
 	if(x < 0)
 		x = -x;
@@ -24,10 +24,10 @@ Color::Color()
 
 void Color::from256(int ir, int ig, int ib, int ia)
 {
-	r = (float32)ir/255.0;
-	g = (float32)ig/255.0;
-	b = (float32)ib/255.0;
-	a = (float32)ia/255.0;
+	r = (float)ir/255.0;
+	g = (float)ig/255.0;
+	b = (float)ib/255.0;
+	a = (float)ia/255.0;
 }
 
 void Color::fromHSV(float h, float s, float v, float fa)
@@ -80,7 +80,7 @@ Point pointFromString(string s)
 	istringstream iss(s);
 	Point pt;
 	if(!(iss >> pt.x >> pt.y))
-		pt.SetZero();
+		pt = Point(0,0);
 	return pt;
 }
 
@@ -148,7 +148,7 @@ Vec3 vec3FromString(string s)
 	Vec3 vec;
 	istringstream iss(s);
 	if(!(iss >> vec.x >> vec.y >> vec.z))
-		vec.setZero();
+		vec = Vec3(0,0,0);
 	return vec;
 }
 
@@ -178,60 +178,22 @@ int32_t randInt(int32_t min, int32_t max)
 	return(irand()%diff + min);
 }
 
-float32 randFloat()
+float randFloat()
 {
 	return drand();
 }
 
-float32 randFloat(float32 min, float32 max)
+float randFloat(float min, float max)
 {
 	if(min == max)
 		return min;
 	if(min > max)
 	{
-		float32 temp = min;
+		float temp = min;
 		min = max;
 		max = temp;
 	}
 	return(drand()*(max-min) + min);
-}
-
-Vec3::Vec3()
-{
-	setZero();
-}
-
-void Vec3::normalize()
-{
-	float32 fMag;
-	fMag = sqrt(x*x + y*y + z*z);
-
-	x = x / fMag;
-	y = y / fMag;
-	z = z / fMag;
-}
-
-Vec3 Vec3::normalized()
-{
-	Vec3 ret;
-	float32 fMag = sqrt(x*x + y*y + z*z);
-
-	ret.x = x / fMag;
-	ret.y = y / fMag;
-	ret.z = z / fMag;
-	return ret;
-}
-
-//Test for inequality between vectors
-bool Vec3::operator!=(const Vec3& v)
-{
-	float32 xdiff = myabs(v.x - x);
-	float32 ydiff = myabs(v.y - y);
-	float32 zdiff = myabs(v.z - z);
-
-	if(xdiff > DIFF_EPSILON || ydiff > DIFF_EPSILON || zdiff > DIFF_EPSILON)	//I call hacks. But it works.
-		return true;
-	return false;
 }
 
 Vec3 crossProduct(Vec3 vec1, Vec3 vec2)
@@ -243,26 +205,26 @@ Vec3 crossProduct(Vec3 vec1, Vec3 vec2)
 	return ret;
 }
 
-float32 dotProduct(Vec3 vec1, Vec3 vec2)
+float dotProduct(Vec3 vec1, Vec3 vec2)
 {
 	return (vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z);
 }
 
 //Rotate the vector vecToRot around the vector rotVec
-Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float32 fAngleDeg)
+Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float fAngleDeg)
 {
 	Vec3 result;
-	float32 ux = rotVec.x * vecToRot.x;
-	float32 uy = rotVec.x * vecToRot.y;
-	float32 uz = rotVec.x * vecToRot.z;
-	float32 vx = rotVec.y * vecToRot.x;
-	float32 vy = rotVec.y * vecToRot.y;
-	float32 vz = rotVec.y * vecToRot.z;
-	float32 wx = rotVec.z * vecToRot.x;
-	float32 wy = rotVec.z * vecToRot.y;
-	float32 wz = rotVec.z * vecToRot.z;
-	float32 sa = sin(DEG2RAD*fAngleDeg);
-	float32 ca = cos(DEG2RAD*fAngleDeg);
+	float ux = rotVec.x * vecToRot.x;
+	float uy = rotVec.x * vecToRot.y;
+	float uz = rotVec.x * vecToRot.z;
+	float vx = rotVec.y * vecToRot.x;
+	float vy = rotVec.y * vecToRot.y;
+	float vz = rotVec.y * vecToRot.z;
+	float wx = rotVec.z * vecToRot.x;
+	float wy = rotVec.z * vecToRot.y;
+	float wz = rotVec.z * vecToRot.z;
+	float sa = sin(DEG2RAD*fAngleDeg);
+	float ca = cos(DEG2RAD*fAngleDeg);
 	//Matrix math without actual matrices woo
 	result.x = rotVec.x*(ux+vy+wz)+(vecToRot.x*(rotVec.y*rotVec.y+rotVec.z*rotVec.z)-rotVec.x*(vy+wz))*ca+(-wy+vz)*sa;
 	result.y = rotVec.y*(ux+vy+wz)+(vecToRot.y*(rotVec.x*rotVec.x+rotVec.z*rotVec.z)-rotVec.y*(ux+wz))*ca+(wx-uz)*sa;
@@ -270,11 +232,11 @@ Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float32 fAngleDeg)
 	return result;
 }
 
-Point rotateAroundPoint(Point vecToRot, float32 fAngleDeg, Point ptRot)
+Point rotateAroundPoint(Point vecToRot, float fAngleDeg, Point ptRot)
 {
 	Point ret;
-	float32 s = sin(DEG2RAD*fAngleDeg);
-	float32 c = cos(DEG2RAD*fAngleDeg);
+	float s = sin(DEG2RAD*fAngleDeg);
+	float c = cos(DEG2RAD*fAngleDeg);
 	vecToRot -= ptRot;
 	ret.x = vecToRot.x * c - vecToRot.y * s;
 	ret.y = vecToRot.x * s + vecToRot.y * c;
@@ -282,7 +244,7 @@ Point rotateAroundPoint(Point vecToRot, float32 fAngleDeg, Point ptRot)
 	return ret;
 }
 
-float32 distanceSquared(Vec3 vec1, Vec3 vec2)
+float distanceSquared(Vec3 vec1, Vec3 vec2)
 {
 	Vec3 diff;
 	diff.x = vec1.x - vec2.x;
@@ -291,7 +253,7 @@ float32 distanceSquared(Vec3 vec1, Vec3 vec2)
 	return (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z);
 }
 
-float32 distanceBetween(Vec3 vec1, Vec3 vec2)
+float distanceBetween(Vec3 vec1, Vec3 vec2)
 {
 	return sqrt(distanceSquared(vec1, vec2));
 }
@@ -350,7 +312,7 @@ void Rect::centerOn(Point p)
 	offset(p.x - cen.x, p.y - cen.y);
 }
 
-float32 wrapAngle(float32 fAngle) 
+float wrapAngle(float fAngle) 
 {
 	if(fAngle >= 360)
 		return fAngle - 360;
@@ -389,7 +351,7 @@ float sumOcatave(int num_iterations, float x, float y, float persistence, float 
     return noise;
 }
 
-float32 getAngle(const Point& p)
+float getAngle(const Point& p)
 {
 	return atan2(p.y, p.x);
 }

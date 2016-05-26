@@ -43,7 +43,7 @@ bool GameEngine::loadConfig(string sFilename)
 		int iVsync = getVsync();
 		int iMSAA = getMSAA();
 		bool bTexAntialias = getImgBlur();
-		float32 fGamma = getGamma();
+		float fGamma = getGamma();
 		
 		window->QueryUnsignedAttribute("width", &width);
 		window->QueryUnsignedAttribute("height", &height);
@@ -664,7 +664,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		}
 		
 		//Get rotation (angle) of box
-		float32 fRot = 0.0f;
+		float fRot = 0.0f;
 		fixture->QueryFloatAttribute("rot", &fRot);
 		
 		bool bHollow = false;

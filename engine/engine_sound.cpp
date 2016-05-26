@@ -1,5 +1,7 @@
 #include "Engine.h"
 
+#if 0
+
 void Engine::createSound(string sPath, string sName)
 {
 	if(m_bSoundDied || m_sounds.count(sName)) return;	//Don't duplicate sounds or attempt to play sounds if we can't
@@ -14,7 +16,7 @@ void Engine::createSound(string sPath, string sName)
 		m_sounds[sName] = handle;
 }
 
-void Engine::playSound(string sName, float32 volume, float32 pan, float32 pitch)
+void Engine::playSound(string sName, float volume, float pan, float pitch)
 {
 	if(m_bSoundDied || !m_sounds.count(sName)) return;
 	FMOD_CHANNEL* channel;
@@ -36,7 +38,7 @@ FMOD_CHANNEL* Engine::getChannel(string sSoundName)
 	return NULL;
 }
 
-void Engine::playMusic(string sName, float32 volume, float32 pan, float32 pitch)
+void Engine::playMusic(string sName, float volume, float pan, float pitch)
 {
 	if(m_bSoundDied) return;
 	if(m_sounds.count("music"))
@@ -56,7 +58,7 @@ void Engine::playMusic(string sName, float32 volume, float32 pan, float32 pitch)
 	}
 }
 
-void Engine::musicLoop(float32 startSec, float32 endSec)
+void Engine::musicLoop(float startSec, float endSec)
 {
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
@@ -99,14 +101,14 @@ void Engine::stopMusic()
 	FMOD_Channel_SetPaused(getChannel("music"), true);
 }
 
-void Engine::seekMusic(float32 fTime)
+void Engine::seekMusic(float fTime)
 {
 	if(m_bSoundDied) return;
 	if(!m_channels.count("music")) return;
 	FMOD_Channel_SetPosition(getChannel("music"), fTime * 1000.0, FMOD_TIMEUNIT_MS);
 }
 
-float32 Engine::getMusicPos()
+float Engine::getMusicPos()
 {
 	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
@@ -114,12 +116,12 @@ float32 Engine::getMusicPos()
 		FMOD_CHANNEL* mus = getChannel("music");
 		unsigned int ms;
 		FMOD_Channel_GetPosition(mus, &ms, FMOD_TIMEUNIT_MS);
-		return (float32)ms / 1000.0f;
+		return (float)ms / 1000.0f;
 	}
 	return -1;
 }
 
-void Engine::volumeMusic(float32 fVol)
+void Engine::volumeMusic(float fVol)
 {
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
@@ -129,14 +131,14 @@ void Engine::volumeMusic(float32 fVol)
 	}
 }
 
-void Engine::setMusicFrequency(float32 freq)
+void Engine::setMusicFrequency(float freq)
 {
 	if(m_bSoundDied) return;
 	if(m_channels.count("music"))
 		FMOD_Channel_SetFrequency(getChannel("music"), freq);
 }
 
-float32 Engine::getMusicFrequency()
+float Engine::getMusicFrequency()
 {
 	if(m_bSoundDied) return -1;
 	if(m_channels.count("music"))
@@ -175,3 +177,6 @@ void Engine::updateSound()
 		}
 	}
 }
+
+#endif
+
