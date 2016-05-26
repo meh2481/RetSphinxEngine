@@ -4,8 +4,10 @@
 */
 
 #include "arc.h"
+#include "GLImage.h"
+#include "opengl-api.h"
 
-arc::arc(uint32_t number, Image* img) : physSegment()
+arc::arc(unsigned number, GLImage* img) : physSegment()
 {
 	segmentPos = NULL;
 	if(img == NULL || number == 0) return;
@@ -14,9 +16,7 @@ arc::arc(uint32_t number, Image* img) : physSegment()
 	arcSegImg = img;
 	add = max = 0.0f;
 	avg = 2;
-	height = 0.1;
-	p1.SetZero();
-	p2.SetZero();
+	height = 0.1f;
 	init();
 }
 
@@ -32,19 +32,19 @@ void arc::draw()
 	glPushMatrix();
 	
 	//Calculate angle between two points and offset accordingly
-	float32 fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));	//Grahh slow
-	float32 fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
+	float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));	//Grahh slow
+	float fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
 		
 	//Offset according to depth
 	glTranslatef(p1.x, -p1.y, depth);
 	glRotatef(RAD2DEG*fAngle,0.0f,0.0f,1.0f);
 	//Center on this point
-	glTranslatef(0, -height / 2.0, 0);
-	float32 fSegWidth = fDistance / (float32)(numSegments-1);
-    for(int i = 0; i < numSegments-1; i++)
+	glTranslatef(0, -height * 0.5f, 0);
+	float fSegWidth = fDistance / (float)(numSegments-1);
+    for(int i = 0; i < int(numSegments)-1; i++)
     {
       Point ul, ur, bl, br;
-      ul.x = bl.x = (float32)i*fSegWidth;
+      ul.x = bl.x = (float)i*fSegWidth;
       ur.x = br.x = bl.x + fSegWidth;
       ul.y = segmentPos[i];
       bl.y = ul.y + height;
@@ -60,7 +60,7 @@ void arc::draw()
 void arc::update(float dt)
 {
 	dt *= 60.0;
-	for(int i = 1; i < numSegments-1; i++)
+	for(int i = 1; i < int(numSegments)-1; i++)
 	{
 		segmentPos[i] += dt*randFloat(-add, add);
 		if(segmentPos[i] > max)
@@ -74,7 +74,7 @@ void arc::update(float dt)
 void arc::init()
 {
 	//Initialize values of array to sane defaults, so we don't start with a flat arc for one frame
-	for(int i = 0; i < numSegments; i++)
+	for(unsigned i = 0; i < numSegments; i++)
 		segmentPos[i] = randFloat(-max, max);
 	average();
 }
@@ -92,15 +92,15 @@ void arc::average()
 	temp[0] = temp[numSegments-1] = 0.0f;
 	
 	//Loop through, averaging values of all but two end values
-	for(int i = 1; i < numSegments-1; i++)
+	for(int i = 1; i < int(numSegments)-1; i++)
     {
       float fTot = 0.0;
-      for(int j = i-avg; j < i+avg+1; j++)
+      for(int j = i-int(avg); j < i+int(avg)+1; j++)
       {
-		if(j >= 0 && j < numSegments)
+		if(j >= 0 && j < int(numSegments))
 			fTot += segmentPos[j];
 	  }
-      temp[i] = fTot / (float32)(avg*2+1);
+      temp[i] = fTot / (float)(avg*2+1);
     }
 	
 	//Copy back over
@@ -108,11 +108,9 @@ void arc::average()
 	free(temp);
 }
 
-
-
-
-
-
-
+const string& arc::getImageFilename()
+{
+    return arcSegImg->getFilename();
+}
 
 

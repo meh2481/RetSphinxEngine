@@ -1,24 +1,10 @@
-#ifdef USE_SDL_FRAMEWORK
 #include <SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 
 #include <iostream>
 #include "opengl-api.h"
 
-#ifdef _WIN32
-#define GLAPIENTRY __stdcall
-#else
-#define GLAPIENTRY
-#endif
 
 // Populate global namespace with static function pointers pFUNC,
 // and function stubs FUNC that call their associated function pointer

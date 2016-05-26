@@ -2,9 +2,11 @@
 	GameEngine source - Engine.cpp
 	Copyright (c) 2014 Mark Hutcheson
 */
-
+#include <SDL_syswm.h>
 #include "Engine.h"
-ofstream errlog;
+#include "Box2D/Box2D.h"
+#include "GLImage.h"
+#include "opengl-api.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -20,7 +22,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_bResizable = bResizable;
 	b2Vec2 gravity(0.0, -9.8);	//Vector for our world's gravity
 	m_physicsWorld = new b2World(gravity);
-	m_ptCursorPos.SetZero();
 	m_physicsWorld->SetAllowSleeping(true);
 	m_physicsWorld->SetDebugDraw(&m_debugDraw);
 	m_physicsWorld->SetContactListener(&m_clContactListener);
@@ -96,7 +97,7 @@ Engine::~Engine()
 	clearObjects();
 
 	//Clean up our sound effects
-	if(!m_bSoundDied)
+	/*if(!m_bSoundDied)
 	{
 		for(map<string, FMOD_SOUND*>::iterator i = m_sounds.begin(); i != m_sounds.end(); i++)
 			FMOD_Sound_Release(i->second);
@@ -107,7 +108,7 @@ Engine::~Engine()
 	{
 		FMOD_System_Close(m_audioSystem);
 		FMOD_System_Release(m_audioSystem);
-	}
+	}*/
 
 	// Clean up and shutdown
 	errlog << "Deleting phys world" << endl;
@@ -175,7 +176,7 @@ bool Engine::_frame()
 		return m_bQuitting;	//Break out here
 	}
 
-	float32 fCurTime = ((float32)SDL_GetTicks())/1000.0;
+	float fCurTime = ((float)SDL_GetTicks())/1000.0;
 	if(m_fAccumulatedTime <= fCurTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
@@ -262,12 +263,12 @@ bool Engine::keyDown(int32_t keyCode)
 	return(m_iKeystates[keyCode]);
 }
 
-void Engine::setFramerate(float32 fFramerate)
+void Engine::setFramerate(float fFramerate)
 {
 	if(fFramerate < 30.0)
 	fFramerate = 30.0;	//30fps is bare minimum
 	if(m_fFramerate == 0.0)
-		m_fAccumulatedTime = (float32)SDL_GetTicks()/1000.0;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
+		m_fAccumulatedTime = (float)SDL_GetTicks()/1000.0;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
 	m_fFramerate = fFramerate;
 	m_fTargetTime = 1.0 / m_fFramerate;
 }
@@ -430,8 +431,8 @@ string Engine::getSaveLocation()
 Rect Engine::getCameraView(Vec3 Camera)
 {
 	Rect rcCamera;
-	const float32 tan45_2 = tan(DEG2RAD*45.0f/2.0f);
-	const float32 fAspect = (float32)getWidth() / (float32)getHeight();
+	const float tan45_2 = tan(DEG2RAD*45.0f/2.0f);
+	const float fAspect = (float)getWidth() / (float)getHeight();
 	rcCamera.top = (tan45_2 * Camera.z);
 	rcCamera.bottom = -(tan45_2 * Camera.z);
 	rcCamera.left = rcCamera.top * fAspect;
@@ -442,8 +443,8 @@ Rect Engine::getCameraView(Vec3 Camera)
 
 Point Engine::worldMovement(Point cursormove, Vec3 Camera)
 {
-	cursormove.x /= (float32)getWidth();
-	cursormove.y /= (float32)getHeight();
+	cursormove.x /= (float)getWidth();
+	cursormove.y /= (float)getHeight();
 	
 	Rect rcCamera = getCameraView(Camera);
 	cursormove.x *= rcCamera.width();
@@ -458,8 +459,8 @@ Point Engine::worldPosFromCursor(Point cursorpos, Vec3 Camera)
 	Rect rcCamera = getCameraView(Camera);
 	
 	//Our relative position in window rect space (in rage 0-1)
-	cursorpos.x /= (float32)getWidth();
-	cursorpos.y /= (float32)getHeight();
+	cursorpos.x /= (float)getWidth();
+	cursorpos.y /= (float)getHeight();
 	
 	//Multiply this by the size of the world rect to get the relative cursor pos
 	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
@@ -468,7 +469,7 @@ Point Engine::worldPosFromCursor(Point cursorpos, Vec3 Camera)
 	return cursorpos;
 }
 
-void Engine::stepPhysics(float32 dt)
+void Engine::stepPhysics(float dt)
 {
 	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
 	
@@ -493,11 +494,11 @@ void Engine::stepPhysics(float32 dt)
 		else if(c.objA && !c.nodeB)
 		{
 			b2Vec2 pt = -worldManifold.normal;	//Flip this, since a Box2D normal is defined from A->B, and we want a wall->obj normal
-			c.objA->collideWall(pt);
+			c.objA->collideWall(Point(pt.x, pt.y));
 		}
 		else if(c.objB && !c.nodeA)
 		{
-			c.objB->collideWall(worldManifold.normal);
+			c.objB->collideWall(Point(worldManifold.normal.x, worldManifold.normal.y));
 		}
 		//Don't care about two non-object fixtures colliding
 		
@@ -514,7 +515,67 @@ void Engine::stepPhysics(float32 dt)
 	m_clContactListener.clearFrameContacts();	//Erase all these now that we've handled them
 }
 
+void Engine::setDoubleBuffered(bool bDoubleBuffered)
+{
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);
+}
 
+bool Engine::getDoubleBuffered()
+{
+    int val = 1; SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
+    return val;
+}
 
+void Engine::setVsync(int iVsync)
+{
+    SDL_GL_SetSwapInterval(iVsync);
+}
 
+int Engine::getVsync()
+{
+    return SDL_GL_GetSwapInterval();
+}
 
+b2Body* Engine::createBody(b2BodyDef* bdef)
+{
+    return m_physicsWorld->CreateBody(bdef);
+}
+
+void Engine::setGravity(Point ptGravity)
+{
+    m_physicsWorld->SetGravity(b2Vec2(ptGravity.x, ptGravity.y));
+}
+
+void Engine::setGravity(float x, float y)
+{
+    setGravity(Point(x,y));
+}
+
+bool Engine::getImgBlur()
+{
+    return g_imageBlur;
+}
+
+void Engine::setImgBlur(bool b)
+{
+    g_imageBlur = b;
+}
+
+bool Engine::isMouseGrabbed()
+{
+    return SDL_GetWindowGrab(m_Window);
+}
+
+void Engine::grabMouse(bool bGrab)
+{
+    SDL_SetWindowGrab(m_Window, (SDL_bool)bGrab);
+}
+
+unsigned Engine::getTicks()
+{
+    return SDL_GetTicks();
+}
+float Engine::getSeconds()
+{
+    return (float)SDL_GetTicks()/1000.0;
+}

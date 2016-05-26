@@ -1,6 +1,7 @@
 #include "GameEngine.h"
 #include <ctime>
 #include <iomanip>
+#include "GLImage.h"
 
 void GameEngine::handleEvent(SDL_Event event)
 {
@@ -216,9 +217,9 @@ void GameEngine::handleKeys()
 }
 
 //TODO: Controller haptic shouldn't be game specific? Or is this too closely tied to controller input in general?
-void GameEngine::rumbleController(float32 strength, float32 sec, int priority)
+void GameEngine::rumbleController(float strength, float sec, int priority)
 {
-	static float32 fLastRumble = 0.0f;
+	static float fLastRumble = 0.0f;
 	static int prevPriority = 0;
 	
 	//Too low priority to rumble here; another higher-priority rumble is currently going on

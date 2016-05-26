@@ -1,6 +1,7 @@
 #include "Engine.h"
+#include <SDL_syswm.h>
 
-void Engine::changeScreenResolution(float32 w, float32 h)
+void Engine::changeScreenResolution(float w, float h)
 {
 	errlog << "Changing screen resolution to " << w << ", " << h << endl;
 	int vsync = SDL_GL_GetSwapInterval();

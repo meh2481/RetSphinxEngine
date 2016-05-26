@@ -23,11 +23,11 @@ public:
 	Background(){screenDiag = 1;type=NONE;};
 	~Background(){};
 	
-	float32 screenDiag;
+	float screenDiag;
 	bgType type;
 	
 	virtual void draw() = 0;
-	virtual void update(float32 dt) = 0;
+	virtual void update(float dt) = 0;
 };
 
 class pinwheelBg : public Background
@@ -37,20 +37,20 @@ public:
 	~pinwheelBg();
 	
 	void draw();
-	void update(float32 dt);
+	void update(float dt);
 	
-	void init(uint32_t num);
-	uint32_t getNum(){return m_iNumSpokes;};
-	void setWheelCol(uint32_t wheel, Color col);
-	Color* getWheelCol(uint32_t wheel);
+	void init(unsigned num);
+	unsigned getNum(){return m_iNumSpokes;};
+	void setWheelCol(unsigned wheel, Color col);
+	Color* getWheelCol(unsigned wheel);
 	
-	float32 speed;
-	float32 rot;
-	float32 acceleration;
+	float speed;
+	float rot;
+	float acceleration;
 	
 protected:
 	Color* m_lWheel;
-	uint32_t m_iNumSpokes;
+	unsigned m_iNumSpokes;
 };
 
 class starfieldBg : public Background
@@ -60,21 +60,21 @@ public:
 	~starfieldBg(){};
 	
 	void draw();
-	void update(float32 dt);
+	void update(float dt);
 	
 	void init();	//Place all stars randomly to begin with
 	
 	Color col;		//Starting color
-	float32 speed;	//Simulation speed
+	float speed;	//Simulation speed
 	uint32_t num;	//Maximum number of stars
 	Vec3 starSize;	//Size of stars
 	Vec3 fieldSize;	//How large the starfield is
 	Point avoidCam;	//Size of rectangle in the center that a star shouldn't be placed in to avoid hitting the camera
 	
 protected:
-	list<Vec3> m_lStars;
+	vector<Vec3> m_lStars;
 	
-	Vec3 _place(float32 z);	//Decide where to put a new star
+	Vec3 _place(float z);	//Decide where to put a new star
 };
 
 class gradientBg : public Background
@@ -84,7 +84,7 @@ public:
 	~gradientBg(){};
 	
 	void draw();
-	void update(float32 dt){};
+	void update(float dt){};
 	
 	Color ul, ur, bl, br;
 };

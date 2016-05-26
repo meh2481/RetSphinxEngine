@@ -7,14 +7,19 @@
 #define OBJECT_H
 
 #include "globaldefs.h"
-#include "Image.h"
 #include "3DObject.h"
 #include "Drawable.h"
 #include "LuaInterface.h"
 #include "luafuncs.h"
+#include "tinyxml2.h"
 
 class obj;
 class physSegment;
+class b2Body;
+struct b2BodyDef;
+class lattice;
+class latticeAnim;
+class GLImage;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO: Why would they just be images unless they're scenery? Make second class for scenery?
@@ -22,7 +27,7 @@ class physSegment : public Drawable
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
-    Image*  		img;		//Image to draw
+    GLImage*  		img;		//Image to draw
 	lattice*		lat;		//Lattice to apply to image
 	latticeAnim*	latanim;	//Animation to apply to lattice
 	obj* 			parent;		//Parent object
@@ -32,7 +37,7 @@ public:
 	Point center;	//Center of rotation (Offset before rotation)
 	Point shear;	//Shear for drawing the image
 	Point tile;		//tile image in x and y
-	float32 rot;
+	float rot;
 	Point size;	//Actual texel size; not pixels
 	Color col;
 	bool show;
@@ -41,8 +46,8 @@ public:
     ~physSegment();
 	
 	void draw(bool bDebugInfo = false);
-	void update(float32 dt);
-	void fromXML(XMLElement* layer);
+	void update(float dt);
+	void fromXML(tinyxml2::XMLElement* layer);
 };
 
 //Collections of the above all stuffed into one object for ease of use.
@@ -55,7 +60,7 @@ public:
 	enum { TYPE = OT_OBJECT };
     vector<physSegment*> 	segments;
     b2Body*         		body; //TODO: is this ever even used?
-	Image*					meshImg;
+	GLImage*					meshImg;
 	lattice*				meshLattice;
 	latticeAnim*			meshAnim;
 	Point					meshSize;
@@ -69,7 +74,7 @@ public:
 
     void draw(bool bDebugInfo = false);
     void addSegment(physSegment* seg);
-	b2BodyDef* update(float32 dt);
+	b2BodyDef* update(float dt);
 	b2Body* getBody();
 	Point getPos();	//TODO: Find where we're using body->getPos and replace with this func
 	void collide(obj* other);
@@ -81,7 +86,7 @@ public:
 	void addProperty(string prop, string value) {setProperty(prop, value);};
 	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(Image* img, uint32_t seg = 0);	//Sets the image of the given physSegment
+	void setImage(GLImage* img, int seg = 0);	//Sets the image of the given physSegment
 };
 
 

@@ -6,6 +6,8 @@
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
+#include "GLImage.h"
+#include "opengl-api.h"
 
 //Keybinding stuff!
 uint32_t JOY_BUTTON_BACK;
@@ -40,7 +42,7 @@ SDL_Scancode KEY_ENTER2;
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
-float32 g_fParticleFac;
+float g_fParticleFac;
 
 void signalHandler(string sSignal)
 {
@@ -59,7 +61,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	
 	//Set camera position for this game
 	m_fDefCameraZ = -16;
-	CameraPos.set(0,0,m_fDefCameraZ);
+	CameraPos = Vec3(0,0,m_fDefCameraZ);
 #ifdef DEBUG
 	m_bMouseGrabOnWindowRegain = false;
 #else
@@ -138,7 +140,7 @@ GameEngine::~GameEngine()
 	//delete testObj;
 }
 
-void GameEngine::frame(float32 dt)
+void GameEngine::frame(float dt)
 {
 	handleKeys();
 	stepPhysics(dt);
@@ -201,10 +203,10 @@ void GameEngine::draw()
 	//glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
 	
 	//Set up OpenGL lights
-	GLfloat lightPosition[] = {0.0, 0.0, 0.0, 1.0};
-	GLfloat lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
-	GLfloat lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	GLfloat lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+	float lightPosition[] = {0.0, 0.0, 0.0, 1.0};
+	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+	float lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 
@@ -218,11 +220,11 @@ void GameEngine::draw()
 	
 	
 	//Set up OpenGL materials
-	GLfloat materialAmbient[] = {0.2, 0.2, 0.2, 1.0};
-	GLfloat materialDiffuse[] = {1, 1, 1, 1};
-	GLfloat materialSpecular[] = {0.6, 0.6, 0.6, 1};
-	GLfloat materialEmission[] = {0, 0, 0, 1};
-	GLfloat materialShininess = 50;
+	float materialAmbient[] = {0.2, 0.2, 0.2, 1.0};
+	float materialDiffuse[] = {1, 1, 1, 1};
+	float materialSpecular[] = {0.6, 0.6, 0.6, 1};
+	float materialEmission[] = {0, 0, 0, 1};
+	float materialShininess = 50;
 	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
@@ -231,7 +233,7 @@ void GameEngine::draw()
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
 		
 	//Set up global OpenGL lighting
-	GLfloat globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_LIGHTING);
@@ -266,9 +268,13 @@ void GameEngine::draw()
 		}
 	}
 	
-	glLoadIdentity();
-	gluLookAt(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, -CameraPos.x, -CameraPos.y, 0.0f, 0, 0, 1);
-			
+	//glLoadIdentity();
+	//gluLookAt(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, -CameraPos.x, -CameraPos.y, 0.0f, 0, 0, 1);
+    Vec3 eye(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z);
+    Vec3 center(-CameraPos.x, -CameraPos.y, 0.0f);
+    Vec3 up(0.0f, 0.0f, 1.0f);
+    glm::mat4 look = glm::lookAt(eye, center, up);
+    glLoadMatrixf(glm::value_ptr(look));
 	
 	glDisable(GL_LIGHTING);
 	drawAll();	//Draw everything in one pass

@@ -7,27 +7,28 @@
 #define ARC_H
 
 #include "globaldefs.h"
-#include "Image.h"
 #include "Object.h"
+
+class GLImage;
 
 class arc : public physSegment
 {
 protected:
-	float32* segmentPos;
-	Image* arcSegImg;
-	uint32_t numSegments;
+	float* segmentPos;
+	GLImage* arcSegImg;
+	unsigned numSegments;
 	
 	arc(){};
 	void average();	//Helper function to average the values for a less jittery arc
 	
 public:
 	Point p1, p2;
-	float32 add;
-	float32 max;
-	float32 height;
-	uint32_t avg;
+	float add;
+	float max;
+	float height;
+	unsigned avg;
 	
-	arc(uint32_t number, Image* img);
+	arc(unsigned number, GLImage* img);
 	~arc();
 	
 	void init();
@@ -35,8 +36,8 @@ public:
 	void update(float dt);
 	
 	//Accessor methods
-	string getImageFilename()	{return arcSegImg->getFilename();};
-	uint32_t getNumber()	{return numSegments;};
+	const string& getImageFilename();
+	unsigned getNumber()	{return numSegments;};
 	
 
 };
