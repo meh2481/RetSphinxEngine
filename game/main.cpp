@@ -17,7 +17,7 @@ int SDL_main(int argc, char *argv[])
 int main(int argc, char** argv)
 #endif
 {
-	FreeImage_Initialise();
+	//FreeImage_Initialise();
 	
 	LuaInterface Lua("res/lua/init.lua", argc, argv);
 	
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	errlog << "Deleting engine" << endl;
 	delete eng;
 	errlog << "Closing FreeImage" << endl;
-	FreeImage_DeInitialise();
+	//FreeImage_DeInitialise();
 	errlog << "Ending program happily" << endl;
 	errlog.close();
 	return 0;

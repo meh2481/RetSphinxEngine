@@ -43,7 +43,7 @@ void GameEngine::handleEvent(SDL_Event event)
 #endif
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
-					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
+					/*/Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
 					time_t t = time(0);   // get time now
 					struct tm * now = localtime(&t);
 				
@@ -66,7 +66,7 @@ void GameEngine::handleEvent(SDL_Event event)
 					//Free resources
 					FreeImage_Unload(image);
 					delete [] pixels;
-					break;
+					break;*/
 				}
 				
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen

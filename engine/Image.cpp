@@ -34,7 +34,7 @@ int power_of_two(int input)
 
 void Image::_load(string sFilename)
 {
-	errlog << "Load " << sFilename << endl;
+	/*errlog << "Load " << sFilename << endl;
 	//image format
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	//pointer to the image, once loaded
@@ -135,13 +135,13 @@ void Image::_load(string sFilename)
 	}
 	
 	//Free FreeImage's copy of the data
-	FreeImage_Unload(dib);
+	FreeImage_Unload(dib);*/
 }
 
 //TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
 void Image::_loadNoise(string sXMLFilename)
 {
-	m_bReloadEachTime = true;
+	/*m_bReloadEachTime = true;
 	XMLDocument* doc = new XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
@@ -223,7 +223,7 @@ void Image::_loadNoise(string sXMLFilename)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	
-	delete[] bits;
+	delete[] bits;*/
 }
 
 

@@ -4,7 +4,7 @@ Overall TODO list:
 - Use GLM for math stuff instead of glPushMatrix() and friends
 - Implement newer OpenGL shaders and such
 - Use shaders rather than lattice animations where possible
-
+- IO in separate thread
 
 
 Refactoring thoughts:

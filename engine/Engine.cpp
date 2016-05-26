@@ -304,7 +304,7 @@ void Engine::setMSAA(int iMSAA)
 //TODO: This needs to be extracted into its own function for loading an SDL_Surface from an image
 void Engine::_loadicon()	//Load icon into SDL window
 {
-	errlog << "Load icon " << m_sIcon << endl;
+	/*errlog << "Load icon " << m_sIcon << endl;
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	FIBITMAP *dib(0);
 	BYTE* bits(0);
@@ -358,7 +358,7 @@ void Engine::_loadicon()	//Load icon into SDL window
 		SDL_FreeSurface(surface);
 	}
 	
-	FreeImage_Unload(dib);
+	FreeImage_Unload(dib);*/
 }
 
 void Engine::setCursorPos(int32_t x, int32_t y)

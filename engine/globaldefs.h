@@ -25,7 +25,7 @@ using namespace tinyxml2;
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #endif
-#include "FreeImage.h"
+//#include "FreeImage.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
