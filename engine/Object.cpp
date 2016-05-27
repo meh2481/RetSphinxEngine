@@ -6,7 +6,7 @@
 #include "Object.h"
 #include "luafuncs.h"
 #include "lattice.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 
 #include <Box2D/Box2D.h>
@@ -128,7 +128,7 @@ b2Body* obj::getBody()
 	return NULL;
 }
 
-void obj::setImage(GLImage* img, int seg)
+void obj::setImage(Image* img, int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;

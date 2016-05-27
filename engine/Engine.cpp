@@ -5,7 +5,7 @@
 #include <SDL_syswm.h>
 #include "Engine.h"
 #include "Box2D/Box2D.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
@@ -549,16 +549,6 @@ void Engine::setGravity(Point ptGravity)
 void Engine::setGravity(float x, float y)
 {
     setGravity(Point(x,y));
-}
-
-bool Engine::getImgBlur()
-{
-    return g_imageBlur;
-}
-
-void Engine::setImgBlur(bool b)
-{
-    g_imageBlur = b;
 }
 
 bool Engine::isMouseGrabbed()

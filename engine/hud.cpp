@@ -11,7 +11,7 @@
 using namespace tinyxml2;
 
 #include "Text.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 
 extern int screenDrawWidth;
@@ -110,7 +110,7 @@ void HUDImage::draw(float fCurTime)
     }
 }
 
-void HUDImage::setImage(GLImage* img)
+void HUDImage::setImage(Image* img)
 {
     m_img = img;
 }
@@ -204,12 +204,12 @@ void HUDToggle::draw(float fCurTime)
     }
 }
 
-void HUDToggle::setEnabledImage(GLImage* img)
+void HUDToggle::setEnabledImage(Image* img)
 {
     m_imgEnabled = img;
 }
 
-void HUDToggle::setDisabledImage(GLImage* img)
+void HUDToggle::setDisabledImage(Image* img)
 {
     m_imgDisabled = img;
 }
@@ -502,7 +502,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
             string sImgName(cImgName);
             const char* cImgPath = elemImage->Attribute("path");
             if(cImgPath == NULL) continue;
-            GLImage* img = new GLImage(cImgPath);   //Load image
+            Image* img = new Image(cImgPath);   //Load image
             m_mImages[sImgName] = img;          //Stick it into our list
         }
     }
@@ -757,7 +757,7 @@ void HUD::create(string sXMLFilename)
 void HUD::destroy()
 {
   //Delete all images
-  for(map<string, GLImage*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
+  for(map<string, Image*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
     delete i->second;
   
   //And all fonts

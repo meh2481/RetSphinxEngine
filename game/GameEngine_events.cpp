@@ -1,7 +1,7 @@
 #include "GameEngine.h"
 #include <ctime>
 #include <iomanip>
-#include "GLImage.h"
+#include "Image.h"
 
 void GameEngine::handleEvent(SDL_Event event)
 {

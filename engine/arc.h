@@ -9,13 +9,13 @@
 #include "globaldefs.h"
 #include "Object.h"
 
-class GLImage;
+class Image;
 
 class arc : public physSegment
 {
 protected:
 	float* segmentPos;
-	GLImage* arcSegImg;
+	Image* arcSegImg;
 	unsigned numSegments;
 	
 	arc(){};
@@ -28,7 +28,7 @@ public:
 	float height;
 	unsigned avg;
 	
-	arc(unsigned number, GLImage* img);
+	arc(unsigned number, Image* img);
 	~arc();
 	
 	void init();

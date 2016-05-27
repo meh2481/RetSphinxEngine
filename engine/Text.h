@@ -20,13 +20,13 @@ enum TextAlignment
     ALIGN_BOTTOM	= 32
 };
 
-class GLImage;
+class Image;
 
 class Text
 {
 private:
 	Text(){};								//Default constructor cannot be called
-	GLImage* m_imgFont;						//Image for this bitmap font
+	Image* m_imgFont;						//Image for this bitmap font
 	map<unsigned char, Rect> m_mRectangles;	//Rectangles for drawing each character
 	map<unsigned char, float> m_mKerning;	//Kerning info for font glyphs
 	string m_sName;

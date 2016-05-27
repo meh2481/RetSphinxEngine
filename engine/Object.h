@@ -19,7 +19,7 @@ class b2Body;
 struct b2BodyDef;
 class lattice;
 class latticeAnim;
-class GLImage;
+class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO: Why would they just be images unless they're scenery? Make second class for scenery?
@@ -27,7 +27,7 @@ class physSegment : public Drawable
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
-    GLImage*  		img;		//Image to draw
+    Image*  		img;		//Image to draw
 	lattice*		lat;		//Lattice to apply to image
 	latticeAnim*	latanim;	//Animation to apply to lattice
 	obj* 			parent;		//Parent object
@@ -60,7 +60,7 @@ public:
 	enum { TYPE = OT_OBJECT };
     vector<physSegment*> 	segments;
     b2Body*         		body; //TODO: is this ever even used?
-	GLImage*					meshImg;
+	Image*					meshImg;
 	lattice*				meshLattice;
 	latticeAnim*			meshAnim;
 	Point					meshSize;
@@ -86,7 +86,7 @@ public:
 	void addProperty(string prop, string value) {setProperty(prop, value);};
 	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(GLImage* img, int seg = 0);	//Sets the image of the given physSegment
+	void setImage(Image* img, int seg = 0);	//Sets the image of the given physSegment
 };
 
 

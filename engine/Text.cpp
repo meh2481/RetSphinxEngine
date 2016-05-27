@@ -4,7 +4,7 @@
 */
 
 #include "Text.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
@@ -42,7 +42,7 @@ Text::Text(string sXMLFilename)
 		{
 			const char* cPath = elem->Attribute("path");
 			if(cPath == NULL) return;
-			m_imgFont = new GLImage(cPath);   //Create image
+			m_imgFont = new Image(cPath);   //Create image
 
 		}
 		else if(sName == "char")	//Character

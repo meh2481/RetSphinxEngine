@@ -10,7 +10,7 @@
 #define NO_TEXTURE 	"image_none"	//Invalid image
 #define NO_MESH		"mesh_none"		//Invalid 3D mesh
 
-class GLImage;
+class Image;
 
 class Vertex
 {
@@ -58,7 +58,7 @@ public:
 
     //void setTexture(GLImage* sImg);
 
-    void render(GLImage* img);
+    void render(Image* img);
 	
 	//Accessor methods
 	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};

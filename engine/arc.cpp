@@ -4,10 +4,10 @@
 */
 
 #include "arc.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 
-arc::arc(unsigned number, GLImage* img) : physSegment()
+arc::arc(unsigned number, Image* img) : physSegment()
 {
 	segmentPos = NULL;
 	if(img == NULL || number == 0) return;

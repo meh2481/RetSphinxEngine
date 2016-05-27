@@ -9,7 +9,7 @@
 #include "globaldefs.h"
 #include "tinyxml2.h"
 
-class GLImage;
+class Image;
 class Text;
 
 //Global functions for use with HUD objects
@@ -55,7 +55,7 @@ public:
 class HUDImage : public HUDItem
 {
 protected:
-	GLImage* m_img;
+	Image* m_img;
 
 public:
 	Point pos, size;
@@ -65,8 +65,8 @@ public:
 
 	void draw(float fCurTime);
 
-	void	setImage(GLImage* img);
-	GLImage*  getImage()			  {return m_img;};
+	void	setImage(Image* img);
+	Image*  getImage()			  {return m_img;};
 };
 
 class HUDTextbox : public HUDItem
@@ -97,8 +97,8 @@ class HUDToggle : public HUDItem
 {
 protected:
 	int	 m_iKey;		 //Key that we watch for to toggle value
-	GLImage*	  m_imgEnabled;   //Enabled/disabled images
-	GLImage*	  m_imgDisabled;
+	Image*	  m_imgEnabled;   //Enabled/disabled images
+	Image*	  m_imgDisabled;
 	bool		m_bValue;	   //Enabled/Disabled
 
 public:
@@ -112,8 +112,8 @@ public:
 	bool getEnabled()				   {return m_bValue;};
 	void setKey(int iKey)		   {m_iKey = iKey;};
 	int getKey()					{return m_iKey;};
-	void setEnabledImage(GLImage* img);
-	void setDisabledImage(GLImage* img);
+	void setEnabledImage(Image* img);
+	void setDisabledImage(Image* img);
 
 };
 
@@ -197,7 +197,7 @@ public:
 class HUD : public HUDItem
 {
 protected:
-	map<string, GLImage*> m_mImages;
+	map<string, Image*> m_mImages;
 	map<string, Text*>  m_mFonts;
 	map<string, list<HUDItem*> > m_mScenes;
 	string m_sScene;

@@ -1,6 +1,4 @@
 set(io_src
-image.cpp
-image.h
 stb_image.h
 stb_image_write.h
 tinyxml2.cpp

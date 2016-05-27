@@ -8,7 +8,7 @@
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 using namespace std;
 using namespace tiny3d;
@@ -293,7 +293,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-void Object3D::render(GLImage* img)
+void Object3D::render(Image* img)
 {
 	//glRotatef(45, 1.0f, 0.0f, 0.0f);
 	//float saveLight[4];

@@ -6,7 +6,7 @@
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 
 //Keybinding stuff!
@@ -272,7 +272,7 @@ void GameEngine::draw()
 	//gluLookAt(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, -CameraPos.x, -CameraPos.y, 0.0f, 0, 0, 1);
     Vec3 eye(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z);
     Vec3 center(-CameraPos.x, -CameraPos.y, 0.0f);
-    Vec3 up(0.0f, 0.0f, 1.0f);
+    Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
     glm::mat4 look = glm::lookAt(eye, center, up);
     glLoadMatrixf(glm::value_ptr(look));
 	

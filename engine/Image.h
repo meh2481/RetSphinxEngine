@@ -2,20 +2,20 @@
  GameEngine header - Image.h
  Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef GLIMAGE_H
-#define GLIMAGE_H
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include "globaldefs.h"
 #include "lattice.h"
 
-class GLImage
+class Image
 {
 private:
-	GLImage(){};  //Default constructor is uncallable
+	Image(){};  //Default constructor is uncallable
 
 	unsigned   	m_hTex;
 	string     	m_sFilename;
-	uint32_t 	m_iWidth, m_iHeight;			// width and height of original image
+	int 		m_iWidth, m_iHeight;			// width and height of original image
 	
 	bool m_bReloadEachTime;						// If we should reload the image each time we try to create it
 	
@@ -30,9 +30,9 @@ public:
 	unsigned _getTex() {return m_hTex;};
 	
 	//Constructor/destructor
-	GLImage(string sFilename);
+	Image(string sFilename);
 	//Image(uint32_t width, uint32_t height, float sizex = 1.0f, float sizey = 1.0f, float xoffset = 0.0f, float yoffset = 0.0f);	//Create image from random noise
-	~GLImage();
+	~Image();
     
 	//Engine use functions
 	void _reload();  //Reload memory associated with this image
@@ -54,14 +54,14 @@ public:
 
 //Image reloading handler functions
 void reloadImages();
-void _addImgReload(GLImage* img);
-void _removeImgReload(GLImage* img);
+void _addImgReload(Image* img);
+void _removeImgReload(Image* img);
 
 //Other image functions
-GLImage* getImage(string sFilename);  //Retrieves an image from the filename, creating it if necessary
+Image* getImage(string sFilename);  //Retrieves an image from the filename, creating it if necessary
 void clearImages();
 
-extern bool g_imageBlur;
+//extern bool g_imageBlur;
 
 #endif
 

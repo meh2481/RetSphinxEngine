@@ -3,7 +3,7 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 #include "cursor.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;

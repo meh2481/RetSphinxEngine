@@ -9,8 +9,8 @@ EngineContactListener.cpp
 EngineContactListener.h
 Gradient.cpp
 Gradient.h
-GLImage.cpp
-GLImage.h
+Image.cpp
+Image.h
 Node.cpp
 Node.h
 Object.cpp

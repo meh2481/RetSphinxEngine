@@ -19,7 +19,7 @@
 
 
 class b2World;
-class GLImage;
+class Image;
 
 #define LMB	1
 #define RMB	0
@@ -225,8 +225,6 @@ public:
 	int getVsync();
 	int getMSAA()				{return m_iMSAA;};
 	void setMSAA(int iMSAA);
-	bool getImgBlur();
-	void setImgBlur(bool b);
 	void setGamma(float fGamma)	{m_fGamma = fGamma;};
 	float getGamma()				{return m_fGamma;};
 	

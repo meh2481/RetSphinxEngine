@@ -1,7 +1,7 @@
 #include "luafuncs.h"
 #include "luainterface.h"
 #include "GameEngine.h"
-#include "GLImage.h"
+#include "Image.h"
 
 extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 

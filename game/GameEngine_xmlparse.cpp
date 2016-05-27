@@ -3,7 +3,7 @@
 using namespace tinyxml2;
 
 #include <Box2D/Box2D.h>
-#include "GLImage.h"
+#include "Image.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -46,7 +46,7 @@ bool GameEngine::loadConfig(string sFilename)
 		bool bPausesOnFocus = pausesOnFocusLost();
 		int iVsync = getVsync();
 		int iMSAA = getMSAA();
-		bool bTexAntialias = getImgBlur();
+//		bool bTexAntialias = getImgBlur();
 		float fGamma = getGamma();
 		
 		window->QueryUnsignedAttribute("width", &width);
@@ -57,7 +57,7 @@ bool GameEngine::loadConfig(string sFilename)
 		window->QueryBoolAttribute("doublebuf", &bDoubleBuf);
 		window->QueryIntAttribute("vsync", &iVsync);
 		window->QueryIntAttribute("MSAA", &iMSAA);
-		window->QueryBoolAttribute("textureantialias", &bTexAntialias);
+//		window->QueryBoolAttribute("textureantialias", &bTexAntialias);
 		window->QueryFloatAttribute("brightness", &fGamma);
 		window->QueryBoolAttribute("pauseminimized", &bPausesOnFocus);
 		
@@ -75,7 +75,7 @@ bool GameEngine::loadConfig(string sFilename)
 		setVsync(iVsync);
 		setDoubleBuffered(bDoubleBuf);
 		setMSAA(iMSAA);
-		setImgBlur(bTexAntialias);
+//		setImgBlur(bTexAntialias);
 		setGamma(fGamma);
 		pauseOnKeyboard(bPausesOnFocus);
 	}
@@ -160,7 +160,7 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("vsync", getVsync());
 	window->SetAttribute("doublebuf", getDoubleBuffered());
 	window->SetAttribute("MSAA", getMSAA());
-	window->SetAttribute("textureantialias", getImgBlur());
+//	window->SetAttribute("textureantialias", getImgBlur());
 	window->SetAttribute("brightness", getGamma());
 	window->SetAttribute("pauseminimized", pausesOnFocusLost());
 	root->InsertEndChild(window);

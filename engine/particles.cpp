@@ -4,7 +4,7 @@
 */
 
 #include "particles.h"
-#include "GLImage.h"
+#include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;

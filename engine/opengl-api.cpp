@@ -1,3 +1,4 @@
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
@@ -11,7 +12,7 @@
 #define GL_FUNC(ret,fn,params,call,rt) \
     extern "C" { \
     static ret (GLAPIENTRY *p##fn) params = NULL; \
-    ret fn params { rt p##fn call; } \
+    ret GLAPIENTRY fn params { rt p##fn call; } \
     }
 
 #include "opengl-stubs.h"

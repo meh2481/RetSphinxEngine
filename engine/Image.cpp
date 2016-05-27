@@ -3,14 +3,17 @@
  Copyright (c) 2014 Mark Hutcheson
 */
 
-#include "GLImage.h"
+#include "Image.h"
 #include "Gradient.h"
 #include <set>
 #include "opengl-api.h"
+#include "Image.h"
 
-bool g_imageBlur = true;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-GLImage::GLImage(string sFilename)
+
+Image::Image(string sFilename)
 {
 	m_bReloadEachTime = false;
 	m_hTex = 0;
@@ -22,125 +25,49 @@ GLImage::GLImage(string sFilename)
 	_addImgReload(this);
 }
 
-#ifdef __BIG_ENDIAN__
-//returns the closest power of two value
-int power_of_two(int input)
+void Image::_load(string sFilename)
 {
-	int value = 1;
-	while (value < input)
-		value <<= 1;
-	return value;
-}
-#endif
+	int comp;
+	unsigned char* cBuf = stbi_load(sFilename.c_str(), &m_iWidth, &m_iHeight, &comp, 0);
+	errlog << "Load " << sFilename << endl;
 
-void GLImage::_load(string sFilename)
-{
-	/*errlog << "Load " << sFilename << endl;
-	//image format
-	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-	//pointer to the image, once loaded
-	FIBITMAP *dib(0);
-	//pointer to the image data
-	BYTE* bits(0);
-	//image width and height
-	unsigned int width(0), height(0);
-	
-	//check the file signature and deduce its format
-	fif = FreeImage_GetFileType(sFilename.c_str(), 0);
-	//if still unknown, try to guess the file format from the file extension
-	if(fif == FIF_UNKNOWN) 
-		fif = FreeImage_GetFIFFromFilename(sFilename.c_str());
-	//if still unkown, return failure
-	if(fif == FIF_UNKNOWN)
-	{
-		errlog << "Unknown image type for file " << sFilename << endl;
-		return;
-	}
-  
-	//check that the plugin has reading capabilities and load the file
-	if(FreeImage_FIFSupportsReading(fif))
-		dib = FreeImage_Load(fif, sFilename.c_str());
-	else
-		errlog << "File " << sFilename << " doesn't support reading." << endl;
-	//if the image failed to load, return failure
-	if(!dib)
-	{
-		errlog << "Error loading image " << sFilename.c_str() << endl;
-		return;
-	}  
-	//retrieve the image data
-  
-	//get the image width and height
-	width = FreeImage_GetWidth(dib);
-	height = FreeImage_GetHeight(dib);
- 
 	int mode, modeflip;
-	if(FreeImage_GetBPP(dib) == 24) // RGB 24bit
+	if(comp == 3) // RGB 24bit
 	{
-#ifdef __BIG_ENDIAN__
 		mode = GL_RGB;
 		modeflip = GL_RGB;
-#else
-		mode = GL_RGB;
-		modeflip = GL_BGR;
-#endif
 	}
-	else if(FreeImage_GetBPP(dib) == 32)  // RGBA 32bit
+	else if(comp == 4)  // RGBA 32bit
 	{
-#ifdef __BIG_ENDIAN__
 		mode = GL_RGBA;
 		modeflip = GL_RGBA;
-#else
-		mode = GL_RGBA;
-		modeflip = GL_BGRA;
-#endif
 	}
   
-	bits = FreeImage_GetBits(dib);	//if this somehow one of these failed (they shouldn't), return failure
-	if((bits == 0) || (width == 0) || (height == 0))
+	if((cBuf == 0) || (m_iWidth == 0) || (m_iHeight == 0))
 	{
 		errlog << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity" << endl;
 		return;
 	}
   
 	//generate an OpenGL texture ID for this texture
-	m_iWidth = width;
-	m_iHeight = height;
 	glGenTextures(1, &m_hTex);
 	//bind to the new texture ID
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	//store the texture data for OpenGL use
-#ifdef __BIG_ENDIAN__
-	m_iRealWidth = power_of_two(width);
-	m_iRealHeight = power_of_two(height);
-	FIBITMAP *bitmap2 = FreeImage_Allocate(m_iRealWidth, m_iRealHeight, FreeImage_GetBPP(dib));
-	FreeImage_FlipVertical(dib);
-	FreeImage_Paste(bitmap2, dib, 0, 0, 255);
-	FreeImage_FlipVertical(bitmap2);
-	bits = FreeImage_GetBits(bitmap2);
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, m_iRealWidth, m_iRealHeight, 0, modeflip, GL_UNSIGNED_BYTE, bits);
-	FreeImage_Unload(bitmap2);
-#else
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, modeflip, GL_UNSIGNED_BYTE, bits);
-#endif
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, mode, m_iWidth, m_iHeight, 0, modeflip, GL_UNSIGNED_BYTE, cBuf);
   
-	if(g_imageBlur)
-	{
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	}
-	else //If you want things pixellated
-	{
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	}
-	
-	//Free FreeImage's copy of the data
-	FreeImage_Unload(dib);*/
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+
+	stbi_image_free(cBuf);
 }
 
 //TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
-void GLImage::_loadNoise(string sXMLFilename)
+void Image::_loadNoise(string sXMLFilename)
 {
 	/*m_bReloadEachTime = true;
 	XMLDocument* doc = new XMLDocument;
@@ -228,7 +155,7 @@ void GLImage::_loadNoise(string sXMLFilename)
 }
 
 
-GLImage::~GLImage()
+Image::~Image()
 {
 	//image cleanup
 	errlog << "Free " << m_sFilename << endl;
@@ -243,7 +170,7 @@ GLImage::~GLImage()
 <fgenesis> also have a look at glOrtho() and glMatrixMode(), you'll need those
 */
 
-void GLImage::render(Point size, float tilex, float tiley)
+void Image::render(Point size, float tilex, float tiley)
 {
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
@@ -258,17 +185,17 @@ void GLImage::render(Point size, float tilex, float tiley)
     };
     const float texCoords[] =
     {
+		0, 0, // lower left
+		tilex, 0, // lower right
         0, tiley, // upper left
         tilex, tiley, // upper right
-        0, 0, // lower left
-        tilex, 0, // lower right
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void GLImage::renderLattice(lattice* l, Point size)
+void Image::renderLattice(lattice* l, Point size)
 {
 	glPushMatrix();
 	
@@ -278,19 +205,12 @@ void GLImage::renderLattice(lattice* l, Point size)
 	glPopMatrix();
 }
 
-void GLImage::render(Point size, Rect rcImg)
+void Image::render(Point size, Rect rcImg)
 {
-#ifdef __BIG_ENDIAN__
-	rcImg.left = rcImg.left / (float)m_iRealWidth;
-	rcImg.right = rcImg.right / (float)m_iRealWidth;
-	rcImg.top = rcImg.top / (float)m_iRealHeight;
-	rcImg.bottom = rcImg.bottom / (float)m_iRealHeight;
-#else
 	rcImg.left = rcImg.left / (float)m_iWidth;
 	rcImg.right = rcImg.right / (float)m_iWidth;
 	rcImg.top = 1.0 - rcImg.top / (float)m_iHeight;
 	rcImg.bottom = 1.0 - rcImg.bottom / (float)m_iHeight;
-#endif
 	
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
@@ -304,24 +224,17 @@ void GLImage::render(Point size, Rect rcImg)
     };
     const float texCoords[] =
     {
-#ifdef __BIG_ENDIAN__
-      rcImg.left, 1.0-rcImg.top, // upper left
-      rcImg.right, 1.0-rcImg.top, // upper right
-      rcImg.left, 1.0-rcImg.bottom, // lower left
-      rcImg.right, 1.0-rcImg.bottom, // lower right
-#else
+		rcImg.left, rcImg.bottom, // lower left
+		rcImg.right, rcImg.bottom, // lower right
         rcImg.left, rcImg.top, // upper left
         rcImg.right, rcImg.top, // upper right
-        rcImg.left, rcImg.bottom, // lower left
-        rcImg.right, rcImg.bottom, // lower right
-#endif
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
 }
 
-void GLImage::render4V(Point ul, Point ur, Point bl, Point br)
+void Image::render4V(Point ul, Point ur, Point bl, Point br)
 {
 	float maxx, maxy;
 #ifdef __BIG_ENDIAN__
@@ -352,7 +265,7 @@ void GLImage::render4V(Point ul, Point ur, Point bl, Point br)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void GLImage::_reload()
+void Image::_reload()
 {
 	if(m_sFilename.find(".xml", m_sFilename.size()-4) != string::npos)
 		_loadNoise(m_sFilename);
@@ -360,35 +273,35 @@ void GLImage::_reload()
 		_load(m_sFilename);
 }
 
-static set<GLImage*> sg_images;
+static set<Image*> sg_images;
 
 void reloadImages()
 {
-	for(set<GLImage*>::iterator i = sg_images.begin(); i != sg_images.end(); i++)
+	for(set<Image*>::iterator i = sg_images.begin(); i != sg_images.end(); i++)
 		(*i)->_reload();
 }
 
-void _addImgReload(GLImage* img)
+void _addImgReload(Image* img)
 {
 	sg_images.insert(img);
 }
 
-void _removeImgReload(GLImage* img)
+void _removeImgReload(Image* img)
 {
 	sg_images.erase(img);
 }
 
-static multimap<string, GLImage*> g_mImages;  //Image handler
-GLImage* getImage(string sFilename)
+static multimap<string, Image*> g_mImages;  //Image handler
+Image* getImage(string sFilename)
 {
 	if(sFilename == "image_none") return NULL;
 	
-	multimap<string, GLImage*>::iterator i = g_mImages.find(sFilename);
+	multimap<string, Image*>::iterator i = g_mImages.find(sFilename);
 	if(i == g_mImages.end() || i->second->reloadEachTime())   //This image isn't here; load it
 	{
-		GLImage* img = new GLImage(sFilename);   //Create this image
+		Image* img = new Image(sFilename);   //Create this image
 		//g_mImages[sFilename] = img; //Add to the map
-		g_mImages.insert(std::pair<string, GLImage*>(sFilename,img));
+		g_mImages.insert(std::pair<string, Image*>(sFilename,img));
 		return img;
 	}
 	return i->second; //Return this image
@@ -396,7 +309,7 @@ GLImage* getImage(string sFilename)
 
 void clearImages()
 {
-	for(multimap<string, GLImage*>::iterator i = g_mImages.begin(); i != g_mImages.end(); i++)
+	for(multimap<string, Image*>::iterator i = g_mImages.begin(); i != g_mImages.end(); i++)
 		delete (i->second);    //Delete each image
 	g_mImages.clear();
 }

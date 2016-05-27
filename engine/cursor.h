@@ -9,7 +9,7 @@
 
 #include "globaldefs.h"
 
-class GLImage;
+class Image;
  
 class myCursor
 {
@@ -23,7 +23,7 @@ public:
 	Point pos;
 	Point size;
 	Point hotSpot;
-	GLImage* img;
+	Image* img;
 	float rot;
 	
 	void draw();
