@@ -1,5 +1,4 @@
-#ifndef LATTICE_H
-#define LATTICE_H
+#pragma once
 
 #include "globaldefs.h"
 
@@ -131,5 +130,3 @@ public:
 	
 	void addBody(b2Body* b, bool bCenter = false);
 };
-
-#endif

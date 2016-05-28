@@ -19,8 +19,6 @@ Text.cpp
 Text.h
 arc.cpp
 arc.h
-bg.cpp
-bg.h
 cursor.cpp
 cursor.h
 engine_gl.cpp

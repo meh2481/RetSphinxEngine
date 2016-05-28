@@ -4,8 +4,7 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 
-#ifndef CURSOR_H
-#define CURSOR_H
+#pragma once
 
 #include "globaldefs.h"
 
@@ -63,6 +62,3 @@ public:
  
  
  
- 
- 
-#endif //defined CURSOR_H

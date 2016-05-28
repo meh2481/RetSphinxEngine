@@ -1,5 +1,4 @@
-#ifndef LUA_INTERFACE_H
-#define LUA_INTERFACE_H
+#pragma once
 
 struct lua_State;
 
@@ -66,6 +65,4 @@ public:
 private:
 	LuaObjGlue(const LuaObjGlue&); // non-copyable
 };
-
-#endif
 

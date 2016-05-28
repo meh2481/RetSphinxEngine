@@ -2,9 +2,7 @@
 	GameEngine header - Engine.h
 	Copyright (c) 2014 Mark Hutcheson
 */
-
-#ifndef ENGINE_H
-#define ENGINE_H
+#pragma once
 
 #include "globaldefs.h"
 #include "Object.h"
@@ -235,5 +233,3 @@ public:
 	void updateParticles(float dt);
 
 };
-
-#endif

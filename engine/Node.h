@@ -1,5 +1,4 @@
-#ifndef NODE_H
-#define NODE_H
+#pragma once
 
 #include "Object.h"
 
@@ -25,5 +24,3 @@ public:
 	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 };
 
-
-#endif	//defined NODE_H

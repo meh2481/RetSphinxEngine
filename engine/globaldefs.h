@@ -3,8 +3,7 @@
 	Global definitions for data types
 	Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef GLOBALDEFS_H
-#define GLOBALDEFS_H
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -133,4 +132,3 @@ float sumOcatave(int num_iterations, float x, float y, float persistence, float 
 void fillRect(Point p1, Point p2, Color col);
 void fillScreen(Color col);
 
-#endif

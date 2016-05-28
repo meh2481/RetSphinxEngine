@@ -2,9 +2,7 @@
     GameEngine header - particles.h
     Copyright (c) 2014 Mark Hutcheson
 */
-
-#ifndef PARTICLES_H
-#define PARICLES_H
+#pragma once
 
 #include "globaldefs.h"
 #include "Image.h"
@@ -166,11 +164,6 @@ void spawnNewParticleSystem(string sFilename, Point ptPos);
 
 
 
-
-
-
-
-#endif
 
 
 

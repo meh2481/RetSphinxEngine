@@ -3,8 +3,7 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 
-#ifndef OBJECT_H
-#define OBJECT_H
+#pragma once
 
 #include "globaldefs.h"
 #include "3DObject.h"
@@ -86,9 +85,8 @@ public:
 	void addProperty(string prop, string value) {setProperty(prop, value);};
 	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(Image* img, int seg = 0);	//Sets the image of the given physSegment
+	void setImage(Image* img, unsigned int seg = 0);	//Sets the image of the given physSegment
 };
 
 
 
-#endif

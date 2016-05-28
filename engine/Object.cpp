@@ -128,7 +128,7 @@ b2Body* obj::getBody()
 	return NULL;
 }
 
-void obj::setImage(Image* img, int seg)
+void obj::setImage(Image* img, unsigned int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;

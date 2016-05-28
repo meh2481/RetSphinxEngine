@@ -3,8 +3,7 @@
     Class for creating electric-looking arcs between two points
     Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef ARC_H
-#define ARC_H
+#pragma once
 
 #include "globaldefs.h"
 #include "Object.h"
@@ -56,5 +55,3 @@ public:
 
 
 
-
-#endif

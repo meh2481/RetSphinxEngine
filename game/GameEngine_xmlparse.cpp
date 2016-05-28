@@ -41,7 +41,7 @@ bool GameEngine::loadConfig(string sFilename)
 		bool bMaximized = isMaximized();
 		uint32_t width = getWidth();
 		uint32_t height = getHeight();
-		uint32_t framerate = getFramerate();
+		float framerate = getFramerate();
 		bool bDoubleBuf = getDoubleBuffered();
 		bool bPausesOnFocus = pausesOnFocusLost();
 		int iVsync = getVsync();
@@ -53,7 +53,7 @@ bool GameEngine::loadConfig(string sFilename)
 		window->QueryUnsignedAttribute("height", &height);
 		window->QueryBoolAttribute("fullscreen", &bFullscreen);
 		window->QueryBoolAttribute("maximized", &bMaximized);
-		window->QueryUnsignedAttribute("fps", &framerate);
+		window->QueryFloatAttribute("fps", &framerate);
 		window->QueryBoolAttribute("doublebuf", &bDoubleBuf);
 		window->QueryIntAttribute("vsync", &iVsync);
 		window->QueryIntAttribute("MSAA", &iMSAA);
@@ -68,7 +68,7 @@ bool GameEngine::loadConfig(string sFilename)
 			setWindowPos(pos);
 		}
 		setFullscreen(bFullscreen);
-		changeScreenResolution(width, height);
+		changeScreenResolution((float)width, (float)height);
 		if(bMaximized && !isMaximized() && !bFullscreen)
 			maximizeWindow();
 		setFramerate(framerate);
@@ -156,7 +156,7 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("fullscreen", isFullscreen());
 	window->SetAttribute("maximized", isMaximized());
 	window->SetAttribute("pos", pointToString(getWindowPos()).c_str());
-	window->SetAttribute("fps", (uint32_t)(getFramerate()));
+	window->SetAttribute("fps", getFramerate());
 	window->SetAttribute("vsync", getVsync());
 	window->SetAttribute("doublebuf", getDoubleBuffered());
 	window->SetAttribute("MSAA", getMSAA());
@@ -383,7 +383,7 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				if(cBodyRes)
 					pMeshSize = pointFromString(cBodyRes);
 				
-				o->meshLattice = new lattice(pMeshSize.x, pMeshSize.y);
+				o->meshLattice = new lattice((int)pMeshSize.x, (int)pMeshSize.y);
 				
 				string sLatticeType = cLatticeType;
 				if(sLatticeType == "softbody")

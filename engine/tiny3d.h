@@ -1,7 +1,5 @@
 // Tiny3D - a small library for reading/writing a binary 3D object format
-
-#ifndef TINY3D_H
-#define TINY3D_H
+#pragma once
 namespace tiny3d {
 
 typedef struct
@@ -35,8 +33,6 @@ typedef struct
 } tiny3dHeader;
 
 
-void fromObjToTiny(const char* cObjFile, const char* cTinyFile);
-void fromTinyToObj(const char* cTinyFile, const char* cObjFile);
 
 
 
@@ -48,4 +44,3 @@ void fromTinyToObj(const char* cTinyFile, const char* cObjFile);
 
 
 };
-#endif

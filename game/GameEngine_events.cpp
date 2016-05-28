@@ -79,9 +79,9 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		//Key released
 		case SDL_KEYUP:
-			switch(event.key.keysym.scancode)
+			/*switch(event.key.keysym.scancode)
 			{
-			}
+			}*/
 			break;
 		
 		case SDL_MOUSEBUTTONDOWN:
@@ -231,5 +231,5 @@ void GameEngine::rumbleController(float strength, float sec, int priority)
 	strength = max(strength, 0.0f);
 	strength = min(strength, 1.0f);
 	if(m_rumble != NULL)
-		SDL_HapticRumblePlay(m_rumble, strength, sec*1000);
+		SDL_HapticRumblePlay(m_rumble, strength, (Uint32)(sec*1000));
 }

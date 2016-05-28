@@ -20,7 +20,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 		errlog.open("err.log");
 	m_sIcon = sIcon;
 	m_bResizable = bResizable;
-	b2Vec2 gravity(0.0, -9.8);	//Vector for our world's gravity
+	b2Vec2 gravity(0.0f, -9.8f);	//Vector for our world's gravity
 	m_physicsWorld = new b2World(gravity);
 	m_physicsWorld->SetAllowSleeping(true);
 	m_physicsWorld->SetDebugDraw(&m_debugDraw);
@@ -136,8 +136,8 @@ bool Engine::_frame()
 		//Update internal cursor position if cursor has moved
 		if(event.type == SDL_MOUSEMOTION)
 		{
-			m_ptCursorPos.x = event.motion.x;
-			m_ptCursorPos.y = event.motion.y;
+			m_ptCursorPos.x = (float) event.motion.x;
+			m_ptCursorPos.y = (float) event.motion.y;
 		}
 		else if(event.type == SDL_WINDOWEVENT)
 		{
@@ -154,7 +154,7 @@ bool Engine::_frame()
 			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				if(m_bResizable)
-					changeScreenResolution(event.window.data1, event.window.data2);
+					changeScreenResolution((float)event.window.data1, (float)event.window.data2);
 				else
 					errlog << "Error! Resize event generated, but resizable flag not set." << endl;
 			}
@@ -176,7 +176,7 @@ bool Engine::_frame()
 		return m_bQuitting;	//Break out here
 	}
 
-	float fCurTime = ((float)SDL_GetTicks())/1000.0;
+	float fCurTime = ((float)SDL_GetTicks())/1000.0f;
 	if(m_fAccumulatedTime <= fCurTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
@@ -213,12 +213,12 @@ void Engine::_render()
 	if(m_fGamma > 1.0f)
 	{
 		glBlendFunc(GL_DST_COLOR, GL_ONE);
-		fillCol.set(m_fGamma - 1.0, m_fGamma - 1.0, m_fGamma - 1.0, 1);
+		fillCol.set(m_fGamma - 1.0f, m_fGamma - 1.0f, m_fGamma - 1.0f, 1.0f);
 	}
 	else
 	{
 		glBlendFunc( GL_ZERO, GL_SRC_COLOR );
-		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1);
+		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1.0f);
 	}
 	fillScreen(fillCol);
 	
@@ -268,9 +268,9 @@ void Engine::setFramerate(float fFramerate)
 	if(fFramerate < 30.0)
 	fFramerate = 30.0;	//30fps is bare minimum
 	if(m_fFramerate == 0.0)
-		m_fAccumulatedTime = (float)SDL_GetTicks()/1000.0;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
+		m_fAccumulatedTime = (float)SDL_GetTicks()/1000.0f;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
 	m_fFramerate = fFramerate;
-	m_fTargetTime = 1.0 / m_fFramerate;
+	m_fTargetTime = 1.0f / m_fFramerate;
 }
 
 void Engine::setMSAA(int iMSAA)
@@ -567,5 +567,5 @@ unsigned Engine::getTicks()
 }
 float Engine::getSeconds()
 {
-    return (float)SDL_GetTicks()/1000.0;
+    return (float)SDL_GetTicks()/1000.0f;
 }

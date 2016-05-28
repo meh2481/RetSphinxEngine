@@ -1,6 +1,4 @@
-#ifndef DRAWABLE_H
-#define DRAWABLE_H
-
+#pragma once
 
 class Drawable
 {
@@ -13,5 +11,3 @@ public:
 	virtual void draw(bool bDebugInfo) = 0;
 
 };
-
-#endif

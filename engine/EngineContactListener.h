@@ -1,5 +1,4 @@
-#ifndef ENGINE_CONTACT_LISTENER_H
-#define ENGINE_CONTACT_LISTENER_H
+#pragma once
 
 #include "Box2D/Dynamics/b2WorldCallbacks.h"
 #include "Object.h"
@@ -33,6 +32,3 @@ public:
 
 
 
-
-
-#endif //ifndef ENGINE_CONTACT_LISTENER_H

@@ -1,5 +1,4 @@
-#ifndef LUA_MY_DEFINES_H
-#define LUA_MY_DEFINES_H
+#pragma once
 
 #include <lua.hpp>
 #include <string>
@@ -83,5 +82,3 @@ inline bool getBool(lua_State *L, int idx = 1)
 }
 
 
-
-#endif

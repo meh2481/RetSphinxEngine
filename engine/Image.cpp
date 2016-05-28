@@ -175,16 +175,16 @@ void Image::render(Point size, float tilex, float tiley)
 	
 	const float vertexData[] =
     {
-        -size.x/2.0, size.y/2.0, // upper left
-        size.x/2.0, size.y/2.0, // upper right
-        -size.x/2.0, -size.y/2.0, // lower left
-        size.x/2.0, -size.y/2.0, // lower right
+        -size.x/2.0f, size.y/2.0f, // upper left
+        size.x/2.0f, size.y/2.0f, // upper right
+        -size.x/2.0f, -size.y/2.0f, // lower left
+        size.x/2.0f, -size.y/2.0f, // lower right
     };
     const float texCoords[] =
     {
-		0, 0, // lower left
-		tilex, 0, // lower right
-        0, tiley, // upper left
+		0.0f, 0.0f, // lower left
+		tilex, 0.0f, // lower right
+        0.0f, tiley, // upper left
         tilex, tiley, // upper right
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
@@ -206,18 +206,18 @@ void Image::render(Point size, Rect rcImg)
 {
 	rcImg.left = rcImg.left / (float)m_iWidth;
 	rcImg.right = rcImg.right / (float)m_iWidth;
-	rcImg.top = 1.0 - rcImg.top / (float)m_iHeight;
-	rcImg.bottom = 1.0 - rcImg.bottom / (float)m_iHeight;
+	rcImg.top = 1.0f - rcImg.top / (float)m_iHeight;
+	rcImg.bottom = 1.0f - rcImg.bottom / (float)m_iHeight;
 	
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	
 	const float vertexData[] =
     {
-        -size.x/2.0, size.y/2.0, // upper left
-        size.x/2.0, size.y/2.0, // upper right
-        -size.x/2.0, -size.y/2.0, // lower left
-        size.x/2.0, -size.y/2.0, // lower right
+        -size.x/2.0f, size.y/2.0f, // upper left
+        size.x/2.0f, size.y/2.0f, // upper right
+        -size.x/2.0f, -size.y/2.0f, // lower left
+        size.x/2.0f, -size.y/2.0f, // lower right
     };
     const float texCoords[] =
     {

@@ -1,9 +1,8 @@
-#ifndef IO_LOG_H
-#define IO_LOG_H
+#pragma once
 
 #include <iosfwd>
 
 extern std::ofstream errlog;	//Defined in Engine.cpp
 
-#endif
+
 

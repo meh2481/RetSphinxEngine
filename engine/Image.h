@@ -2,8 +2,7 @@
  GameEngine header - Image.h
  Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include "globaldefs.h"
 #include "lattice.h"
@@ -60,10 +59,4 @@ void _removeImgReload(Image* img);
 //Other image functions
 Image* getImage(string sFilename);  //Retrieves an image from the filename, creating it if necessary
 void clearImages();
-
-//extern bool g_imageBlur;
-
-#endif
-
-
 

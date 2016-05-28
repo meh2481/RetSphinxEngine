@@ -1,5 +1,4 @@
-#ifndef GRADIENT_H
-#define GRADIENT_H
+#pragma once
 
 #include "globaldefs.h"
 #include <map>
@@ -23,5 +22,3 @@ public:
 	bool load(string sXMLFilename);
 	
 };
-
-#endif

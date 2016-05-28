@@ -1,5 +1,4 @@
-#ifndef OPENGL_API_H
-#define OPENGL_API_H
+#pragma once
 
 #ifdef _DLL
 #define WASDLL
@@ -24,5 +23,3 @@ namespace OpenGLAPI
     unsigned int GetCallCount();
 };
 
-
-#endif

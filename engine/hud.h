@@ -2,9 +2,7 @@
  GameEngine header - hud.h
  Copyright (c) 2014 Mark Hutcheson
 */
-
-#ifndef HUDITEM_H
-#define HUDITEM_H
+#pragma once
 
 #include "globaldefs.h"
 #include "tinyxml2.h"
@@ -221,6 +219,3 @@ public:
 
 
 
-
-
-#endif

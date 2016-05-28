@@ -2,11 +2,10 @@
 	GameEngine source - GameEngine.h
 	Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef GAMEENGINE_H
-#define GAMEENGINE_H
+#pragma once
 
 #include "Engine.h"
-#include "bg.h"
+
 #include <vector>
 #include <set>
 #include "luainterface.h"
@@ -135,4 +134,3 @@ void signalHandler(string sSignal); //Stub function for handling signals that co
 float myAbs(float v);	//Because stinking namespace stuff
 
 
-#endif

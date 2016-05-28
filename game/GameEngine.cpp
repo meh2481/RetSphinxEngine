@@ -220,11 +220,11 @@ void GameEngine::draw()
 	
 	
 	//Set up OpenGL materials
-	float materialAmbient[] = {0.2, 0.2, 0.2, 1.0};
-	float materialDiffuse[] = {1, 1, 1, 1};
-	float materialSpecular[] = {0.6, 0.6, 0.6, 1};
-	float materialEmission[] = {0, 0, 0, 1};
-	float materialShininess = 50;
+	float materialAmbient[] = {0.2f, 0.2f, 0.2f, 1.0f};
+	float materialDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f };
+	float materialSpecular[] = {0.6f, 0.6f, 0.6f, 1.0f };
+	float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
+	float materialShininess = 50.0f;
 	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);

@@ -147,9 +147,9 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 
 luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --force is range [0,1]
 {
-	float force = lua_tonumber(L, 1);
-	float sec = lua_tonumber(L, 2);
-	int priority = lua_tointeger(L, 3);
+	float force = (float)lua_tonumber(L, 1);
+	float sec = (float)lua_tonumber(L, 2);
+	int priority = (int)lua_tointeger(L, 3);
 	GameEngineLua::rumble(force, sec, priority);
 	luaReturnNil();
 }
@@ -174,7 +174,7 @@ luaFunc(getFramerate)	//float getFramerate()
 luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
 {
 	obj *o = getObj<obj>(L);
-	float f = lua_tonumber(L,2);
+	float f = (float)lua_tonumber(L,2);
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -203,7 +203,7 @@ luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
 luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
 	obj *o = getObj<obj>(L);
-	b2Vec2 p(lua_tonumber(L,2),lua_tonumber(L, 3));
+	b2Vec2 p((float)lua_tonumber(L,2), (float)lua_tonumber(L, 3));
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -229,7 +229,7 @@ luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 {
 	obj *o = getObj<obj>(L);
-	b2Vec2 pForce(lua_tonumber(L,2),lua_tonumber(L, 3));
+	b2Vec2 pForce((float)lua_tonumber(L,2), (float)lua_tonumber(L, 3));
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -268,13 +268,13 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 	Point ptPos(0,0);
 	Point ptVel(0,0);
 	if(lua_isnumber(L, 2))
-		ptPos.x = lua_tonumber(L, 2);
+		ptPos.x = (float)lua_tonumber(L, 2);
 	if(lua_isnumber(L, 3))
-		ptPos.y = lua_tonumber(L, 3);
+		ptPos.y = (float)lua_tonumber(L, 3);
 	if(lua_isnumber(L, 4))
-		ptVel.x = lua_tonumber(L, 4);
+		ptVel.x = (float)lua_tonumber(L, 4);
 	if(lua_isnumber(L, 5))
-		ptVel.y = lua_tonumber(L, 5);
+		ptVel.y = (float)lua_tonumber(L, 5);
 	obj* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
 	if(o)
 	{
@@ -313,7 +313,7 @@ luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 {
 	obj *o = getObj<obj>(L);
-	bool b = lua_toboolean(L, 2);
+	bool b = (lua_toboolean(L, 2) != 0);
 	if(o)
 	{
 		b2Body* bod = o->getBody();
@@ -338,10 +338,10 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 	obj *o = getObj<obj>(L);
 	if(o)
 	{
-		uint32_t seg = 1;
+		lua_Integer seg = 1;
 		if(lua_isinteger(L, 3))
 			seg = lua_tointeger(L, 3);
-		o->setImage(getImage(lua_tostring(L, 2)), seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
+		o->setImage(getImage(lua_tostring(L, 2)), (unsigned int)seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
 	}
     luaReturnNil(); // FG: FIXME: return success?
 }
@@ -470,7 +470,7 @@ luaFunc(particles_setFiring)	//void particles_setFiring(ParticleSystem* p, bool 
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
-		ps->firing = lua_toboolean(L, 2);
+		ps->firing = (lua_toboolean(L, 2) != 0);
 	luaReturnNil();
 }
 
@@ -478,7 +478,7 @@ luaFunc(particles_setFireRate)	//void particles_setFirerate(ParticleSystem* p, f
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
-		ps->curRate = lua_tonumber(L, 2);
+		ps->curRate = (float)lua_tonumber(L, 2);
 	luaReturnNil();
 }
 
@@ -486,7 +486,7 @@ luaFunc(particles_setEmitPos)	//void particles_setEmitPos(ParticleSystem* p, flo
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
-		ps->emitFrom.centerOn(Point(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+		ps->emitFrom.centerOn(Point((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3)));
 	luaReturnNil();
 }
 
@@ -495,8 +495,8 @@ luaFunc(particles_setEmitVel)	//void particles_setEmitVel(ParticleSystem* p, flo
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
 	{
-		ps->emissionVel.x = lua_tonumber(L, 2);
-		ps->emissionVel.y = lua_tonumber(L, 3);
+		ps->emissionVel.x = (float)lua_tonumber(L, 2);
+		ps->emissionVel.y = (float)lua_tonumber(L, 3);
 	}
 	luaReturnNil();
 }
@@ -506,17 +506,17 @@ luaFunc(particles_setEmitVel)	//void particles_setEmitVel(ParticleSystem* p, flo
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
 {
-	luaReturnBool(GameEngineLua::keyDown(lua_tointeger(L, 1)));
+	luaReturnBool(GameEngineLua::keyDown((int)lua_tointeger(L, 1)));
 }
 
 luaFunc(joy_isDown) //bool joy_isDown(int button)
 {
-	luaReturnBool(GameEngineLua::joyDown(lua_tointeger(L, 1)));
+	luaReturnBool(GameEngineLua::joyDown((int)lua_tointeger(L, 1)));
 }
 
 luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 {
-	luaReturnInt(GameEngineLua::joyAxis(lua_tointeger(L, 1)));
+	luaReturnInt(GameEngineLua::joyAxis((int)lua_tointeger(L, 1)));
 }
 
 luaFunc(mouse_getPos) //int x, int y mouse_getPos()
@@ -529,7 +529,7 @@ luaFunc(mouse_isDown) //bool mouse_isDown(int button)
 {
 	if(!lua_isinteger(L, 1))
 		luaReturnBool(GameEngineLua::getMouseDown(LMB));
-	luaReturnBool(GameEngineLua::getMouseDown(lua_tointeger(L, 1)));
+	luaReturnBool(GameEngineLua::getMouseDown((int)lua_tointeger(L, 1)));
 }
 
 luaFunc(mouse_transformToWorld) // float x, float y mouse_transformToWorld(int x, int y)

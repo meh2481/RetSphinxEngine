@@ -3,8 +3,7 @@
 	Class for ease of drawing bitmapped fonts
 	Copyright (c) 2014 Mark Hutcheson
 */
-#ifndef TEXT_H
-#define TEXT_H
+#pragma once
 
 #include "globaldefs.h"
 #include "Image.h"
@@ -67,4 +66,3 @@ public:
 
 
 
-#endif
