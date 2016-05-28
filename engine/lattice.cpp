@@ -14,7 +14,7 @@ void lattice::reset(float sx, float sy)
 		for(int ix = 0; ix <= numx; ix++)
 		{
 			(*ptruv).x = (float)(ix) * segsizex;
-			(*ptruv).y = (float)(iy) * segsizey;
+			(*ptruv).y = 1.0 - (float)(iy) * segsizey;
 			(*ptr).x = ((float)(ix) * segsizex - 0.5)*sx;
 			(*ptr).y = ((float)(iy) * segsizey - 0.5)*sy;
 			ptr++;
@@ -37,7 +37,7 @@ void lattice::bind()
 			latticeVert* uvur = &UV[(ix+1)+iy*(numx+1)];
 			latticeVert* uvbr = &UV[(ix+1)+(iy+1)*(numx+1)];
 			latticeVert* uvbl = &UV[(ix)+(iy+1)*(numx+1)];
-			
+
 			//Upper left
 			*ptruv++ = uvul->x;
 			*ptruv++ = uvul->y;
@@ -45,16 +45,15 @@ void lattice::bind()
 			//Upper right
 			*ptruv++ = uvur->x;
 			*ptruv++ = uvur->y;
-			
+
 			//Lower right
 			*ptruv++ = uvbr->x;
 			*ptruv++ = uvbr->y;
-			
+
 			//Lower left
 			*ptruv++ = uvbl->x;
 			*ptruv++ = uvbl->y;
-			
-			
+
 			//Vertex coords
 			latticeVert* vertul = &vertex[ix+iy*(numx+1)];
 			latticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];

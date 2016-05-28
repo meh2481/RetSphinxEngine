@@ -265,21 +265,21 @@ void Object3D::_fromTiny3DFile(string sFilename)
 		uv UV = uvs[faces[i].uv1];
 		normal norm = normals[faces[i].norm1];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, 1-UV.v);
+        glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
         
 		v = vertices[faces[i].v2];
 		UV = uvs[faces[i].uv2];
 		norm = normals[faces[i].norm2];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, 1-UV.v);
+        glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
 		
 		v = vertices[faces[i].v3];
 		UV = uvs[faces[i].uv3];
 		norm = normals[faces[i].norm3];
         glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, 1-UV.v);
+        glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
     }
 

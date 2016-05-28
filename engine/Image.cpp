@@ -17,6 +17,7 @@ Image::Image(string sFilename)
 {
 	m_bReloadEachTime = false;
 	m_hTex = 0;
+	m_iWidth = m_iHeight = 0;
 	m_sFilename = sFilename;
 	if(sFilename.find(".xml", sFilename.size()-4) != string::npos)
 		_loadNoise(sFilename);
@@ -27,7 +28,7 @@ Image::Image(string sFilename)
 
 void Image::_load(string sFilename)
 {
-	int comp;
+	int comp = 0;
 	unsigned char* cBuf = stbi_load(sFilename.c_str(), &m_iWidth, &m_iHeight, &comp, 0);
 	errlog << "Load " << sFilename << endl;
 
@@ -54,10 +55,6 @@ void Image::_load(string sFilename)
 	//bind to the new texture ID
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	//store the texture data for OpenGL use
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, mode, m_iWidth, m_iHeight, 0, modeflip, GL_UNSIGNED_BYTE, cBuf);
   
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
