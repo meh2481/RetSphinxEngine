@@ -52,7 +52,7 @@ extern SDL_Scancode KEY_ENTER2;
 #define JOY_MINMOVE_TRIP	6500
 #define MOUSE_MOVE_TRIP_AMT	20
 
-typedef glm::vec2 Point;	//Our point structure
+typedef glm::vec2 Point;
 typedef glm::vec3 Vec3;
 
 #define PI 3.1415926535f //Close enough for my calculations

@@ -30,9 +30,9 @@ void myCursor::draw()
 	if(img != NULL)
 	{
 		Point ptDrawPos = pos;
-		ptDrawPos.x += size.x / 2.0;
+		ptDrawPos.x += size.x / 2.0f;
 		ptDrawPos.x -= hotSpot.x/(float)img->getWidth() * size.x;
-		ptDrawPos.y -= size.y / 2.0;
+		ptDrawPos.y -= size.y / 2.0f;
 		ptDrawPos.y += hotSpot.y/(float)img->getHeight() * size.y;
 		glPushMatrix();
 		glTranslatef(ptDrawPos.x, ptDrawPos.y, 0.0f);

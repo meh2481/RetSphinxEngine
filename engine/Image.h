@@ -51,6 +51,7 @@ public:
 	void render4V(Point ul, Point ur, Point bl, Point br);
 };
 
+//TODO SHOULD BE A CLASS
 //Image reloading handler functions
 void reloadImages();
 void _addImgReload(Image* img);

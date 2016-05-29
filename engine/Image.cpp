@@ -4,7 +4,7 @@
 */
 
 #include "Image.h"
-#include "Gradient.h"
+//#include "Gradient.h"
 #include <set>
 #include "opengl-api.h"
 #include "Image.h"

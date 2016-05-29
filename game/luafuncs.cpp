@@ -589,8 +589,8 @@ static const struct {
 } luaConstantTable[] = {
 	
 	//Joystick
-	luaConstant(JOY_MIN),
-	luaConstant(JOY_MAX),
+	luaConstant(JOY_AXIS_MIN),
+	luaConstant(JOY_AXIS_MIN),
 	
 	//Mouse
 	luaConstant(LMB),

@@ -8,13 +8,6 @@
 #include <float.h>
 #include <sstream>
 
-float myAbs(float v)
-{
-	if(v < 0.0)
-		return -v;
-	return v;
-}
-
 void GameEngine::updateColors(float dt)
 {
 	//Update our colors that are phasing into one another
@@ -22,15 +15,15 @@ void GameEngine::updateColors(float dt)
 	{
 		if(i->dir)
 		{
-			if(myAbs(i->colorToChange->r - i->destr) >= myAbs(i->amtr*dt))
+			if(abs(i->colorToChange->r - i->destr) >= abs(i->amtr*dt))
 				i->colorToChange->r += i->amtr * dt;
-			if(myAbs(i->colorToChange->g - i->destg) >= myAbs(i->amtg*dt))
+			if(abs(i->colorToChange->g - i->destg) >= abs(i->amtg*dt))
 				i->colorToChange->g += i->amtg * dt;
-			if(myAbs(i->colorToChange->b - i->destb) >= myAbs(i->amtb*dt))
+			if(abs(i->colorToChange->b - i->destb) >= abs(i->amtb*dt))
 				i->colorToChange->b += i->amtb * dt;
-			if(myAbs(i->colorToChange->r - i->destr) <= myAbs(i->amtr*dt) &&
-			   myAbs(i->colorToChange->g - i->destg) <= myAbs(i->amtg*dt) &&
-			   myAbs(i->colorToChange->b - i->destb) <= myAbs(i->amtb*dt))
+			if(abs(i->colorToChange->r - i->destr) <= abs(i->amtr*dt) &&
+			   abs(i->colorToChange->g - i->destg) <= abs(i->amtg*dt) &&
+			   abs(i->colorToChange->b - i->destb) <= abs(i->amtb*dt))
 			{
 				i->colorToChange->r = i->destr;
 				i->colorToChange->g = i->destg;
@@ -47,15 +40,15 @@ void GameEngine::updateColors(float dt)
 		}
 		else
 		{
-			if(myAbs(i->colorToChange->r - i->srcr) >= myAbs(i->amtr*dt))
+			if(abs(i->colorToChange->r - i->srcr) >= abs(i->amtr*dt))
 				i->colorToChange->r -= i->amtr * dt;
-			if(myAbs(i->colorToChange->g - i->srcg) >= myAbs(i->amtg*dt))
+			if(abs(i->colorToChange->g - i->srcg) >= abs(i->amtg*dt))
 				i->colorToChange->g -= i->amtg * dt;
-			if(myAbs(i->colorToChange->b - i->srcb) >= myAbs(i->amtb*dt))
+			if(abs(i->colorToChange->b - i->srcb) >= abs(i->amtb*dt))
 				i->colorToChange->b -= i->amtb * dt;
-			if(myAbs(i->colorToChange->r - i->srcr) <= myAbs(i->amtr*dt) &&
-			   myAbs(i->colorToChange->g - i->srcg) <= myAbs(i->amtg*dt) &&
-			   myAbs(i->colorToChange->b - i->srcb) <= myAbs(i->amtb*dt))
+			if(abs(i->colorToChange->r - i->srcr) <= abs(i->amtr*dt) &&
+			   abs(i->colorToChange->g - i->srcg) <= abs(i->amtg*dt) &&
+			   abs(i->colorToChange->b - i->srcb) <= abs(i->amtb*dt))
 			{
 				i->colorToChange->r = i->srcr;
 				i->colorToChange->g = i->srcg;

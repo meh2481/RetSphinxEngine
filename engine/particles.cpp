@@ -262,7 +262,6 @@ void ParticleSystem::_initValues()
 
 void ParticleSystem::update(float dt)
 {
-	//cout << "Update particles " << dt << " " << firing << " " << startedFiring << endl;
 	if(!show) return;
 	curTime += dt;
 	if(startedFiring)
@@ -279,7 +278,7 @@ void ParticleSystem::update(float dt)
 		startedFiring = curTime;
 	
 	spawnCounter += dt * rate * curRate * g_fParticleFac;
-	//cout << "Spawn: " << spawnCounter << endl;
+
 	int iSpawnAmt = floor(spawnCounter);
 	spawnCounter -= iSpawnAmt;
 	if(!iSpawnAmt)
@@ -293,7 +292,7 @@ void ParticleSystem::update(float dt)
 	//Update particle fields (In separate for loops to cut down on cache thrashing)
 	Point* ptPos = m_pos;
 	Point* ptVel = m_vel;
-	for(int i = 0; i < m_num; i++, ptPos++, ptVel++)
+	for(unsigned int i = 0; i < m_num; i++, ptPos++, ptVel++)
 	{
 		ptPos->x += ptVel->x * dt;
 		ptPos->y += ptVel->y * dt;
@@ -303,7 +302,7 @@ void ParticleSystem::update(float dt)
 	Point* ptAccel = m_accel;
 	float* normAccel = m_normalAccel;
 	float* tanAccel = m_tangentialAccel;
-	for(int i = 0; i < m_num; i++, ptVel++, ptAccel++, normAccel++, tanAccel++)
+	for(unsigned int i = 0; i < m_num; i++, ptVel++, ptAccel++, normAccel++, tanAccel++)
 	{
 		ptVel->x += ptAccel->x * dt;
 		ptVel->y += ptAccel->y * dt;
@@ -325,17 +324,17 @@ void ParticleSystem::update(float dt)
 	
 	float* fRot = m_rot;
 	float* fRotVel = m_rotVel;
-	for(int i = 0; i < m_num; i++, fRot++, fRotVel++)
+	for(unsigned int i = 0; i < m_num; i++, fRot++, fRotVel++)
 		*fRot += *fRotVel * dt;
 	
 	fRotVel = m_rotVel;
 	float* fRotAccel = m_rotAccel;
-	for(int i = 0; i < m_num; i++, fRotAccel++, fRotVel++)
+	for(unsigned int i = 0; i < m_num; i++, fRotAccel++, fRotVel++)
 		*fRotVel += *fRotAccel * dt;
 	
 	float* created = m_created;
 	float* life = m_lifetime;
-	for(int i = 0; i < m_num; i++, created++, life++)
+	for(unsigned int i = 0; i < m_num; i++, created++, life++)
 	{
 		if(curTime - *created > *life)	//time for this particle go bye-bye
 		{
@@ -349,7 +348,7 @@ void ParticleSystem::update(float dt)
 
 void ParticleSystem::draw(bool bDebugInfo)
 {
-	//cout << "Draw particles " << m_num << endl;
+	//cout << "Draw particles " << m_num;
 	if(img == NULL) return;
 	if(!show) return;
 	
@@ -368,7 +367,7 @@ void ParticleSystem::draw(bool bDebugInfo)
 			break;
 	}
 	
-	for(int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
+	for(unsigned int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
 		float fLifeFac = (curTime - m_created[i] - m_lifePreFade[i]) / (m_lifetime[i] - m_lifePreFade[i]);
 		if(fLifeFac > 1.0) continue;	//Particle is already dead

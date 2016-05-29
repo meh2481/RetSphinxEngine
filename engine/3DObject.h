@@ -64,13 +64,14 @@ public:
 
 };
 
+//TODO SHOULD BE A CLASS
 //Object3D reloading handler functions
 void reload3DObjects();
 void _add3DObjReload(Object3D* obj);
 void _remove3DObjReload(Object3D* obj);
 
-Object3D* getObject(string sFilename);
-void clearObjects();
+Object3D* getObject(string sFilename);	//TODO NEEDS LESS GENERIC NAME
+void clearObjects();	//TODO NEEDS LESS GENERIC NAME
 
 
 

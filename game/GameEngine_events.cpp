@@ -44,7 +44,7 @@ void GameEngine::handleEvent(SDL_Event event)
 #endif
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
-					/*/Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
+					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
 					time_t t = time(0);   // get time now
 					struct tm * now = localtime(&t);
 				
@@ -57,7 +57,7 @@ void GameEngine::handleEvent(SDL_Event event)
 					uint16_t width = getWidth();
 					uint16_t height = getHeight();
 					
-					BYTE* pixels = new BYTE[3 * width * height];
+					/*BYTE* pixels = new BYTE[3 * width * height];
 					glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
 
 					//Convert to FreeImage format & save to file
@@ -66,8 +66,8 @@ void GameEngine::handleEvent(SDL_Event event)
 
 					//Free resources
 					FreeImage_Unload(image);
-					delete [] pixels;
-					break;*/
+					delete [] pixels;*/
+					break;
 				}
 				
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
@@ -79,9 +79,9 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		//Key released
 		case SDL_KEYUP:
-			/*switch(event.key.keysym.scancode)
+			switch(event.key.keysym.scancode)
 			{
-			}*/
+			}
 			break;
 		
 		case SDL_MOUSEBUTTONDOWN:
@@ -214,9 +214,25 @@ void GameEngine::handleEvent(SDL_Event event)
 
 void GameEngine::handleKeys()
 {
+#ifdef DEBUG
+	setTimeScale(1.0f);
+	if (keyDown(SDL_SCANCODE_G))
+	{
+		setTimeScale(0.25f);
+		if (keyDown(SDL_SCANCODE_CTRL))
+			setTimeScale(0.125f);
+	}
+
+	if (keyDown(SDL_SCANCODE_H))
+	{
+		setTimeScale(2.0f);
+		if (keyDown(SDL_SCANCODE_CTRL))
+			setTimeScale(3.0f);
+	}
+#endif
 }
 
-//TODO: Controller haptic shouldn't be game specific? Or is this too closely tied to controller input in general?
+//TODO: Controller haptic shouldn't be game specific
 void GameEngine::rumbleController(float strength, float sec, int priority)
 {
 	static float fLastRumble = 0.0f;

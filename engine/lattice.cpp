@@ -60,8 +60,6 @@ void lattice::bind()
 			latticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
 			latticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
 			
-			//cout << ix << ',' << iy << endl;
-			
 			//Upper left
 			*ptr++ = vertul->x;
 			*ptr++ = vertul->y;

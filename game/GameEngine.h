@@ -9,45 +9,12 @@
 #include <vector>
 #include <set>
 #include "luainterface.h"
-#include "arc.h"
+
 #include "3DObject.h"
 #include "tinyxml2.h"
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
-
-#define DEFAULT_TIMESCALE	1.0
-
-//Keybinding stuff!
-extern uint32_t JOY_BUTTON_BACK;
-extern uint32_t JOY_BUTTON_START;
-extern uint32_t JOY_BUTTON_X;
-extern uint32_t JOY_BUTTON_Y;
-extern uint32_t JOY_BUTTON_A;
-extern uint32_t JOY_BUTTON_B;
-extern uint32_t JOY_BUTTON_LB;
-extern uint32_t JOY_BUTTON_RB;
-extern uint32_t JOY_BUTTON_LSTICK;
-extern uint32_t JOY_BUTTON_RSTICK;
-extern uint32_t JOY_AXIS_HORIZ;
-extern uint32_t JOY_AXIS_VERT;
-extern uint32_t JOY_AXIS2_HORIZ;
-extern uint32_t JOY_AXIS2_VERT;
-extern uint32_t JOY_AXIS_LT;
-extern uint32_t JOY_AXIS_RT;
-extern int32_t JOY_AXIS_TRIP;
-#define JOY_MAX 32767
-#define JOY_MIN -32768
-extern SDL_Scancode KEY_UP1;
-extern SDL_Scancode KEY_UP2;
-extern SDL_Scancode KEY_DOWN1;
-extern SDL_Scancode KEY_DOWN2;
-extern SDL_Scancode KEY_LEFT1;
-extern SDL_Scancode KEY_LEFT2;
-extern SDL_Scancode KEY_RIGHT1;
-extern SDL_Scancode KEY_RIGHT2;
-extern SDL_Scancode KEY_ENTER1;
-extern SDL_Scancode KEY_ENTER2;
 
 class ColorPhase
 {
@@ -66,7 +33,7 @@ class GameEngine : public Engine
 private:
 	//Important general-purpose game variables
 	Vec3 CameraPos;
-	HUD* m_hud;
+	//HUD* m_hud;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
@@ -107,7 +74,7 @@ public:
 	bool _shouldSelect(b2Fixture* fix);
 
 	//Functions dealing with input and user IO - GameEngine_events.cpp
-	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD //TODO Rip out or fix
+//	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD //TODO Rip out or fix
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
@@ -130,7 +97,7 @@ public:
 	
 };
 
-void signalHandler(string sSignal); //Stub function for handling signals that come in from our HUD, and passing them on to the engine
-float myAbs(float v);	//Because stinking namespace stuff
+//void signalHandler(string sSignal); //Stub function for handling signals that come in from our HUD, and passing them on to the engine
+//float myAbs(float v);	//Because stinking namespace stuff
 
 

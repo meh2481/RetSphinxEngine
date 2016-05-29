@@ -357,11 +357,6 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	}
 	
 	
-	
-	
-	//-----------------------------------------------------------------
-	//TODO Yuck soft body stuff. Fix it so it works properly or get rid
-	
 	XMLElement* latticeElem = root->FirstChildElement("lattice");
 	if(latticeElem)
 	{
