@@ -16,7 +16,6 @@
 using namespace std;
 #include "glmx.h"
 #include <SDL.h>
-#include "log.h" // from io
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768

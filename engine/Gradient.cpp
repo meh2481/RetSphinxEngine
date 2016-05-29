@@ -1,6 +1,6 @@
 #include "Gradient.h"
 #include "tinyxml2.h"
-using namespace tinyxml2;
+#include "easylogging++.h"
 
 Gradient::Gradient(string sXMLFilename)
 {
@@ -57,24 +57,24 @@ bool Gradient::load(string sXMLFilename)
 {
 	m_colorMap.clear();
 	
-	XMLDocument* doc = new XMLDocument;
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error opening gradient XML file: " << sXMLFilename << "- Error " << iErr << endl;
+		LOG(INFO) << "Error opening gradient XML file: " << sXMLFilename << "- Error " << iErr;
 		delete doc;
 		return false;
 	}
 	
-	XMLElement* root = doc->RootElement();
+	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..." << endl;
+		LOG(INFO) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring...";
 		delete doc;
 		return false;
 	}
 	
-	for(XMLElement* val = root->FirstChildElement("val"); val != NULL; val = val->NextSiblingElement("val"))
+	for(tinyxml2::XMLElement* val = root->FirstChildElement("val"); val != NULL; val = val->NextSiblingElement("val"))
 	{
 		float pos = 0.0f;
 		

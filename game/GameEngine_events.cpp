@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iomanip>
 #include "Image.h"
+#include "easylogging++.h"
 
 void GameEngine::handleEvent(SDL_Event event)
 {
@@ -32,7 +33,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_ESCAPE:
 					quit();
 					break;
-#ifdef DEBUG
+#ifdef _DEBUG
 				case SDL_SCANCODE_P:
 					playPausePhysics();
 					break;
@@ -120,7 +121,9 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEMOTION:
-			//cout << "Mouse moved to " << event.motion.x << ", " << event.motion.y << endl;
+#ifdef DEBUG_INPUT
+			cout << "Mouse moved to " << event.motion.x << ", " << event.motion.y << endl;
+#endif
 			break;
 		
 		case SDL_WINDOWEVENT:
@@ -139,45 +142,45 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		//Gamepad stuff!
 		case SDL_JOYDEVICEADDED:
-			errlog << "Joystick " << (int)event.jdevice.which << " connected." << endl;
+			LOG(INFO) << "Joystick " << (int)event.jdevice.which << " connected.";
 			m_joy = SDL_JoystickOpen(event.jdevice.which);
 
-			if(m_joy) 
+			if (m_joy)
 			{
-				errlog << "Opened Joystick " << event.jdevice.which << endl;
-				errlog << "Name: " << SDL_JoystickNameForIndex(event.jdevice.which) << endl;
-				errlog << "Number of Axes: " << SDL_JoystickNumAxes(m_joy) << endl;
-				errlog << "Number of Buttons: " << SDL_JoystickNumButtons(m_joy) << endl;
-				errlog << "Number of Balls: " << SDL_JoystickNumBalls(m_joy) << endl;
-				errlog << "Number of Hats: " << SDL_JoystickNumHats(m_joy) << endl;
-				
+				LOG(INFO) << "Opened Joystick " << event.jdevice.which;
+				LOG(INFO) << "Name: " << SDL_JoystickNameForIndex(event.jdevice.which);
+				LOG(INFO) << "Number of Axes: " << SDL_JoystickNumAxes(m_joy);
+				LOG(INFO) << "Number of Buttons: " << SDL_JoystickNumButtons(m_joy);
+				LOG(INFO) << "Number of Balls: " << SDL_JoystickNumBalls(m_joy);
+				LOG(INFO) << "Number of Hats: " << SDL_JoystickNumHats(m_joy);
+
 				//On Linux, "xboxdrv" is the driver I had the most success with when it came to rumble (default driver said it rumbled, but didn't)
 				m_rumble = NULL;
-				if(SDL_JoystickIsHaptic(m_joy))
+				if (SDL_JoystickIsHaptic(m_joy))
 					m_rumble = SDL_HapticOpenFromJoystick(m_joy);
-				if(m_rumble)
+				if (m_rumble)
 				{
-					if(SDL_HapticRumbleInit(m_rumble) != 0)
+					if (SDL_HapticRumbleInit(m_rumble) != 0)
 					{
-						errlog << "Error initializing joystick " << (int)event.jdevice.which << " as rumble." << endl;
+						LOG(INFO) << "Error initializing joystick " << (int)event.jdevice.which << " as rumble.";
 						SDL_HapticClose(m_rumble);
 						m_rumble = NULL;
 					}
-					else 
+					else
 					{
-						errlog << "Initialized joystick " << (int)event.jdevice.which << " as rumble." << endl;
+						LOG(INFO) << "Initialized joystick " << (int)event.jdevice.which << " as rumble.";
 					}
 				}
 				else
-					errlog << "Joystick " << (int)event.jdevice.which << " has no rumble support." << endl;
-			} 
+					LOG(INFO) << "Joystick " << (int)event.jdevice.which << " has no rumble support.";
+			}
 			else
-				errlog << "Couldn't open Joystick " << (int)event.jdevice.which << endl;
+				LOG(INFO) << "Couldn't open Joystick " << (int)event.jdevice.which;
 			break;
 			
 		//TODO: Test if this is working now
 		case SDL_JOYDEVICEREMOVED:
-			errlog << "Joystick " << (int)event.jdevice.which << " disconnected." << endl;
+			LOG(INFO) << "Joystick " << (int)event.jdevice.which << " disconnected.";
 			break;
 			
 		case SDL_JOYBUTTONDOWN:
@@ -214,7 +217,7 @@ void GameEngine::handleEvent(SDL_Event event)
 
 void GameEngine::handleKeys()
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	setTimeScale(1.0f);
 	if (keyDown(SDL_SCANCODE_G))
 	{

@@ -11,6 +11,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "easylogging++.h"
 
 
 Image::Image(string sFilename)
@@ -30,7 +31,7 @@ void Image::_load(string sFilename)
 {
 	int comp = 0;
 	unsigned char* cBuf = stbi_load(sFilename.c_str(), &m_iWidth, &m_iHeight, &comp, 0);
-	errlog << "Load " << sFilename << endl;
+	LOG(INFO) << "Load " << sFilename;
 
 	int mode, modeflip;
 	if(comp == 3) // RGB 24bit
@@ -46,7 +47,7 @@ void Image::_load(string sFilename)
   
 	if((cBuf == 0) || (m_iWidth == 0) || (m_iHeight == 0))
 	{
-		errlog << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity" << endl;
+		LOG(ERROR) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity";
 		return;
 	}
   
@@ -71,7 +72,7 @@ void Image::_loadNoise(string sXMLFilename)
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
 	{
-		errlog << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr << endl;
+		LOG(INFO) << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr
 		delete doc;
 		return;
 	}
@@ -79,7 +80,7 @@ void Image::_loadNoise(string sXMLFilename)
 	XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..." << endl;
+		LOG(INFO) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..."
 		delete doc;
 		return;
 	}
@@ -155,7 +156,7 @@ void Image::_loadNoise(string sXMLFilename)
 Image::~Image()
 {
 	//image cleanup
-	errlog << "Free " << m_sFilename << endl;
+	LOG(INFO) << "Free " << m_sFilename;
 	if(m_hTex)
 		glDeleteTextures(1, &m_hTex);	//Free OpenGL graphics memory
 	_removeImgReload(this);

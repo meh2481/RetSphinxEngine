@@ -6,7 +6,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
-using namespace tinyxml2;
+#include "easylogging++.h"
 
 //TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
 myCursor::myCursor()
@@ -46,19 +46,19 @@ bool myCursor::fromXML(string sXMLFilename)
 {
 	_init();
 	
-	XMLDocument* doc = new XMLDocument();
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
     int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing XML file " << sXMLFilename << ": Error " << iErr << endl;
+		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return false;
 	}
 
-    XMLElement* root = doc->FirstChildElement("cursor");
+	tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
     if(root == NULL)
 	{
-		errlog << "Error: No toplevel \"cursor\" item in XML file " << sXMLFilename << endl;
+		LOG(INFO) << "Error: No toplevel \"cursor\" item in XML file " << sXMLFilename;
 		delete doc;
 		return false;
 	}

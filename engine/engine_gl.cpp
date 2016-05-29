@@ -1,23 +1,24 @@
 #include "Engine.h"
 #include "opengl-api.h"
+#include "easylogging++.h"
 
 void Engine::setup_sdl()
 {
 
 	if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
-		errlog << "SDL_InitSubSystem Error: " << SDL_GetError() << std::endl;
+		LOG(INFO) << "SDL_InitSubSystem Error: " << SDL_GetError();
 		exit(1);
 	}
 	
-	if(SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
-		errlog << "Unable to init SDL2 gamepad subsystem." << endl;
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
+		LOG(INFO) << "Unable to init SDL2 gamepad subsystem.";
 
-	errlog << "Loading OpenGL..." << std::endl;
+	LOG(INFO) << "Loading OpenGL...";
 
 	if (SDL_GL_LoadLibrary(NULL) == -1)
 	{
-		errlog << "SDL_GL_LoadLibrary Error: " << SDL_GetError() << std::endl;
+		LOG(INFO) << "SDL_GL_LoadLibrary Error: " << SDL_GetError();
 		exit(1);
 	}
 
@@ -49,7 +50,7 @@ void Engine::setup_sdl()
 
 	if(m_Window == NULL)
 	{
-		errlog << "Couldn't set video mode: " << SDL_GetError() << endl;
+		LOG(INFO) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1); //Share objects between OpenGL contexts
@@ -64,15 +65,15 @@ void Engine::setup_sdl()
 	setFramerate(mode.refresh_rate);
 	
 	int numDisplays = SDL_GetNumVideoDisplays();
-	errlog << "Available displays: " << numDisplays << endl;
+	LOG(INFO) << "Available displays: " << numDisplays;
 	for(int display = 0; display < numDisplays; display++)
 	{
 		int num = SDL_GetNumDisplayModes(display);
-		errlog << "Available modes for display " << display+1 << ':' << endl;
+		LOG(INFO) << "Available modes for display " << display + 1 << ':';
 		for(int i = 0; i < num; i++)
 		{
 			SDL_GetDisplayMode(display, i, &mode);
-			errlog << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz" << endl;
+			LOG(INFO) << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz";
 		}
 	}
 	
@@ -85,9 +86,9 @@ void Engine::setup_sdl()
 	_loadicon();	//Load our window icon
 	
 	const char *ver = (const char*)glGetString(GL_VERSION);
-    errlog << "GL version: " << ver << endl;
+	LOG(INFO) << "GL version: " << ver;
     const char *ven = (const char*)glGetString(GL_VENDOR);
-    errlog << "GL vendor: " << ven << endl;
+	LOG(INFO) << "GL vendor: " << ven;
 }
 
 //Set up OpenGL

@@ -4,6 +4,10 @@
 */
 
 #include "GameEngine.h"
+#include "easylogging++.h"
+
+//Define constants for logger
+INITIALIZE_EASYLOGGINGPP
 
 #ifdef _WIN32
 #define ICONNAME "res/icons/icon_32.png"	//For some reason, Windoze (Or SDL2, or something) doesn't like large (256x256) icons for windows. Using a 32x32 icon instead.
@@ -17,12 +21,16 @@ int SDL_main(int argc, char *argv[])
 int main(int argc, char** argv)
 #endif
 {
-	LuaInterface Lua("res/lua/init.lua", argc, argv);
-	
-	if(!Lua.Init()) return 1;
+	//Give logger our commandline parameters (logger isn't actually started until Engine::Engine())
+	START_EASYLOGGINGPP(argc, argv);
 	
 	GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "GameEngine", "GameEngine", ICONNAME, true); //Create our engine
+
+	//Start Lua
+	LuaInterface Lua("res/lua/init.lua", argc, argv);
+	if (!Lua.Init()) return 1;
 	eng->setLua(&Lua);
+
 	list<string> lCommandLine;
 	
 	for(int i = 1; i < argc; i++)
@@ -32,9 +40,8 @@ int main(int argc, char** argv)
 	eng->start(); //Get the engine rolling
 	
 	//Done main loop; exit program	
-	errlog << "Deleting engine" << endl;
+	LOG(INFO) << "Deleting engine";
 	delete eng;
-	errlog << "Ending program happily" << endl;
-	errlog.close();
+	LOG(INFO) << "Ending program happily";
 	return 0;
 }

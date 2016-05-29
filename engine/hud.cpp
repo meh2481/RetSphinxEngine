@@ -8,11 +8,11 @@
 #include <sstream>
 
 #include "tinyxml2.h"
-using namespace tinyxml2;
 
 #include "Text.h"
 #include "Image.h"
 #include "opengl-api.h"
+#include "easylogging++.h"
 
 extern int screenDrawWidth;
 extern int screenDrawHeight;
@@ -479,12 +479,12 @@ HUD::HUD(string sName) : HUDItem(sName)
 
 HUD::~HUD()
 {
-    errlog << "Destroying HUD \"" << m_sName << "\"" << endl;
+	LOG(INFO) << "Destroying HUD \"" << m_sName << "\"";
 
     destroy();
 }
 
-HUDItem* HUD::_getItem(XMLElement* elem)
+HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
 {
     if(elem == NULL)
         return NULL;
@@ -494,7 +494,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
     string sName(cName);
     if(sName == "images")    //Image list
     {
-        for(XMLElement* elemImage = elem->FirstChildElement("image"); elemImage != NULL; elemImage = elemImage->NextSiblingElement())
+        for(tinyxml2::XMLElement* elemImage = elem->FirstChildElement("image"); elemImage != NULL; elemImage = elemImage->NextSiblingElement())
         {
             if(elemImage == NULL) break;    //Done
             const char* cImgName = elemImage->Attribute("name");
@@ -509,7 +509,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
     else if(sName == "fonts")    //Font list
     {
         //Load all fonts
-        for(XMLElement* elemFont = elem->FirstChildElement("font"); elemFont != NULL; elemFont = elemFont->NextSiblingElement())
+        for(tinyxml2::XMLElement* elemFont = elem->FirstChildElement("font"); elemFont != NULL; elemFont = elemFont->NextSiblingElement())
         {
             if(elemFont == NULL) break; //Done
             const char* cFontName = elemFont->Attribute("name");
@@ -555,7 +555,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
         }
 
         //Load all children of this group
-        for(XMLElement* elemGroup = elem->FirstChildElement(); elemGroup != NULL; elemGroup = elemGroup->NextSiblingElement())
+        for(tinyxml2::XMLElement* elemGroup = elem->FirstChildElement(); elemGroup != NULL; elemGroup = elemGroup->NextSiblingElement())
         {
             HUDItem* it = _getItem(elemGroup);  //Recursive call for group items
             hGroup->addChild(it);
@@ -636,7 +636,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
 		const char* cColor = elem->Attribute("col");
 		if(cColor != NULL)
 			geom->col = colorFromString(cColor);
-		for(XMLElement* quad = elem->FirstChildElement("quad"); quad != NULL; quad = quad->NextSiblingElement("quad"))
+		for(tinyxml2::XMLElement* quad = elem->FirstChildElement("quad"); quad != NULL; quad = quad->NextSiblingElement("quad"))
 		{
 			Quad q;
 			const char* cQuad1 = quad->Attribute("p1");
@@ -681,7 +681,7 @@ HUDItem* HUD::_getItem(XMLElement* elem)
 		elem->QueryFloatAttribute("selectpt", &hm->selectedpt);
 		elem->QueryFloatAttribute("vspacing", &hm->vspacing);
 		elem->QueryBoolAttribute("hidden", &hm->hidden);
-		for(XMLElement* menuitem = elem->FirstChildElement("menuitem"); menuitem != NULL; menuitem = menuitem->NextSiblingElement("menuitem"))
+		for(tinyxml2::XMLElement* menuitem = elem->FirstChildElement("menuitem"); menuitem != NULL; menuitem = menuitem->NextSiblingElement("menuitem"))
 		{
 			HUDMenu::menuItem it;
 			const char* cSignal = menuitem->Attribute("signal");
@@ -697,35 +697,35 @@ HUDItem* HUD::_getItem(XMLElement* elem)
 	}
     
 	else
-        errlog << "Unknown HUD item \"" << sName << "\". Ignoring..." << endl;
+		LOG(INFO) << "Unknown HUD item \"" << sName << "\". Ignoring...";
     return NULL;
 }
 
 void HUD::create(string sXMLFilename)
 {
     //Load in the XML document
-    XMLDocument* doc = new XMLDocument();
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
     int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing XML file " << sXMLFilename << ": Error " << iErr << endl;
+		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
 
-    XMLElement* root = doc->FirstChildElement("hud");
+	tinyxml2::XMLElement* root = doc->FirstChildElement("hud");
     if(root == NULL)
 	{
-		errlog << "Error: No toplevel \"hud\" item in XML file " << sXMLFilename << endl;
+		LOG(INFO) << "Error: No toplevel \"hud\" item in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}
     const char* cName = root->Attribute("name");
     if(cName != NULL)
         m_sName = cName;    //Grab the name
-    errlog << "Creating HUD \"" << m_sName << "\"" << endl;
+	LOG(INFO) << "Creating HUD \"" << m_sName << "\"";
     //Load all elements
-    for(XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+    for(tinyxml2::XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
     {
         if(elem == NULL) break;
 		string sElemType = elem->Name();
@@ -733,7 +733,7 @@ void HUD::create(string sXMLFilename)
 		{
 			//Loop through scene children, populating list
 			string sSceneName = elem->Attribute("name");
-			for(XMLElement* elem2 = elem->FirstChildElement(); elem2 != NULL; elem2 = elem2->NextSiblingElement())
+			for(tinyxml2::XMLElement* elem2 = elem->FirstChildElement(); elem2 != NULL; elem2 = elem2->NextSiblingElement())
 			{
 				HUDItem* it = _getItem(elem2);
 				if(it != NULL)

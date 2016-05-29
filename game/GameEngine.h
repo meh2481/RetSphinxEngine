@@ -31,26 +31,23 @@ class GameEngine : public Engine
 {
 	friend class GameEngineLua;
 private:
-	//Important general-purpose game variables
+	//Important general-purpose game variables!
 	Vec3 CameraPos;
-	//HUD* m_hud;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
-	list<Object*> m_lAddLater;	//TODO: This should be managed by the Engine by default, not GameEngine
-	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time
+	list<Object*> m_lAddLater;	//TODO: This should be managed by the Engine, not GameEngine
+	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time, also manage with Engine
 	SDL_Haptic* m_rumble;
 	
-	//Game stuff!
+	//Game-specific stuff!
 	LuaInterface* Lua;
 	myCursor* m_Cursor;
-	
-	//Testing stuff!
-	//Object3D* testObj;
-	//physSegment* m_sun;
 	Object* player;
 	Rect rcSceneBounds;
-	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
+	
+	//Testing stuff that should eventually be finalized/fixed!
+	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map	TODO: Better way of doing this
 	string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 	string m_sLastScene;
 
@@ -72,7 +69,6 @@ public:
 	void setLua(LuaInterface* l)	{Lua = l;};
 
 	//Functions dealing with input and user IO - GameEngine_events.cpp
-//	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD //TODO Rip out or fix
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
@@ -94,8 +90,5 @@ public:
 	void clearColors();
 	
 };
-
-//void signalHandler(string sSignal); //Stub function for handling signals that come in from our HUD, and passing them on to the engine
-//float myAbs(float v);	//Because stinking namespace stuff
 
 

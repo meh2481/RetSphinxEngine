@@ -1,6 +1,6 @@
 #include "GameEngine.h"
+#include "easylogging++.h"
 #include "tinyxml2.h"
-using namespace tinyxml2;
 
 #include <Box2D/Box2D.h>
 #include "Image.h"
@@ -10,13 +10,13 @@ using namespace tinyxml2;
 //---------------------------------------------------------------------------------------------------------------------------
 bool GameEngine::loadConfig(string sFilename)
 {
-	errlog << "Parsing config file " << sFilename << endl;
+	LOG(INFO) << "Parsing config file " << sFilename;
 	//Open file
-	XMLDocument* doc = new XMLDocument;
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	int iErr = doc->LoadFile(sFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing config file: Error " << iErr << ". Ignoring..." << endl;
+		LOG(INFO) << "Error parsing config file: Error " << iErr << ". Ignoring...";
 		if(isFullscreen())
 			setInitialFullscreen();
 		delete doc;
@@ -24,17 +24,17 @@ bool GameEngine::loadConfig(string sFilename)
 	}
 	
 	//Grab root element
-	XMLElement* root = doc->RootElement();
+	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file. Ignoring..." << endl;
+		LOG(INFO) << "Error: Root element NULL in XML file. Ignoring...";
 		if(isFullscreen())
 			setInitialFullscreen();
 		delete doc;
 		return false;
 	}
 	
-	XMLElement* window = root->FirstChildElement("window");
+	tinyxml2::XMLElement* window = root->FirstChildElement("window");
 	if(window != NULL)
 	{
 		bool bFullscreen = isFullscreen();
@@ -80,7 +80,7 @@ bool GameEngine::loadConfig(string sFilename)
 		pauseOnKeyboard(bPausesOnFocus);
 	}
 	
-	XMLElement* joystick = root->FirstChildElement("joystick");
+	tinyxml2::XMLElement* joystick = root->FirstChildElement("joystick");
 	if(joystick != NULL)
 	{
 		joystick->QueryIntAttribute("axistripthreshold", &JOY_AXIS_TRIP);
@@ -102,7 +102,7 @@ bool GameEngine::loadConfig(string sFilename)
 		joystick->QueryUnsignedAttribute("rtaxis", &JOY_AXIS_RT);
 	}
 	
-	XMLElement* keyboard = root->FirstChildElement("keyboard");
+	tinyxml2::XMLElement* keyboard = root->FirstChildElement("keyboard");
 	if(keyboard != NULL)
 	{
 		const char* cUpKey1 = keyboard->Attribute("upkey1");
@@ -146,11 +146,11 @@ bool GameEngine::loadConfig(string sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 void GameEngine::saveConfig(string sFilename)
 {
-	errlog << "Saving config XML " << sFilename << endl;
-	XMLDocument* doc = new XMLDocument;
-	XMLElement* root = doc->NewElement("config");
+	LOG(INFO) << "Saving config XML " << sFilename;
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
+	tinyxml2::XMLElement* root = doc->NewElement("config");
 	
-	XMLElement* window = doc->NewElement("window");
+	tinyxml2::XMLElement* window = doc->NewElement("window");
 	window->SetAttribute("width", getWidth());
 	window->SetAttribute("height", getHeight());
 	window->SetAttribute("fullscreen", isFullscreen());
@@ -165,7 +165,7 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("pauseminimized", pausesOnFocusLost());
 	root->InsertEndChild(window);
 	
-	XMLElement* joystick = doc->NewElement("joystick");
+	tinyxml2::XMLElement* joystick = doc->NewElement("joystick");
 	joystick->SetAttribute("axistripthreshold", JOY_AXIS_TRIP);
 	joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);
 	joystick->SetAttribute("startbutton", JOY_BUTTON_START);
@@ -185,7 +185,7 @@ void GameEngine::saveConfig(string sFilename)
 	joystick->SetAttribute("rtaxis", JOY_AXIS_RT);
 	root->InsertEndChild(joystick);
 	
-	XMLElement* keyboard = doc->NewElement("keyboard");
+	tinyxml2::XMLElement* keyboard = doc->NewElement("keyboard");
 	keyboard->SetAttribute("upkey1", SDL_GetScancodeName(KEY_UP1));
 	keyboard->SetAttribute("upkey2", SDL_GetScancodeName(KEY_UP2));
 	keyboard->SetAttribute("downkey1", SDL_GetScancodeName(KEY_DOWN1));
@@ -214,22 +214,22 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	oss << "res/obj/" << sType << ".xml";
 	string sXMLFilename = oss.str();
 	
-	errlog << "Parsing object XML file " << sXMLFilename << endl;
+	LOG(INFO) << "Parsing object XML file " << sXMLFilename;
 	//Open file
-	XMLDocument* doc = new XMLDocument;
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing object XML file: Error " << iErr << endl;
+		LOG(INFO) << "Error parsing object XML file: Error " << iErr;
 		delete doc;
 		return NULL;
 	}
 	
 	//Grab root element
-	XMLElement* root = doc->RootElement();
+	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file." << endl;
+		LOG(INFO) << "Error: Root element NULL in XML file.";
 		delete doc;
 		return NULL;
 	}
@@ -243,11 +243,11 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	map<string, b2Body*> mBodyNames;
 	
 	//Add segments
-	for(XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
+	for(tinyxml2::XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
 	{
 		ObjSegment* seg = new ObjSegment;
 		seg->parent = o;
-		XMLElement* body = segment->FirstChildElement("body");
+		tinyxml2::XMLElement* body = segment->FirstChildElement("body");
 		if(body != NULL)
 		{
 			string sBodyName;
@@ -293,10 +293,10 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 			mBodyNames[sBodyName] = bod;
 			
 			//Create body fixtures
-			for(XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
+			for(tinyxml2::XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
 				readFixture(fixture, bod);
 		}
-		XMLElement* layer = segment->FirstChildElement("layer");
+		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
 		if(layer != NULL)
 		{
 			seg->fromXML(layer);
@@ -304,7 +304,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 		o->addSegment(seg);
 	}
 	//Create joints
-	for(XMLElement* joint = root->FirstChildElement("joint"); joint != NULL; joint = joint->NextSiblingElement("joint"))
+	for(tinyxml2::XMLElement* joint = root->FirstChildElement("joint"); joint != NULL; joint = joint->NextSiblingElement("joint"))
 	{
 		const char* cJointType = joint->Attribute("type");
 		if(cJointType)
@@ -357,7 +357,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	}
 	
 	
-	XMLElement* latticeElem = root->FirstChildElement("lattice");
+	tinyxml2::XMLElement* latticeElem = root->FirstChildElement("lattice");
 	if(latticeElem)
 	{
 		const char* cMeshImg = latticeElem->Attribute("img");
@@ -451,22 +451,22 @@ void GameEngine::loadScene(string sXMLFilename)
 	cleanupObjects();
 	cleanupParticles();
 	player = NULL;
-	errlog << "Loading scene " << sXMLFilename << endl;
+	LOG(INFO) << "Loading scene " << sXMLFilename;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
-	XMLDocument* doc = new XMLDocument;
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr << endl;
+		LOG(INFO) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
 	
 	//Grab root element
-	XMLElement* root = doc->RootElement();
+	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		errlog << "Error: Root element NULL in XML file " << sXMLFilename << endl;
+		LOG(INFO) << "Error: Root element NULL in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}
@@ -506,7 +506,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	}
 	
 	//Load layers for the scene
-	for(XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
+	for(tinyxml2::XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
 		ObjSegment* seg = new ObjSegment();
 		seg->fromXML(layer);
@@ -515,7 +515,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	}
 	
 	//Load objects
-	for(XMLElement* object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object"))
+	for(tinyxml2::XMLElement* object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object"))
 	{
 		const char* cObjType = object->Attribute("type");
 		const char* cName = object->Attribute("name");
@@ -559,7 +559,7 @@ void GameEngine::loadScene(string sXMLFilename)
 				}
 				
 				//Populate this obj with ALL THE INFO in case Lua wants it
-				for(const XMLAttribute* attrib = object->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
+				for(const tinyxml2::XMLAttribute* attrib = object->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
 					o->setProperty(attrib->Name(), attrib->Value());
 				
 				addObject(o);
@@ -568,7 +568,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	}
 	
 	//Load particles
-	for(XMLElement* particles = root->FirstChildElement("particles"); particles != NULL; particles = particles->NextSiblingElement("particles"))
+	for(tinyxml2::XMLElement* particles = root->FirstChildElement("particles"); particles != NULL; particles = particles->NextSiblingElement("particles"))
 	{
 		const char* cFilename = particles->Attribute("file");
 		if(cFilename != NULL)
@@ -580,7 +580,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	}
 	
 	//Load level geometry
-	for(XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
+	for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
 	{
 		readFixture(geom, groundBody);
 	}
@@ -634,7 +634,7 @@ void GameEngine::loadScene(string sXMLFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Load Box2D fixture from XML
 //---------------------------------------------------------------------------------------------------------------------------
-void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
+void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
 	b2FixtureDef fixtureDef;
 	b2PolygonShape dynamicBox;
@@ -646,7 +646,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
 	{
-		errlog << "readFixture ERR: No fixture type" << endl;
+		LOG(INFO) << "readFixture ERR: No fixture type";
 		return;
 	}
 	string sFixType = cFixType;
@@ -655,7 +655,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 		const char* cBoxSize = fixture->Attribute("size");
 		if(!cBoxSize)
 		{
-			errlog << "readFixture ERR: No box size" << endl;
+			LOG(INFO) << "readFixture ERR: No box size";
 			return;
 		}
 		
@@ -743,7 +743,7 @@ void GameEngine::readFixture(XMLElement* fixture, b2Body* bod)
 			n->name = cName;
 		
 		//Populate this node with ALL THE INFO in case Lua wants it
-		for(const XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
+		for(const tinyxml2::XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
 			n->setProperty(attrib->Name(), attrib->Value());
 		
 		addNode(n);

@@ -11,7 +11,7 @@ class Image;
 class Text;
 
 //Global functions for use with HUD objects
-inline void stubSignal(string sSignal){errlog << "Generating signal: " << sSignal << endl;}; //For stubbing out HUD signal handling functions
+inline void stubSignal(string sSignal) { }; //For stubbing out HUD signal handling functions
 
 // HUDItem class -- base class for HUD items
 class HUDItem

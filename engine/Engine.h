@@ -80,7 +80,7 @@ private:
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
 	list<ParticleSystem*> m_particles;
 	map<string, Node*> m_nodes;
-#ifdef DEBUG
+#ifdef _DEBUG
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
 #endif
@@ -178,7 +178,7 @@ public:
 	void toggleDebugDraw() {m_bDebugDraw = !m_bDebugDraw;};
 	void toggleObjDebugDraw() {m_bObjDebugDraw = !m_bObjDebugDraw;};
 	b2World* getWorld() {return m_physicsWorld;};
-#ifdef DEBUG
+#ifdef _DEBUG
 	void playPausePhysics()	{m_bSteppingPhysics = !m_bSteppingPhysics;};
 	void pausePhysics()		{m_bSteppingPhysics = true;};
 	void stepPhysics()		{m_bStepFrame = true;};

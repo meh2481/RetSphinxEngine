@@ -1,11 +1,12 @@
 #include "Engine.h"
+#include "easylogging++.h"
 
 
 void Engine::createSound(string sPath, string sName)
 {
     /*
 	if(m_bSoundDied || m_sounds.count(sName)) return;	//Don't duplicate sounds or attempt to play sounds if we can't
-	errlog << "Load sound " << sPath << endl;
+	LOG(INFO) << "Load sound " << sPath
 	FMOD_SOUND* handle;
 	FMOD_MODE open_mode = FMOD_CREATESAMPLE;
 #ifndef DEBUG_REVSOUND

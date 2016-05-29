@@ -1,9 +1,10 @@
 #include "Engine.h"
 #include <SDL_syswm.h>
+#include "easylogging++.h"
 
 void Engine::changeScreenResolution(float w, float h)
 {
-	errlog << "Changing screen resolution to " << w << ", " << h << endl;
+	LOG(INFO) << "Changing screen resolution to " << w << ", " << h;
 	int vsync = SDL_GL_GetSwapInterval();
 //In Windoze, we copy the graphics memory to our new context, so we don't have to reload all of our images and stuff every time the resolution changes
 //TODO: Look into SDL_GL_SHARE_WITH_CURRENT_CONTEXT for newer versions of Windows instead
@@ -14,7 +15,7 @@ void Engine::changeScreenResolution(float w, float h)
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		errlog << "SDL_GetWMInfo #1 failed" << endl;
+		LOG(INFO) << "SDL_GetWMInfo #1 failed";
 		return;
 	}
 
@@ -25,7 +26,7 @@ void Engine::changeScreenResolution(float w, float h)
 	HGLRC tempRC = wglCreateContext(tempDC);
 	if(tempRC == NULL) 
 	{
-		errlog << "wglCreateContext failed" << endl;
+		LOG(INFO) << "wglCreateContext failed";
 		return;
 	}
 	
@@ -33,7 +34,7 @@ void Engine::changeScreenResolution(float w, float h)
 	SetLastError(0);
 	if(!wglShareLists(wglGetCurrentContext(), tempRC))
 	{
-		errlog << "wglShareLists #1 failed" << endl;
+		LOG(INFO) << "wglShareLists #1 failed";
 		return;
 	}
 #endif
@@ -58,21 +59,21 @@ void Engine::changeScreenResolution(float w, float h)
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		errlog << "SDL_GetWMInfo #2 failed" << endl;
+		LOG(INFO) << "SDL_GetWMInfo #2 failed";
 		return;
 	}
  
 	//Share resources to our new SDL-created context
 	if(!wglShareLists(tempRC, wglGetCurrentContext()))
 	{
-		errlog << "wglShareLists #2 failed" << endl;
+		LOG(INFO) << "wglShareLists #2 failed";
 		return;
 	}
  
 	//We no longer need our temporary context
 	if(!wglDeleteContext(tempRC))
 	{
-		errlog << "wglDeleteContext failed" << endl;
+		LOG(INFO) << "wglDeleteContext failed";
 		return;
 	}
 #else
@@ -105,7 +106,7 @@ bool Engine::isMaximized()
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		errlog << "SDL_GetWMInfo failed" << endl;
+		LOG(INFO) << "SDL_GetWMInfo failed";
 		return false;
 	}
 	

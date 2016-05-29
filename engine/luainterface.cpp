@@ -2,13 +2,14 @@
 #include "luadefines.h"
 #include "luafuncs.h"
 #include "globaldefs.h"
+#include "easylogging++.h"
 
 #include <assert.h>
 #include <sstream>
 #include <new>
 
 static int the_panic (lua_State *L) {
-    errlog << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1) << endl;
+	LOG(INFO) << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1);
 	assert(false);
     return 0;  /* return to Lua to abort */
 }
@@ -17,12 +18,12 @@ static int the_panic (lua_State *L) {
 LuaInterface::LuaInterface(const char *script, int argc, const char * const *argv)
  : script(script), argc(argc), argv(argv), _lua(NULL)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	cout
 #else
-	errlog
+	LOG(INFO)
 #endif
-	<< "LuaInterface: Using " << LUA_RELEASE << endl;
+		<< "LuaInterface: Using " << LUA_RELEASE;
 }
 
 LuaInterface::~LuaInterface()
@@ -102,7 +103,7 @@ static void printCallstack(lua_State *L, const char *errmsg = "<unspecified erro
 {
 	lua_Debug dummy;
 	std::ostringstream os;
-	os << "Lua Error: " << errmsg << std::endl;
+	os << "Lua Error: " << errmsg;
 	int level = 0;
 	while(true)
 	{
@@ -112,10 +113,10 @@ static void printCallstack(lua_State *L, const char *errmsg = "<unspecified erro
 		os << luaFormatStackInfo(L, level) << "\n";
 		++level;
 	}
-#ifdef DEBUG
+#ifdef _DEBUG
 	printf("%s\n", os.str().c_str());
 #else
-	errlog << os.str() << endl;
+	LOG(INFO) << os.str();
 #endif
 }
 
@@ -127,12 +128,12 @@ void LuaInterface::lookupFunc(const char *f)
 void LuaInterface::lookupMethod(void *o, const char *func)
 {
     int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, o);
-#ifdef DEBUG
+#ifdef _DEBUG
 	assert(lty == LUA_TUSERDATA);
 #endif
     // now [Lglue]
     lty = lua_getfield(_lua, -1, func);
-#ifdef DEBUG
+#ifdef _DEBUG
 	assert(lty == LUA_TFUNCTION);
 #endif
     // now [Lglue][func]
@@ -197,7 +198,7 @@ bool LuaInterface::callMethod(void *o, const char *func, void* other)
 {
     lookupMethod(o, func);
 	int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, other);
-#ifdef DEBUG
+#ifdef _DEBUG
 	assert(lty == LUA_TUSERDATA);
 #endif
     return doCall(1+1); // first parameter is self (aka o)

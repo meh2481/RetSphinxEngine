@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include "opengl-api.h"
+#include "easylogging++.h"
 
 
 // Populate global namespace with static function pointers pFUNC,
@@ -23,7 +24,7 @@ static bool lookup_glsym(const char *funcname, void **func)
     *func = SDL_GL_GetProcAddress(funcname);
     if (*func == NULL)
     {
-        std::cerr << "Failed to find OpenGL symbol '" << funcname << "'" << std::endl;
+		LOG(ERROR) << "Failed to find OpenGL symbol '" << funcname << "'";
         return false;
     }
     return true;

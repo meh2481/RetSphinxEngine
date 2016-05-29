@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "Image.h"
 #include "opengl-api.h"
+#include "easylogging++.h"
 using namespace std;
 using namespace tiny3d;
 
@@ -52,7 +53,7 @@ Object3D::~Object3D()
 void Object3D::_fromOBJFile(string sFilename)
 {
     m_sObjFilename = sFilename;
-    errlog << "Loading 3D object " << sFilename << endl;
+	LOG(INFO) << "Loading 3D object " << sFilename;
     vector<Vertex> vVerts;
     vector<Vertex> vNormals;
     vector<UV> vUVs;
@@ -67,7 +68,7 @@ void Object3D::_fromOBJFile(string sFilename)
     ifstream infile(sFilename.c_str());
     if(infile.fail())
     {
-        errlog << "Error: Unable to open wavefront object file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to open wavefront object file " << sFilename;
         return;    //Abort
     }
     //Loop until we hit eof or fail
@@ -198,11 +199,11 @@ void Object3D::_fromOBJFile(string sFilename)
 //TODO: On *nix systems, I ought to be able to mmap() to load even faster
 void Object3D::_fromTiny3DFile(string sFilename)
 {
-	errlog << "Loading 3D object " << sFilename << endl;
+	LOG(INFO) << "Loading 3D object " << sFilename;
 	FILE* fp = fopen(sFilename.c_str(), "rb");
 	if(fp == NULL)
 	{
-		errlog << "Error: Input tiny3d file " << sFilename << " does not exist." << endl;
+		LOG(INFO) << "Error: Input tiny3d file " << sFilename << " does not exist.";
 		return;
 	}
 	
@@ -210,7 +211,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	tiny3dHeader header;
 	if(fread(&header, 1, sizeof(tiny3dHeader), fp) != sizeof(tiny3dHeader))
 	{
-		errlog << "Error: Unable to read in tiny3d header from file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to read in tiny3d header from file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -219,7 +220,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	normal* normals = (normal*)malloc(sizeof(normal) * header.numNormals);
 	if(fread(normals, 1, sizeof(normal)*header.numNormals, fp) != sizeof(normal) * header.numNormals)
 	{
-		errlog << "Error: Unable to read normals from tiny3d file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to read normals from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -228,7 +229,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	uv* uvs = (uv*)malloc(sizeof(uv) * header.numUVs);
 	if(fread(uvs, 1, sizeof(uv)*header.numUVs, fp) != sizeof(uv) * header.numUVs)
 	{
-		errlog << "Error: Unable to read UVs from tiny3d file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to read UVs from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -237,7 +238,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	vert* vertices = (vert*)malloc(sizeof(vert) * header.numVertices);
 	if(fread(vertices, 1, sizeof(vert)*header.numVertices, fp) != sizeof(vert) * header.numVertices)
 	{
-		errlog << "Error: Unable to read vertices from tiny3d file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to read vertices from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -246,7 +247,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	face* faces = (face*)malloc(sizeof(face) * header.numFaces);
 	if(fread(faces, 1, sizeof(face)*header.numFaces, fp) != sizeof(face) * header.numFaces)
 	{
-		errlog << "Error: Unable to read faces from tiny3d file " << sFilename << endl;
+		LOG(INFO) << "Error: Unable to read faces from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}

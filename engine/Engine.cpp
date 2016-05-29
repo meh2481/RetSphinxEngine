@@ -7,6 +7,7 @@
 #include "Box2D/Box2D.h"
 #include "Image.h"
 #include "opengl-api.h"
+#include "easylogging++.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -15,9 +16,13 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
-	errlog.open((getSaveLocation() + "err.log").c_str());
-	if(errlog.fail())
-		errlog.open("err.log");
+
+	//Start logger
+	el::Configurations conf("logging.conf");
+	if(!conf.hasConfiguration(el::ConfigurationType::Filename))
+		conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + "logfile.log").c_str());
+	el::Loggers::reconfigureAllLoggers(conf);
+
 	m_sIcon = sIcon;
 	m_bResizable = bResizable;
 	b2Vec2 gravity(0.0f, -9.8f);	//Vector for our world's gravity
@@ -27,11 +32,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_physicsWorld->SetContactListener(&m_clContactListener);
 	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
 	m_bObjDebugDraw = false;
-#ifdef DEBUG
-	errlog << "Debug build" << endl;
+#ifdef _DEBUG
+	LOG(DEBUG) << "Debug build";
 	m_bDebugDraw = true;
 #else
-	errlog << "Release build" << endl;
+	LOG(INFO) << "Release build";
 	m_bDebugDraw = false;
 #endif
 	m_iWidth = iWidth;
@@ -50,7 +55,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_cursor = NULL;
 	m_bCursorShow = true;
 	m_bCursorOutOfWindow = false;
-#ifdef DEBUG
+#ifdef _DEBUG
 	m_bSteppingPhysics = false;
 	m_bStepFrame = false;
 #endif
@@ -62,12 +67,12 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	randSeed(SDL_GetTicks());	//Not as random as it could be... who cares
 	m_fTimeScale = 1.0f;
 
-	errlog << "Initializing FMOD..." << endl;
+	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
 	//TODO: Fix FMOD
 	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
 	{
-		errlog << "Failed to init FMOD." << std::endl;
+		LOG(INFO) << "Failed to init FMOD."
 		m_bSoundDied = true;
 	}
 	else
@@ -78,11 +83,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 		FMOD_System_GetRecordNumDrivers(m_audioSystem, &numDrivers);
 		const int DRIVER_INFO_STR_SIZE = 512;
 		char driverInfoStr[DRIVER_INFO_STR_SIZE];
-		errlog << numDrivers << " recording drivers available." << endl;
+		LOG(INFO) << numDrivers << " recording drivers available."
 		for(int i = 0; i < numDrivers; i++)
 		{
 			FMOD_System_GetRecordDriverInfo(m_audioSystem, i, driverInfoStr, DRIVER_INFO_STR_SIZE, NULL);
-			errlog << "Driver " << i << ": " << driverInfoStr << endl;
+			LOG(INFO) << "Driver " << i << ": " << driverInfoStr
 		}
 	}*/
 }
@@ -92,7 +97,7 @@ Engine::~Engine()
 	SDL_DestroyWindow(m_Window);
 
 	//Clean up our image map
-	errlog << "Clearing images" << endl;
+	LOG(INFO) << "Clearing images";
 	clearImages();
 	clearObjects();
 
@@ -111,9 +116,9 @@ Engine::~Engine()
 	}*/
 
 	// Clean up and shutdown
-	errlog << "Deleting phys world" << endl;
+	LOG(INFO) << "Deleting phys world";
 	delete m_physicsWorld;
-	errlog << "Quit SDL" << endl;
+	LOG(INFO) << "Quit SDL";
 	SDL_Quit();
 }
 
@@ -153,10 +158,10 @@ bool Engine::_frame()
 			}
 			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
-				if(m_bResizable)
+				if (m_bResizable)
 					changeScreenResolution((float)event.window.data1, (float)event.window.data2);
 				else
-					errlog << "Error! Resize event generated, but resizable flag not set." << endl;
+					LOG(INFO) << "Error! Resize event generated, but resizable flag not set.";
 			}
 			else if(event.window.event == SDL_WINDOWEVENT_ENTER)
 				m_bCursorOutOfWindow = false;
@@ -181,13 +186,13 @@ bool Engine::_frame()
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
-#ifdef DEBUG
+#ifdef _DEBUG
 		if(!m_bSteppingPhysics || m_bStepFrame)
 		{
 			m_bStepFrame = false;
 #endif
 			frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
-#ifdef DEBUG
+#ifdef _DEBUG
 		}
 #endif
 		_render();
@@ -305,7 +310,7 @@ void Engine::setMSAA(int iMSAA)
 //TODO: This needs to be extracted into its own function for loading an SDL_Surface from an image
 void Engine::_loadicon()	//Load icon into SDL window
 {
-	/*errlog << "Load icon " << m_sIcon << endl;
+	/*LOG(INFO) << "Load icon " << m_sIcon
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	FIBITMAP *dib(0);
 	BYTE* bits(0);
@@ -319,7 +324,7 @@ void Engine::_loadicon()	//Load icon into SDL window
 	//if still unkown, return failure
 	if(fif == FIF_UNKNOWN)
 	{
-		errlog << "Unknown image type for file " << m_sIcon << endl;
+		LOG(INFO) << "Unknown image type for file " << m_sIcon
 		return;
 	}
 	
@@ -327,11 +332,11 @@ void Engine::_loadicon()	//Load icon into SDL window
 	if(FreeImage_FIFSupportsReading(fif))
 		dib = FreeImage_Load(fif, m_sIcon.c_str());
 	else
-		errlog << "File " << m_sIcon << " doesn't support reading." << endl;
+		LOG(INFO) << "File " << m_sIcon << " doesn't support reading."
 	//if the image failed to load, return failure
 	if(!dib)
 	{
-		errlog << "Error loading image " << m_sIcon.c_str() << endl;
+		LOG(INFO) << "Error loading image " << m_sIcon.c_str()
 		return;
 	}	
 	//retrieve the image data
@@ -345,14 +350,14 @@ void Engine::_loadicon()	//Load icon into SDL window
 	bits = FreeImage_GetBits(dib);	//if this somehow one of these failed (they shouldn't), return failure
 	if((bits == 0) || (width == 0) || (height == 0))
 	{
-		errlog << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity" << endl;
+		LOG(INFO) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity"
 		return;
 	}
 	
 	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(bits, width, height, FreeImage_GetBPP(dib), FreeImage_GetPitch(dib), 
 													0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	if(surface == NULL)
-		errlog << "NULL surface for icon " << m_sIcon << endl;
+		LOG(INFO) << "NULL surface for icon " << m_sIcon
 	else
 	{
 		SDL_SetWindowIcon(m_Window, surface);
@@ -382,7 +387,7 @@ bool Engine::getCursorDown(int iButtonCode)
 		case MMB:
 			return(ms & SDL_BUTTON(SDL_BUTTON_MIDDLE));
 		default:
-			//errlog << "Unsupported mouse code: " << iButtonCode << endl;	//meh
+			//LOG(INFO) << "Unsupported mouse code: " << iButtonCode	//meh
 			break;
 	}
 	return false;

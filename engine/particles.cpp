@@ -7,7 +7,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
-using namespace tinyxml2;
+#include "easylogging++.h"
 
 ParticleSystem::ParticleSystem() : Drawable()
 {
@@ -348,7 +348,6 @@ void ParticleSystem::update(float dt)
 
 void ParticleSystem::draw(bool bDebugInfo)
 {
-	//cout << "Draw particles " << m_num;
 	if(img == NULL) return;
 	if(!show) return;
 	
@@ -436,24 +435,24 @@ void ParticleSystem::init()
 
 void ParticleSystem::fromXML(string sXMLFilename)
 {
-	errlog << "Loading particle system " << sXMLFilename << endl;
+	LOG(INFO) << "Loading particle system " << sXMLFilename;
 	_initValues();
 	
-	XMLDocument* doc = new XMLDocument();
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
     int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
+	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		errlog << "Error parsing XML file " << sXMLFilename << ": Error " << iErr << endl;
+		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
 	
 	m_sXMLFrom = sXMLFilename;
 
-    XMLElement* root = doc->FirstChildElement("particlesystem");
+	tinyxml2::XMLElement* root = doc->FirstChildElement("particlesystem");
     if(root == NULL)
 	{
-		errlog << "Error: No toplevel \"particlesystem\" item in XML file " << sXMLFilename << endl;
+		LOG(INFO) << "Error: No toplevel \"particlesystem\" item in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}
@@ -489,7 +488,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 	root->QueryFloatAttribute("decayvar", &fDecayVar);
 	decay += randFloat(-fDecayVar, fDecayVar);
 	
-	for(XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+	for(tinyxml2::XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{
 		string sName = elem->Name();
 		if(sName == "img")
@@ -498,7 +497,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 			if(cPath != NULL)
 			{
 				img = getImage(cPath);
-				for(XMLElement* rect = elem->FirstChildElement("rect"); rect != NULL; rect = rect->NextSiblingElement("rect"))
+				for(tinyxml2::XMLElement* rect = elem->FirstChildElement("rect"); rect != NULL; rect = rect->NextSiblingElement("rect"))
 				{
 					const char* cVal = rect->Attribute("val");
 					if(cVal != NULL)
@@ -603,7 +602,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 					particleDeathSpawn = true;
 			}
 			
-			for(XMLElement* particle = elem->FirstChildElement("particle"); particle != NULL; particle = particle->NextSiblingElement("particle"))
+			for(tinyxml2::XMLElement* particle = elem->FirstChildElement("particle"); particle != NULL; particle = particle->NextSiblingElement("particle"))
 			{
 				const char* cPath = particle->Attribute("path");
 				if(cPath != NULL)
@@ -611,7 +610,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 			}
 		}
 		else
-			errlog << "Warning: Unknown element type \"" << sName << "\" found in XML file " << sXMLFilename << ". Ignoring..." << endl;
+			LOG(WARNING) << "Warning: Unknown element type \"" << sName << "\" found in XML file " << sXMLFilename << ". Ignoring...";
 	}
 	
 	delete doc;

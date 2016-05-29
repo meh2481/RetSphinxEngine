@@ -7,7 +7,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
-using namespace tinyxml2;
+#include "easylogging++.h"
 
 
 Text::Text(string sXMLFilename)
@@ -24,15 +24,15 @@ Text::Text(string sXMLFilename)
 	//	  ...
 	//  </font>
 
-	XMLDocument* doc = new XMLDocument();
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 	doc->LoadFile(sXMLFilename.c_str());
 
-	XMLElement* elem = doc->FirstChildElement("font");
+	tinyxml2::XMLElement* elem = doc->FirstChildElement("font");
 	if(elem == NULL) return;
 	const char* cName = elem->Attribute("name");
 	if(cName != NULL)
 		m_sName = cName;
-	errlog << "Creating font \"" << m_sName << "\"" << endl;
+	LOG(INFO) << "Creating font \"" << m_sName << "\"";
 	for(elem = elem->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{
 		cName = elem->Name();
@@ -63,7 +63,7 @@ Text::Text(string sXMLFilename)
 
 Text::~Text()
 {
-	errlog << "Destroying font \"" << m_sName << "\"" << endl;
+	LOG(INFO) << "Destroying font \"" << m_sName << "\"";
 	if(m_imgFont != NULL)
 		delete m_imgFont;
 }

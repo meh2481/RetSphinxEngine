@@ -8,6 +8,7 @@
 #include <sstream>
 #include "Image.h"
 #include "opengl-api.h"
+#include "easylogging++.h"
 
 //Keybinding stuff!
 uint32_t JOY_BUTTON_BACK;
@@ -57,7 +58,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	//Set camera position for this game
 	m_fDefCameraZ = -16;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);
-#ifdef DEBUG
+#ifdef _DEBUG
 	m_bMouseGrabOnWindowRegain = false;
 #else
 	m_bMouseGrabOnWindowRegain = true;
@@ -124,13 +125,10 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 
 GameEngine::~GameEngine()
 {
-	errlog << "~GameEngine()" << endl;
+	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
 	cleanupObjects();
 	delete m_Cursor;
-	//delete m_lTest;
-	//delete m_lAnimTest;
-	//delete testObj;
 }
 
 void GameEngine::frame(float dt)
@@ -145,23 +143,14 @@ void GameEngine::frame(float dt)
 		addObject(*i);
 	m_lAddLater.clear();
 	
-	//m_lAnimTest->update(dt);
-	
-	
-	//m_sun->pos.x = cos(DEG2RAD*fSunRotAmt) * 50;
-	//m_sun->depth = -sin(DEG2RAD*fSunRotAmt) * 50;
-	//updateSceneryLayer(m_sun);
-	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
 	{
-		//cout << "Load scene " << m_sLoadScene << ", " << m_sLoadNode << endl;
 		reloadImages();
 		loadScene(m_sLoadScene);
 		m_sLoadScene.clear();
 		if(m_sLoadNode.size())
 		{
-			//cout << "warp to node " << m_sLoadNode << endl;
 			//Warp to node on map
 			warpObjectToNode(player, getNode(m_sLoadNode));
 			m_sLoadNode.clear();
@@ -238,7 +227,6 @@ void GameEngine::draw()
 	if(rcSceneBounds.area())	//If it's not unset
 	{
 		Rect rcCam = getCameraView(CameraPos);
-		//cout << "camera view: " << rectToString(rcCam) << endl;
 		if(rcCam.left < rcSceneBounds.left)
 		{
 			CameraPos.x += rcSceneBounds.left - rcCam.left;
@@ -287,8 +275,8 @@ void GameEngine::draw()
 void GameEngine::init(list<commandlineArg> sArgs)
 {
 	//Run through list for arguments we recognize
-	for(list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
-		errlog << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue << endl;
+	for (list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+		LOG(INFO) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such
 	loadConfig(getSaveLocation() + "config.xml");
