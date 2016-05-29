@@ -220,7 +220,7 @@ void GameEngine::handleKeys()
 	{
 		setTimeScale(0.25f);
 		if (keyDown(SDL_SCANCODE_CTRL))
-			setTimeScale(0.125f);
+			setTimeScale(0.0625f);
 	}
 
 	if (keyDown(SDL_SCANCODE_H))

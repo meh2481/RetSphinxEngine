@@ -70,8 +70,6 @@ public:
 	~GameEngine();
 	
 	void setLua(LuaInterface* l)	{Lua = l;};
-	
-	bool _shouldSelect(b2Fixture* fix);
 
 	//Functions dealing with input and user IO - GameEngine_events.cpp
 //	void hudSignalHandler(string sSignal);	//For handling signals that come from the HUD //TODO Rip out or fix

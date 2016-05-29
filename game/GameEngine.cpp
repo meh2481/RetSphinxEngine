@@ -44,11 +44,6 @@ SDL_Scancode KEY_ENTER2;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
-void signalHandler(string sSignal)
-{
-	g_pGlobalEngine->hudSignalHandler(sSignal);
-}
-
 void spawnNewParticleSystem(string sFilename, Point ptPos)
 {
 	g_pGlobalEngine->spawnNewParticleSystem(sFilename, ptPos);
@@ -72,8 +67,6 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	m_Cursor = new myCursor();
 	m_Cursor->fromXML("res/cursor/arrow.xml");
 	setCursor(m_Cursor);
-	
-	setTimeScale(DEFAULT_TIMESCALE);
 	
 	m_joy = NULL;
 	m_rumble = NULL;
@@ -335,12 +328,6 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	
 	Lua->call("loadStartingMap");
 	//loadScene("res/3d/solarsystem.scene.xml");
-}
-
-
-void GameEngine::hudSignalHandler(string sSignal)
-{
-	
 }
 
 void GameEngine::pause()
