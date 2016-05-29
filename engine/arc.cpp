@@ -7,7 +7,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 
-arc::arc(unsigned number, Image* img) : physSegment()
+arc::arc(unsigned number, Image* img) : ObjSegment()
 {
 	segmentPos = NULL;
 	if(img == NULL || number == 0) return;

@@ -26,9 +26,9 @@ void EngineContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse
 	
 }
 
-obj* EngineContactListener::getObj(b2Fixture* fix)
+Object* EngineContactListener::getObj(b2Fixture* fix)
 {
-	obj* result = NULL;
+	Object* result = NULL;
 	if(fix)
 	{
 		b2Body* bod = fix->GetBody();
@@ -37,7 +37,7 @@ obj* EngineContactListener::getObj(b2Fixture* fix)
 			void* data = bod->GetUserData();
 			if(data)
 			{
-				physSegment* seg = (physSegment*)data;
+				ObjSegment* seg = (ObjSegment*)data;
 				result = seg->parent;
 			}
 		}

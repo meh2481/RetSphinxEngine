@@ -141,7 +141,7 @@ void GameEngine::frame(float dt)
 	updateObjects(dt);
 	
 	//Add any objects created during updating this frame
-	for(list<obj*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
+	for(list<Object*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
 		addObject(*i);
 	m_lAddLater.clear();
 	
@@ -351,7 +351,7 @@ void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
 	addParticles(pSys);
 }
 
-void GameEngine::warpObjectToNode(obj* o, Node* n)
+void GameEngine::warpObjectToNode(Object* o, Node* n)
 {
 	if(o && n)
 		o->setPosition(n->pos);

@@ -37,7 +37,7 @@ private:
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
-	list<obj*> m_lAddLater;
+	list<Object*> m_lAddLater;	//TODO: This should be managed by the Engine by default, not GameEngine
 	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time
 	SDL_Haptic* m_rumble;
 	
@@ -48,7 +48,7 @@ private:
 	//Testing stuff!
 	//Object3D* testObj;
 	//physSegment* m_sun;
-	obj* player;
+	Object* player;
 	Rect rcSceneBounds;
 	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
 	string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
@@ -78,15 +78,15 @@ public:
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
 	bool loadConfig(string sFilename);
 	void saveConfig(string sFilename);
-	obj* objFromXML(string sType, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
+	Object* objFromXML(string sType, Point ptOffset = Point(0,0), Point ptVel = Point(0,0));
 	void loadScene(string sXMLFilename);	//Load scene from file
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
 	void spawnNewParticleSystem(string sFilename, Point ptPos);
-	void addAfterUpdate(obj* o) {m_lAddLater.push_back(o);};	//Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
-	void warpObjectToNode(obj* o, Node* n);
+	void addAfterUpdate(Object* o) {m_lAddLater.push_back(o);};	//TODO REMOVE Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
+	void warpObjectToNode(Object* o, Node* n);
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float dt);

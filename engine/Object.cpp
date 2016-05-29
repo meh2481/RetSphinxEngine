@@ -16,10 +16,8 @@ using namespace tinyxml2;
 //----------------------------------------------------------------------------------------------------
 // obj class
 //----------------------------------------------------------------------------------------------------
-obj::obj() : Drawable()
+Object::Object() : Drawable()
 {
-  usr = NULL;
-  body = NULL;
   meshImg = NULL;
   meshLattice = NULL;
   meshAnim = NULL;
@@ -30,7 +28,7 @@ obj::obj() : Drawable()
   segments.reserve(1);	//don't expect very many segments
 }
 
-obj::~obj()
+Object::~Object()
 {
 	if(lua)
 	{
@@ -40,7 +38,7 @@ obj::~obj()
 		//Cleanup Lua glue object
 		lua->deleteObject(glueObj);
 	}
-    for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
 	if(meshLattice)
 		delete meshLattice;
@@ -48,40 +46,28 @@ obj::~obj()
 		delete meshAnim;
 }
 
-void obj::draw(bool bDebugInfo)
+void Object::draw(bool bDebugInfo)
 {
 	if(!active)
 		return;
 	
 	//Draw segments of this object
-    for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
-		if(!(*i)->show) continue;	//Skip frames that shouldn't be drawn up front
-		if(body && !(*i)->body)	//Override parenting if the child segments have their own physics already
-		{
-			//Make the children bodies follow the parent
-			glPushMatrix();
-			b2Vec2 objpos = body->GetWorldCenter();
-			float objrot = body->GetAngle();
-			glTranslatef(objpos.x, objpos.y, depth);
-			glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
-			(*i)->draw();
-			glPopMatrix();
-		}
-		else
+		if((*i)->show)	//Skip frames that shouldn't be drawn up front
 			(*i)->draw();
 	}
 	if(meshImg)
 	{
 		//TODO Jeepers this is messy. I totally thought this was a for loop. Make this look sane
-		vector<physSegment*>::iterator i = segments.begin();
+		vector<ObjSegment*>::iterator i = segments.begin();
 		if(i != segments.end())
 		{
-			physSegment* seg = *i;
+			ObjSegment* seg = *i;
 			if(seg != NULL && seg->body != NULL)
 			{
 				b2Vec2 pos = seg->body->GetPosition();
-				//float fAngle = seg->body->GetAngle();
+				//float fAngle = seg->body->GetAngle();	//TODO Is this needed?
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
 				if(meshLattice)
@@ -101,59 +87,55 @@ void obj::draw(bool bDebugInfo)
 	}
 }
 
-void obj::addSegment(physSegment* seg)
+void Object::addSegment(ObjSegment* seg)
 {
 	if(seg == NULL) return;
     segments.push_back(seg);
 	seg->parent = this;
 }
 
-b2BodyDef* obj::update(float dt)
+void Object::update(float dt)
 {
-	b2BodyDef* def = NULL;
-	
 	if(meshAnim)
 		meshAnim->update(dt);
 	
 	if(lua)
 		lua->callMethod(this, "update", dt);
-	
-	return def;
 }
 
-b2Body* obj::getBody()
+b2Body* Object::getBody()
 {
 	if(segments.size())
 		return (*segments.begin())->body;
 	return NULL;
 }
 
-void obj::setImage(Image* img, unsigned int seg)
+void Object::setImage(Image* img, unsigned int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;
 }
 
-Point obj::getPos()
+Point Object::getPos()
 {
 	b2Body* b = getBody();
 	b2Vec2 p = b ? b->GetPosition() : b2Vec2(0,0);
 	return Point(p.x, p.y);
 }
 
-void obj::collide(obj* other)
+void Object::collide(Object* other)
 {
 	if(lua)
 		lua->callMethod(this, "collide", other);
 }
 
-void obj::collideWall(Point ptNormal)
+void Object::collideWall(Point ptNormal)
 {
 	if(lua)
 		lua->callMethod(this, "collidewall", ptNormal.x, ptNormal.y);
 }
 
-void obj::initLua()
+void Object::initLua()
 {
 	if(lua && glueObj == NULL)
 	{
@@ -167,14 +149,14 @@ void obj::initLua()
 	}
 }
 
-void obj::setPosition(Point p)
+void Object::setPosition(Point p)
 {
 	b2Body* b = getBody();
 	if(b != NULL)
 	{
 		b2Vec2 ptDiff = b->GetPosition();	//Get relative offset for all bodies
 		ptDiff = b2Vec2(p.x, p.y) - ptDiff;
-		for(vector<physSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+		for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
 		{
 			if((*i)->body != NULL)
 			{
@@ -189,7 +171,7 @@ void obj::setPosition(Point p)
 //----------------------------------------------------------------------------------------------------
 // physSegment class
 //----------------------------------------------------------------------------------------------------
-physSegment::physSegment() : Drawable()
+ObjSegment::ObjSegment() : Drawable()
 {
     body = NULL;
     img = NULL;
@@ -198,13 +180,12 @@ physSegment::physSegment() : Drawable()
 	latanim = NULL;
 	obj3D = NULL;
 
-	//shear.SetZero();
 	rot = 0.0f;
 	size.x = size.y = tile.x = tile.y = 1.0f;
 	show = true;
 }
 
-physSegment::~physSegment()
+ObjSegment::~ObjSegment()
 {
 	//Free Box2D body
 	if(body != NULL)
@@ -215,7 +196,7 @@ physSegment::~physSegment()
 		delete latanim;
 }
 
-void physSegment::draw(bool bDebugInfo)
+void ObjSegment::draw(bool bDebugInfo)
 {
 	if(img == NULL || !show) return;
 	glColor4f(col.r,col.g,col.b,col.a);
@@ -271,13 +252,13 @@ void physSegment::draw(bool bDebugInfo)
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
-void physSegment::update(float dt)
+void ObjSegment::update(float dt)
 {
 	if(latanim)
 		latanim->update(dt);
 }
 
-void physSegment::fromXML(XMLElement* layer)
+void ObjSegment::fromXML(XMLElement* layer)
 {
 	const char* cLayerFilename = layer->Attribute("img");
 	if(cLayerFilename != NULL)

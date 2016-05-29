@@ -10,7 +10,7 @@
 
 class Image;
 
-class arc : public physSegment
+class arc : public ObjSegment
 {
 protected:
 	float* segmentPos;

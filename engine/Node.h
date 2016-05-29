@@ -16,7 +16,7 @@ public:
 	~Node();
 	
 	void update(float dt);	//Update the node
-	void collided(obj* o);		//Collided with an object
+	void collided(Object* o);		//Collided with an object
 	void init();				//Create stuff in lua for this object
 	
 	void setProperty(string prop, string value)	{propertyValues[prop] = value;};

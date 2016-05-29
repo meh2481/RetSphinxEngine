@@ -23,23 +23,23 @@ public:
 		g_pGlobalEngine->CameraPos.y = -pt.y;
 	}
 	
-	static obj* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
+	static Object* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
 	{
 		return g_pGlobalEngine->objFromXML(sClassName, ptOffset, ptVel);
 	}
 	
-	static void addObject(obj* o)
+	static void addObject(Object* o)
 	{
 		g_pGlobalEngine->addAfterUpdate(o);
 		o->initLua();	//Need to init this now so the glue ptr gets initialized properly
 	}
 	
-	static obj* getPlayerObject()
+	static Object* getPlayerObject()
 	{
 		return g_pGlobalEngine->player;
 	}
 	
-	static void setPlayerObject(obj* o)
+	static void setPlayerObject(Object* o)
 	{
 		g_pGlobalEngine->player = o;
 	}
@@ -102,7 +102,7 @@ public:
 		return g_pGlobalEngine->getFramerate();
 	}
 	
-	static obj* getObjAtPoint(Point p)
+	static Object* getObjAtPoint(Point p)
 	{
 		return g_pGlobalEngine->getObject(p);
 	}
@@ -122,7 +122,7 @@ public:
 		return g_pGlobalEngine->getNode(sNodeName);
 	}
 	
-	static obj* getClosestObject(Point p)
+	static Object* getClosestObject(Point p)
 	{
 		return g_pGlobalEngine->getClosestObject(p);
 	}
@@ -173,7 +173,7 @@ luaFunc(getFramerate)	//float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	float f = (float)lua_tonumber(L,2);
 	if(o)
 	{
@@ -189,7 +189,7 @@ luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
 
 luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	float f = 0.0f;
 	if(o)
 	{
@@ -202,7 +202,7 @@ luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
 
 luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	b2Vec2 p((float)lua_tonumber(L,2), (float)lua_tonumber(L, 3));
 	if(o)
 	{
@@ -216,7 +216,7 @@ luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 {
 	b2Vec2 p(0,0);
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	if(o)
 	{
 		b2Body* b = o->getBody();
@@ -228,7 +228,7 @@ luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 
 luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	b2Vec2 pForce((float)lua_tonumber(L,2), (float)lua_tonumber(L, 3));
 	if(o)
 	{
@@ -241,7 +241,7 @@ luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 
 luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	b2Vec2 pt(0,0);
 	if(o)
 	{
@@ -254,7 +254,7 @@ luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 
 luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	Point p(lua_tonumber(L,2), lua_tonumber(L,3));
 	if(o)
 		o->setPosition(p);
@@ -275,7 +275,7 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 		ptVel.x = (float)lua_tonumber(L, 4);
 	if(lua_isnumber(L, 5))
 		ptVel.y = (float)lua_tonumber(L, 5);
-	obj* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
+	Object* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
 	if(o)
 	{
 		GameEngineLua::addObject(o);
@@ -286,7 +286,7 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 
 luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
 {
-	obj* o = GameEngineLua::getPlayerObject();
+	Object* o = GameEngineLua::getPlayerObject();
 	if(o)
 		luaReturnObj(o);
 	luaReturnNil();
@@ -294,7 +294,7 @@ luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
 
 luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	if(o)
 		GameEngineLua::setPlayerObject(o);
 	luaReturnNil();
@@ -303,7 +303,7 @@ luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
 luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 {
 	Point p(lua_tonumber(L,1), lua_tonumber(L,2));
-	obj* o = GameEngineLua::getObjAtPoint(p);
+	Object* o = GameEngineLua::getObjAtPoint(p);
 	if(o == NULL)
 		luaReturnNil();
 	luaReturnObj(o);
@@ -312,7 +312,7 @@ luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 //Set physics off or on for an object's body
 luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	bool b = (lua_toboolean(L, 2) != 0);
 	if(o)
 	{
@@ -327,7 +327,7 @@ luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 luaFunc(obj_getProperty)	//string obj_getProperty(obj* o, string sProp)
 {
 	string s;
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	if(o)
 		s = o->getProperty(lua_tostring(L, 2));
 	luaReturnString(s);
@@ -335,7 +335,7 @@ luaFunc(obj_getProperty)	//string obj_getProperty(obj* o, string sProp)
 
 luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 1)
 {
-	obj *o = getObj<obj>(L);
+	Object *o = getObj<Object>(L);
 	if(o)
 	{
 		lua_Integer seg = 1;
@@ -391,7 +391,7 @@ luaFunc(node_getNearestObj) //obj* node_getNearestObj(Node* n/*, string sObjName
 	Node* n = getObj<Node>(L);
 	if(n)
 	{
-		obj* o = GameEngineLua::getClosestObject(n->pos);
+		Object* o = GameEngineLua::getClosestObject(n->pos);
 		if(o)
 			luaReturnObj(o);
 	}

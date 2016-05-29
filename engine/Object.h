@@ -12,8 +12,8 @@
 #include "luafuncs.h"
 #include "tinyxml2.h"
 
-class obj;
-class physSegment;
+class Object;
+class ObjSegment;
 class b2Body;
 struct b2BodyDef;
 class lattice;
@@ -22,14 +22,14 @@ class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO: Why would they just be images unless they're scenery? Make second class for scenery?
-class physSegment : public Drawable
+class ObjSegment : public Drawable
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
     Image*  		img;		//Image to draw
 	lattice*		lat;		//Lattice to apply to image
 	latticeAnim*	latanim;	//Animation to apply to lattice
-	obj* 			parent;		//Parent object
+	Object* 		parent;		//Parent object
 	Object3D*		obj3D;		//3D object
 	
 	Point pos;		//Offset (after rotation)
@@ -41,8 +41,8 @@ public:
 	Color col;
 	bool show;
 
-    physSegment();
-    ~physSegment();
+    ObjSegment();
+    ~ObjSegment();
 	
 	void draw(bool bDebugInfo = false);
 	void update(float dt);
@@ -50,33 +50,30 @@ public:
 };
 
 //Collections of the above all stuffed into one object for ease of use.
-//TODO: Rename from 'obj' to something more intelligent
-class obj : public Drawable
+class Object : public Drawable
 {
 	LuaObjGlue* glueObj;
 	map<string, string> propertyValues;
 public:
 	enum { TYPE = OT_OBJECT };
-    vector<physSegment*> 	segments;
-    b2Body*         		body; //TODO: is this ever even used?
+    vector<ObjSegment*> 	segments;
 	Image*					meshImg;
 	lattice*				meshLattice;
 	latticeAnim*			meshAnim;
 	Point					meshSize;
-    void* 					usr;
 	LuaInterface* 			lua;
 	string 					luaClass;
 	bool 					active;
     
-    obj();
-    ~obj();
+    Object();
+    ~Object();
 
     void draw(bool bDebugInfo = false);
-    void addSegment(physSegment* seg);
-	b2BodyDef* update(float dt);
+    void addSegment(ObjSegment* seg);
+	void update(float dt);
 	b2Body* getBody();
-	Point getPos();	//TODO: Find where we're using body->getPos and replace with this func
-	void collide(obj* other);
+	Point getPos();
+	void collide(Object* other);
 	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
 	void setPosition(Point p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)

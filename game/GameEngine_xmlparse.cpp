@@ -208,7 +208,7 @@ void GameEngine::saveConfig(string sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 
 //TODO: This should be engine-specific, not game-specific
-obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
+Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 {
 	ostringstream oss;
 	oss << "res/obj/" << sType << ".xml";
@@ -234,7 +234,7 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 		return NULL;
 	}
 	
-	obj* o = new obj;
+	Object* o = new Object;
 	
 	const char* cLuaClass = root->Attribute("luaclass");
 	if(cLuaClass != NULL)
@@ -245,7 +245,7 @@ obj* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	//Add segments
 	for(XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
 	{
-		physSegment* seg = new physSegment;
+		ObjSegment* seg = new ObjSegment;
 		seg->parent = o;
 		XMLElement* body = segment->FirstChildElement("body");
 		if(body != NULL)
@@ -508,7 +508,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load layers for the scene
 	for(XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
-		physSegment* seg = new physSegment();
+		ObjSegment* seg = new ObjSegment();
 		seg->fromXML(layer);
 		
 		addScenery(seg);
@@ -532,7 +532,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(cVel != NULL)
 				vel = pointFromString(cVel);
 			
-			obj* o = objFromXML(cObjType, pos, vel);
+			Object* o = objFromXML(cObjType, pos, vel);
 			
 			if(o != NULL)
 			{
@@ -542,10 +542,10 @@ void GameEngine::loadScene(string sXMLFilename)
 					string s = cName;
 					if(s == "ship")	//TODO: Remove & move logic elsewhere
 					{
-						vector<physSegment*>::iterator segiter = o->segments.begin();
+						vector<ObjSegment*>::iterator segiter = o->segments.begin();
 						if(segiter != o->segments.end())
 						{
-							physSegment* sg = *segiter;
+							ObjSegment* sg = *segiter;
 							if(sg->obj3D != NULL)
 							{
 								sg->obj3D->useGlobalLight = false;

@@ -36,7 +36,7 @@ typedef struct
 class depthComparator
 {
 public:
-	bool operator()(const physSegment* s1, const physSegment* s2)
+	bool operator()(const ObjSegment* s1, const ObjSegment* s2)
 	{
 		return s1->depth < s2->depth;
 	}
@@ -61,8 +61,8 @@ private:
 	float m_fFramerate;
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
-	list<obj*> m_lObjects;	//Object handler
-	multiset<physSegment*, depthComparator> m_lScenery;
+	list<Object*> m_lObjects;	//Object handler
+	multiset<ObjSegment*, depthComparator> m_lScenery;
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
 	uint16_t m_iWidth, m_iHeight;
@@ -109,7 +109,7 @@ protected:
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
-	virtual obj* objFromXML(string sXMLFilename, Point ptOffset, Point ptVel) = 0;	//Function called when an object should be created
+	virtual Object* objFromXML(string sXMLFilename, Point ptOffset, Point ptVel) = 0;	//Function called when an object should be created
 
 public:
 	//Constructor/destructor
@@ -204,16 +204,16 @@ public:
 	float getFramerate()   {return m_fFramerate;};
 	
 	//Object management functions - engine_obj.cpp
-	void addObject(obj* o);
-	void addScenery(physSegment* seg) 	{m_lScenery.insert(seg);};
+	void addObject(Object* o);
+	void addScenery(ObjSegment* seg) 	{m_lScenery.insert(seg);};
 	//void updateSceneryLayer(physSegment* seg);
 	void drawAll();
 	void cleanupObjects();
 	void updateObjects(float dt);
 	void addNode(Node* n);
 	Node* getNode(string sNodeName);
-	obj* getObject(Point p);	//Get first object at this point
-	obj* getClosestObject(Point p);	//Get closest object to this point
+	Object* getObject(Point p);	//Get first object at this point
+	Object* getClosestObject(Point p);	//Get closest object to this point
 	Node* getNode(Point p);		//Get first node at this point
 
 	//OpenGL methods

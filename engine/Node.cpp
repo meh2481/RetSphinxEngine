@@ -32,7 +32,7 @@ void Node::update(float dt)
 }
 
 //Collided with an object
-void Node::collided(obj* o)
+void Node::collided(Object* o)
 {
 	if(lua)
 		lua->callMethod(this, "collide", o);
