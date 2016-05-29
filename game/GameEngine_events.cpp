@@ -43,6 +43,7 @@ void GameEngine::handleEvent(SDL_Event event)
 					stepPhysics();
 					break;
 #endif
+				//TODO Fix to work properly now
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
 					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
@@ -103,9 +104,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-#ifdef DEBUG_INPUT
-			cout << "Mouse button " << (int)event.button.button << " released." << endl;
-#endif
+			//LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
 			if(event.button.button == SDL_BUTTON_LEFT)
 			{
 				
@@ -121,9 +120,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEMOTION:
-#ifdef DEBUG_INPUT
-			cout << "Mouse moved to " << event.motion.x << ", " << event.motion.y << endl;
-#endif
+			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
 			break;
 		
 		case SDL_WINDOWEVENT:
@@ -143,16 +140,17 @@ void GameEngine::handleEvent(SDL_Event event)
 		//Gamepad stuff!
 		case SDL_JOYDEVICEADDED:
 			LOG(INFO) << "Joystick " << (int)event.jdevice.which << " connected.";
+			//TODO: Create new joystick, don't override old one
 			m_joy = SDL_JoystickOpen(event.jdevice.which);
 
 			if (m_joy)
 			{
-				LOG(INFO) << "Opened Joystick " << event.jdevice.which;
-				LOG(INFO) << "Name: " << SDL_JoystickNameForIndex(event.jdevice.which);
-				LOG(INFO) << "Number of Axes: " << SDL_JoystickNumAxes(m_joy);
-				LOG(INFO) << "Number of Buttons: " << SDL_JoystickNumButtons(m_joy);
-				LOG(INFO) << "Number of Balls: " << SDL_JoystickNumBalls(m_joy);
-				LOG(INFO) << "Number of Hats: " << SDL_JoystickNumHats(m_joy);
+				LOG(TRACE) << "Opened Joystick " << event.jdevice.which;
+				LOG(TRACE) << "Name: " << SDL_JoystickNameForIndex(event.jdevice.which);
+				LOG(TRACE) << "Number of Axes: " << SDL_JoystickNumAxes(m_joy);
+				LOG(TRACE) << "Number of Buttons: " << SDL_JoystickNumButtons(m_joy);
+				LOG(TRACE) << "Number of Balls: " << SDL_JoystickNumBalls(m_joy);
+				LOG(TRACE) << "Number of Hats: " << SDL_JoystickNumHats(m_joy);
 
 				//On Linux, "xboxdrv" is the driver I had the most success with when it came to rumble (default driver said it rumbled, but didn't)
 				m_rumble = NULL;
@@ -162,7 +160,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				{
 					if (SDL_HapticRumbleInit(m_rumble) != 0)
 					{
-						LOG(INFO) << "Error initializing joystick " << (int)event.jdevice.which << " as rumble.";
+						LOG(WARNING) << "Unable to initialize joystick " << (int)event.jdevice.which << " as rumble.";
 						SDL_HapticClose(m_rumble);
 						m_rumble = NULL;
 					}
@@ -175,7 +173,7 @@ void GameEngine::handleEvent(SDL_Event event)
 					LOG(INFO) << "Joystick " << (int)event.jdevice.which << " has no rumble support.";
 			}
 			else
-				LOG(INFO) << "Couldn't open Joystick " << (int)event.jdevice.which;
+				LOG(WARNING) << "Couldn't open Joystick " << (int)event.jdevice.which;
 			break;
 			
 		//TODO: Test if this is working now
@@ -184,33 +182,23 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 			
 		case SDL_JOYBUTTONDOWN:
-#ifdef DEBUG_INPUT
-			cout << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button << endl;
-#endif
+			LOG(TRACE) << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button;
 			if(event.jbutton.button == JOY_BUTTON_BACK)
 				quit();
 				
 			break;
 			
 		case SDL_JOYBUTTONUP:
-#ifdef DEBUG_INPUT
-			cout << "Joystick " << (int)event.jbutton.which << " released button " << (int)event.jbutton.button << endl;
-#endif
+			LOG(TRACE) << "Joystick " << (int)event.jbutton.which << " released button " << (int)event.jbutton.button;
 			break;
 			
 		case SDL_JOYAXISMOTION:
 			if(abs(event.jaxis.value) > JOY_MINMOVE_TRIP)
-			{
-#ifdef DEBUG_INPUT
-				cout << "Joystick " << (int)event.jaxis.which << " moved axis " << (int)event.jaxis.axis << " to " << event.jaxis.value << endl;
-#endif
-			}
+				LOG(TRACE) << "Joystick " << (int)event.jaxis.which << " moved axis " << (int)event.jaxis.axis << " to " << event.jaxis.value;
 			break;
 			
 		case SDL_JOYHATMOTION:
-#ifdef DEBUG_INPUT
-			cout << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value << endl;
-#endif
+			LOG(TRACE) << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value;
 			break;
 	}
 }

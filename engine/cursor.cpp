@@ -50,7 +50,7 @@ bool myCursor::fromXML(string sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
+		LOG(ERROR) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return false;
 	}
@@ -58,7 +58,7 @@ bool myCursor::fromXML(string sXMLFilename)
 	tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
     if(root == NULL)
 	{
-		LOG(INFO) << "Error: No toplevel \"cursor\" item in XML file " << sXMLFilename;
+		LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sXMLFilename;
 		delete doc;
 		return false;
 	}

@@ -697,7 +697,7 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
 	}
     
 	else
-		LOG(INFO) << "Unknown HUD item \"" << sName << "\". Ignoring...";
+		LOG(WARNING) << "Unknown HUD item \"" << sName << "\". Ignoring...";
     return NULL;
 }
 
@@ -708,7 +708,7 @@ void HUD::create(string sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
+		LOG(ERROR) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
@@ -716,7 +716,7 @@ void HUD::create(string sXMLFilename)
 	tinyxml2::XMLElement* root = doc->FirstChildElement("hud");
     if(root == NULL)
 	{
-		LOG(INFO) << "Error: No toplevel \"hud\" item in XML file " << sXMLFilename;
+		LOG(ERROR) << "Error: No toplevel \"hud\" item in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}

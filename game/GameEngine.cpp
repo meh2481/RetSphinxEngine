@@ -276,7 +276,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 {
 	//Run through list for arguments we recognize
 	for (list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
-		LOG(INFO) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
+		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such
 	loadConfig(getSaveLocation() + "config.xml");

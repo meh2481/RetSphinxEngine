@@ -72,7 +72,7 @@ void Image::_loadNoise(string sXMLFilename)
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr
+		LOG(ERROR) << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr
 		delete doc;
 		return;
 	}
@@ -80,7 +80,7 @@ void Image::_loadNoise(string sXMLFilename)
 	XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		LOG(INFO) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..."
+		LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..."
 		delete doc;
 		return;
 	}

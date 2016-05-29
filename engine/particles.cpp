@@ -442,7 +442,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
+		LOG(ERROR) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
@@ -452,7 +452,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 	tinyxml2::XMLElement* root = doc->FirstChildElement("particlesystem");
     if(root == NULL)
 	{
-		LOG(INFO) << "Error: No toplevel \"particlesystem\" item in XML file " << sXMLFilename;
+		LOG(ERROR) << "Error: No toplevel \"particlesystem\" item in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}

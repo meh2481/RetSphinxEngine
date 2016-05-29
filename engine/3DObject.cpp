@@ -68,7 +68,7 @@ void Object3D::_fromOBJFile(string sFilename)
     ifstream infile(sFilename.c_str());
     if(infile.fail())
     {
-		LOG(INFO) << "Error: Unable to open wavefront object file " << sFilename;
+		LOG(ERROR) << "Error: Unable to open wavefront object file " << sFilename;
         return;    //Abort
     }
     //Loop until we hit eof or fail
@@ -203,7 +203,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	FILE* fp = fopen(sFilename.c_str(), "rb");
 	if(fp == NULL)
 	{
-		LOG(INFO) << "Error: Input tiny3d file " << sFilename << " does not exist.";
+		LOG(ERROR) << "Error: Input tiny3d file " << sFilename << " does not exist.";
 		return;
 	}
 	
@@ -211,7 +211,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	tiny3dHeader header;
 	if(fread(&header, 1, sizeof(tiny3dHeader), fp) != sizeof(tiny3dHeader))
 	{
-		LOG(INFO) << "Error: Unable to read in tiny3d header from file " << sFilename;
+		LOG(ERROR) << "Error: Unable to read in tiny3d header from file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -220,7 +220,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	normal* normals = (normal*)malloc(sizeof(normal) * header.numNormals);
 	if(fread(normals, 1, sizeof(normal)*header.numNormals, fp) != sizeof(normal) * header.numNormals)
 	{
-		LOG(INFO) << "Error: Unable to read normals from tiny3d file " << sFilename;
+		LOG(ERROR) << "Error: Unable to read normals from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -229,7 +229,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	uv* uvs = (uv*)malloc(sizeof(uv) * header.numUVs);
 	if(fread(uvs, 1, sizeof(uv)*header.numUVs, fp) != sizeof(uv) * header.numUVs)
 	{
-		LOG(INFO) << "Error: Unable to read UVs from tiny3d file " << sFilename;
+		LOG(ERROR) << "Error: Unable to read UVs from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -238,7 +238,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	vert* vertices = (vert*)malloc(sizeof(vert) * header.numVertices);
 	if(fread(vertices, 1, sizeof(vert)*header.numVertices, fp) != sizeof(vert) * header.numVertices)
 	{
-		LOG(INFO) << "Error: Unable to read vertices from tiny3d file " << sFilename;
+		LOG(ERROR) << "Error: Unable to read vertices from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}
@@ -247,7 +247,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	face* faces = (face*)malloc(sizeof(face) * header.numFaces);
 	if(fread(faces, 1, sizeof(face)*header.numFaces, fp) != sizeof(face) * header.numFaces)
 	{
-		LOG(INFO) << "Error: Unable to read faces from tiny3d file " << sFilename;
+		LOG(ERROR) << "Error: Unable to read faces from tiny3d file " << sFilename;
 		fclose(fp);
 		return;
 	}

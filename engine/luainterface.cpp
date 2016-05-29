@@ -9,7 +9,7 @@
 #include <new>
 
 static int the_panic (lua_State *L) {
-	LOG(INFO) << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1);
+	LOG(FATAL) << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1);
 	assert(false);
     return 0;  /* return to Lua to abort */
 }
@@ -116,7 +116,7 @@ static void printCallstack(lua_State *L, const char *errmsg = "<unspecified erro
 #ifdef _DEBUG
 	printf("%s\n", os.str().c_str());
 #else
-	LOG(INFO) << os.str();
+	LOG(ERROR) << os.str();
 #endif
 }
 

@@ -16,7 +16,7 @@ bool GameEngine::loadConfig(string sFilename)
 	int iErr = doc->LoadFile(sFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing config file: Error " << iErr << ". Ignoring...";
+		LOG(ERROR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
 		if(isFullscreen())
 			setInitialFullscreen();
 		delete doc;
@@ -27,7 +27,7 @@ bool GameEngine::loadConfig(string sFilename)
 	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		LOG(INFO) << "Error: Root element NULL in XML file. Ignoring...";
+		LOG(ERROR) << "Error: Root element NULL in XML file. Ignoring...";
 		if(isFullscreen())
 			setInitialFullscreen();
 		delete doc;
@@ -220,7 +220,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing object XML file: Error " << iErr;
+		LOG(ERROR) << "Error parsing object XML file: Error " << iErr;
 		delete doc;
 		return NULL;
 	}
@@ -229,7 +229,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		LOG(INFO) << "Error: Root element NULL in XML file.";
+		LOG(ERROR) << "Error: Root element NULL in XML file.";
 		delete doc;
 		return NULL;
 	}
@@ -457,7 +457,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
-		LOG(INFO) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
+		LOG(ERROR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
 		delete doc;
 		return;
 	}
@@ -466,7 +466,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		LOG(INFO) << "Error: Root element NULL in XML file " << sXMLFilename;
+		LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename;
 		delete doc;
 		return;
 	}
@@ -646,7 +646,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
 	{
-		LOG(INFO) << "readFixture ERR: No fixture type";
+		LOG(ERROR) << "readFixture ERR: No fixture type";
 		return;
 	}
 	string sFixType = cFixType;
@@ -655,7 +655,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		const char* cBoxSize = fixture->Attribute("size");
 		if(!cBoxSize)
 		{
-			LOG(INFO) << "readFixture ERR: No box size";
+			LOG(ERROR) << "readFixture ERR: No box size";
 			return;
 		}
 		

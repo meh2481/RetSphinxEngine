@@ -7,18 +7,18 @@ void Engine::setup_sdl()
 
 	if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
-		LOG(INFO) << "SDL_InitSubSystem Error: " << SDL_GetError();
+		LOG(ERROR) << "SDL_InitSubSystem Error: " << SDL_GetError();
 		exit(1);
 	}
 	
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
-		LOG(INFO) << "Unable to init SDL2 gamepad subsystem.";
+		LOG(ERROR) << "Unable to init SDL2 gamepad subsystem.";
 
 	LOG(INFO) << "Loading OpenGL...";
 
 	if (SDL_GL_LoadLibrary(NULL) == -1)
 	{
-		LOG(INFO) << "SDL_GL_LoadLibrary Error: " << SDL_GetError();
+		LOG(ERROR) << "SDL_GL_LoadLibrary Error: " << SDL_GetError();
 		exit(1);
 	}
 
@@ -50,7 +50,7 @@ void Engine::setup_sdl()
 
 	if(m_Window == NULL)
 	{
-		LOG(INFO) << "Couldn't set video mode: " << SDL_GetError();
+		LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1); //Share objects between OpenGL contexts

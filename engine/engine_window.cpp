@@ -15,7 +15,7 @@ void Engine::changeScreenResolution(float w, float h)
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		LOG(INFO) << "SDL_GetWMInfo #1 failed";
+		LOG(ERROR) << "SDL_GetWMInfo #1 failed";
 		return;
 	}
 
@@ -26,7 +26,7 @@ void Engine::changeScreenResolution(float w, float h)
 	HGLRC tempRC = wglCreateContext(tempDC);
 	if(tempRC == NULL) 
 	{
-		LOG(INFO) << "wglCreateContext failed";
+		LOG(ERROR) << "wglCreateContext failed";
 		return;
 	}
 	
@@ -34,7 +34,7 @@ void Engine::changeScreenResolution(float w, float h)
 	SetLastError(0);
 	if(!wglShareLists(wglGetCurrentContext(), tempRC))
 	{
-		LOG(INFO) << "wglShareLists #1 failed";
+		LOG(ERROR) << "wglShareLists #1 failed";
 		return;
 	}
 #endif
@@ -59,21 +59,21 @@ void Engine::changeScreenResolution(float w, float h)
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		LOG(INFO) << "SDL_GetWMInfo #2 failed";
+		LOG(ERROR) << "SDL_GetWMInfo #2 failed";
 		return;
 	}
  
 	//Share resources to our new SDL-created context
 	if(!wglShareLists(tempRC, wglGetCurrentContext()))
 	{
-		LOG(INFO) << "wglShareLists #2 failed";
+		LOG(ERROR) << "wglShareLists #2 failed";
 		return;
 	}
  
 	//We no longer need our temporary context
 	if(!wglDeleteContext(tempRC))
 	{
-		LOG(INFO) << "wglDeleteContext failed";
+		LOG(ERROR) << "wglDeleteContext failed";
 		return;
 	}
 #else
@@ -106,7 +106,7 @@ bool Engine::isMaximized()
 	SDL_VERSION(&info.version);
 	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
 	{
-		LOG(INFO) << "SDL_GetWMInfo failed";
+		LOG(ERROR) << "SDL_GetWMInfo failed";
 		return false;
 	}
 	

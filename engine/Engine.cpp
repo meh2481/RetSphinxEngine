@@ -32,8 +32,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_physicsWorld->SetContactListener(&m_clContactListener);
 	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
 	m_bObjDebugDraw = false;
+	LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
 #ifdef _DEBUG
-	LOG(DEBUG) << "Debug build";
+	LOG(INFO) << "Debug build";
 	m_bDebugDraw = true;
 #else
 	LOG(INFO) << "Release build";
@@ -72,7 +73,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	//TODO: Fix FMOD
 	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
 	{
-		LOG(INFO) << "Failed to init FMOD."
+		LOG(ERROR) << "Failed to init FMOD."
 		m_bSoundDied = true;
 	}
 	else
@@ -83,11 +84,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 		FMOD_System_GetRecordNumDrivers(m_audioSystem, &numDrivers);
 		const int DRIVER_INFO_STR_SIZE = 512;
 		char driverInfoStr[DRIVER_INFO_STR_SIZE];
-		LOG(INFO) << numDrivers << " recording drivers available."
+		LOG(TRACE) << numDrivers << " recording drivers available."
 		for(int i = 0; i < numDrivers; i++)
 		{
 			FMOD_System_GetRecordDriverInfo(m_audioSystem, i, driverInfoStr, DRIVER_INFO_STR_SIZE, NULL);
-			LOG(INFO) << "Driver " << i << ": " << driverInfoStr
+			LOG(TRACE) << "Driver " << i << ": " << driverInfoStr
 		}
 	}*/
 }
@@ -161,7 +162,7 @@ bool Engine::_frame()
 				if (m_bResizable)
 					changeScreenResolution((float)event.window.data1, (float)event.window.data2);
 				else
-					LOG(INFO) << "Error! Resize event generated, but resizable flag not set.";
+					LOG(ERROR) << "Error! Resize event generated, but resizable flag not set.";
 			}
 			else if(event.window.event == SDL_WINDOWEVENT_ENTER)
 				m_bCursorOutOfWindow = false;
@@ -324,7 +325,7 @@ void Engine::_loadicon()	//Load icon into SDL window
 	//if still unkown, return failure
 	if(fif == FIF_UNKNOWN)
 	{
-		LOG(INFO) << "Unknown image type for file " << m_sIcon
+		LOG(ERROR) << "Unknown image type for file " << m_sIcon
 		return;
 	}
 	
@@ -332,11 +333,11 @@ void Engine::_loadicon()	//Load icon into SDL window
 	if(FreeImage_FIFSupportsReading(fif))
 		dib = FreeImage_Load(fif, m_sIcon.c_str());
 	else
-		LOG(INFO) << "File " << m_sIcon << " doesn't support reading."
+		LOG(ERROR) << "File " << m_sIcon << " doesn't support reading."
 	//if the image failed to load, return failure
 	if(!dib)
 	{
-		LOG(INFO) << "Error loading image " << m_sIcon.c_str()
+		LOG(ERROR) << "Error loading image " << m_sIcon.c_str()
 		return;
 	}	
 	//retrieve the image data
@@ -350,14 +351,14 @@ void Engine::_loadicon()	//Load icon into SDL window
 	bits = FreeImage_GetBits(dib);	//if this somehow one of these failed (they shouldn't), return failure
 	if((bits == 0) || (width == 0) || (height == 0))
 	{
-		LOG(INFO) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity"
+		LOG(ERROR) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity"
 		return;
 	}
 	
 	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(bits, width, height, FreeImage_GetBPP(dib), FreeImage_GetPitch(dib), 
 													0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	if(surface == NULL)
-		LOG(INFO) << "NULL surface for icon " << m_sIcon
+		LOG(ERROR) << "NULL surface for icon " << m_sIcon
 	else
 	{
 		SDL_SetWindowIcon(m_Window, surface);
@@ -386,8 +387,9 @@ bool Engine::getCursorDown(int iButtonCode)
 			return(ms & SDL_BUTTON(SDL_BUTTON_RIGHT));
 		case MMB:
 			return(ms & SDL_BUTTON(SDL_BUTTON_MIDDLE));
+		//TODO: What about buttons 4, 5, and up?
 		default:
-			//LOG(INFO) << "Unsupported mouse code: " << iButtonCode	//meh
+			LOG(WARNING) << "Unsupported mouse code: " << iButtonCode;
 			break;
 	}
 	return false;

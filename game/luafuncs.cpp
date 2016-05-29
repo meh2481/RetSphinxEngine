@@ -590,7 +590,7 @@ static const struct {
 	
 	//Joystick
 	luaConstant(JOY_AXIS_MIN),
-	luaConstant(JOY_AXIS_MIN),
+	luaConstant(JOY_AXIS_MAX),
 	
 	//Mouse
 	luaConstant(LMB),
