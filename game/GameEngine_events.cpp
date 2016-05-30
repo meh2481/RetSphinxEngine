@@ -3,6 +3,8 @@
 #include <iomanip>
 #include "Image.h"
 #include "easylogging++.h"
+#include <SDL_opengl.h>
+#include "stb_image_write.h"
 
 void GameEngine::handleEvent(SDL_Event event)
 {
@@ -43,7 +45,7 @@ void GameEngine::handleEvent(SDL_Event event)
 					stepPhysics();
 					break;
 #endif
-				//TODO Fix to work properly now
+				//TODO Run in different thread
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
 					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
@@ -52,23 +54,32 @@ void GameEngine::handleEvent(SDL_Event event)
 				
 					//Create filename that we'll save this as
 					ostringstream ssfile;
-					ssfile << getSaveLocation() << "/screenshots/" << "Screenshot " 
+					ssfile << getSaveLocation() << "Screenshot " 
 					       << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
-					       << now->tm_hour << '.' << setw(2) << setfill('0') << now->tm_min << '.' << setw(2) << setfill('0') << now->tm_sec << ".png";
+					       << now->tm_hour << '.' << setw(2) << setfill('0') << now->tm_min << '.' << setw(2) << setfill('0') << now->tm_sec << ',' << SDL_GetTicks() << ".png";
 				
-					uint16_t width = getWidth();
-					uint16_t height = getHeight();
+					uint16_t w = getWidth();
+					uint16_t h = getHeight();
 					
-					/*BYTE* pixels = new BYTE[3 * width * height];
-					glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+					//Copied whatever this guy did: https://github.com/ocornut/imgui/wiki/screenshot_tool
+					unsigned char* pixels = new unsigned char[3 * w * h];
+					glPixelStorei(GL_PACK_ALIGNMENT, 1);
+					glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+					unsigned char* line_tmp = new unsigned char[3 * w];
+					unsigned char* line_a = pixels;
+					unsigned char* line_b = pixels + (3 * w * (h - 1));
+					while(line_a < line_b)
+					{
+						memcpy(line_tmp, line_a, w * 3);
+						memcpy(line_a, line_b, w * 3);
+						memcpy(line_b, line_tmp, w * 3);
+						line_a += w * 3;
+						line_b -= w * 3;
+					}
 
-					//Convert to FreeImage format & save to file
-					FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
-					FreeImage_Save(FIF_PNG, image, ssfile.str().c_str(), PNG_Z_BEST_SPEED);
-
-					//Free resources
-					FreeImage_Unload(image);
-					delete [] pixels;*/
+					LOG(INFO) << "Saving screenshot " << ssfile.str() << ": " <<  stbi_write_png(ssfile.str().c_str(), w, h, 3, pixels, w * 3);
+					delete[] pixels;
+					delete[] line_tmp;
 					break;
 				}
 				

@@ -16,6 +16,9 @@
 #pragma once
 
 #define ELPP_NO_DEFAULT_LOG_FILE
+#define ELPP_DISABLE_ASSERT
+#define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
+
 // Compilers and C++0x/C++11 Evaluation
 #if defined(__GNUC__)
 #   define ELPP_COMPILER_GCC 1

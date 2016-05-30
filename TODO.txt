@@ -12,6 +12,7 @@ Overall TODO list:
 - rip out displaylists for 3D objects - vertex buffers are better
 - class predeclaration - don't have to include headers
 - Ortho HUD
+- Research SDL gamecontroller stuff
 
 
 
