@@ -2,6 +2,7 @@
 #include "opengl-api.h"
 
 #include "Box2D/Box2D.h"
+#include "Random.h"
 
 void Lattice::reset(float sx, float sy)
 {	
@@ -223,8 +224,8 @@ void WobbleLatticeAnim::init()
 	{
 		for(int ix = 0; ix <= m_l->numx; ix++)
 		{
-			*angptr++ = randFloat(startangle-anglevar, startangle + anglevar);
-			*distptr++ = randFloat(startdist-distvar, startdist+distvar);
+			*angptr++ = Random::randomFloat(startangle-anglevar, startangle + anglevar);
+			*distptr++ = Random::randomFloat(startdist-distvar, startdist+distvar);
 		}
 	}
 	

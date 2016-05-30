@@ -46,6 +46,10 @@ ParticleSystem.h
 simplexnoise1234.cpp
 simplexnoise1234.h
 tiny3d.h
+Interpolator.cpp
+Interpolator.h
+Random.cpp
+Random.h 
 )
 
 add_library(engine ${engine_src})

@@ -8,6 +8,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
+#include "Random.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -65,7 +66,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fAccumulatedTime = 0.0;
 	//m_bFirstMusic = true;
 	m_bQuitting = false;
-	randSeed(SDL_GetTicks());	//Not as random as it could be... who cares
+	Random::seed(SDL_GetTicks());	//TODO fix RNG or no?
 	m_fTimeScale = 1.0f;
 
 	LOG(INFO) << "Initializing FMOD...";

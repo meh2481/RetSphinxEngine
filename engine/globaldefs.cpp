@@ -4,12 +4,11 @@
 */
 
 #include "globaldefs.h"
-#include "mtrand.h"
 #include "simplexnoise1234.h"
 #include "opengl-api.h"
 
-static MTRand_int32 irand;
-static MTRand drand;
+//static MTRand_int32 irand;
+//static MTRand drand;
 
 float myabs(float x)	//Stupid namespace stuff
 {
@@ -97,20 +96,7 @@ Color colorFromString(string s)
 	static Color s_cLastCol;
 	Color c;
 	
-	if(s == "random_pastel")	//Some random pastel color (good for parasprites)
-	{
-		float h, s, v;
-		h = randFloat(0.0, 360.0);
-		s = randFloat(40.0, 100.0);
-		v = 100.0;
-		c = HsvToRgb(h,s,v);
-		c.r /= 100;
-		c.g /= 100;
-		c.b /= 100;
-		s_cLastCol = c;
-		return c;
-	}
-	else if(s == "last")	//Last color we got from this function
+	if(s == "last")
 		return s_cLastCol;
 	
 	s = stripCommas(s);
@@ -156,46 +142,13 @@ Vec3 vec3FromString(string s)
 //Use actual random number generator
 void randSeed(unsigned long s)
 {
-	irand.seed(s);
-	drand.seed(s);
+	//TODO
+
+	//irand.seed(s);
+	//drand.seed(s);
 }
 
-int32_t randInt()
-{
-	return irand();
-}
 
-int32_t randInt(int32_t min, int32_t max)
-{
-	if(min == max)
-		return min;
-	if(min > max)
-	{
-		int32_t temp = min;
-		min = max;
-		max = temp;
-	}
-	int32_t diff = max-min+1;
-	return(irand()%diff + min);
-}
-
-float randFloat()
-{
-	return drand();
-}
-
-float randFloat(float min, float max)
-{
-	if(min == max)
-		return min;
-	if(min > max)
-	{
-		float temp = min;
-		min = max;
-		max = temp;
-	}
-	return(drand()*(max-min) + min);
-}
 
 Vec3 crossProduct(Vec3 vec1, Vec3 vec2)
 {

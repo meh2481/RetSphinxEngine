@@ -11,7 +11,7 @@ Overall TODO list:
 - Add ImGUI - super-simple GUI for editing
 - rip out displaylists for 3D objects - vertex buffers are better
 - class predeclaration - don't have to include headers
-- better logfile
+- Ortho HUD
 
 
 

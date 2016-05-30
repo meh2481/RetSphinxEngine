@@ -18,13 +18,11 @@ using namespace tinyxml2;
 //----------------------------------------------------------------------------------------------------
 Object::Object() : Drawable()
 {
-  meshImg = NULL;
   meshLattice = NULL;
   meshAnim = NULL;
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
-  active = true;
   segments.reserve(1);	//don't expect very many segments
 }
 
@@ -54,10 +52,10 @@ void Object::draw(bool bDebugInfo)
 	//Draw segments of this object
     for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
-		if((*i)->show)	//Skip frames that shouldn't be drawn up front
+		if((*i)->active)	//Skip frames that shouldn't be drawn up front
 			(*i)->draw();
 	}
-	if(meshImg)
+	if(img)
 	{
 		//TODO Jeepers this is messy. I totally thought this was a for loop. Make this look sane
 		vector<ObjSegment*>::iterator i = segments.begin();
@@ -71,9 +69,9 @@ void Object::draw(bool bDebugInfo)
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
 				if(meshLattice)
-					meshImg->renderLattice(meshLattice, meshSize);
+					img->renderLattice(meshLattice, meshSize);
 				else
-					meshImg->render(meshSize);
+					img->render(meshSize);
 				
 				if(bDebugInfo && meshLattice)
 				{
@@ -174,7 +172,6 @@ void Object::setPosition(Point p)
 ObjSegment::ObjSegment() : Drawable()
 {
     body = NULL;
-    img = NULL;
 	parent = NULL;
 	lat = NULL;
 	latanim = NULL;
@@ -182,7 +179,6 @@ ObjSegment::ObjSegment() : Drawable()
 
 	rot = 0.0f;
 	size.x = size.y = tile.x = tile.y = 1.0f;
-	show = true;
 }
 
 ObjSegment::~ObjSegment()
@@ -198,7 +194,7 @@ ObjSegment::~ObjSegment()
 
 void ObjSegment::draw(bool bDebugInfo)
 {
-	if(img == NULL || !show) return;
+	if(img == NULL || !active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
 	glPushMatrix();
 	if(body == NULL)

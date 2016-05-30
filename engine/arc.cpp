@@ -3,17 +3,19 @@
     Copyright (c) 2014 Mark Hutcheson
 */
 
-#include "arc.h"
+#include "Arc.h"
 #include "Image.h"
 #include "opengl-api.h"
+#include "Object.h"
+#include "Random.h"
 
-Arc::Arc(unsigned number, Image* img) : ObjSegment()
+Arc::Arc(unsigned number, Image* arcSegImg) : Drawable()
 {
 	segmentPos = NULL;
-	if(img == NULL || number == 0) return;
+	if(arcSegImg == NULL || number == 0) return;
 	numSegments = number;
 	segmentPos = (float*)malloc(sizeof(float)*numSegments);
-	arcSegImg = img;
+	img = arcSegImg;
 	add = max = 0.0f;
 	avg = 2;
 	height = 0.1f;
@@ -27,12 +29,12 @@ Arc::~Arc()
 
 void Arc::draw()
 {
-	if(!show || arcSegImg == NULL) return;
+	if(!active || img == NULL) return;
 	glColor4f(col.r,col.g,col.b,col.a);
 	glPushMatrix();
 	
 	//Calculate angle between two points and offset accordingly
-	float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));	//Grahh slow
+	float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));
 	float fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
 		
 	//Offset according to depth
@@ -50,7 +52,7 @@ void Arc::draw()
       bl.y = ul.y + height;
       ur.y = segmentPos[i+1];
       br.y = ur.y + height;
-	  arcSegImg->render4V(ul, ur, bl, br);
+	  img->render4V(ul, ur, bl, br);
     }
 	
 	glPopMatrix();
@@ -62,7 +64,7 @@ void Arc::update(float dt)
 	dt *= 60.0;
 	for(int i = 1; i < int(numSegments)-1; i++)
 	{
-		segmentPos[i] += dt*randFloat(-add, add);
+		segmentPos[i] += dt*Random::randomFloat(-add, add);
 		if(segmentPos[i] > max)
 			segmentPos[i] = max;
 		if(segmentPos[i] < -max)
@@ -75,7 +77,7 @@ void Arc::init()
 {
 	//Initialize values of array to sane defaults, so we don't start with a flat arc for one frame
 	for(unsigned i = 0; i < numSegments; i++)
-		segmentPos[i] = randFloat(-max, max);
+		segmentPos[i] = Random::randomFloat(-max, max);
 	average();
 }
 
@@ -110,7 +112,7 @@ void Arc::average()
 
 const string& Arc::getImageFilename()
 {
-    return arcSegImg->getFilename();
+    return img->getFilename();
 }
 
 

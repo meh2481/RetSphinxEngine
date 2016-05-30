@@ -8,6 +8,7 @@
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
+#include "Random.h"
 
 ParticleSystem::ParticleSystem() : Drawable()
 {
@@ -120,71 +121,71 @@ void ParticleSystem::_newParticle()
 			m_imgRect[num] = Rect(0,0,0,0);
 	}
 	else
-		m_imgRect[num] = imgRect[randInt(0, imgRect.size()-1)];
-	m_pos[num] = Point(randFloat(emitFrom.left, emitFrom.right),
-						 randFloat(emitFrom.top, emitFrom.bottom));
-	float sizediff = randFloat(-sizeVar,sizeVar);
+		m_imgRect[num] = imgRect[Random::random(imgRect.size()-1)];
+	m_pos[num] = Point(Random::randomFloat(emitFrom.left, emitFrom.right),
+						 Random::randomFloat(emitFrom.top, emitFrom.bottom));
+	float sizediff = Random::randomFloat(-sizeVar,sizeVar);
 	m_sizeStart[num].x = sizeStart.x + sizediff;
 	m_sizeStart[num].y = sizeStart.y + sizediff;
 	m_sizeEnd[num].x = sizeEnd.x + sizediff;
 	m_sizeEnd[num].y = sizeEnd.y + sizediff;
-	float angle = emissionAngle + randFloat(-emissionAngleVar,emissionAngleVar);
-	float amt = speed + randFloat(-speedVar,speedVar);
+	float angle = emissionAngle + Random::randomFloat(-emissionAngleVar,emissionAngleVar);
+	float amt = speed + Random::randomFloat(-speedVar,speedVar);
 	m_vel[num].x = amt*cos(DEG2RAD*angle);
 	m_vel[num].y = amt*sin(DEG2RAD*angle);
-	m_accel[num].x = accel.x + randFloat(-accelVar.x,accelVar.x);
-	m_accel[num].y = accel.y + randFloat(-accelVar.y,accelVar.y);
-	m_rot[num] = rotStart + randFloat(-rotStartVar,rotStartVar);
-	m_rotVel[num] = rotVel + randFloat(-rotVelVar,rotVelVar);
-	m_rotAccel[num] = rotAccel + randFloat(-rotAccelVar,rotAccelVar);
-	m_colStart[num].r = colStart.r + randFloat(-colVar.r,colVar.r);
+	m_accel[num].x = accel.x + Random::randomFloat(-accelVar.x,accelVar.x);
+	m_accel[num].y = accel.y + Random::randomFloat(-accelVar.y,accelVar.y);
+	m_rot[num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
+	m_rotVel[num] = rotVel + Random::randomFloat(-rotVelVar,rotVelVar);
+	m_rotAccel[num] = rotAccel + Random::randomFloat(-rotAccelVar,rotAccelVar);
+	m_colStart[num].r = colStart.r + Random::randomFloat(-colVar.r,colVar.r);
 	if(m_colStart[num].r > 1)
 		m_colStart[num].r = 1;
 	if(m_colStart[num].r < 0)
 		m_colStart[num].r = 0;
-	m_colStart[num].g = colStart.g + randFloat(-colVar.g,colVar.g);
+	m_colStart[num].g = colStart.g + Random::randomFloat(-colVar.g,colVar.g);
 	if(m_colStart[num].g > 1)
 		m_colStart[num].g = 1;
 	if(m_colStart[num].g < 0)
 		m_colStart[num].g = 0;
-	m_colStart[num].b = colStart.b + randFloat(-colVar.b,colVar.b);
+	m_colStart[num].b = colStart.b + Random::randomFloat(-colVar.b,colVar.b);
 	if(m_colStart[num].b > 1)
 		m_colStart[num].b = 1;
 	if(m_colStart[num].b < 0)
 		m_colStart[num].b = 0;
-	m_colStart[num].a = colStart.a + randFloat(-colVar.a,colVar.a);
+	m_colStart[num].a = colStart.a + Random::randomFloat(-colVar.a,colVar.a);
 	if(m_colStart[num].a > 1)
 		m_colStart[num].a = 1;
 	if(m_colStart[num].a < 0)
 		m_colStart[num].a = 0;
-	m_colEnd[num].r = colEnd.r + randFloat(-colVar.r,colVar.r);
+	m_colEnd[num].r = colEnd.r + Random::randomFloat(-colVar.r,colVar.r);
 	if(m_colEnd[num].r > 1)
 		m_colEnd[num].r = 1;
 	if(m_colEnd[num].r < 0)
 		m_colEnd[num].r = 0;
-	m_colEnd[num].g = colEnd.g + randFloat(-colVar.g,colVar.g);
+	m_colEnd[num].g = colEnd.g + Random::randomFloat(-colVar.g,colVar.g);
 	if(m_colEnd[num].g > 1)
 		m_colEnd[num].g = 1;
 	if(m_colEnd[num].g < 0)
 		m_colEnd[num].g = 0;
-	m_colEnd[num].b = colEnd.b + randFloat(-colVar.b,colVar.b);
+	m_colEnd[num].b = colEnd.b + Random::randomFloat(-colVar.b,colVar.b);
 	if(m_colEnd[num].b > 1)
 		m_colEnd[num].b = 1;
 	if(m_colEnd[num].b < 0)
 		m_colEnd[num].b = 0;
-	m_colEnd[num].a = colEnd.a + randFloat(-colVar.a,colVar.a);
+	m_colEnd[num].a = colEnd.a + Random::randomFloat(-colVar.a,colVar.a);
 	if(m_colEnd[num].a > 1)
 		m_colEnd[num].a = 1;
 	if(m_colEnd[num].a < 0)
 		m_colEnd[num].a = 0;
-	m_tangentialAccel[num] = tangentialAccel + randFloat(-tangentialAccelVar,tangentialAccelVar);
-	m_normalAccel[num] = normalAccel + randFloat(-normalAccelVar,normalAccelVar);
-	m_lifetime[num] = lifetime + randFloat(-lifetimeVar,lifetimeVar);
+	m_tangentialAccel[num] = tangentialAccel + Random::randomFloat(-tangentialAccelVar,tangentialAccelVar);
+	m_normalAccel[num] = normalAccel + Random::randomFloat(-normalAccelVar,normalAccelVar);
+	m_lifetime[num] = lifetime + Random::randomFloat(-lifetimeVar,lifetimeVar);
 	m_created[num] = curTime;
-	m_lifePreFade[num] = lifetimePreFade + randFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
-	m_rotAxis[num].x = rotAxis.x + randFloat(-rotAxisVar.x,rotAxisVar.x);
-	m_rotAxis[num].y = rotAxis.y + randFloat(-rotAxisVar.y,rotAxisVar.y);
-	m_rotAxis[num].z = rotAxis.z + randFloat(-rotAxisVar.z,rotAxisVar.z);
+	m_lifePreFade[num] = lifetimePreFade + Random::randomFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
+	m_rotAxis[num].x = rotAxis.x + Random::randomFloat(-rotAxisVar.x,rotAxisVar.x);
+	m_rotAxis[num].y = rotAxis.y + Random::randomFloat(-rotAxisVar.y,rotAxisVar.y);
+	m_rotAxis[num].z = rotAxis.z + Random::randomFloat(-rotAxisVar.z,rotAxisVar.z);
 	
 	m_num++;
 }
@@ -192,7 +193,7 @@ void ParticleSystem::_newParticle()
 void ParticleSystem::_rmParticle(const uint32_t idx)
 {
 	if(particleDeathSpawn && spawnOnDeath.size())
-		spawnNewParticleSystem(spawnOnDeath[randInt(0, spawnOnDeath.size()-1)], m_pos[idx]);
+		spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
 	//Order doesn't matter, so just shift the newest particle over to replace this one
 	m_imgRect[idx] = m_imgRect[m_num-1];
 	m_pos[idx] = m_pos[m_num-1];
@@ -271,7 +272,7 @@ void ParticleSystem::update(float dt)
 			firing = false;
 			startedFiring = 0.0f;
 			if(!particleDeathSpawn && spawnOnDeath.size())
-				spawnNewParticleSystem(spawnOnDeath[randInt(0, spawnOnDeath.size()-1)], emitFrom.center());
+				spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());
 		}
 	}
 	else if(firing)
@@ -486,7 +487,7 @@ void ParticleSystem::fromXML(string sXMLFilename)
 	root->QueryFloatAttribute("decay", &decay);
 	float fDecayVar = 0.0f;
 	root->QueryFloatAttribute("decayvar", &fDecayVar);
-	decay += randFloat(-fDecayVar, fDecayVar);
+	decay += Random::randomFloat(-fDecayVar, fDecayVar);
 	
 	for(tinyxml2::XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{

@@ -193,7 +193,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 			
 		case SDL_JOYAXISMOTION:
-			if(abs(event.jaxis.value) > JOY_MINMOVE_TRIP)
+			if(abs(event.jaxis.value) > JOY_AXIS_TRIP)
 				LOG(TRACE) << "Joystick " << (int)event.jaxis.which << " moved axis " << (int)event.jaxis.axis << " to " << event.jaxis.value;
 			break;
 			

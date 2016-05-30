@@ -369,7 +369,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 		
 		if(cMeshImg && cMeshImgSize)
 		{
-			o->meshImg = getImage(cMeshImg);
+			o->img = getImage(cMeshImg);
 			o->meshSize = pointFromString(cMeshImgSize);
 			
 			const char* cLatticeType = latticeElem->Attribute("type");

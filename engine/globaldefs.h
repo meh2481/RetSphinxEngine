@@ -48,8 +48,6 @@ extern SDL_Scancode KEY_RIGHT1;
 extern SDL_Scancode KEY_RIGHT2;
 extern SDL_Scancode KEY_ENTER1;
 extern SDL_Scancode KEY_ENTER2;
-#define JOY_MINMOVE_TRIP	6500
-#define MOUSE_MOVE_TRIP_AMT	20
 
 typedef glm::vec2 Point;
 typedef glm::vec3 Vec3;
@@ -115,10 +113,8 @@ Color colorFromString(string s);	//Get a color from comma-separated values in a 
 string colorToString(Color c);
 Vec3 vec3FromString(string s);		//Get a 3D point from comma-separated values in a string
 string vec3ToString(Vec3 vec);
-int32_t randInt(int32_t min, int32_t max);  		//Get a random integer
-int32_t randInt();									//Get an unbounded random integer
-float randFloat(float min, float max);		//Get a random float
-float randFloat();								//Get an unbounded random float
+
+
 void randSeed(unsigned long s);						//Seed the random number generator
 float distanceSquared(Vec3 vec1, Vec3 vec2);		//Get the distance between two vectors squared
 float distanceBetween(Vec3 vec1, Vec3 vec2);				//Get the distance between two vectors (slower than above)

@@ -26,7 +26,6 @@ class ObjSegment : public Drawable
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
-    Image*  		img;		//Image to draw
 	Lattice*		lat;		//Lattice to apply to image
 	LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
@@ -38,8 +37,6 @@ public:
 	Point tile;		//tile image in x and y
 	float rot;
 	Point size;	//Actual texel size; not pixels
-	Color col;
-	bool show;
 
     ObjSegment();
     ~ObjSegment();
@@ -57,13 +54,11 @@ class Object : public Drawable
 public:
 	enum { TYPE = OT_OBJECT };
     vector<ObjSegment*> 	segments;
-	Image*					meshImg;
 	Lattice*				meshLattice;
 	LatticeAnim*			meshAnim;
 	Point					meshSize;
 	LuaInterface* 			lua;
 	string 					luaClass;
-	bool 					active;
     
     Object();
     ~Object();

@@ -89,8 +89,8 @@ void Image::_loadNoise(string sXMLFilename)
 	uint32_t height = 512;
 	float sizex = 10.0f;
 	float sizey = 10.0f;
-	float xoffset = randFloat(0, 5000);	//By default, use random position in noise function
-	float yoffset = randFloat(0, 5000);
+	float xoffset = Random::randomFloat(0, 5000);	//By default, use random position in noise function
+	float yoffset = Random::randomFloat(0, 5000);
 	uint32_t iterations = 5;
 	float persistence = 0.5f;
 	float minval = -1.0f;

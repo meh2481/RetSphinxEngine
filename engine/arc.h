@@ -6,11 +6,11 @@
 #pragma once
 
 #include "globaldefs.h"
-#include "Object.h"
+#include "Drawable.h"
 
 class Image;
 
-class Arc : public ObjSegment
+class Arc : public Drawable
 {
 protected:
 	float* segmentPos;
