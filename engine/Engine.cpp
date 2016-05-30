@@ -378,21 +378,7 @@ void Engine::setCursorPos(int32_t x, int32_t y)
 
 bool Engine::getCursorDown(int iButtonCode)
 {
-	Uint8 ms = SDL_GetMouseState(NULL, NULL);
-	switch(iButtonCode)
-	{
-		case LMB:
-			return(ms & SDL_BUTTON(SDL_BUTTON_LEFT));
-		case RMB:
-			return(ms & SDL_BUTTON(SDL_BUTTON_RIGHT));
-		case MMB:
-			return(ms & SDL_BUTTON(SDL_BUTTON_MIDDLE));
-		//TODO: What about buttons 4, 5, and up?
-		default:
-			LOG(WARNING) << "Unsupported mouse code: " << iButtonCode;
-			break;
-	}
-	return false;
+	return (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
 }
 
 void Engine::commandline(list<string> argv)

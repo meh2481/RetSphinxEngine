@@ -7,24 +7,21 @@
 #include "globaldefs.h"
 #include "Object.h"
 #include "Text.h"
-#include "Hud.h"
+#include "HUD.h"
 #include "ParticleSystem.h"
 #include "MouseCursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
 #include "DebugDraw.h"
-//#include <fmod.h>
-
 
 class b2World;
 class Image;
 
-#define LMB	1
-#define RMB	0
-#define MMB 2
-
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
+
+#define SDL_BUTTON_FORWARD	SDL_BUTTON_X2
+#define SDL_BUTTON_BACK		SDL_BUTTON_X1
 
 const float soundFreqDefault = 44100.0;
 

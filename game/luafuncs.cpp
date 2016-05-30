@@ -528,7 +528,7 @@ luaFunc(mouse_getPos) //int x, int y mouse_getPos()
 luaFunc(mouse_isDown) //bool mouse_isDown(int button)
 {
 	if(!lua_isinteger(L, 1))
-		luaReturnBool(GameEngineLua::getMouseDown(LMB));
+		luaReturnBool(GameEngineLua::getMouseDown(SDL_BUTTON_LEFT));
 	luaReturnBool(GameEngineLua::getMouseDown((int)lua_tointeger(L, 1)));
 }
 
@@ -593,9 +593,11 @@ static const struct {
 	luaConstant(JOY_AXIS_MAX),
 	
 	//Mouse
-	luaConstant(LMB),
-	luaConstant(RMB),
-	luaConstant(MMB),
+	luaConstant(SDL_BUTTON_LEFT),
+	luaConstant(SDL_BUTTON_RIGHT),
+	luaConstant(SDL_BUTTON_MIDDLE),
+	luaConstant(SDL_BUTTON_FORWARD),
+	luaConstant(SDL_BUTTON_BACK),
 	
 	//Keyboard
 	luaConstant(SDL_SCANCODE_SPACE),

@@ -88,7 +88,7 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		case SDL_MOUSEBUTTONDOWN:
 		{
-			
+			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
 		}
 		break;
 			
@@ -104,7 +104,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			//LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
+			LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
 			if(event.button.button == SDL_BUTTON_LEFT)
 			{
 				
