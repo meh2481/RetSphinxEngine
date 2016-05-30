@@ -2,7 +2,7 @@
  CutsceneEditor source - 3DObject.cpp
  Copyright (c) 2013 Mark Hutcheson
 */
-#include "3DObject.h"
+#include "Mesh3D.h"
 #include "tiny3d.h"
 #include <sstream>
 #include <set>
@@ -14,7 +14,7 @@
 using namespace std;
 using namespace tiny3d;
 
-Object3D::Object3D(string sOBJFile)
+Mesh3D::Mesh3D(string sOBJFile)
 {
 	useGlobalLight = true;
 	//rot[0] = 0.0f;
@@ -34,7 +34,7 @@ Object3D::Object3D(string sOBJFile)
 	shaded = true;
 }
 
-Object3D::Object3D()
+Mesh3D::Mesh3D()
 {
   m_obj = 0;
   _add3DObjReload(this);
@@ -42,7 +42,7 @@ Object3D::Object3D()
   shaded = true;
 }
 
-Object3D::~Object3D()
+Mesh3D::~Mesh3D()
 {
 	_remove3DObjReload(this);
 	//Free OpenGL graphics memory
@@ -50,7 +50,7 @@ Object3D::~Object3D()
 		glDeleteLists(m_obj, 1);
 }
 
-void Object3D::_fromOBJFile(string sFilename)
+void Mesh3D::_fromOBJFile(string sFilename)
 {
     m_sObjFilename = sFilename;
 	LOG(INFO) << "Loading 3D object " << sFilename;
@@ -197,7 +197,7 @@ void Object3D::_fromOBJFile(string sFilename)
 
 //Fall back on pure C functions for speed
 //TODO: On *nix systems, I ought to be able to mmap() to load even faster
-void Object3D::_fromTiny3DFile(string sFilename)
+void Mesh3D::_fromTiny3DFile(string sFilename)
 {
 	LOG(INFO) << "Loading 3D object " << sFilename;
 	FILE* fp = fopen(sFilename.c_str(), "rb");
@@ -294,7 +294,7 @@ void Object3D::_fromTiny3DFile(string sFilename)
 	free(faces);
 }
 
-void Object3D::render(Image* img)
+void Mesh3D::render(Image* img)
 {
 	//glRotatef(45, 1.0f, 0.0f, 0.0f);
 	//float saveLight[4];
@@ -319,7 +319,7 @@ void Object3D::render(Image* img)
 		glDisable(GL_LIGHTING);
 }
 
-void Object3D::_reload()
+void Mesh3D::_reload()
 {
   if(m_sObjFilename.find(".obj", m_sObjFilename.size()-4) != string::npos)
     _fromOBJFile(m_sObjFilename);
@@ -327,35 +327,35 @@ void Object3D::_reload()
     _fromTiny3DFile(m_sObjFilename);
 }
 
-static set<Object3D*> sg_objs;
+static set<Mesh3D*> sg_objs;
 
 void reload3DObjects()
 {
-  for(set<Object3D*>::iterator i = sg_objs.begin(); i != sg_objs.end(); i++)
+  for(set<Mesh3D*>::iterator i = sg_objs.begin(); i != sg_objs.end(); i++)
   {
     (*i)->_reload();
   }
 }
 
-void _add3DObjReload(Object3D* obj)
+void _add3DObjReload(Mesh3D* obj)
 {
   sg_objs.insert(obj);
 }
 
-void _remove3DObjReload(Object3D* obj)
+void _remove3DObjReload(Mesh3D* obj)
 {
   sg_objs.erase(obj);
 }
 
-static map<string, Object3D*> g_mObj;
-Object3D* getObject(string sFilename)
+static map<string, Mesh3D*> g_mObj;
+Mesh3D* getObject(string sFilename)
 {
 	if(sFilename == "model_none") return NULL;
 	
-	map<string, Object3D*>::iterator i = g_mObj.find(sFilename);
+	map<string, Mesh3D*>::iterator i = g_mObj.find(sFilename);
 	if(i == g_mObj.end())   //This model isn't here; load it
 	{
-		Object3D* img = new Object3D(sFilename);
+		Mesh3D* img = new Mesh3D(sFilename);
 		g_mObj[sFilename] = img; //Add to the map
 		return img;
 	}
@@ -364,7 +364,7 @@ Object3D* getObject(string sFilename)
 
 void clearObjects()
 {
-	for(map<string, Object3D*>::iterator i = g_mObj.begin(); i != g_mObj.end(); i++)
+	for(map<string, Mesh3D*>::iterator i = g_mObj.begin(); i != g_mObj.end(); i++)
 		delete (i->second);    //Delete every object
 	g_mObj.clear();
 }

@@ -411,7 +411,7 @@ luaFunc(node_getCollidingObj) //obj[]* node_getCollidingObj(Node* n)
 		{
 			for(b2Contact* contact = world->GetContactList(); contact != NULL; contact = contact->GetNext())
 			{
-				collision coll = EngineContactListener::getCollision(contact);
+				Collision coll = EngineContactListener::getCollision(contact);
 				if(coll.nodeA == n && coll.objB != NULL)
 				{
 					//Push key/value pairs into table

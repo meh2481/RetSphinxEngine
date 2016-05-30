@@ -7,9 +7,9 @@
 #include "globaldefs.h"
 #include "Object.h"
 #include "Text.h"
-#include "hud.h"
-#include "particles.h"
-#include "cursor.h"
+#include "Hud.h"
+#include "ParticleSystem.h"
+#include "MouseCursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
 #include "DebugDraw.h"
@@ -33,7 +33,7 @@ typedef struct
 	string sSwitch, sValue;
 } commandlineArg;
 
-class depthComparator
+class DepthComparator
 {
 public:
 	bool operator()(const ObjSegment* s1, const ObjSegment* s2)
@@ -62,7 +62,7 @@ private:
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
 	list<Object*> m_lObjects;	//Object handler
-	multiset<ObjSegment*, depthComparator> m_lScenery;
+	multiset<ObjSegment*, DepthComparator> m_lScenery;
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
 	uint16_t m_iWidth, m_iHeight;
@@ -75,7 +75,7 @@ private:
 	bool m_bPauseOnKeyboardFocus;	//If the game pauses when keyboard focus is lost
 	bool m_bSoundDied;  //If tyrsound fails to load, don't try to use it
 	int m_iMSAA;		//Antialiasing (0x, 2x, 4x, 8x, etc)
-	myCursor* m_cursor;
+	MouseCursor* m_cursor;
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
 	list<ParticleSystem*> m_particles;
@@ -191,7 +191,7 @@ public:
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};
-	void setCursor(myCursor* cur)	{m_cursor = cur;};
+	void setCursor(MouseCursor* cur)	{m_cursor = cur;};
 	bool isMouseGrabbed();
 	void grabMouse(bool bGrab = true);
 	

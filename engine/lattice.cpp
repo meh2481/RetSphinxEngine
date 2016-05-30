@@ -3,10 +3,10 @@
 
 #include "Box2D/Box2D.h"
 
-void lattice::reset(float sx, float sy)
+void Lattice::reset(float sx, float sy)
 {	
-	latticeVert* ptr = vertex;
-	latticeVert* ptruv = UV;
+	LatticeVert* ptr = vertex;
+	LatticeVert* ptruv = UV;
 	float segsizex = 1.0f/(float)(numx);
 	float segsizey = 1.0f/(float)(numy);
 	for(int iy = 0; iy <= numy; iy++)
@@ -23,7 +23,7 @@ void lattice::reset(float sx, float sy)
 	}
 }
 
-void lattice::bind()
+void Lattice::bind()
 {
 	float* ptr = m_vertex;
 	float* ptruv = m_UV;
@@ -33,10 +33,10 @@ void lattice::bind()
 		for(int ix = 0; ix < numx; ix++)
 		{
 			//Tex coords
-			latticeVert* uvul = &UV[ix+iy*(numx+1)];
-			latticeVert* uvur = &UV[(ix+1)+iy*(numx+1)];
-			latticeVert* uvbr = &UV[(ix+1)+(iy+1)*(numx+1)];
-			latticeVert* uvbl = &UV[(ix)+(iy+1)*(numx+1)];
+			LatticeVert* uvul = &UV[ix+iy*(numx+1)];
+			LatticeVert* uvur = &UV[(ix+1)+iy*(numx+1)];
+			LatticeVert* uvbr = &UV[(ix+1)+(iy+1)*(numx+1)];
+			LatticeVert* uvbl = &UV[(ix)+(iy+1)*(numx+1)];
 
 			//Upper left
 			*ptruv++ = uvul->x;
@@ -55,10 +55,10 @@ void lattice::bind()
 			*ptruv++ = uvbl->y;
 
 			//Vertex coords
-			latticeVert* vertul = &vertex[ix+iy*(numx+1)];
-			latticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];
-			latticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
-			latticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
+			LatticeVert* vertul = &vertex[ix+iy*(numx+1)];
+			LatticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];
+			LatticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
+			LatticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
 			
 			//Upper left
 			*ptr++ = vertul->x;
@@ -80,21 +80,21 @@ void lattice::bind()
 	}
 }
 
-void lattice::setup(int x, int y)
+void Lattice::setup(int x, int y)
 {
 	m_vertex = new float[NUMLATTICEPOINTS(x*y)];
 	m_UV = new float[NUMLATTICEPOINTS(x*y)];
 	numx = x;
 	numy = y;
 	
-	vertex = new latticeVert[(x+1)*(y+1)];
-	UV = new latticeVert[(x+1)*(y+1)];
+	vertex = new LatticeVert[(x+1)*(y+1)];
+	UV = new LatticeVert[(x+1)*(y+1)];
 	
 	reset();
 	bind();
 }
 
-lattice::~lattice()
+Lattice::~Lattice()
 {
 	delete [] m_vertex;
 	delete [] m_UV;
@@ -103,7 +103,7 @@ lattice::~lattice()
 }
 
 //Ultra-fast render pass go!
-void lattice::renderTex(unsigned tex)
+void Lattice::renderTex(unsigned tex)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glVertexPointer(2, GL_FLOAT, 0, m_vertex);
@@ -120,7 +120,7 @@ void lattice::renderTex(unsigned tex)
 	glEnd();
 }*/
 
-void lattice::renderDebug()
+void Lattice::renderDebug()
 {
 	//latticeVert* ptr = vertex;
 	
@@ -132,10 +132,10 @@ void lattice::renderDebug()
 		for(int ix = 0; ix < numx; ix++)
 		{
 			glBegin(GL_LINES);
-			latticeVert* vertul = &vertex[ix+iy*(numx+1)];
-			latticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];
-			latticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
-			latticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
+			LatticeVert* vertul = &vertex[ix+iy*(numx+1)];
+			LatticeVert* vertur = &vertex[(ix+1)+iy*(numx+1)];
+			LatticeVert* vertbr = &vertex[(ix+1)+(iy+1)*(numx+1)];
+			LatticeVert* vertbl = &vertex[(ix)+(iy+1)*(numx+1)];
 			
 			glVertex2f(vertul->x, vertul->y);
 			glVertex2f(vertur->x, vertur->y);
@@ -157,29 +157,29 @@ void lattice::renderDebug()
 // LATTICE ANIMATIONS
 //-------------------------------------------------------------------------
 
-sinLatticeAnim::sinLatticeAnim(lattice* l) : latticeAnim(l)
+SinLatticeAnim::SinLatticeAnim(Lattice* l) : LatticeAnim(l)
 {
 	curtime = 0.0f;
 	freq = amp = vtime = 1.0f;
 }
 
-void sinLatticeAnim::init()
+void SinLatticeAnim::init()
 {
 	setEffect();
 }
 
-void sinLatticeAnim::update(float dt)
+void SinLatticeAnim::update(float dt)
 {
 	curtime += dt;
 	setEffect();
 }
 
-void sinLatticeAnim::setEffect()
+void SinLatticeAnim::setEffect()
 {
 	m_l->reset();
 	
 	float relTime = curtime;
-	latticeVert* ptr = m_l->vertex;
+	LatticeVert* ptr = m_l->vertex;
 	for(int iy = 0; iy <= m_l->numy; iy++)
 	{
 		for(int ix = 0; ix <= m_l->numx; ix++)
@@ -196,7 +196,7 @@ void sinLatticeAnim::setEffect()
 //-------------------------------------------------------------------------
 
 
-wobbleLatticeAnim::wobbleLatticeAnim(lattice* l) : latticeAnim(l)
+WobbleLatticeAnim::WobbleLatticeAnim(Lattice* l) : LatticeAnim(l)
 {
 	speed = 1.0f;
 	startdist = 0.05f;
@@ -206,13 +206,13 @@ wobbleLatticeAnim::wobbleLatticeAnim(lattice* l) : latticeAnim(l)
 	hfac = vfac = 1;
 }
 
-wobbleLatticeAnim::~wobbleLatticeAnim()
+WobbleLatticeAnim::~WobbleLatticeAnim()
 {
 	delete [] angle;
 	delete [] dist;
 }
 
-void wobbleLatticeAnim::init()
+void WobbleLatticeAnim::init()
 {
 	angle = new float[(m_l->numx+1)*(m_l->numy+1)];
 	dist = new float[(m_l->numx+1)*(m_l->numy+1)];
@@ -231,7 +231,7 @@ void wobbleLatticeAnim::init()
 	setEffect();
 }
 
-void wobbleLatticeAnim::update(float dt)
+void WobbleLatticeAnim::update(float dt)
 {
 	float* angptr = angle;
 	for(int iy = 0; iy <= m_l->numy; iy++)
@@ -245,11 +245,11 @@ void wobbleLatticeAnim::update(float dt)
 	setEffect();
 }
 
-void wobbleLatticeAnim::setEffect()
+void WobbleLatticeAnim::setEffect()
 {
 	m_l->reset();
 	
-	latticeVert* ptr = m_l->UV;
+	LatticeVert* ptr = m_l->UV;
 	float* angptr = angle;
 	float* distptr = dist;
 	for(int iy = 0; iy <= m_l->numy; iy++)
@@ -289,10 +289,10 @@ void wobbleLatticeAnim::setEffect()
 
 
 
-Point softBodyAnim::getCenter()
+Point SoftBodyAnim::getCenter()
 {
 	b2Vec2 centroid(0,0);
-	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		centroid = centroid + i->b->GetPosition();
 	
 	centroid.x = centroid.x / bodies.size();
@@ -305,13 +305,13 @@ Point softBodyAnim::getCenter()
 	return Point(centroid.x, centroid.y);
 }
 
-softBodyAnim::softBodyAnim(lattice* l) : latticeAnim(l)
+SoftBodyAnim::SoftBodyAnim(Lattice* l) : LatticeAnim(l)
 {
 	center.b = NULL;
 	size = Point(0, 0);
 }
 
-softBodyAnim::~softBodyAnim()
+SoftBodyAnim::~SoftBodyAnim()
 {
 	//for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 	//{
@@ -319,10 +319,10 @@ softBodyAnim::~softBodyAnim()
 	//}
 }
 
-void softBodyAnim::setEffect()
+void SoftBodyAnim::setEffect()
 {
 	m_l->reset();
-	latticeVert* ptr = m_l->vertex;
+	LatticeVert* ptr = m_l->vertex;
 	for(uint32 iy = 0; iy <= m_l->numy; iy++)
 	{
 		for(uint32 ix = 0; ix <= m_l->numx; ix++)
@@ -331,13 +331,13 @@ void softBodyAnim::setEffect()
 			
 			//Find total distance between this vertex and all bodies
 			float totalDist = 0.0;
-			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Point dist = vertPos - i->pos;
 				totalDist += glmx::lensqr(dist);
 			}
 			
-			for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Point pMoved = distMoved(&(*i));
 				
@@ -360,37 +360,37 @@ void softBodyAnim::setEffect()
 	m_l->bind();
 }
 
-Point softBodyAnim::relOffset(b2Body* b)
+Point SoftBodyAnim::relOffset(b2Body* b)
 {
     b2Vec2 p = b->GetPosition();
 	return Point(p.x, p.y) - getCenter();
 }
 
-Point softBodyAnim::distMoved(bodypos* bp)
+Point SoftBodyAnim::distMoved(BodyPos* bp)
 {
 	Point rel = relOffset(bp->b);
 	rel = rel - bp->pos;
 	return rel;
 }
 
-void softBodyAnim::init()
+void SoftBodyAnim::init()
 {
-	for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		i->pos = relOffset(i->b);
     b2Vec2 p = center.b->GetPosition();
 	center.pos = Point(p.x, p.y);
 }
 
-void softBodyAnim::update(float dt)
+void SoftBodyAnim::update(float dt)
 {
 	setEffect();
 }
 
-void softBodyAnim::addBody(b2Body* b, bool bCenter)
+void SoftBodyAnim::addBody(b2Body* b, bool bCenter)
 {
 	//if(!bCenter)
 	{
-		bodypos bp;
+		BodyPos bp;
 		bp.b = b;
 		bodies.push_back(bp);
 	}
@@ -400,14 +400,14 @@ void softBodyAnim::addBody(b2Body* b, bool bCenter)
 	}
 }
 
-Point softBodyAnim::getVertex(latticeVert* v)
+Point SoftBodyAnim::getVertex(LatticeVert* v)
 {
 	Point p(v->x * size.x, v->y * size.y);
 	
 	return p + getCenter();
 }
 
-void softBodyAnim::setVertex(Point p, latticeVert* v)
+void SoftBodyAnim::setVertex(Point p, LatticeVert* v)
 {
 	p = p - getCenter();
 	

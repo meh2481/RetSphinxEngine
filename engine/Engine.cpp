@@ -489,7 +489,7 @@ void Engine::stepPhysics(float dt)
 	//Iterate over all these
 	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
 	{
-		collision c = m_clContactListener.getCollision(*i);
+		Collision c = m_clContactListener.getCollision(*i);
 		b2WorldManifold worldManifold;
 		(*i)->GetWorldManifold(&worldManifold);
 		if(c.objA && c.objB)

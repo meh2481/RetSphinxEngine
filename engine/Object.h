@@ -6,7 +6,7 @@
 #pragma once
 
 #include "globaldefs.h"
-#include "3DObject.h"
+#include "Mesh3D.h"
 #include "Drawable.h"
 #include "LuaInterface.h"
 #include "luafuncs.h"
@@ -16,8 +16,8 @@ class Object;
 class ObjSegment;
 class b2Body;
 struct b2BodyDef;
-class lattice;
-class latticeAnim;
+class Lattice;
+class LatticeAnim;
 class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
@@ -27,10 +27,10 @@ class ObjSegment : public Drawable
 public:
     b2Body*         body;		//Physics body associated with this segment
     Image*  		img;		//Image to draw
-	lattice*		lat;		//Lattice to apply to image
-	latticeAnim*	latanim;	//Animation to apply to lattice
+	Lattice*		lat;		//Lattice to apply to image
+	LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
-	Object3D*		obj3D;		//3D object
+	Mesh3D*		obj3D;		//3D object
 	
 	Point pos;		//Offset (after rotation)
 	Point center;	//Center of rotation (Offset before rotation)
@@ -58,8 +58,8 @@ public:
 	enum { TYPE = OT_OBJECT };
     vector<ObjSegment*> 	segments;
 	Image*					meshImg;
-	lattice*				meshLattice;
-	latticeAnim*			meshAnim;
+	Lattice*				meshLattice;
+	LatticeAnim*			meshAnim;
 	Point					meshSize;
 	LuaInterface* 			lua;
 	string 					luaClass;

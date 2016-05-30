@@ -10,14 +10,14 @@
 
 class Image;
 
-class arc : public ObjSegment
+class Arc : public ObjSegment
 {
 protected:
 	float* segmentPos;
 	Image* arcSegImg;
 	unsigned numSegments;
 	
-	arc(){};
+	Arc(){};
 	void average();	//Helper function to average the values for a less jittery arc
 	
 public:
@@ -27,8 +27,8 @@ public:
 	float height;
 	unsigned avg;
 	
-	arc(unsigned number, Image* img);
-	~arc();
+	Arc(unsigned number, Image* img);
+	~Arc();
 	
 	void init();
 	void draw();

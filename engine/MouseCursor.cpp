@@ -2,30 +2,30 @@
     GameEngine source - cursor.cpp
     Copyright (c) 2014 Mark Hutcheson
 */
-#include "cursor.h"
+#include "MouseCursor.h"
 #include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
 
 //TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
-myCursor::myCursor()
+MouseCursor::MouseCursor()
 {
 	_init();
 }
 
-myCursor::~myCursor()
+MouseCursor::~MouseCursor()
 {
 	
 }
 	
-void myCursor::_init()
+void MouseCursor::_init()
 {
 	img = NULL;
 	rot = 0;
 }
 	
-void myCursor::draw()
+void MouseCursor::draw()
 {
 	if(img != NULL)
 	{
@@ -42,7 +42,7 @@ void myCursor::draw()
 	}
 }
 	
-bool myCursor::fromXML(string sXMLFilename)
+bool MouseCursor::fromXML(string sXMLFilename)
 {
 	_init();
 	

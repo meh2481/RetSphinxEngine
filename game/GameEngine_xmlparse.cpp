@@ -378,7 +378,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				if(cBodyRes)
 					pMeshSize = pointFromString(cBodyRes);
 				
-				o->meshLattice = new lattice((int)pMeshSize.x, (int)pMeshSize.y);
+				o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
 				
 				string sLatticeType = cLatticeType;
 				if(sLatticeType == "softbody")
@@ -388,7 +388,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 					{
 						//Override default mesh size if we've provided one
 						
-						softBodyAnim* manim = new softBodyAnim(o->meshLattice);
+						SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
 						manim->addBody(mBodyNames[cBodyCenter], true);
 						manim->size = o->meshSize;
 						for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
@@ -403,7 +403,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				}
 				else if(sLatticeType == "sin")
 				{
-					sinLatticeAnim* manim = new sinLatticeAnim(o->meshLattice);
+					SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
 					
 					latticeElem->QueryFloatAttribute("amp", &manim->amp);
 					latticeElem->QueryFloatAttribute("freq", &manim->freq);
@@ -414,7 +414,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 				}
 				else if(sLatticeType == "wobble")
 				{
-					wobbleLatticeAnim* manim = new wobbleLatticeAnim(o->meshLattice);
+					WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
 					
 					latticeElem->QueryFloatAttribute("speed", &manim->speed);
 					latticeElem->QueryFloatAttribute("dist", &manim->startdist);

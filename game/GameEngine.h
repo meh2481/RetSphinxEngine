@@ -8,9 +8,9 @@
 
 #include <vector>
 #include <set>
-#include "luainterface.h"
+#include "LuaInterface.h"
 
-#include "3DObject.h"
+#include "Mesh3D.h"
 #include "tinyxml2.h"
 
 #define DEFAULT_WIDTH	800
@@ -42,7 +42,7 @@ private:
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
-	myCursor* m_Cursor;
+	MouseCursor* m_Cursor;
 	Object* player;
 	Rect rcSceneBounds;
 	

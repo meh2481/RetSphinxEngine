@@ -193,7 +193,7 @@ void Image::render(Point size, float tilex, float tiley)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void Image::renderLattice(lattice* l, Point size)
+void Image::renderLattice(Lattice* l, Point size)
 {
 	glPushMatrix();
 	

@@ -30,7 +30,7 @@ struct Face
     uint32_t norm1, norm2, norm3;
 };
 
-class Object3D
+class Mesh3D
 {
 protected:
     unsigned m_obj;   //The object in 3D memory
@@ -51,9 +51,9 @@ public:
     
     void _reload();  //Reload memory associated with this object
 
-    Object3D(string sOBJFile);//, GLImage* sImg);
-    Object3D();
-    ~Object3D();
+    Mesh3D(string sOBJFile);//, GLImage* sImg);
+    Mesh3D();
+    ~Mesh3D();
 
     //void setTexture(GLImage* sImg);
 
@@ -67,10 +67,10 @@ public:
 //TODO SHOULD BE A CLASS
 //Object3D reloading handler functions
 void reload3DObjects();
-void _add3DObjReload(Object3D* obj);
-void _remove3DObjReload(Object3D* obj);
+void _add3DObjReload(Mesh3D* obj);
+void _remove3DObjReload(Mesh3D* obj);
 
-Object3D* getObject(string sFilename);	//TODO NEEDS LESS GENERIC NAME
+Mesh3D* getObject(string sFilename);	//TODO NEEDS LESS GENERIC NAME
 void clearObjects();	//TODO NEEDS LESS GENERIC NAME
 
 

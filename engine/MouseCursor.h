@@ -10,14 +10,15 @@
 
 class Image;
  
-class myCursor
+//TODO This should be some derivative of Drawable or some child thereof
+class MouseCursor
 {
 protected:
 	void _init();
 	
 public:
-	myCursor();
-	~myCursor();
+	MouseCursor();
+	~MouseCursor();
 	
 	Point pos;
 	Point size;

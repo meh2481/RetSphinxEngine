@@ -65,7 +65,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 #endif
 	showCursor();
 	
-	m_Cursor = new myCursor();
+	m_Cursor = new MouseCursor();
 	m_Cursor->fromXML("res/cursor/arrow.xml");
 	setCursor(m_Cursor);
 	

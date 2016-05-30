@@ -9,7 +9,7 @@ typedef struct {
 	Object* objB;
 	Node* nodeA;
 	Node* nodeB;
-}collision;
+} Collision;
 	
 class EngineContactListener : public b2ContactListener
 {
@@ -25,7 +25,7 @@ public:
 	virtual void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
 	
 	//Helper functions for my use
-	static collision getCollision(b2Contact* c);	//Get two objects that are colliding on this fixture (either one can be NULL)
+	static Collision getCollision(b2Contact* c);	//Get two objects that are colliding on this fixture (either one can be NULL)
 	static Object* getObj(b2Fixture* fix);				//Get the object (or NULL) this fixture is associated with
 	void clearFrameContacts();						//Call every frame to wipe temporary (hit and leave) contacts for that frame
 };

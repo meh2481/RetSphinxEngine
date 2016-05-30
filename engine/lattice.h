@@ -6,12 +6,12 @@
 
 class b2Body;
 
-struct latticeVert
+struct LatticeVert
 {
 	float x, y;
 };
 
-class lattice
+class Lattice
 {
 	void setup(int x, int y);
 	
@@ -19,14 +19,14 @@ class lattice
 	float* m_UV;
 	
 public:
-	latticeVert* vertex;
-	latticeVert* UV;
+	LatticeVert* vertex;
+	LatticeVert* UV;
 	
 	int numx, numy;
 	
-	lattice(int x, int y) {setup(x,y);};
-	lattice() {setup(10,10);};
-	~lattice();
+	Lattice(int x, int y) {setup(x,y);};
+	Lattice() {setup(10,10);};
+	~Lattice();
 	
 	void renderTex(unsigned tex);
 	void renderDebug();
@@ -37,21 +37,21 @@ public:
 	//void setVertex(uint32 x, uint32 y);
 };
 
-class latticeAnim
+class LatticeAnim
 {
 protected:
-	lattice* m_l;
-	latticeAnim(){};
+	Lattice* m_l;
+	LatticeAnim(){};
 	
 public:
-	latticeAnim(lattice* l) {m_l = l;};
-	~latticeAnim(){};
+	LatticeAnim(Lattice* l) {m_l = l;};
+	~LatticeAnim(){};
 	
 	virtual void init() = 0;
 	virtual void update(float dt) = 0;
 };
 
-class sinLatticeAnim : public latticeAnim
+class SinLatticeAnim : public LatticeAnim
 {
 protected:
 	float curtime;
@@ -59,8 +59,8 @@ protected:
 	void setEffect();
 	
 public:
-	sinLatticeAnim(lattice* l);
-	~sinLatticeAnim(){};
+	SinLatticeAnim(Lattice* l);
+	~SinLatticeAnim(){};
 
 	void init();
 	void update(float dt);
@@ -71,7 +71,7 @@ public:
 	
 };
 
-class wobbleLatticeAnim : public latticeAnim
+class WobbleLatticeAnim : public LatticeAnim
 {
 protected:
 	float* angle;	//Radians
@@ -80,8 +80,8 @@ protected:
 	void setEffect();
 	
 public:
-	wobbleLatticeAnim(lattice* l);
-	~wobbleLatticeAnim();
+	WobbleLatticeAnim(Lattice* l);
+	~WobbleLatticeAnim();
 	
 	void init();
 	void update(float dt);
@@ -95,7 +95,7 @@ public:
 	float vfac;
 };
 
-struct bodypos
+struct BodyPos
 {
 	b2Body* b;			//Body
 	Point pos;			//Starting body pos
@@ -106,22 +106,22 @@ struct bodypos
 	//float* weights;	//Vertex weights
 };
 
-class softBodyAnim : public latticeAnim
+class SoftBodyAnim : public LatticeAnim
 {
 protected:
-	list<bodypos> bodies;
-	bodypos center;
+	list<BodyPos> bodies;
+	BodyPos center;
 	
 	Point getCenter();
 	void setEffect();
 	Point relOffset(b2Body* b);	//returns angle, dist relative to center body
-	Point distMoved(bodypos* bp);	//returns angle, dist that the body has moved relative to starting pos
-	Point getVertex(latticeVert* v);	//Get vertex in box2d coordinates
-	void setVertex(Point p, latticeVert* v);	//Set vertex position from box2d coordinates
+	Point distMoved(BodyPos* bp);	//returns angle, dist that the body has moved relative to starting pos
+	Point getVertex(LatticeVert* v);	//Get vertex in box2d coordinates
+	void setVertex(Point p, LatticeVert* v);	//Set vertex position from box2d coordinates
 	
 public:
-	softBodyAnim(lattice* l);
-	~softBodyAnim();
+	SoftBodyAnim(Lattice* l);
+	~SoftBodyAnim();
 	
 	Point size;
 	

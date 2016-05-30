@@ -7,7 +7,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 
-arc::arc(unsigned number, Image* img) : ObjSegment()
+Arc::Arc(unsigned number, Image* img) : ObjSegment()
 {
 	segmentPos = NULL;
 	if(img == NULL || number == 0) return;
@@ -20,12 +20,12 @@ arc::arc(unsigned number, Image* img) : ObjSegment()
 	init();
 }
 
-arc::~arc()
+Arc::~Arc()
 {
 	free(segmentPos);
 }
 
-void arc::draw()
+void Arc::draw()
 {
 	if(!show || arcSegImg == NULL) return;
 	glColor4f(col.r,col.g,col.b,col.a);
@@ -57,7 +57,7 @@ void arc::draw()
 	glColor4f(1.0,1.0,1.0,1.0);
 }
 
-void arc::update(float dt)
+void Arc::update(float dt)
 {
 	dt *= 60.0;
 	for(int i = 1; i < int(numSegments)-1; i++)
@@ -71,7 +71,7 @@ void arc::update(float dt)
 	average();
 }
 
-void arc::init()
+void Arc::init()
 {
 	//Initialize values of array to sane defaults, so we don't start with a flat arc for one frame
 	for(unsigned i = 0; i < numSegments; i++)
@@ -79,7 +79,7 @@ void arc::init()
 	average();
 }
 
-void arc::average()
+void Arc::average()
 {
 	if(avg < 1) return;
 	
@@ -108,7 +108,7 @@ void arc::average()
 	free(temp);
 }
 
-const string& arc::getImageFilename()
+const string& Arc::getImageFilename()
 {
     return arcSegImg->getFilename();
 }
