@@ -30,6 +30,7 @@ include_directories("${glm_INCLUDE_DIRS}")
 include_directories("${BOX2D_INCLUDE_DIRS}/..")
 include_directories("${SDL2_INCLUDE_DIR}")
 include_directories(dep/lua)
+include_directories(dep/imgui)
 
 add_subdirectory(engine)
 
