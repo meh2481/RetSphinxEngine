@@ -6,6 +6,7 @@
 #include <SDL_opengl.h>
 #include "stb_image_write.h"
 #include <SDL_thread.h>
+#include "DebugUI.h"
 
 typedef struct
 {
@@ -41,6 +42,7 @@ static int saveScreenshot(void *ptr)
 
 void GameEngine::handleEvent(SDL_Event event)
 {
+	// Input that happens no matter what
 	switch(event.type)
 	{
 		//Key pressed
@@ -56,28 +58,14 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_F6:
 					Lua->call("loadStartingMap");	//Start from initial map
 					break;
-					
-				case SDL_SCANCODE_V:
-					toggleDebugDraw();
-					break;
-					
-				case SDL_SCANCODE_L:
-					toggleObjDebugDraw();
-					break;
-					
+
 				case SDL_SCANCODE_ESCAPE:
-					quit();
+					if(m_debugUI->visible)
+						m_debugUI->visible = false;
+					else
+						quit();
 					break;
-#ifdef _DEBUG
-				case SDL_SCANCODE_P:
-					playPausePhysics();
-					break;
-					
-				case SDL_SCANCODE_O:
-					pausePhysics();
-					stepPhysics();
-					break;
-#endif
+
 				case SDL_SCANCODE_PRINTSCREEN:
 				{
 					//Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
@@ -109,58 +97,16 @@ void GameEngine::handleEvent(SDL_Event event)
 					
 					break;
 				}
-				
+
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
 					if(keyDown(SDL_SCANCODE_ALT))
 						setFullscreen(!isFullscreen());
 					break;
-			}
-			break;
-		
-		//Key released
-		case SDL_KEYUP:
-			switch(event.key.keysym.scancode)
-			{
-			}
-			break;
-		
-		case SDL_MOUSEBUTTONDOWN:
-		{
-			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
-		}
-		break;
-			
-		case SDL_MOUSEWHEEL:
-			if(event.wheel.y > 0)
-			{
-				CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
-			}
-			else
-			{
-				CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
-			}
-			break;
 
-		case SDL_MOUSEBUTTONUP:
-			LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
-			if(event.button.button == SDL_BUTTON_LEFT)
-			{
-				
+				case SDL_SCANCODE_GRAVE: // Use the traditional quake key for debug console stuff
+					m_debugUI->visible = !m_debugUI->visible;
 			}
-			else if(event.button.button == SDL_BUTTON_RIGHT)
-			{
-			
-			}
-			else if(event.button.button == SDL_BUTTON_MIDDLE)
-			{
-				
-			}
-			break;
 
-		case SDL_MOUSEMOTION:
-			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
-			break;
-		
 		case SDL_WINDOWEVENT:
 			switch (event.window.event)
 			{
@@ -237,6 +183,85 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		case SDL_JOYHATMOTION:
 			LOG(TRACE) << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value;
+			break;
+	}
+
+	//----------------------------------------------------------------------------------------------------
+	// Ignore non-essential input when the debugUI has focus
+	if(m_debugUI->hasFocus())
+		return;
+
+
+	switch(event.type)
+	{
+		//Key pressed
+		case SDL_KEYDOWN:
+			switch(event.key.keysym.scancode)
+			{
+				case SDL_SCANCODE_V:
+					toggleDebugDraw();
+					break;
+					
+				case SDL_SCANCODE_L:
+					toggleObjDebugDraw();
+					break;
+					
+#ifdef _DEBUG
+				case SDL_SCANCODE_P:
+					playPausePhysics();
+					break;
+					
+				case SDL_SCANCODE_O:
+					pausePhysics();
+					stepPhysics();
+					break;
+#endif
+				
+			}
+			break;
+		
+		//Key released
+		case SDL_KEYUP:
+			switch(event.key.keysym.scancode)
+			{
+			}
+			break;
+		
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
+		}
+		break;
+			
+		case SDL_MOUSEWHEEL:
+			if(event.wheel.y > 0)
+			{
+				CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
+			}
+			else
+			{
+				CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
+			}
+			break;
+
+		case SDL_MOUSEBUTTONUP:
+			LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
+			if(event.button.button == SDL_BUTTON_LEFT)
+			{
+				
+			}
+			else if(event.button.button == SDL_BUTTON_RIGHT)
+			{
+			
+			}
+			else if(event.button.button == SDL_BUTTON_MIDDLE)
+			{
+				
+			}
+			break;
+
+		case SDL_MOUSEMOTION:
+			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
 			break;
 	}
 }

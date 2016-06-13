@@ -9,6 +9,8 @@
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "Random.h"
+#include "imgui/imgui.h"
+#include "imgui_impl_sdl.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -92,10 +94,15 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 			LOG(TRACE) << "Driver " << i << ": " << driverInfoStr
 		}
 	}*/
+
+	ImGui_ImplSdl_Init(m_Window);
+	ImGui_Impl_GL2_CreateDeviceObjects();
 }
 
 Engine::~Engine()
 {
+	ImGui_Impl_GL2_Shutdown();
+
 	SDL_DestroyWindow(m_Window);
 
 	//Clean up our image map
@@ -140,6 +147,8 @@ bool Engine::_frame()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
+		ImGui_ImplSdl_ProcessEvent(&event);
+
 		//Update internal cursor position if cursor has moved
 		if(event.type == SDL_MOUSEMOTION)
 		{
@@ -177,6 +186,9 @@ bool Engine::_frame()
 		if(!m_bPaused)
 			handleEvent(event);
 	}
+
+	ImGui_ImplSdl_NewFrame(m_Window);
+
 	if(m_bPaused)
 	{
 		SDL_Delay(100);	//Wait 100 ms
@@ -231,6 +243,8 @@ void Engine::_render()
 	
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	ImGui::Render();
 	
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);

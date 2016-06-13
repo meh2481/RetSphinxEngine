@@ -4,6 +4,8 @@ GameEngine.h
 GameEngine_color.cpp
 GameEngine_events.cpp
 GameEngine_xmlparse.cpp
+DebugUI.cpp
+DebugUI.h
 luafuncs.cpp
 main.cpp
 )

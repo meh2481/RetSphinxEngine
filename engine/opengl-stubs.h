@@ -54,6 +54,7 @@ GL_FUNC(void,glLoadMatrixf,(const GLfloat *m),(m),)
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
 GL_FUNC(void,glTexCoordPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
 GL_FUNC(void,glDrawArrays,(GLenum mode, GLint first, GLsizei count),(mode,first,count),)
+GL_FUNC(void,glDrawElements,(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices),(mode,count,type,indices),)
 
 GL_FUNC(void,glVertex3f,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
 GL_FUNC(void,glVertex3i,(GLint x, GLint y, GLint z),(x,y,z),)
@@ -78,6 +79,9 @@ GL_FUNC(void,glGetLightfv,(GLenum light, GLenum pname, GLfloat *params),(light,p
 GL_FUNC(void,glLightModelfv,(GLenum pname, const GLfloat *params),(pname, params),)
 GL_FUNC(void,glMaterialfv,(GLenum face, GLenum pname, const GLfloat *params),(face, pname, params),)
 GL_FUNC(void,glMaterialf,(GLenum face, GLenum pname, const GLfloat param),(face, pname, param),)
+
+GL_FUNC(void,glColorPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr),(size,type,stride,ptr),)
+
 
 //Win32 context stuff
 #ifdef _WIN32

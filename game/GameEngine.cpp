@@ -9,6 +9,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
+#include "DebugUI.h"
 
 //Keybinding stuff!
 uint32_t JOY_BUTTON_BACK;
@@ -121,6 +122,8 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	JOY_AXIS_LT = 2;
 //#endif
 	g_fParticleFac = 1.0f;
+
+	m_debugUI = new DebugUI(this);
 }
 
 GameEngine::~GameEngine()
@@ -134,6 +137,9 @@ GameEngine::~GameEngine()
 void GameEngine::frame(float dt)
 {
 	handleKeys();
+
+	m_debugUI->draw();
+
 	stepPhysics(dt);
 	updateParticles(dt);
 	updateObjects(dt);

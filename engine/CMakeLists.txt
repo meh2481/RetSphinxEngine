@@ -49,8 +49,14 @@ tiny3d.h
 Interpolator.cpp
 Interpolator.h
 Random.cpp
-Random.h 
+Random.h
+imgui_impl_opengl2.cpp
+#imgui_impl_opengl3.cpp
+imgui_impl_sdl.cpp
+imgui_impl_sdl.h
+MemoryEditor.cpp
+MemoryEditor.h
 )
 
 add_library(engine ${engine_src})
-target_link_libraries(engine lua53 io ${BOX2D_LIBRARY} ${SDL2_LIBRARY})
+target_link_libraries(engine imgui lua53 io ${BOX2D_LIBRARY} ${SDL2_LIBRARY})
