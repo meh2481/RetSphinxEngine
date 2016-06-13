@@ -64,8 +64,9 @@ void ImGui_Impl_GL2_RenderDrawLists(ImDrawData* draw_data)
 
     // Restore modified state
     glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D, 0);
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
