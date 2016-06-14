@@ -67,7 +67,7 @@ bool ImGui_ImplSdl_ProcessEvent(SDL_Event* event)
     return false;
 }
 
-bool    ImGui_ImplSdl_Init(SDL_Window *window)
+bool    ImGui_ImplSdl_Init(SDL_Window *window, string sIniFile)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.KeyMap[ImGuiKey_Tab] = SDLK_TAB;                     // Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
@@ -94,6 +94,8 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window)
     io.RenderDrawListsFn = ImGui_Impl_GL2_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplSdl_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplSdl_GetClipboardText;
+
+	io.IniFilename = sIniFile;
 	
 #ifdef _WIN32
 	SDL_SysWMinfo wmInfo;

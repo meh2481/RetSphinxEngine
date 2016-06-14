@@ -14,9 +14,6 @@
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
-	//Create save folder
-	string sFileLoc = getSaveLocation() + "/screenshots/";
-	
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
 
@@ -95,7 +92,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 		}
 	}*/
 
-	ImGui_ImplSdl_Init(m_Window);
+	ImGui_ImplSdl_Init(m_Window, getSaveLocation() + "imgui.ini");
 	ImGui_Impl_GL2_CreateDeviceObjects();
 }
 
