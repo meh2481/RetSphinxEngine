@@ -800,8 +800,8 @@ ImGuiIO::ImGuiIO()
     DisplaySize = ImVec2(-1.0f, -1.0f);
     DeltaTime = 1.0f/60.0f;
     IniSavingRate = 5.0f;
-	//IniFilename = NULL;// "imgui.ini";
-	LogFilename = NULL;// "imgui_log.txt";
+    IniFilename = "imgui.ini";
+    LogFilename = "imgui_log.txt";
     Fonts = &GImDefaultFontAtlas;
     FontGlobalScale = 1.0f;
     DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
@@ -2362,7 +2362,7 @@ static ImGuiIniData* AddWindowSettings(const char* name)
 static void LoadSettings()
 {
     ImGuiContext& g = *GImGui;
-    const char* filename = g.IO.IniFilename.c_str();
+    const char* filename = g.IO.IniFilename;
     if (!filename)
         return;
 
@@ -2408,7 +2408,7 @@ static void LoadSettings()
 static void SaveSettings()
 {
     ImGuiContext& g = *GImGui;
-    const char* filename = g.IO.IniFilename.c_str();
+    const char* filename = g.IO.IniFilename;
     if (!filename)
         return;
 

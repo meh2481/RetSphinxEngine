@@ -92,7 +92,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 		}
 	}*/
 
-	ImGui_ImplSdl_Init(m_Window, getSaveLocation() + "imgui.ini");
+	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
+	static const string sIniFile = getSaveLocation() + "imgui.ini";
+	//Init ImGUI
+	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
 }
 
