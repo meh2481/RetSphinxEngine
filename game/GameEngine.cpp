@@ -272,7 +272,8 @@ void GameEngine::draw()
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
 	Vec3 cam(CameraPos.x, CameraPos.y, m_fDefCameraZ);
 	m_Cursor->pos = worldPosFromCursor(getCursorPos(), cam);
-	drawCursor();
+	
+	glPushMatrix();
 	
 	glTranslatef(0, 0, m_fDefCameraZ);
 	

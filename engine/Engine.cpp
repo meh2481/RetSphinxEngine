@@ -245,6 +245,9 @@ void Engine::_render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ImGui::Render();
+
+	glPopMatrix();
+	drawCursor();
 	
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
