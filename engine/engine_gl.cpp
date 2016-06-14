@@ -120,10 +120,8 @@ void Engine::setup_opengl()
 	// Set the camera projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-	//gluPerspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f, 500.0f);
-    //glm::mat4 persp = glm::perspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f, 500.0f);
-    glm::mat4 persp = glm::tweakedInfinitePerspective(45.0f, (float)m_iWidth/(float)m_iHeight, 0.1f); // FG: FIXME: is this ok?
+	
+    glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth/(float)m_iHeight, 0.1f);
     glLoadMatrixf(glm::value_ptr(persp));
 
 	glMatrixMode(GL_MODELVIEW);

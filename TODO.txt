@@ -13,6 +13,7 @@ Overall TODO list:
 - class predeclaration - don't have to include headers
 - Ortho HUD
 - Research SDL gamecontroller stuff
+- Definitely ortho for mouse cursor
 
 
 
