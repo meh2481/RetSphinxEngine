@@ -138,8 +138,6 @@ void GameEngine::frame(float dt)
 {
 	handleKeys();
 
-	m_debugUI->draw();
-
 	stepPhysics(dt);
 	updateParticles(dt);
 	updateObjects(dt);
@@ -175,6 +173,8 @@ void GameEngine::draw()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+
+	m_debugUI->draw();
 	
 	/*/Set mouse cursor to proper location
 	for(map<string, myCursor*>::iterator i = m_mCursors.begin(); i != m_mCursors.end(); i++)

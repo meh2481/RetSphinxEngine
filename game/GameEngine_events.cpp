@@ -186,11 +186,6 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 	}
 
-	//----------------------------------------------------------------------------------------------------
-	// Ignore non-essential input when the debugUI has focus
-	if(m_debugUI->hasFocus())
-		return;
-
 
 	switch(event.type)
 	{

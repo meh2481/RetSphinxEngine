@@ -53,10 +53,6 @@ bool ImGui_ImplSdl_ProcessEvent(SDL_Event* event)
             return true;
         }
     case SDL_KEYDOWN:
-        // HACK: SDL_TEXTINPUT doesn't seem to work, use this instead
-        if(event->key.keysym.sym <= 255)
-            io.AddInputCharacter(event->key.keysym.sym);
-        // fall through
     case SDL_KEYUP:
         {
             bool down = (event->type == SDL_KEYDOWN);
