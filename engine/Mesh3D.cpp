@@ -17,10 +17,6 @@ using namespace tiny3d;
 Mesh3D::Mesh3D(string sOBJFile)
 {
 	useGlobalLight = true;
-	//rot[0] = 0.0f;
-	//rot[1] = 0.0f;
-	//rot[2] = 0.0f;
-	//rot[3] = 1.0f;
 	
     m_obj = 0;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
@@ -190,13 +186,10 @@ void Mesh3D::_fromOBJFile(string sFilename)
     }
 
     glEnd();
-
     glEndList();
-
 }
 
 //Fall back on pure C functions for speed
-//TODO: On *nix systems, I ought to be able to mmap() to load even faster
 void Mesh3D::_fromTiny3DFile(string sFilename)
 {
 	LOG(INFO) << "Loading 3D object " << sFilename;
@@ -260,32 +253,34 @@ void Mesh3D::_fromTiny3DFile(string sFilename)
 	
     //Loop through and add faces
     glBegin(GL_TRIANGLES);
+	face* facePtr = faces;
     for(unsigned i = 0; i < header.numFaces; i++)
     {
-		vert v = vertices[faces[i].v1];
-		uv UV = uvs[faces[i].uv1];
-		normal norm = normals[faces[i].norm1];
+		vert v = vertices[facePtr->v1];
+		uv UV = uvs[facePtr->uv1];
+		normal norm = normals[facePtr->norm1];
         glNormal3f(norm.x, norm.y, norm.z);
         glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
         
-		v = vertices[faces[i].v2];
-		UV = uvs[faces[i].uv2];
-		norm = normals[faces[i].norm2];
+		v = vertices[facePtr->v2];
+		UV = uvs[facePtr->uv2];
+		norm = normals[facePtr->norm2];
         glNormal3f(norm.x, norm.y, norm.z);
         glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
 		
-		v = vertices[faces[i].v3];
-		UV = uvs[faces[i].uv3];
-		norm = normals[faces[i].norm3];
+		v = vertices[facePtr->v3];
+		UV = uvs[facePtr->uv3];
+		norm = normals[facePtr->norm3];
         glNormal3f(norm.x, norm.y, norm.z);
         glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);
+
+		facePtr++;
     }
 
     glEnd();
-
     glEndList();
 	
 	free(normals);

@@ -14,62 +14,129 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "easylogging++.h"
+#include "ResourceTypes.h"
 
 
 Image::Image(string sFilename)
 {
-	m_bReloadEachTime = false;
+	//m_bReloadEachTime = false;
 	m_hTex = 0;
 	m_iWidth = m_iHeight = 0;
 	m_sFilename = sFilename;
-	if(sFilename.find(".xml", sFilename.size()-4) != string::npos)
-		_loadNoise(sFilename);
-	else
-		_load(sFilename);
+	_load(sFilename);
 	_addImgReload(this);
 }
 
-void Image::_load(string sFilename)
+Image::~Image()
 {
-	int comp = 0;
-	unsigned char* cBuf = stbi_load(sFilename.c_str(), &m_iWidth, &m_iHeight, &comp, 0);
-	LOG(INFO) << "Load " << sFilename;
+	//image cleanup
+	LOG(INFO) << "Free " << m_sFilename;
+	if(m_hTex)
+		glDeleteTextures(1, &m_hTex);	//Free OpenGL graphics memory
+	_removeImgReload(this);
+}
 
-	int mode, modeflip;
-	if(comp == 3) // RGB 24bit
-	{
-		mode = GL_RGB;
-		modeflip = GL_RGB;
-	}
-	else if(comp == 4)  // RGBA 32bit
-	{
-		mode = GL_RGBA;
-		modeflip = GL_RGBA;
-	}
-  
-	if((cBuf == 0) || (m_iWidth == 0) || (m_iHeight == 0))
-	{
-		LOG(ERROR) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity";
-		return;
-	}
-  
+void Image::_bind(unsigned char* data, unsigned int width, unsigned int height, int mode)
+{
+	m_iWidth = width;
+	m_iHeight = height;
+
 	//generate an OpenGL texture ID for this texture
 	glGenTextures(1, &m_hTex);
 	//bind to the new texture ID
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	//store the texture data for OpenGL use
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, m_iWidth, m_iHeight, 0, modeflip, GL_UNSIGNED_BYTE, cBuf);
+	glTexImage2D(GL_TEXTURE_2D, 0, mode, m_iWidth, m_iHeight, 0, mode, GL_UNSIGNED_BYTE, data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+//TODO: This should be split into a resource loader
+void Image::_loadBlob(unsigned char* blob, unsigned int size)
+{
+	if(size < sizeof(TextureHeader))
+	{
+		LOG(ERROR) << "Decompressed image data smaller than texture header";
+		return;
+	}
+
+	//Read header
+	TextureHeader header;
+	memcpy(&header, blob, sizeof(TextureHeader));
+	blob += sizeof(TextureHeader);
+	size -= sizeof(TextureHeader);
+
+	if(size < header.width * header.height * header.bpp / 8)
+	{
+		LOG(ERROR) << "Insufficient image data. Expected: " << header.width * header.height * header.bpp / 8 << ", actual: " << size;
+		return;
+	}
+
+	int mode = GL_RGBA;	// RGBA 32bit
+	if(header.bpp == TEXTURE_BPP_RGB) // RGB 24bit
+		mode = GL_RGB;
+
+	_bind(blob, header.width, header.height, mode);
+}
+
+//TODO: This should be split out into a resource loader
+void Image::_loadIMG(string sFilename)
+{
+	//Read file
+	unsigned int size = 0;
+	unsigned char* compressed = readFile(sFilename.c_str(), &size);
+
+	if(!compressed) return;
+	if(!size)
+	{
+		freeResource(compressed);
+		return;
+	}
+
+	unsigned int decompressedSize = 0;
+	unsigned char* decompressed = decompressResource(compressed, &decompressedSize, size);
+
+	freeResource(compressed);
+
+	if(!decompressed) return;
+	if(!decompressedSize)
+	{
+		freeResource(decompressed);
+		return;
+	}
+
+	_loadBlob(decompressed, decompressedSize);
+
+	freeResource(decompressed);
+}
+
+void Image::_loadPNG(string sFilename)
+{
+	int comp = 0;
+	int width = 0;
+	int height = 0;
+	unsigned char* cBuf = stbi_load(sFilename.c_str(), &width, &height, &comp, 0);
+
+	int mode = GL_RGBA;	// RGBA 32bit
+	if(comp == 3) // RGB 24bit
+		mode = GL_RGB;
   
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	if((cBuf == 0) || (width == 0) || (height == 0))
+	{
+		LOG(ERROR) << "Unable to load image " << sFilename;
+		return;
+	}
+  
+	_bind(cBuf, width, height, mode);
 
 	stbi_image_free(cBuf);
 }
 
-//TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
+/*/TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
 void Image::_loadNoise(string sXMLFilename)
 {
-	/*m_bReloadEachTime = true;
+	m_bReloadEachTime = true;
 	XMLDocument* doc = new XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != XML_NO_ERROR)
@@ -151,18 +218,8 @@ void Image::_loadNoise(string sXMLFilename)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	
-	delete[] bits;*/
-}
-
-
-Image::~Image()
-{
-	//image cleanup
-	LOG(INFO) << "Free " << m_sFilename;
-	if(m_hTex)
-		glDeleteTextures(1, &m_hTex);	//Free OpenGL graphics memory
-	_removeImgReload(this);
-}
+	delete[] bits;
+}*/
 
 /* TODO: Intelligent drawing
 <fgenesis> i recommend using glViewport and related functions so you don't have to scale stuff into [-1 .. 1] anymore
@@ -265,12 +322,18 @@ void Image::render4V(Point ul, Point ur, Point bl, Point br)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+void Image::_load(string sFilename)
+{
+	LOG(INFO) << "Load " << sFilename;
+	if(sFilename.find(".img", sFilename.size() - 4) != string::npos)
+		_loadIMG(sFilename);
+	else
+		_loadPNG(sFilename);
+}
+
 void Image::_reload()
 {
-	if(m_sFilename.find(".xml", m_sFilename.size()-4) != string::npos)
-		_loadNoise(m_sFilename);
-	else
-		_load(m_sFilename);
+	_load(m_sFilename);
 }
 
 static set<Image*> sg_images;
@@ -297,7 +360,7 @@ Image* getImage(string sFilename)
 	if(sFilename == "image_none") return NULL;
 	
 	multimap<string, Image*>::iterator i = g_mImages.find(sFilename);
-	if(i == g_mImages.end() || i->second->reloadEachTime())   //This image isn't here; load it
+	if(i == g_mImages.end())// || i->second->reloadEachTime())   //This image isn't here; load it
 	{
 		Image* img = new Image(sFilename);   //Create this image
 		//g_mImages[sFilename] = img; //Add to the map

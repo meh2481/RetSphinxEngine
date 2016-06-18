@@ -16,14 +16,18 @@ private:
 	string     	m_sFilename;
 	int 		m_iWidth, m_iHeight;			// width and height of original image
 	
-	bool m_bReloadEachTime;						// If we should reload the image each time we try to create it
+	//bool m_bReloadEachTime;						// If we should reload the image each time we try to create it
 	
 #ifdef BIG_ENDIAN
 	uint32_t m_iRealWidth, m_iRealHeight;
 #endif
 
 	void _load(string sFilename);
-	void _loadNoise(string sXMLFilename);
+	void _loadPNG(string sFilename);
+	void _loadIMG(string sFilename);
+	void _loadBlob(unsigned char* blob, unsigned int size);
+	void _bind(unsigned char* data, unsigned int width, unsigned int height, int mode);
+	//void _loadNoise(string sXMLFilename);
 
 public:
 	unsigned _getTex() {return m_hTex;};
@@ -41,7 +45,7 @@ public:
 	uint32_t getWidth()     {return m_iWidth;};
 	uint32_t getHeight()    {return m_iHeight;};
 	const string& getFilename()    {return m_sFilename;};
-	bool reloadEachTime()	{return m_bReloadEachTime;};
+	//bool reloadEachTime()	{return m_bReloadEachTime;};
 	
 	//Drawing methods for texel-based coordinates
 	void render(Point size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
