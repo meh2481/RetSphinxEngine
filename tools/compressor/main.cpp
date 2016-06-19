@@ -1,4 +1,4 @@
-//This program takes PNG images and outputs WFLZ-compressed image data
+//This program takes any file and outputs raw WFLZ-compressed data
 #include "wfLZ.h"
 #include <iostream>
 #include <vector>
@@ -27,40 +27,46 @@ string remove_extension(const string& filename)
 	return filename.substr(0, lastdot);
 }
 
+unsigned char* readFile(const char* filename, unsigned int* fileSize)
+{
+	FILE *f = fopen(filename, "rb");
+	if(f == NULL)
+	{
+		return NULL;
+	}
+	fseek(f, 0, SEEK_END);
+	long size = ftell(f);
+	fseek(f, 0, SEEK_SET);  //same as rewind(f);
+
+	unsigned char *buf = (unsigned char*)malloc(size);
+	fread(buf, 1, size, f);
+	fclose(f);
+
+	if(fileSize)
+		*fileSize = size;
+
+	return buf;
+}
+
 void compress(string filename)
 {
 	cout << filename << endl;
-	int comp = 0;
-	int width = 0;
-	int height = 0;
-	unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
+	unsigned int size = 0;
+	unsigned char* decompressed = readFile(filename.c_str(), &size);
 	
-	if((cBuf == 0) || (width == 0) || (height == 0))
+	if(size == 0)
 	{
-		cout << "Unable to load image " << filename << endl;
+		cout << "Unable to load file " << filename << endl;
 		return;
 	}
-	filename = remove_extension(filename) + ".img";
-	TextureHeader textureHeader;
-	textureHeader.width = width;
-	textureHeader.height = height;
-	textureHeader.bpp = TEXTURE_BPP_RGBA;
-	if(comp == 3)
-		textureHeader.bpp = TEXTURE_BPP_RGB;
-	
-	int decompressedSize = textureHeader.width*textureHeader.height*textureHeader.bpp/8 + sizeof(TextureHeader);
-	
-	//Add texheader to buf
-	uint8_t* decompressed = ( uint8_t* )malloc( decompressedSize );
-	memcpy(decompressed, &textureHeader, sizeof(TextureHeader));
-	memcpy(&decompressed[sizeof(TextureHeader)], cBuf, decompressedSize-sizeof(TextureHeader));
+	filename = remove_extension(filename) + ".wflz";
 	
 	CompressionHeader header;
 	header.flags = COMPRESSION_FLAGS_WFLZ;
-	header.decompressedSize = decompressedSize;
-	uint8_t* compressed = ( uint8_t* )malloc( wfLZ_GetMaxCompressedSize( header.decompressedSize ) );
+	header.decompressedSize = size;
+	uint8_t* compressed = ( uint8_t* )malloc( wfLZ_GetMaxCompressedSize( header.decompressedSize) );
 	uint8_t* workMem = ( uint8_t* )malloc( wfLZ_GetWorkMemSize() );
-	header.compressedSize = wfLZ_CompressFast( decompressed, decompressedSize, compressed, workMem, 0 );
+	header.compressedSize = wfLZ_CompressFast( decompressed, size, compressed, workMem, 0 );
 	
 	FILE *f = fopen(filename.c_str(), "wb");
 	fwrite(&header, 1, sizeof(CompressionHeader), f);

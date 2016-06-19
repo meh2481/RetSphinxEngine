@@ -4,6 +4,7 @@
 
 #include <Box2D/Box2D.h>
 #include "Image.h"
+#include "ResourceTypes.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -454,7 +455,33 @@ void GameEngine::loadScene(string sXMLFilename)
 	LOG(INFO) << "Loading scene " << sXMLFilename;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
-	int iErr = doc->LoadFile(sXMLFilename.c_str());
+	int iErr;
+	//TODO: This should be split out into a resource loader
+	if(sXMLFilename.find(".xml", sXMLFilename.size() - 4) != string::npos)
+		iErr = doc->LoadFile(sXMLFilename.c_str());
+	else
+	{
+		unsigned int fileSize;
+		unsigned char* compressed = readFile(sXMLFilename.c_str(), &fileSize);
+		if(!compressed)
+		{
+			LOG(ERROR) << "Error opening WFLZ-compressed XML " << sXMLFilename;
+			delete doc;
+			return;
+		}
+		unsigned int decompressedSize;
+		unsigned char* decompressed = decompressResource(compressed, &decompressedSize, fileSize);
+		freeResource(compressed);
+		if(!decompressed)
+		{
+			LOG(ERROR) << "Error decompressing WFLZ-compressed XML " << sXMLFilename;
+			delete doc;
+			return;
+		}
+		iErr = doc->Parse((const char*)decompressed, (size_t)decompressedSize);
+
+		freeResource(decompressed);
+	}
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
 		LOG(ERROR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
