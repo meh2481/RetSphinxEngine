@@ -56,6 +56,8 @@ imgui_impl_sdl.cpp
 imgui_impl_sdl.h
 MemoryEditor.cpp
 MemoryEditor.h
+ResourceLoader.cpp
+ResourceLoader.h
 )
 
 add_library(engine ${engine_src})

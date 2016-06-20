@@ -7,6 +7,7 @@
 #include "stb_image_write.h"
 #include <SDL_thread.h>
 #include "DebugUI.h"
+#include "ResourceLoader.h"
 
 typedef struct
 {
@@ -51,7 +52,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			{
 				case SDL_SCANCODE_F5:
 					Lua->call("clearClasses"); //Reload Lua classes
-					reloadImages();
+					getResourceLoader()->reloadImages();
 					loadScene(m_sLastScene);	//Reload current scene
 					break;
 					

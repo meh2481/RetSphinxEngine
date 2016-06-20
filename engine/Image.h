@@ -55,13 +55,6 @@ public:
 	void render4V(Point ul, Point ur, Point bl, Point br);
 };
 
-//TODO SHOULD BE A CLASS
-//Image reloading handler functions
-void reloadImages();
-void _addImgReload(Image* img);
-void _removeImgReload(Image* img);
-
 //Other image functions
 Image* getImage(string sFilename);  //Retrieves an image from the filename, creating it if necessary
-void clearImages();
 

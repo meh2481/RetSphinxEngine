@@ -11,6 +11,7 @@
 #include "Random.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
+#include "ResourceLoader.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -68,6 +69,8 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	Random::seed(SDL_GetTicks());	//TODO fix RNG or no?
 	m_fTimeScale = 1.0f;
 
+	resourceLoader = new ResourceLoader();
+
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
 	//TODO: Fix FMOD
@@ -107,7 +110,7 @@ Engine::~Engine()
 
 	//Clean up our image map
 	LOG(INFO) << "Clearing images";
-	clearImages();
+	getResourceLoader()->clearImages();
 	clearObjects();
 
 	//Clean up our sound effects

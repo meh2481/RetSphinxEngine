@@ -48,28 +48,34 @@ void compress(string filename)
 	if(comp == 3)
 		textureHeader.bpp = TEXTURE_BPP_RGB;
 	
-	int decompressedSize = textureHeader.width*textureHeader.height*textureHeader.bpp/8 + sizeof(TextureHeader);
+	int size = textureHeader.width*textureHeader.height*textureHeader.bpp / 8;// +sizeof(TextureHeader);
 	
 	//Add texheader to buf
-	uint8_t* decompressed = ( uint8_t* )malloc( decompressedSize );
-	memcpy(decompressed, &textureHeader, sizeof(TextureHeader));
-	memcpy(&decompressed[sizeof(TextureHeader)], cBuf, decompressedSize-sizeof(TextureHeader));
+	//uint8_t* decompressed = ( uint8_t* )malloc( size );
+	//memcpy(decompressed, &textureHeader, sizeof(TextureHeader));
+	//memcpy(&decompressed[sizeof(TextureHeader)], cBuf, size-sizeof(TextureHeader));
 	
-	CompressionHeader header;
+	/*CompressionHeader header;
 	header.flags = COMPRESSION_FLAGS_WFLZ;
 	header.decompressedSize = decompressedSize;
 	uint8_t* compressed = ( uint8_t* )malloc( wfLZ_GetMaxCompressedSize( header.decompressedSize ) );
 	uint8_t* workMem = ( uint8_t* )malloc( wfLZ_GetWorkMemSize() );
-	header.compressedSize = wfLZ_CompressFast( decompressed, decompressedSize, compressed, workMem, 0 );
+	header.compressedSize = wfLZ_CompressFast( decompressed, decompressedSize, compressed, workMem, 0 );*/
 	
 	FILE *f = fopen(filename.c_str(), "wb");
-	fwrite(&header, 1, sizeof(CompressionHeader), f);
-	fwrite(compressed, 1, header.compressedSize, f);
+	if(f == NULL)
+	{
+		cout << "Unable to write image " << filename << endl;
+		stbi_image_free(cBuf);
+		return;
+	}
+	fwrite(&textureHeader, 1, sizeof(TextureHeader), f);
+	fwrite(cBuf, 1, size, f);
 	fclose(f);
 	
-	free(decompressed);
-	free(compressed);
-	free(workMem);
+	stbi_image_free(cBuf);
+	//free(compressed);
+	//free(workMem);
 }
 
 int main(int argc, char** argv)

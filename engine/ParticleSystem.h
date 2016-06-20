@@ -26,7 +26,8 @@ typedef enum
 
 class ParticleSystem : public Drawable
 {
-protected:
+public:
+	//Should not directly set or modify these
 	//Arrays of particle fields (structure-of-array format rather than array-of structure for speed)
 	Rect* 		m_imgRect;			//Rectangle of the image to draw
 	Point* 		m_pos;				//Position, in 2D space, of particle
@@ -58,8 +59,7 @@ protected:
 	float startedFiring;			//When we started firing (to keep track of decay)
 	
 	string m_sXMLFrom;	//So we know what XML file we should reload from
-	
-public:
+
 	enum { TYPE = OT_PARTICLESYSTEM };
 	LuaObjGlue *glue;
 	LuaInterface* lua;
@@ -117,13 +117,13 @@ public:
 	void update(float dt);
 	void draw(bool bDebugInfo);
 	void init();
-	void fromXML(string sXMLFilename);		//Load particle definitions from XML file
 	unsigned count() {return m_num;};		//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};		//Kill all active particles
-	void reload()			{fromXML(m_sXMLFrom);};	//Reload 
+	//void reload()			{fromXML(m_sXMLFrom);};	//Reload 
 	bool done()				{return !(m_num || firing);};	//Test and see if effect is done
 };
 
+//TODO REMOVE
 //External function you need to declare
 void spawnNewParticleSystem(string sFilename, Point ptPos);
 

@@ -193,7 +193,7 @@ void ParticleSystem::_newParticle()
 void ParticleSystem::_rmParticle(const uint32_t idx)
 {
 	if(particleDeathSpawn && spawnOnDeath.size())
-		spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
+		spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);	//TODO REMOVE
 	//Order doesn't matter, so just shift the newest particle over to replace this one
 	m_imgRect[idx] = m_imgRect[m_num-1];
 	m_pos[idx] = m_pos[m_num-1];
@@ -272,7 +272,7 @@ void ParticleSystem::update(float dt)
 			firing = false;
 			startedFiring = 0.0f;
 			if(!particleDeathSpawn && spawnOnDeath.size())
-				spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());
+				spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());	//TODO REMOVE
 		}
 	}
 	else if(firing)
@@ -433,191 +433,6 @@ void ParticleSystem::init()
 	m_lifePreFade = new float[m_totalAmt];
 	m_rotAxis = new Vec3[m_totalAmt];
 }
-
-void ParticleSystem::fromXML(string sXMLFilename)
-{
-	LOG(INFO) << "Loading particle system " << sXMLFilename;
-	_initValues();
-	
-	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-    int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != tinyxml2::XML_NO_ERROR)
-	{
-		LOG(ERROR) << "Error parsing XML file " << sXMLFilename << ": Error " << iErr;
-		delete doc;
-		return;
-	}
-	
-	m_sXMLFrom = sXMLFilename;
-
-	tinyxml2::XMLElement* root = doc->FirstChildElement("particlesystem");
-    if(root == NULL)
-	{
-		LOG(ERROR) << "Error: No toplevel \"particlesystem\" item in XML file " << sXMLFilename;
-		delete doc;
-		return;
-	}
-	
-	const char* emfrom = root->Attribute("emitfrom");
-	if(emfrom != NULL)
-		emitFrom = rectFromString(emfrom);
-	const char* emfromvel = root->Attribute("emitfromvel");
-	if(emfromvel != NULL)
-		emissionVel = pointFromString(emfromvel);
-	
-	root->QueryBoolAttribute("fireonstart", &firing);
-	root->QueryBoolAttribute("changecolor", &changeColor);
-	root->QueryFloatAttribute("depth", &depth);
-	
-	const char* blendmode = root->Attribute("blend");
-	if(blendmode != NULL)
-	{
-		string sMode = blendmode;
-		if(sMode == "additive")
-			blend = ADDITIVE;
-		else if(sMode == "normal")
-			blend = NORMAL;
-		if(sMode == "subtractive")
-			blend = SUBTRACTIVE;
-	}
-	
-	root->QueryUnsignedAttribute("max", &max);
-	root->QueryFloatAttribute("rate", &rate);
-	root->QueryBoolAttribute("velrotate", &velRotate);
-	root->QueryFloatAttribute("decay", &decay);
-	float fDecayVar = 0.0f;
-	root->QueryFloatAttribute("decayvar", &fDecayVar);
-	decay += Random::randomFloat(-fDecayVar, fDecayVar);
-	
-	for(tinyxml2::XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
-	{
-		string sName = elem->Name();
-		if(sName == "img")
-		{
-			const char* cPath = elem->Attribute("path");
-			if(cPath != NULL)
-			{
-				img = getImage(cPath);
-				for(tinyxml2::XMLElement* rect = elem->FirstChildElement("rect"); rect != NULL; rect = rect->NextSiblingElement("rect"))
-				{
-					const char* cVal = rect->Attribute("val");
-					if(cVal != NULL)
-					{
-						Rect rc = rectFromString(cVal);
-						imgRect.push_back(rc);
-					}
-				}
-			}
-		}
-		else if(sName == "emit")
-		{
-			elem->QueryFloatAttribute("angle", &emissionAngle);
-			elem->QueryFloatAttribute("var", &emissionAngleVar);
-		}
-		else if(sName == "size")
-		{
-			const char* cStart = elem->Attribute("start");
-			if(cStart != NULL)
-				sizeStart = pointFromString(cStart);
-			const char* cEnd = elem->Attribute("end");
-			if(cEnd != NULL)
-				sizeEnd = pointFromString(cEnd);
-			elem->QueryFloatAttribute("var", &sizeVar);
-		}
-		else if(sName == "speed")
-		{
-			elem->QueryFloatAttribute("value", &speed);
-			elem->QueryFloatAttribute("var", &speedVar);
-		}
-		else if(sName == "accel")
-		{
-			const char* cAccel = elem->Attribute("value");
-			if(cAccel != NULL)
-				accel = pointFromString(cAccel);
-			const char* cAccelVar = elem->Attribute("var");
-			if(cAccelVar != NULL)
-				accelVar = pointFromString(cAccelVar);
-		}
-		else if(sName == "rotstart")
-		{
-			elem->QueryFloatAttribute("value", &rotStart);
-			elem->QueryFloatAttribute("var", &rotStartVar);
-		}
-		else if(sName == "rotvel")
-		{
-			elem->QueryFloatAttribute("value", &rotVel);
-			elem->QueryFloatAttribute("var", &rotVelVar);
-		}
-		else if(sName == "rotaccel")
-		{
-			elem->QueryFloatAttribute("value", &rotAccel);
-			elem->QueryFloatAttribute("var", &rotAccelVar);
-		}
-		else if(sName == "rotaxis")
-		{
-			const char* cAxis = elem->Attribute("value");
-			if(cAxis && strlen(cAxis))
-				rotAxis = vec3FromString(cAxis);
-			const char* cAxisVar = elem->Attribute("var");
-			if(cAxisVar && strlen(cAxisVar))
-				rotAxisVar = vec3FromString(cAxisVar);			
-		}
-		else if(sName == "col")
-		{
-			const char* cStartCol = elem->Attribute("start");
-			if(cStartCol != NULL)
-				colStart = colorFromString(cStartCol);
-			const char* cEndCol = elem->Attribute("end");
-			if(cEndCol != NULL)
-				colEnd = colorFromString(cEndCol);
-			const char* cColVar = elem->Attribute("var");
-			if(cColVar != NULL)
-				colVar = colorFromString(cColVar);
-		}
-		else if(sName == "tanaccel")
-		{
-			elem->QueryFloatAttribute("value", &tangentialAccel);
-			elem->QueryFloatAttribute("var", &tangentialAccelVar);
-		}
-		else if(sName == "normaccel")
-		{
-			elem->QueryFloatAttribute("value", &normalAccel);
-			elem->QueryFloatAttribute("var", &normalAccelVar);
-		}
-		else if(sName == "life")
-		{
-			elem->QueryFloatAttribute("value", &lifetime);
-			elem->QueryFloatAttribute("var", &lifetimeVar);
-			elem->QueryFloatAttribute("prefade", &lifetimePreFade);
-			elem->QueryFloatAttribute("prefadevar", &lifetimePreFadeVar);
-		}
-		else if(sName == "spawnondeath")
-		{
-			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
-			if(cDeathSpawnType && strlen(cDeathSpawnType))
-			{
-				string sDeathSpawntype = cDeathSpawnType;
-				if(sDeathSpawntype == "system")
-					particleDeathSpawn = false;
-				else if(sDeathSpawntype == "particle")
-					particleDeathSpawn = true;
-			}
-			
-			for(tinyxml2::XMLElement* particle = elem->FirstChildElement("particle"); particle != NULL; particle = particle->NextSiblingElement("particle"))
-			{
-				const char* cPath = particle->Attribute("path");
-				if(cPath != NULL)
-					spawnOnDeath.push_back(cPath);
-			}
-		}
-		else
-			LOG(WARNING) << "Warning: Unknown element type \"" << sName << "\" found in XML file " << sXMLFilename << ". Ignoring...";
-	}
-	
-	delete doc;
-	init();
-}
-
 
 
 

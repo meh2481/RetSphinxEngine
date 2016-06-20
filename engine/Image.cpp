@@ -24,7 +24,6 @@ Image::Image(string sFilename)
 	m_iWidth = m_iHeight = 0;
 	m_sFilename = sFilename;
 	_load(sFilename);
-	_addImgReload(this);
 }
 
 Image::~Image()
@@ -33,7 +32,6 @@ Image::~Image()
 	LOG(INFO) << "Free " << m_sFilename;
 	if(m_hTex)
 		glDeleteTextures(1, &m_hTex);	//Free OpenGL graphics memory
-	_removeImgReload(this);
 }
 
 void Image::_bind(unsigned char* data, unsigned int width, unsigned int height, int mode)
@@ -336,24 +334,7 @@ void Image::_reload()
 	_load(m_sFilename);
 }
 
-static set<Image*> sg_images;
-
-void reloadImages()
-{
-	for(set<Image*>::iterator i = sg_images.begin(); i != sg_images.end(); i++)
-		(*i)->_reload();
-}
-
-void _addImgReload(Image* img)
-{
-	sg_images.insert(img);
-}
-
-void _removeImgReload(Image* img)
-{
-	sg_images.erase(img);
-}
-
+//TODO Remove
 static multimap<string, Image*> g_mImages;  //Image handler
 Image* getImage(string sFilename)
 {
@@ -368,13 +349,6 @@ Image* getImage(string sFilename)
 		return img;
 	}
 	return i->second; //Return this image
-}
-
-void clearImages()
-{
-	for(multimap<string, Image*>::iterator i = g_mImages.begin(); i != g_mImages.end(); i++)
-		delete (i->second);    //Delete each image
-	g_mImages.clear();
 }
 
 

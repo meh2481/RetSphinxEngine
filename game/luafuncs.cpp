@@ -2,6 +2,7 @@
 #include "luainterface.h"
 #include "GameEngine.h"
 #include "Image.h"
+#include "ResourceLoader.h"
 
 extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 
@@ -86,8 +87,8 @@ public:
 	
 	static ParticleSystem* createParticles(string sName)
 	{
-		ParticleSystem* pSys = new ParticleSystem();
-		pSys->fromXML(sName);
+		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);// new ParticleSystem();
+		//pSys->fromXML(sName);
 		g_pGlobalEngine->addParticles(pSys);
 		return pSys;
 	}
@@ -341,7 +342,7 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 		lua_Integer seg = 1;
 		if(lua_isinteger(L, 3))
 			seg = lua_tointeger(L, 3);
-		o->setImage(getImage(lua_tostring(L, 2)), (unsigned int)seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
+		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
 	}
     luaReturnNil(); // FG: FIXME: return success?
 }

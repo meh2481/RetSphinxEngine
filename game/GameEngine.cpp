@@ -10,6 +10,7 @@
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "DebugUI.h"
+#include "ResourceLoader.h"
 
 //Keybinding stuff!
 uint32_t JOY_BUTTON_BACK;
@@ -46,6 +47,7 @@ SDL_Scancode KEY_ENTER2;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
+//TODO REMOVE
 void spawnNewParticleSystem(string sFilename, Point ptPos)
 {
 	g_pGlobalEngine->spawnNewParticleSystem(sFilename, ptPos);
@@ -150,7 +152,7 @@ void GameEngine::frame(float dt)
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
 	{
-		reloadImages();
+		getResourceLoader()->reloadImages();
 		loadScene(m_sLoadScene);
 		m_sLoadScene.clear();
 		if(m_sLoadNode.size())
@@ -335,10 +337,11 @@ void GameEngine::resume()
 	resumeMusic();
 }
 
+//TODO REMOVE
 void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
 {
-	ParticleSystem* pSys = new ParticleSystem();
-	pSys->fromXML(sFilename);
+	ParticleSystem* pSys = getResourceLoader()->getParticleSystem(sFilename);//new ParticleSystem();
+	//pSys->fromXML(sFilename);
 	pSys->emitFrom.centerOn(ptPos);
 	pSys->init();
 	pSys->firing = true;

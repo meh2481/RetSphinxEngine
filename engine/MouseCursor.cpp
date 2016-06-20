@@ -65,7 +65,7 @@ bool MouseCursor::fromXML(string sXMLFilename)
 	
 	const char* cImgPath = root->Attribute("path");
 	if(cImgPath)
-		img = getImage(cImgPath);
+		img = getImage(cImgPath);	//TODO REMOVE
 	
 	const char* cSize = root->Attribute("size");
 	if(cSize)

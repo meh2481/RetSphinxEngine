@@ -258,7 +258,7 @@ void ObjSegment::fromXML(XMLElement* layer)
 {
 	const char* cLayerFilename = layer->Attribute("img");
 	if(cLayerFilename != NULL)
-		img = getImage(cLayerFilename);
+		img = getImage(cLayerFilename);	//TODO REMOVE
 		
 	const char* cSegPos = layer->Attribute("pos");
 	if(cSegPos != NULL)

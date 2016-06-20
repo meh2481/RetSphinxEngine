@@ -5,6 +5,7 @@
 #include <Box2D/Box2D.h>
 #include "Image.h"
 #include "ResourceTypes.h"
+#include "ResourceLoader.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -370,7 +371,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 		
 		if(cMeshImg && cMeshImgSize)
 		{
-			o->img = getImage(cMeshImg);
+			o->img = getResourceLoader()->getImage(cMeshImg);
 			o->meshSize = pointFromString(cMeshImgSize);
 			
 			const char* cLatticeType = latticeElem->Attribute("type");
@@ -600,8 +601,8 @@ void GameEngine::loadScene(string sXMLFilename)
 		const char* cFilename = particles->Attribute("file");
 		if(cFilename != NULL)
 		{
-			ParticleSystem* pSys = new ParticleSystem();
-			pSys->fromXML(cFilename);
+			ParticleSystem* pSys = getResourceLoader()->getParticleSystem(cFilename); //new ParticleSystem();
+			//pSys->fromXML(cFilename);
 			addParticles(pSys);
 		}
 	}

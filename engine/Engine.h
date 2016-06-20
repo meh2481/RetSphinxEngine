@@ -16,6 +16,7 @@
 
 class b2World;
 class Image;
+class ResourceLoader;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -81,6 +82,7 @@ private:
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
 #endif
+	ResourceLoader* resourceLoader;
 	
 	
 	//multimap<string, FMOD_CHANNEL*> m_channels;
@@ -228,5 +230,10 @@ public:
 	void cleanupParticles();
 	void drawParticles();
 	void updateParticles(float dt);
+
+
+	//---------------------------------------------------------
+	// ResourceLoader
+	ResourceLoader* getResourceLoader() { return resourceLoader; };
 
 };
