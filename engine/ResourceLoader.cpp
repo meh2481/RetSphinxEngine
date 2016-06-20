@@ -4,6 +4,7 @@
 #include "easylogging++.h"
 #include "tinyxml2.h"
 #include "Random.h"
+#include "MouseCursor.h"
 
 Image* ResourceLoader::getImage(string sID)
 {
@@ -222,4 +223,44 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	return ps;
 }
+
+MouseCursor* ResourceLoader::getCursor(string sID)
+{
+	MouseCursor* cur = new MouseCursor();
+	cur->_init();
+
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+	int iErr = doc->LoadFile(sID.c_str());
+	if(iErr != tinyxml2::XML_NO_ERROR)
+	{
+		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
+		delete doc;
+		return cur;
+	}
+
+	tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
+	if(root == NULL)
+	{
+		LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
+		delete doc;
+		return cur;
+	}
+
+	const char* cImgPath = root->Attribute("path");
+	if(cImgPath)
+		cur->img = getImage(cImgPath);	//TODO REMOVE
+
+	const char* cSize = root->Attribute("size");
+	if(cSize)
+		cur->size = pointFromString(cSize);
+
+	const char* cHotSpot = root->Attribute("hotspot");
+	if(cHotSpot)
+		cur->hotSpot = pointFromString(cHotSpot);
+
+	delete doc;
+	return cur;
+}
+
+
 

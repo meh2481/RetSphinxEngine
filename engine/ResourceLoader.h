@@ -5,6 +5,7 @@ using namespace std;
 
 class Image;
 class ParticleSystem;
+class MouseCursor;
 
 class ResourceLoader
 {
@@ -17,4 +18,5 @@ public:
 	void reloadImages();
 	//Particles
 	ParticleSystem* getParticleSystem(string sID);
+	MouseCursor* getCursor(string sID);
 };

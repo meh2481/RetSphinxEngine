@@ -13,10 +13,9 @@ class Image;
 //TODO This should be some derivative of Drawable or some child thereof
 class MouseCursor
 {
-protected:
-	void _init();
-	
 public:
+	void _init();
+
 	MouseCursor();
 	~MouseCursor();
 	
@@ -27,7 +26,6 @@ public:
 	float rot;
 	
 	void draw();
-	bool fromXML(string sXMLFilename);
 };
  
  
