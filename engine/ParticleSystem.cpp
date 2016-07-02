@@ -10,7 +10,7 @@
 #include "easylogging++.h"
 #include "Random.h"
 
-ParticleSystem::ParticleSystem() : Drawable()
+ParticleSystem::ParticleSystem()
 {
 	m_imgRect = NULL;
 	m_pos = NULL;
@@ -190,10 +190,10 @@ void ParticleSystem::_newParticle()
 	m_num++;
 }
 
-void ParticleSystem::_rmParticle(const uint32_t idx)
+void ParticleSystem::_rmParticle(const unsigned idx)
 {
 	if(particleDeathSpawn && spawnOnDeath.size())
-		spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);	//TODO REMOVE
+		m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
 	//Order doesn't matter, so just shift the newest particle over to replace this one
 	m_imgRect[idx] = m_imgRect[m_num-1];
 	m_pos[idx] = m_pos[m_num-1];
@@ -272,7 +272,7 @@ void ParticleSystem::update(float dt)
 			firing = false;
 			startedFiring = 0.0f;
 			if(!particleDeathSpawn && spawnOnDeath.size())
-				spawnNewParticleSystem(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());	//TODO REMOVE
+				m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());	//TODO This should be a shout
 		}
 	}
 	else if(firing)
@@ -347,10 +347,9 @@ void ParticleSystem::update(float dt)
 	}
 }
 
-void ParticleSystem::draw(bool bDebugInfo)
+void ParticleSystem::draw()
 {
 	if(img == NULL) return;
-	if(!show) return;
 	
 	switch(blend)
 	{
@@ -388,7 +387,7 @@ void ParticleSystem::draw(bool bDebugInfo)
 		drawsz.y = (m_sizeEnd[i].y - m_sizeStart[i].y) * fLifeFac + m_sizeStart[i].y;
 		glPushMatrix();
 		glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);
-		glTranslatef(m_pos[i].x, m_pos[i].y, depth);
+		glTranslatef(m_pos[i].x, m_pos[i].y, 0);
 		if(!velRotate)
 		{
 			glRotatef(m_rot[i], m_rotAxis[i].x, m_rotAxis[i].y, m_rotAxis[i].z);

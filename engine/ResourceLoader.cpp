@@ -6,6 +6,12 @@
 #include "Random.h"
 #include "MouseCursor.h"
 
+unsigned char* ResourceLoader::getResource(string sID)
+{
+	//TODO: Map resources to specific .pak files or whatever
+	return NULL;
+}
+
 Image* ResourceLoader::getImage(string sID)
 {
 	if(sID == "image_none") return NULL;
@@ -71,7 +77,6 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
 	root->QueryBoolAttribute("changecolor", &ps->changeColor);
-	root->QueryFloatAttribute("depth", &ps->depth);
 
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)
@@ -261,6 +266,5 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 	delete doc;
 	return cur;
 }
-
 
 

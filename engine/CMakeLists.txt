@@ -23,7 +23,6 @@ MouseCursor.cpp
 MouseCursor.h
 engine_gl.cpp
 engine_obj.cpp
-engine_particle.cpp
 engine_sound.cpp
 engine_window.cpp
 globaldefs.cpp
@@ -60,5 +59,23 @@ ResourceLoader.cpp
 ResourceLoader.h
 )
 
-add_library(engine ${engine_src})
+set(engine_events_src
+events/Observer.h
+events/Subject.cpp
+events/Subject.h
+)
+
+set(engine_manager_src
+managers/ParticleSystemManager.h
+managers/ParticleSystemManager.cpp
+)
+
+include_directories (.)
+include_directories (events)
+include_directories (managers)
+
+source_group("events" FILES ${engine_events_src})
+source_group("managers" FILES ${engine_manager_src})
+
+add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src})
 target_link_libraries(engine imgui lua53 io ${BOX2D_LIBRARY} ${SDL2_LIBRARY})

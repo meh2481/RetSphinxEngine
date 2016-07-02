@@ -9,6 +9,7 @@
 #include "Drawable.h"
 #include "luafuncs.h"
 #include "luainterface.h"
+#include "Subject.h"
 
 #ifndef PARTICLES_H
 #define PARICLES_H
@@ -24,9 +25,10 @@ typedef enum
 	SUBTRACTIVE,
 } particleBlendType;
 
-class ParticleSystem : public Drawable
+class ParticleSystem
 {
-public:
+	friend class ResourceLoader;
+
 	//Should not directly set or modify these
 	//Arrays of particle fields (structure-of-array format rather than array-of structure for speed)
 	Rect* 		m_imgRect;			//Rectangle of the image to draw
@@ -46,19 +48,23 @@ public:
 	float*	m_lifePreFade;		//How long the particle is alive before it starts fading colors
 	float*	m_created;			//When this particle was created/spawned
 	Vec3*		m_rotAxis;			//What axis this particle rotates around when it rotates
-	
+
 	unsigned m_num;					//How many actual particles there are active (i.e. current size of above arrays)
 	unsigned m_totalAmt;			//max times particle factor (i.e. true total max)
 	void _deleteAll();				//Delete all memory associated with particles
 	void _newParticle();			//Create a new particle
 	void _rmParticle(const unsigned idx);	//Delete an expired particle (i.e. copy particle at end of the list to where this one was)
 	void _initValues();				//Initialize particle system variables
-	
+
 	float curTime;
 	float spawnCounter;
 	float startedFiring;			//When we started firing (to keep track of decay)
-	
+
 	string m_sXMLFrom;	//So we know what XML file we should reload from
+
+	Subject* m_subject;
+
+public:
 
 	enum { TYPE = OT_PARTICLESYSTEM };
 	LuaObjGlue *glue;
@@ -115,17 +121,15 @@ public:
 	bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
 	
 	void update(float dt);
-	void draw(bool bDebugInfo);
+	void draw();
 	void init();
 	unsigned count() {return m_num;};		//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};		//Kill all active particles
 	//void reload()			{fromXML(m_sXMLFrom);};	//Reload 
 	bool done()				{return !(m_num || firing);};	//Test and see if effect is done
-};
 
-//TODO REMOVE
-//External function you need to declare
-void spawnNewParticleSystem(string sFilename, Point ptPos);
+	void setSubject(Subject* subject) { m_subject = subject; };
+};
 
 #endif
 

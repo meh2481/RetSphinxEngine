@@ -47,12 +47,6 @@ SDL_Scancode KEY_ENTER2;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
-//TODO REMOVE
-void spawnNewParticleSystem(string sFilename, Point ptPos)
-{
-	g_pGlobalEngine->spawnNewParticleSystem(sFilename, ptPos);
-}
-
 GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable) : 
 Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 {
@@ -141,7 +135,7 @@ void GameEngine::frame(float dt)
 	handleKeys();
 
 	stepPhysics(dt);
-	updateParticles(dt);
+	getParticleSystemManager()->updateParticles(dt);
 	updateObjects(dt);
 	
 	//Add any objects created during updating this frame
@@ -335,18 +329,6 @@ void GameEngine::pause()
 void GameEngine::resume()
 {
 	resumeMusic();
-}
-
-//TODO REMOVE
-void GameEngine::spawnNewParticleSystem(string sFilename, Point ptPos)
-{
-	ParticleSystem* pSys = getResourceLoader()->getParticleSystem(sFilename);//new ParticleSystem();
-	//pSys->fromXML(sFilename);
-	pSys->emitFrom.centerOn(ptPos);
-	pSys->init();
-	pSys->firing = true;
-	
-	addParticles(pSys);
 }
 
 void GameEngine::warpObjectToNode(Object* o, Node* n)

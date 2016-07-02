@@ -451,7 +451,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
-	cleanupParticles();
+	getParticleSystemManager()->cleanupParticles();
 	player = NULL;
 	LOG(INFO) << "Loading scene " << sXMLFilename;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
@@ -601,9 +601,8 @@ void GameEngine::loadScene(string sXMLFilename)
 		const char* cFilename = particles->Attribute("file");
 		if(cFilename != NULL)
 		{
-			ParticleSystem* pSys = getResourceLoader()->getParticleSystem(cFilename); //new ParticleSystem();
-			//pSys->fromXML(cFilename);
-			addParticles(pSys);
+			ParticleSystem* pSys = getResourceLoader()->getParticleSystem(cFilename);
+			getParticleSystemManager()->addParticles(pSys);
 		}
 	}
 	

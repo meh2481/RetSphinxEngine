@@ -69,7 +69,8 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	Random::seed(SDL_GetTicks());	//TODO fix RNG or no?
 	m_fTimeScale = 1.0f;
 
-	resourceLoader = new ResourceLoader();
+	m_resourceLoader = new ResourceLoader();
+	m_particleSystemManager = new ParticleSystemManager(m_resourceLoader);
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;

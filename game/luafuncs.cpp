@@ -87,9 +87,8 @@ public:
 	
 	static ParticleSystem* createParticles(string sName)
 	{
-		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);// new ParticleSystem();
-		//pSys->fromXML(sName);
-		g_pGlobalEngine->addParticles(pSys);
+		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);
+		g_pGlobalEngine->getParticleSystemManager()->addParticles(pSys);
 		return pSys;
 	}
 	

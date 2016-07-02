@@ -36,5 +36,7 @@ add_subdirectory(engine)
 
 
 include_directories(engine)
+include_directories(engine/events)
+include_directories(engine/managers)
 add_subdirectory(game)
 add_subdirectory(tools)

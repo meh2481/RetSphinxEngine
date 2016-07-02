@@ -14,6 +14,6 @@ public:
 	bool active;
 	Color col;
 	
-	virtual void draw(bool bDebugInfo) = 0;
+	virtual void draw(bool bDebugInfo = false) = 0;	//TODO This shouldn't have a debug thing?
 
 };

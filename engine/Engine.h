@@ -8,7 +8,7 @@
 #include "Object.h"
 #include "Text.h"
 #include "HUD.h"
-#include "ParticleSystem.h"
+#include "ParticleSystemManager.h"
 #include "MouseCursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
@@ -76,13 +76,13 @@ private:
 	MouseCursor* m_cursor;
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
-	list<ParticleSystem*> m_particles;
 	map<string, Node*> m_nodes;
 #ifdef _DEBUG
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
 #endif
-	ResourceLoader* resourceLoader;
+	ResourceLoader* m_resourceLoader;
+	ParticleSystemManager* m_particleSystemManager;
 	
 	
 	//multimap<string, FMOD_CHANNEL*> m_channels;
@@ -225,15 +225,11 @@ public:
 	void setGamma(float fGamma)	{m_fGamma = fGamma;};
 	float getGamma()				{return m_fGamma;};
 	
-	//Particle functions - engine_particle.cpp
-	void addParticles(ParticleSystem* sys)	{if(sys)m_particles.push_back(sys);};
-	void cleanupParticles();
-	void drawParticles();
-	void updateParticles(float dt);
-
-
+	//TODO Put this underneath the proper manager
+	ParticleSystemManager* getParticleSystemManager() { return m_particleSystemManager; };
+	
 	//---------------------------------------------------------
 	// ResourceLoader
-	ResourceLoader* getResourceLoader() { return resourceLoader; };
+	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
 
 };

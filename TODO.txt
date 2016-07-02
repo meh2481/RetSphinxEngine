@@ -1,3 +1,8 @@
+ResourceManager stuff:
+-Remove getImage() stuff
+-Split ResourceManager into multiple classes, one per resource type?
+-ParticleSystem can use ParticleManager/whatever it'll be called class to load other particle systems on explosion
+
 Overall TODO list:
 - Fix noise loading so it's not crazy slow
 - Fix math for softbody lattice anim so it actually works properly

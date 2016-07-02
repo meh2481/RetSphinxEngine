@@ -43,12 +43,14 @@ void Engine::drawAll()
 	for(list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
 		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
 		
-	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)	//Add particles
-		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
+//	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)	//Add particles
+//		drawList.insert(make_pair((*i)->depth, (Drawable*)(*i)));
 		
 	//Draw everything in one pass
 	for(multimap<float, Drawable*>::iterator i = drawList.begin(); i != drawList.end(); i++)
 		i->second->draw(m_bObjDebugDraw);
+
+	m_particleSystemManager->drawParticles();	//TODO: Better draw order
 }
 
 void Engine::cleanupObjects()
