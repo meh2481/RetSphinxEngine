@@ -1,12 +1,13 @@
 #pragma once
 #include <map>
 #include <string>
-#include "Observer.h"
+#include "tinyxml2.h"
 using namespace std;
 
 class Image;
 class ParticleSystem;
 class MouseCursor;
+class ObjSegment;
 
 class ResourceLoader
 {
@@ -27,4 +28,6 @@ public:
 
 	//Mouse cursor
 	MouseCursor* getCursor(string sID);
+
+	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);
 };

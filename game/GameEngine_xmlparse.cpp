@@ -247,7 +247,13 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 	//Add segments
 	for(tinyxml2::XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
 	{
-		ObjSegment* seg = new ObjSegment;
+		ObjSegment* seg;
+		//TODO Unify this. It looks like we're loading from XML multiple ways
+		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
+		if(layer != NULL)
+			seg= getResourceLoader()->getObjSegment(layer);
+		else
+			seg = new ObjSegment;
 		seg->parent = o;
 		tinyxml2::XMLElement* body = segment->FirstChildElement("body");
 		if(body != NULL)
@@ -297,11 +303,6 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 			//Create body fixtures
 			for(tinyxml2::XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
 				readFixture(fixture, bod);
-		}
-		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
-		if(layer != NULL)
-		{
-			seg->fromXML(layer);
 		}
 		o->addSegment(seg);
 	}
@@ -536,9 +537,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load layers for the scene
 	for(tinyxml2::XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
-		ObjSegment* seg = new ObjSegment();
-		seg->fromXML(layer);
-		
+		ObjSegment* seg = getResourceLoader()->getObjSegment(layer);
 		addScenery(seg);
 	}
 	

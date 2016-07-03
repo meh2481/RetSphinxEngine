@@ -10,7 +10,6 @@
 #include "Drawable.h"
 #include "LuaInterface.h"
 #include "luafuncs.h"
-#include "tinyxml2.h"
 
 class Object;
 class ObjSegment;
@@ -32,8 +31,6 @@ public:
 	Mesh3D*		obj3D;		//3D object
 	
 	Point pos;		//Offset (after rotation)
-	Point center;	//Center of rotation (Offset before rotation)
-	Point shear;	//Shear for drawing the image
 	Point tile;		//tile image in x and y
 	float rot;
 	Point size;	//Actual texel size; not pixels
@@ -43,7 +40,6 @@ public:
 	
 	void draw(bool bDebugInfo = false);
 	void update(float dt);
-	void fromXML(tinyxml2::XMLElement* layer);
 };
 
 //Collections of the above all stuffed into one object for ease of use.

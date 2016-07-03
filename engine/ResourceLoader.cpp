@@ -5,6 +5,7 @@
 #include "tinyxml2.h"
 #include "Random.h"
 #include "MouseCursor.h"
+#include "Object.h"
 
 unsigned char* ResourceLoader::getResource(string sID)
 {
@@ -267,4 +268,36 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 	return cur;
 }
 
+ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
+{
+	ObjSegment* seg = new ObjSegment();
 
+	const char* cLayerFilename = layer->Attribute("img");
+	if(cLayerFilename != NULL)
+		seg->img = getImage(cLayerFilename);	//TODO REMOVE
+
+	const char* cSegPos = layer->Attribute("pos");
+	if(cSegPos != NULL)
+		seg->pos = pointFromString(cSegPos);
+
+	const char* cSegTile = layer->Attribute("tile");
+	if(cSegTile != NULL)
+		seg->tile = pointFromString(cSegTile);
+
+	layer->QueryFloatAttribute("rot", &seg->rot);
+	layer->QueryFloatAttribute("depth", &seg->depth);
+
+	const char* cSegSz = layer->Attribute("size");
+	if(cSegSz != NULL)
+		seg->size = pointFromString(cSegSz);
+
+	const char* cSegCol = layer->Attribute("col");
+	if(cSegCol != NULL)
+		seg->col = colorFromString(cSegCol);
+
+	const char* cSegObj = layer->Attribute("obj");
+	if(cSegObj != NULL)
+		seg->obj3D = getObject(cSegObj);
+
+	return seg;
+}

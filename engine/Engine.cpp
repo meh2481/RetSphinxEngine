@@ -49,6 +49,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fFramerate = 60.0f;
 	setFramerate(60);	 //60 fps default
 	m_bFullscreen = true;
+
 	setup_sdl();
 	setup_opengl();
 	m_fGamma = 1.0f;
@@ -68,7 +69,8 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_bQuitting = false;
 	Random::seed(SDL_GetTicks());	//TODO fix RNG or no?
 	m_fTimeScale = 1.0f;
-
+	
+	LOG(INFO) << "Creating resource loader";
 	m_resourceLoader = new ResourceLoader();
 	m_particleSystemManager = new ParticleSystemManager(m_resourceLoader);
 

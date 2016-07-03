@@ -334,22 +334,5 @@ void Image::_reload()
 	_load(m_sFilename);
 }
 
-//TODO Remove
-static multimap<string, Image*> g_mImages;  //Image handler
-Image* getImage(string sFilename)
-{
-	if(sFilename == "image_none") return NULL;
-	
-	multimap<string, Image*>::iterator i = g_mImages.find(sFilename);
-	if(i == g_mImages.end())// || i->second->reloadEachTime())   //This image isn't here; load it
-	{
-		Image* img = new Image(sFilename);   //Create this image
-		//g_mImages[sFilename] = img; //Add to the map
-		g_mImages.insert(std::pair<string, Image*>(sFilename,img));
-		return img;
-	}
-	return i->second; //Return this image
-}
-
 
 

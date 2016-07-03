@@ -125,7 +125,6 @@ public:
 	void init();
 	unsigned count() {return m_num;};		//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};		//Kill all active particles
-	//void reload()			{fromXML(m_sXMLFrom);};	//Reload 
 	bool done()				{return !(m_num || firing);};	//Test and see if effect is done
 
 	void setSubject(Subject* subject) { m_subject = subject; };
