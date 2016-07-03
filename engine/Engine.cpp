@@ -105,6 +105,8 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 
 Engine::~Engine()
 {
+	delete m_particleSystemManager;
+
 	ImGui_Impl_GL2_Shutdown();
 
 	SDL_DestroyWindow(m_Window);

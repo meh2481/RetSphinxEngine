@@ -7,6 +7,11 @@ ParticleSystemManager::ParticleSystemManager(ResourceLoader* loader)
 	m_loader = loader;
 }
 
+ParticleSystemManager::~ParticleSystemManager()
+{
+	delete m_notifySubject;
+}
+
 void ParticleSystemManager::addParticles(ParticleSystem * sys)
 {
 	if(sys)

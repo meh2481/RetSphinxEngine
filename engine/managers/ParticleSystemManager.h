@@ -16,6 +16,7 @@ class ParticleSystemManager : public Observer
 
 public:
 	ParticleSystemManager(ResourceLoader* loader);
+	~ParticleSystemManager();
 
 	void addParticles(ParticleSystem* sys);
 	void cleanupParticles();
