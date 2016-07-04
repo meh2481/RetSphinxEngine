@@ -214,6 +214,7 @@ bool Engine::_frame()
 		{
 			m_bStepFrame = false;
 #endif
+
 			frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
 #ifdef _DEBUG
 		}

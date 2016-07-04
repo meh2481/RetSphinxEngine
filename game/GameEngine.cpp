@@ -138,12 +138,6 @@ void GameEngine::frame(float dt)
 	stepPhysics(dt);
 	getEntityManager()->update(dt);
 	
-	//TODO: Remove
-	//Add any objects created during updating this frame
-	/*for(list<Object*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
-		addObject(*i);
-	m_lAddLater.clear();*/
-	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
 	{
@@ -173,21 +167,10 @@ void GameEngine::draw()
 
 	m_debugUI->draw();
 	
-	/*/Set mouse cursor to proper location
-	for(map<string, myCursor*>::iterator i = m_mCursors.begin(); i != m_mCursors.end(); i++)
-	{
-		//i->second->pos = worldPosFromCursor(getCursorPos());
-		if(i->first == "dir")
-			i->second->rot = -RAD2DEG * atan2(i->second->pos.x, i->second->pos.y) + 90;
-	}*/
 	glColor4f(1,1,1,1);
 	
-	
-	
-	//Rotate sun point around planet
-	//glRotatef(fSunRotAmt, 0.0f, 1.0f, 0.0f);
-	
 	//Set up OpenGL lights
+	//TODO: Remove
 	float lightPosition[] = {0.0, 0.0, 0.0, 1.0};
 	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -319,7 +302,6 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(KEY_ENTER2);
 	
 	Lua->call("loadStartingMap");
-	//loadScene("res/3d/solarsystem.scene.xml");
 }
 
 void GameEngine::pause()

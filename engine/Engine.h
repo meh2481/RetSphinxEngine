@@ -184,7 +184,6 @@ public:
 	//Mouse functions
 	Point getCursorPos()	{return m_ptCursorPos;};
 	void setCursorPos(int32_t x, int32_t y);
-	//void setCursorPos(Point ptPos)  {setCursorPos(ptPos.x, ptPos.y);};
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};
@@ -201,9 +200,7 @@ public:
 	float getFramerate()   {return m_fFramerate;};
 	
 	//Object management functions - engine_obj.cpp
-	
 	void addScenery(ObjSegment* seg) 	{m_lScenery.insert(seg);};
-	//void updateSceneryLayer(physSegment* seg);
 	void drawAll();
 	
 
