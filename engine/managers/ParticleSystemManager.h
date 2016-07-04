@@ -3,7 +3,7 @@
 #include "Observer.h"
 #include "Subject.h"
 #include "ResourceLoader.h"
-#include "glm/glm.hpp"
+#include "glmx.h"
 using namespace std;
 
 class ParticleSystem;

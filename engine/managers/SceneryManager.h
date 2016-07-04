@@ -1,6 +1,6 @@
-#ifndef SCENERY_MANAGER_H
-#define SCENERY_MANAGER_H
-#include "glm/glm.hpp"
+#pragma once
+
+#include "glmx.h"
 #include <set>
 #include "Object.h"
 using namespace std;
@@ -38,5 +38,3 @@ public:
 
 
 
-
-#endif

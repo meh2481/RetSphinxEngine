@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include "globaldefs.h"	//TODO Remove
-#include "glm/glm.hpp"
+#include "glmx.h"
 using namespace std;
 
 class Object;

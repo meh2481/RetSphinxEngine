@@ -1,5 +1,5 @@
 /*
-    GameEngine header - particles.h
+    GameEngine header - ParticleSystem.h
     Copyright (c) 2014 Mark Hutcheson
 */
 #pragma once
@@ -11,8 +11,7 @@
 #include "luainterface.h"
 #include "Subject.h"
 
-#ifndef PARTICLES_H
-#define PARTICLES_H
+#pragma once
 
 extern float g_fParticleFac;
 
@@ -130,7 +129,6 @@ public:
 	void setSubject(Subject* subject) { m_subject = subject; };
 };
 
-#endif
 
 
 

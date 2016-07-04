@@ -171,24 +171,24 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		}
 		else if(sName == "rotaxis")
 		{
-			const char* cAxis = elem->Attribute("value");
-			if(cAxis && strlen(cAxis))
-				ps->rotAxis = vec3FromString(cAxis);
-			const char* cAxisVar = elem->Attribute("var");
-			if(cAxisVar && strlen(cAxisVar))
-				ps->rotAxisVar = vec3FromString(cAxisVar);
+			//const char* cAxis = elem->Attribute("value");
+			//if(cAxis && strlen(cAxis))
+			//	ps->rotAxis = vec3FromString(cAxis);
+			//const char* cAxisVar = elem->Attribute("var");
+			//if(cAxisVar && strlen(cAxisVar))
+			//	ps->rotAxisVar = vec3FromString(cAxisVar);
 		}
 		else if(sName == "col")
 		{
 			const char* cStartCol = elem->Attribute("start");
 			if(cStartCol != NULL)
-				ps->colStart = colorFromString(cStartCol);
+				ps->colStart.fromString(cStartCol);
 			const char* cEndCol = elem->Attribute("end");
 			if(cEndCol != NULL)
-				ps->colEnd = colorFromString(cEndCol);
+				ps->colEnd.fromString(cEndCol);
 			const char* cColVar = elem->Attribute("var");
 			if(cColVar != NULL)
-				ps->colVar = colorFromString(cColVar);
+				ps->colVar.fromString(cColVar);
 		}
 		else if(sName == "tanaccel")
 		{
@@ -299,7 +299,7 @@ ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 
 	const char* cSegCol = layer->Attribute("col");
 	if(cSegCol != NULL)
-		seg->col = colorFromString(cSegCol);
+		seg->col.fromString(cSegCol);
 
 	const char* cSegObj = layer->Attribute("obj");
 	if(cSegObj != NULL)

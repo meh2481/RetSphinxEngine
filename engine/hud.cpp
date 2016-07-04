@@ -623,7 +623,7 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
             tb->setPos(pointFromString(cPos));
 		const char* cColor = elem->Attribute("col");
 		if(cColor != NULL)
-			tb->col = colorFromString(cColor);
+			tb->col.fromString(cColor);
 		elem->QueryFloatAttribute("pt", &tb->pt);
 		elem->QueryBoolAttribute("hidden", &tb->hidden);
         return(tb);
@@ -635,7 +635,7 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
 		HUDGeom* geom = new HUDGeom(cGeomName);
 		const char* cColor = elem->Attribute("col");
 		if(cColor != NULL)
-			geom->col = colorFromString(cColor);
+			geom->col.fromString(cColor);
 		for(tinyxml2::XMLElement* quad = elem->FirstChildElement("quad"); quad != NULL; quad = quad->NextSiblingElement("quad"))
 		{
 			Quad q;
@@ -645,10 +645,10 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
 			const char* cQuad4 = quad->Attribute("p4");
 			if(cQuad1 != NULL && cQuad2 != NULL && cQuad3 != NULL && cQuad4 != NULL)
 			{
-				q.pt[0] = vec3FromString(cQuad1);
-				q.pt[1] = vec3FromString(cQuad2);
-				q.pt[2] = vec3FromString(cQuad3);
-				q.pt[3] = vec3FromString(cQuad4);
+				//q.pt[0] = vec3FromString(cQuad1);
+				//q.pt[1] = vec3FromString(cQuad2);
+				//q.pt[2] = vec3FromString(cQuad3);
+				//q.pt[3] = vec3FromString(cQuad4);
 				geom->addQuad(q);
 			}
 		}
@@ -667,13 +667,13 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
             hm->setPos(pointFromString(cPos));
 		const char* cTextColor = elem->Attribute("textcol");
 		if(cTextColor != NULL)
-			hm->m_sNormal = colorFromString(cTextColor);
+			hm->m_sNormal.fromString(cTextColor);
 		const char* cSelectColor = elem->Attribute("selectcol");
 		if(cSelectColor != NULL)
-			hm->m_sSelected = colorFromString(cSelectColor);
+			hm->m_sSelected.fromString(cSelectColor);
 		const char* cSelectColor2 = elem->Attribute("selectcol2");
 		if(cSelectColor2 != NULL)
-			hm->m_sSelected2 = colorFromString(cSelectColor2);
+			hm->m_sSelected2.fromString(cSelectColor2);
 		const char* cSelectSignal = elem->Attribute("selectsignal");
 		if(cSelectSignal != NULL)
 			hm->selectsignal = cSelectSignal;

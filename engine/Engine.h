@@ -116,6 +116,7 @@ public:
 	Rect getScreenRect()	{Rect rc(0,0,getWidth(),getHeight()); return rc;};
 	void drawDebug();
 	void drawCursor();
+	void fillScreen(Color col);
 	
 	//Window functions - engine_window.cpp
 	void changeScreenResolution(float w, float h);  //Change resolution mid-game and reload OpenGL textures as needed

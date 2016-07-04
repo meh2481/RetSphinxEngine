@@ -1,5 +1,5 @@
 #pragma once
-#include "glm/glm.hpp"
+#include "glmx.h"
 #include <string>
 #include "globaldefs.h" //TODO Remove
 using namespace std;

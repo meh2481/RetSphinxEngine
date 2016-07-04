@@ -17,6 +17,10 @@ using namespace std;
 #include "glmx.h"
 #include <SDL.h>
 
+//-------------------------------
+// Keybinding stuff
+//-------------------------------
+
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768
 #define JOY_AXIS_MAX	32767
@@ -49,34 +53,19 @@ extern SDL_Scancode KEY_RIGHT2;
 extern SDL_Scancode KEY_ENTER1;
 extern SDL_Scancode KEY_ENTER2;
 
-typedef glm::vec2 Point;
-typedef glm::vec3 Vec3;
-
-#define PI 3.1415926535f //Close enough for my calculations
-#define DEG2RAD (PI/180.0f)  //Convert degrees to radians
-#define RAD2DEG (180.0f/PI)  //Convert radians to degrees
-#define DIFF_EPSILON 0.0000001	  //HACK: How much different two vectors must be to register as a difference
-#define G 66.7384	//Gravitational constant times one trillion (Becase we aren't exactly on a planetary scale here)
-
 //HACK: SDL scancodes that really should be defined but aren't
 #define SDL_SCANCODE_CTRL	(SDL_NUM_SCANCODES)
 #define SDL_SCANCODE_SHIFT 	(SDL_NUM_SCANCODES+1)
 #define SDL_SCANCODE_ALT	(SDL_NUM_SCANCODES+2)
 #define SDL_SCANCODE_GUI	(SDL_NUM_SCANCODES+3)
 
-class Color
-{
-public:
-	float r,g,b,a;
-	Color();
-	Color(int ir, int ig, int ib) {from256(ir,ig,ib);};
-	Color(float fr, float fg, float fb, float fa) {r=fr;g=fg;b=fb;a=fa;};
 
-	void from256(int ir, int ig, int ib, int a = 255);
-	void fromHSV(float h, float s, float v, float fa = 1.0f);
-	void set(float fr, float fg, float fb, float fa = 1.0) {r=fr;g=fg;b=fb;a=fa;};
-	void clear()	{r=g=b=a=1.0f;};
-};
+//-------------------------------
+// Math stuff
+//-------------------------------
+
+typedef glm::vec2 Point;
+typedef glm::vec3 Vec3;
 
 class Rect {
 public:
@@ -97,33 +86,33 @@ public:
 	void	centerOn(Point p);
 };
 
-//Global Helper functions
-//TODO: Make into class or package or something
-//TODO: Some of these might not even be used. Check and see.
-Vec3 crossProduct(Vec3 vec1, Vec3 vec2);	//Cross product of two vectors
-float dotProduct(Vec3 vec1, Vec3 vec2);   //Dot product of two vectors
-Vec3 rotateAroundVector(Vec3 vecToRot, Vec3 rotVec, float fAngleDeg);	//Rotate one vector around another
-Point rotateAroundPoint(Point vecToRot, float fAngleDeg, Point ptRot = Point(0,0)); //Rotate point around given point (Default: origin)
+
+//--------------------------------------------------
+// Parsing functions
+//--------------------------------------------------
+
 string stripCommas(string s);	   //Strip all the commas from s, leaving spaces in their place
 Rect rectFromString(string s);	  //Get a rectangle from comma-separated values in a string
-string rectToString(Rect r);
 Point pointFromString(string s);	//Get a point from comma-separated values in a string
 string pointToString(Point p);
-Color colorFromString(string s);	//Get a color from comma-separated values in a string
-string colorToString(Color c);
-Vec3 vec3FromString(string s);		//Get a 3D point from comma-separated values in a string
-string vec3ToString(Vec3 vec);
 
 
-void randSeed(unsigned long s);						//Seed the random number generator
-float distanceSquared(Vec3 vec1, Vec3 vec2);		//Get the distance between two vectors squared
-float distanceBetween(Vec3 vec1, Vec3 vec2);				//Get the distance between two vectors (slower than above)
-Color HsvToRgb(int h, int s, int v);		//Convert HSV values to RGB
-float wrapAngle(float fAngle);
-float getAngle(const Point& p);	//Get angle of a vector
 
-float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high, float freqinc);
 
-void fillRect(Point p1, Point p2, Color col);
-void fillScreen(Color col);
+//--------------------------------------------------
+// Color stuff
+//--------------------------------------------------
+class Color
+{
+public:
+	float r, g, b, a;
+	Color();
+	Color(int ir, int ig, int ib) { from256(ir, ig, ib); };
+	Color(float fr, float fg, float fb, float fa) { r = fr; g = fg; b = fb; a = fa; };
 
+	void from256(int ir, int ig, int ib, int a = 255);
+	void set(float fr, float fg, float fb, float fa = 1.0) { r = fr; g = fg; b = fb; a = fa; };
+	void clear() { r = g = b = a = 1.0f; };
+
+	void fromString(string s);	//Set values from comma-separated values in a string
+};

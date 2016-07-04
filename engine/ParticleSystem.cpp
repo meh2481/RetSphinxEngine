@@ -131,8 +131,8 @@ void ParticleSystem::_newParticle()
 	m_sizeEnd[num].y = sizeEnd.y + sizediff;
 	float angle = emissionAngle + Random::randomFloat(-emissionAngleVar,emissionAngleVar);
 	float amt = speed + Random::randomFloat(-speedVar,speedVar);
-	m_vel[num].x = amt*cos(DEG2RAD*angle);
-	m_vel[num].y = amt*sin(DEG2RAD*angle);
+	m_vel[num].x = amt*cos(glm::radians(angle));
+	m_vel[num].y = amt*sin(glm::radians(angle));
 	m_accel[num].x = accel.x + Random::randomFloat(-accelVar.x,accelVar.x);
 	m_accel[num].y = accel.y + Random::randomFloat(-accelVar.y,accelVar.y);
 	m_rot[num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
@@ -316,8 +316,8 @@ void ParticleSystem::update(float dt)
 		}
 		if(*tanAccel)
 		{
-			Point ptTan = glm::normalize(m_pos[i] - emitFrom.center());
-			ptTan = rotateAroundPoint(ptTan, 90);
+			Point ptTemp = glm::normalize(m_pos[i] - emitFrom.center());
+			Point ptTan(-ptTemp.y, ptTemp.x);	//Tangent vector is just rotated 90 degrees
 			ptTan *= *tanAccel * dt;
 			*ptVel += ptTan;
 		}
@@ -395,7 +395,7 @@ void ParticleSystem::draw()
 				glClear(GL_DEPTH_BUFFER_BIT);	//Rotating intersecting particles is a pain
 		}
 		else
-			glRotatef(RAD2DEG*atan2(m_vel[i].y, m_vel[i].x), 0, 0, 1);
+			glRotatef(glm::degrees(atan2(m_vel[i].y, m_vel[i].x)), 0, 0, 1);
 		img->render(drawsz, m_imgRect[i]);	//TODO: NO NO NO NO NO this should generate a list of vertices and draw them all in one opengl call!
 		glPopMatrix();
 	}

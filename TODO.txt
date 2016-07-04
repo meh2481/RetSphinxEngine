@@ -1,6 +1,3 @@
-ResourceManager stuff:
--Split ResourceManager into multiple classes, one per resource type
-
 Overall TODO list:
 - Fix noise loading so it's not crazy slow
 - Fix math for softbody lattice anim so it actually works properly

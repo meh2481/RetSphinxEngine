@@ -153,8 +153,6 @@ void GameEngine::frame(float dt)
 	}
 }
 
-#define CAMERA_ANGLE_RAD PI/2.0//1.152572
-
 void GameEngine::draw()
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)

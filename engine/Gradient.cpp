@@ -81,10 +81,7 @@ bool Gradient::load(string sXMLFilename)
 		val->QueryFloatAttribute("pos", &pos);
 		const char* cCol = val->Attribute("col");
 		if(cCol != NULL)
-		{
-			Color c = colorFromString(cCol);
-			m_colorMap[pos] = c;
-		}
+			m_colorMap[pos].fromString(cCol);
 	}
 	
 	delete doc;

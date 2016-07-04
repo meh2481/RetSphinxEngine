@@ -199,7 +199,7 @@ void ObjSegment::draw(bool bDebugInfo)
 	glPushMatrix();
 	if(body == NULL)
 	{
-		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
+		glRotatef(glm::degrees(rot), 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
 		if(obj3D)
 		{
@@ -223,9 +223,9 @@ void ObjSegment::draw(bool bDebugInfo)
 		b2Vec2 objpos = body->GetWorldCenter();
 		float objrot = body->GetAngle();
 		glTranslatef(objpos.x, objpos.y, 0.0f);
-		glRotatef(objrot*RAD2DEG, 0.0f, 0.0f, 1.0f);
+		glRotatef(glm::degrees(objrot), 0.0f, 0.0f, 1.0f);
 		glTranslatef(pos.x, pos.y, depth);
-		glRotatef(rot*RAD2DEG, 0.0f, 0.0f, 1.0f);
+		glRotatef(glm::degrees(rot), 0.0f, 0.0f, 1.0f);
 		if(obj3D)
 		{
 			glScalef(size.x, size.y, size.x);

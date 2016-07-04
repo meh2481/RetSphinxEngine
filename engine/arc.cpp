@@ -39,7 +39,7 @@ void Arc::draw()
 		
 	//Offset according to depth
 	glTranslatef(p1.x, -p1.y, depth);
-	glRotatef(RAD2DEG*fAngle,0.0f,0.0f,1.0f);
+	glRotatef(glm::degrees(fAngle),0.0f,0.0f,1.0f);
 	//Center on this point
 	glTranslatef(0, -height * 0.5f, 0);
 	float fSegWidth = fDistance / (float)(numSegments-1);
