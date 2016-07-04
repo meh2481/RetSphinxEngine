@@ -73,7 +73,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	
 	LOG(INFO) << "Creating resource loader";
 	m_resourceLoader = new ResourceLoader();
-	m_entityManager = new EntityManager(m_resourceLoader);
+	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;

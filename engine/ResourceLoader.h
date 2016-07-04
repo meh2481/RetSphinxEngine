@@ -29,5 +29,6 @@ public:
 	//Mouse cursor
 	MouseCursor* getCursor(string sID);
 
+	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);
 };

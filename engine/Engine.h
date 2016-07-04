@@ -59,7 +59,6 @@ private:
 	float m_fFramerate;
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
-	list<Object*> m_lObjects;	//Object handler
 	multiset<ObjSegment*, DepthComparator> m_lScenery;
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
@@ -202,14 +201,11 @@ public:
 	float getFramerate()   {return m_fFramerate;};
 	
 	//Object management functions - engine_obj.cpp
-	void addObject(Object* o);
+	
 	void addScenery(ObjSegment* seg) 	{m_lScenery.insert(seg);};
 	//void updateSceneryLayer(physSegment* seg);
 	void drawAll();
-	void cleanupObjects();
-	void updateObjects(float dt);
-	Object* getObject(Point p);	//Get first object at this point
-	Object* getClosestObject(Point p);	//Get closest object to this point
+	
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered);

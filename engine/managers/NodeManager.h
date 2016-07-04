@@ -12,6 +12,8 @@ class NodeManager
 	map<string, Node*> m_nodes;
 
 public:
+	~NodeManager();
+
 	void add(Node* n);
 	void update(float dt);
 	void cleanup();

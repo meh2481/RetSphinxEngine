@@ -1,6 +1,11 @@
 #include "NodeManager.h"
 #include "Node.h"
 
+NodeManager::~NodeManager()
+{
+	cleanup();
+}
+
 void NodeManager::add(Node* n)
 {
 	if(n != NULL)
@@ -30,6 +35,32 @@ Node* NodeManager::getNode(string sNodeName)
 		return i->second;
 	return NULL;
 }
+
+
+//Node* Engine::getNode(Point p)
+//{
+//	PointQueryCallback pqc;
+//	b2AABB aabb;
+//	aabb.lowerBound.Set(p.x, p.y);
+//	aabb.upperBound.Set(p.x, p.y);
+//	m_physicsWorld->QueryAABB(&pqc, aabb);
+//	
+//	//This returns a list of possible bodies; loop through and check for actual containment
+//	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+//	{
+//		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
+//		{
+//			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
+//			{
+//				void* data = fix->GetUserData();
+//				if(data)
+//					return (Node*)(data);
+//			}
+//		}
+//	}
+//	
+//	return NULL;
+//}
 
 Node* NodeManager::getNode(Point p)
 {

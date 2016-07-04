@@ -135,7 +135,7 @@ void Object::collideWall(Point ptNormal)
 
 void Object::initLua()
 {
-	if(lua && glueObj == NULL)
+	if(lua && !glueObj)
 	{
 		lua->call("loadclass", luaClass.c_str());	//Create this class if it hasn't been created already
 		

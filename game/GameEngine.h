@@ -38,7 +38,7 @@ private:
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	list<ColorPhase> m_ColorsChanging;
-	list<Object*> m_lAddLater;	//TODO: This should be managed by the Engine, not GameEngine
+	//list<Object*> m_lAddLater;	//TODO: This should be managed by the Engine, not GameEngine
 	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time, also manage with Engine
 	SDL_Haptic* m_rumble;
 	
@@ -84,7 +84,7 @@ public:
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
-	void addAfterUpdate(Object* o) {m_lAddLater.push_back(o);};	//TODO REMOVE Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
+	//void addAfterUpdate(Object* o) {m_lAddLater.push_back(o);};	//TODO REMOVE Add an object after upating all the objects is done (so we don't error out when adding objects during an object's update function)
 	void warpObjectToNode(Object* o, Node* n);
 	
 	//GameEngine_color.cpp functions

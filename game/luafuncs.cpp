@@ -33,8 +33,7 @@ public:
 	
 	static void addObject(Object* o)
 	{
-		g_pGlobalEngine->addAfterUpdate(o);
-		o->initLua();	//Need to init this now so the glue ptr gets initialized properly
+		g_pGlobalEngine->getEntityManager()->add(o);
 	}
 	
 	static Object* getPlayerObject()
@@ -106,7 +105,7 @@ public:
 	
 	static Object* getObjAtPoint(Point p)
 	{
-		return g_pGlobalEngine->getObject(p);
+		return g_pGlobalEngine->getEntityManager()->getObject(p);
 	}
 	
 	static Node* getNodeAtPoint(Point p)
@@ -126,7 +125,7 @@ public:
 	
 	static Object* getClosestObject(Point p)
 	{
-		return g_pGlobalEngine->getClosestObject(p);
+		return g_pGlobalEngine->getEntityManager()->getClosestObject(p);
 	}
 };
 

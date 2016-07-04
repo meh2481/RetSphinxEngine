@@ -72,6 +72,8 @@ managers/EntityManager.h
 managers/EntityManager.cpp
 managers/NodeManager.cpp
 managers/NodeManager.h
+managers/ObjectManager.h
+managers/ObjectManager.cpp
 )
 
 include_directories (.)

@@ -3,6 +3,7 @@
 #include "Observer.h"
 #include "Subject.h"
 #include "ResourceLoader.h"
+#include "glm/glm.hpp"
 using namespace std;
 
 class ParticleSystem;
@@ -23,7 +24,7 @@ public:
 
 	void add(ParticleSystem* sys);
 	void cleanup();
-	void render();
+	void render(glm::mat4 mat);
 	void update(float dt);
 
 	virtual void onNotify(string sParticleFilename, Point pos);

@@ -37,8 +37,9 @@ void ParticleSystemManager::cleanup()
 	m_updateParticles.clear();
 }
 
-void ParticleSystemManager::render()
+void ParticleSystemManager::render(glm::mat4 mat)
 {
+	//TODO Use mat
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		(*i)->draw();
 }

@@ -127,7 +127,7 @@ GameEngine::~GameEngine()
 {
 	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
-	cleanupObjects();
+	getEntityManager()->cleanup();
 	delete m_Cursor;
 }
 
@@ -137,12 +137,12 @@ void GameEngine::frame(float dt)
 
 	stepPhysics(dt);
 	getEntityManager()->update(dt);
-	updateObjects(dt);
 	
+	//TODO: Remove
 	//Add any objects created during updating this frame
-	for(list<Object*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
+	/*for(list<Object*>::iterator i = m_lAddLater.begin(); i != m_lAddLater.end(); i++)
 		addObject(*i);
-	m_lAddLater.clear();
+	m_lAddLater.clear();*/
 	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
