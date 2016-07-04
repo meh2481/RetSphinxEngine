@@ -11,13 +11,16 @@ class NodeManager;
 class Node;
 class ObjectManager;
 class Object;
+class ObjSegment;
 class b2World;
+class SceneryManager;
 
 class EntityManager
 {
 	ParticleSystemManager* particleSystemManager;
 	NodeManager* nodeManager;
 	ObjectManager* objectManager;
+	SceneryManager* sceneryManager;
 
 public:
 	EntityManager(ResourceLoader* resourceLoader, b2World* world);
@@ -40,4 +43,7 @@ public:
 	void add(Object* o);
 	Object* getObject(Point p);
 	Object* getClosestObject(Point p);
+
+	//Scenery functions
+	void add(ObjSegment* o);
 };

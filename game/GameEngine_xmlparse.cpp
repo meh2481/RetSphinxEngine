@@ -538,7 +538,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	for(tinyxml2::XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
 		ObjSegment* seg = getResourceLoader()->getObjSegment(layer);
-		addScenery(seg);
+		getEntityManager()->add(seg);
 	}
 	
 	//Load objects

@@ -22,7 +22,6 @@ Arc.h
 MouseCursor.cpp
 MouseCursor.h
 engine_gl.cpp
-engine_obj.cpp
 engine_sound.cpp
 engine_window.cpp
 globaldefs.cpp
@@ -74,6 +73,8 @@ managers/NodeManager.cpp
 managers/NodeManager.h
 managers/ObjectManager.h
 managers/ObjectManager.cpp
+managers/SceneryManager.cpp
+managers/SceneryManager.h
 )
 
 include_directories (.)

@@ -31,15 +31,6 @@ typedef struct
 	string sSwitch, sValue;
 } commandlineArg;
 
-class DepthComparator
-{
-public:
-	bool operator()(const ObjSegment* s1, const ObjSegment* s2)
-	{
-		return s1->depth < s2->depth;
-	}
-};
-
 class Engine
 {
 private:
@@ -59,7 +50,7 @@ private:
 	float m_fFramerate;
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
-	multiset<ObjSegment*, DepthComparator> m_lScenery;
+	
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
 	uint16_t m_iWidth, m_iHeight;
@@ -197,12 +188,7 @@ public:
 	unsigned getTicks();
 	float getSeconds();
 	void setFramerate(float fFramerate);
-	float getFramerate()   {return m_fFramerate;};
-	
-	//Object management functions - engine_obj.cpp
-	void addScenery(ObjSegment* seg) 	{m_lScenery.insert(seg);};
-	void drawAll();
-	
+	float getFramerate()   {return m_fFramerate;};	
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered);

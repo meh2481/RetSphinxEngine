@@ -245,7 +245,8 @@ void GameEngine::draw()
     //glLoadMatrixf(glm::value_ptr(look));
 	
 	glDisable(GL_LIGHTING);
-	drawAll();	//Draw everything in one pass
+	glm::mat4 mat;	//TODO Use real mat
+	getEntityManager()->render(mat);
 	drawDebug();
 	
 	glLoadIdentity();
