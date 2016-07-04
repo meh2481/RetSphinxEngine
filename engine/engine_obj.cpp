@@ -1,15 +1,6 @@
 #include "Engine.h"
 #include "EntityManager.h"
 
-void Engine::addNode(Node* n)
-{
-	if(n != NULL)
-	{
-		m_nodes[n->name] = n;
-		n->init();
-	}
-}
-
 void Engine::addObject(Object* o)
 {
 	if(o != NULL)
@@ -48,11 +39,11 @@ void Engine::cleanupObjects()
 		delete (*i);
 	for(multiset<ObjSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)
 		delete (*i);
-	for(map<string, Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
-		delete it->second;
+	
 	m_lScenery.clear();
 	m_lObjects.clear();
-	m_nodes.clear();
+
+	m_entityManager->cleanup();
 	
 	//Wipe Box2D physics data that's left over
 	list<b2Body*> bodies;
@@ -69,19 +60,7 @@ void Engine::updateObjects(float dt)
 	for(list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
 		(*i)->update(dt);
 
-	//Update nodes
-	for(map<string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
-		i->second->update(dt);
-
 	//TODO: Add any added objects that were generated while updating
-}
-
-Node* Engine::getNode(string sNodeName)
-{
-	map<string, Node*>::iterator i = m_nodes.find(sNodeName);
-	if(i != m_nodes.end())
-		return i->second;
-	return NULL;
 }
 
 class PointQueryCallback : public b2QueryCallback
@@ -142,27 +121,27 @@ Object* Engine::getObject(Point p)
 	return NULL;
 }
 
-Node* Engine::getNode(Point p)
-{
-	PointQueryCallback pqc;
-	b2AABB aabb;
-	aabb.lowerBound.Set(p.x, p.y);
-	aabb.upperBound.Set(p.x, p.y);
-	m_physicsWorld->QueryAABB(&pqc, aabb);
-	
-	//This returns a list of possible bodies; loop through and check for actual containment
-	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
-	{
-		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
-		{
-			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
-			{
-				void* data = fix->GetUserData();
-				if(data)
-					return (Node*)(data);
-			}
-		}
-	}
-	
-	return NULL;
-}
+//Node* Engine::getNode(Point p)
+//{
+//	PointQueryCallback pqc;
+//	b2AABB aabb;
+//	aabb.lowerBound.Set(p.x, p.y);
+//	aabb.upperBound.Set(p.x, p.y);
+//	m_physicsWorld->QueryAABB(&pqc, aabb);
+//	
+//	//This returns a list of possible bodies; loop through and check for actual containment
+//	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+//	{
+//		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
+//		{
+//			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
+//			{
+//				void* data = fix->GetUserData();
+//				if(data)
+//					return (Node*)(data);
+//			}
+//		}
+//	}
+//	
+//	return NULL;
+//}

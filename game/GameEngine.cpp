@@ -153,7 +153,7 @@ void GameEngine::frame(float dt)
 		if(m_sLoadNode.size())
 		{
 			//Warp to node on map
-			warpObjectToNode(player, getNode(m_sLoadNode));
+			warpObjectToNode(player, getEntityManager()->getNode(m_sLoadNode));
 			m_sLoadNode.clear();
 		}
 	}

@@ -453,7 +453,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
-	getEntityManager()->cleanupParticles();
+	getEntityManager()->cleanup();
 	player = NULL;
 	LOG(INFO) << "Loading scene " << sXMLFilename;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
@@ -602,7 +602,7 @@ void GameEngine::loadScene(string sXMLFilename)
 		if(cFilename != NULL)
 		{
 			ParticleSystem* pSys = getResourceLoader()->getParticleSystem(cFilename);
-			getEntityManager()->addParticles(pSys);
+			getEntityManager()->add(pSys);
 		}
 	}
 	
@@ -773,7 +773,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		for(const tinyxml2::XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
 			n->setProperty(attrib->Name(), attrib->Value());
 		
-		addNode(n);
+		getEntityManager()->addNode(n);
 		fixtureDef.userData = (void*)n;	//TODO: Use heavy userdata
 	}
 	

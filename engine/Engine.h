@@ -76,7 +76,6 @@ private:
 	MouseCursor* m_cursor;
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
-	map<string, Node*> m_nodes;
 #ifdef _DEBUG
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
@@ -209,11 +208,8 @@ public:
 	void drawAll();
 	void cleanupObjects();
 	void updateObjects(float dt);
-	void addNode(Node* n);
-	Node* getNode(string sNodeName);
 	Object* getObject(Point p);	//Get first object at this point
 	Object* getClosestObject(Point p);	//Get closest object to this point
-	Node* getNode(Point p);		//Get first node at this point
 
 	//OpenGL methods
 	void setDoubleBuffered(bool bDoubleBuffered);

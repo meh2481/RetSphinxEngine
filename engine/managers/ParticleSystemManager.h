@@ -21,10 +21,10 @@ public:
 	ParticleSystemManager(ResourceLoader* loader);
 	~ParticleSystemManager();
 
-	void addParticles(ParticleSystem* sys);
-	void cleanupParticles();
-	void drawParticles();
-	void updateParticles(float dt);
+	void add(ParticleSystem* sys);
+	void cleanup();
+	void render();
+	void update(float dt);
 
 	virtual void onNotify(string sParticleFilename, Point pos);
 };

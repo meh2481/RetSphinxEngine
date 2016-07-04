@@ -11,11 +11,11 @@ ParticleSystemManager::ParticleSystemManager(ResourceLoader* loader)
 
 ParticleSystemManager::~ParticleSystemManager()
 {
-	cleanupParticles();
+	cleanup();
 	delete m_notifySubject;
 }
 
-void ParticleSystemManager::addParticles(ParticleSystem * sys)
+void ParticleSystemManager::add(ParticleSystem * sys)
 {
 	if(sys)
 	{
@@ -27,7 +27,7 @@ void ParticleSystemManager::addParticles(ParticleSystem * sys)
 	}
 }
 
-void ParticleSystemManager::cleanupParticles()
+void ParticleSystemManager::cleanup()
 {
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		delete *i;
@@ -37,13 +37,13 @@ void ParticleSystemManager::cleanupParticles()
 	m_updateParticles.clear();
 }
 
-void ParticleSystemManager::drawParticles()
+void ParticleSystemManager::render()
 {
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		(*i)->draw();
 }
 
-void ParticleSystemManager::updateParticles(float dt)
+void ParticleSystemManager::update(float dt)
 {
 	updating = true;
 	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
@@ -67,5 +67,5 @@ void ParticleSystemManager::onNotify(string sParticleFilename, Point pos)
 {
 	ParticleSystem* pSys = m_loader->getParticleSystem(sParticleFilename);
 	pSys->emitFrom.centerOn(pos);
-	addParticles(pSys);
+	add(pSys);
 }

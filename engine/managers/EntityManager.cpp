@@ -1,34 +1,55 @@
 #include "EntityManager.h"
 #include "ParticleSystemManager.h"
 #include "ResourceLoader.h"
+#include "NodeManager.h"
+#include "globaldefs.h"	//TODO Remove
 
 EntityManager::EntityManager(ResourceLoader* resourceLoader)
 {
 	particleSystemManager = new ParticleSystemManager(resourceLoader);
+	nodeManager = new NodeManager();
 }
 
 EntityManager::~EntityManager()
 {
 	delete particleSystemManager;
+	delete nodeManager;
 }
 
 void EntityManager::update(float dt)
 {
-	particleSystemManager->updateParticles(dt);
+	particleSystemManager->update(dt);
+	nodeManager->update(dt);
 }
 
 void EntityManager::render(glm::mat4 mat)
 {
 	//TODO Use the mat4
-	particleSystemManager->drawParticles();
+	particleSystemManager->render();
 }
 
-void EntityManager::cleanupParticles()
+void EntityManager::cleanup()
 {
-	particleSystemManager->cleanupParticles();
+	particleSystemManager->cleanup();
+	nodeManager->cleanup();
 }
 
-void EntityManager::addParticles(ParticleSystem * pSys)
+void EntityManager::add(ParticleSystem * pSys)
 {
-	particleSystemManager->addParticles(pSys);
+	particleSystemManager->add(pSys);
+}
+
+void EntityManager::addNode(Node * n)
+{
+	nodeManager->add(n);
+}
+
+Node* EntityManager::getNode(Point pos)
+{
+	return nodeManager->getNode(pos);
+}
+
+Node* EntityManager::getNode(string sNodeName)
+{
+	return nodeManager->getNode(sNodeName);
 }

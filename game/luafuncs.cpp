@@ -90,7 +90,7 @@ public:
 	static ParticleSystem* createParticles(string sName)
 	{
 		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);
-		g_pGlobalEngine->getEntityManager()->addParticles(pSys);
+		g_pGlobalEngine->getEntityManager()->add(pSys);
 		return pSys;
 	}
 	
@@ -111,7 +111,7 @@ public:
 	
 	static Node* getNodeAtPoint(Point p)
 	{
-		return g_pGlobalEngine->getNode(p);
+		return g_pGlobalEngine->getEntityManager()->getNode(p);
 	}
 	
 	static b2World* getPhysWorld()
@@ -121,7 +121,7 @@ public:
 	
 	static Node* getNode(string sNodeName)
 	{
-		return g_pGlobalEngine->getNode(sNodeName);
+		return g_pGlobalEngine->getEntityManager()->getNode(sNodeName);
 	}
 	
 	static Object* getClosestObject(Point p)

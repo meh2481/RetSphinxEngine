@@ -70,6 +70,8 @@ managers/ParticleSystemManager.h
 managers/ParticleSystemManager.cpp
 managers/EntityManager.h
 managers/EntityManager.cpp
+managers/NodeManager.cpp
+managers/NodeManager.h
 )
 
 include_directories (.)
