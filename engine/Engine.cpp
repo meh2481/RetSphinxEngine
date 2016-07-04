@@ -12,6 +12,7 @@
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
 #include "ResourceLoader.h"
+#include "EntityManager.h"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
@@ -72,7 +73,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	
 	LOG(INFO) << "Creating resource loader";
 	m_resourceLoader = new ResourceLoader();
-	m_particleSystemManager = new ParticleSystemManager(m_resourceLoader);
+	m_entityManager = new EntityManager(m_resourceLoader);
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
@@ -107,7 +108,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 
 Engine::~Engine()
 {
-	delete m_particleSystemManager;
+	delete m_entityManager;
 
 	ImGui_Impl_GL2_Shutdown();
 

@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "EntityManager.h"
 
 void Engine::addNode(Node* n)
 {
@@ -18,23 +19,11 @@ void Engine::addObject(Object* o)
 	}
 }
 
-/*/ This seems like a bad idea overall
-void Engine::updateSceneryLayer(physSegment* seg)
-{
-	for(multiset<physSegment*>::iterator layer = m_lScenery.begin(); layer != m_lScenery.end(); layer++)
-	{
-		if((*layer) == seg)
-		{
-			m_lScenery.erase(layer);
-			break;
-		}
-	}
-	m_lScenery.insert(seg);
-}*/
-
 //TODO: I hate this a lot
 void Engine::drawAll()
 {
+	glm::mat4 mat; //TODO use this for drawing
+
 	multimap<float, Drawable*> drawList;	//Depth matters, and some Drawables will be at different depths, so draw all in one pass
 
 	for(multiset<ObjSegment*>::iterator i = m_lScenery.begin(); i != m_lScenery.end(); i++)	//Add bg layers
@@ -50,7 +39,7 @@ void Engine::drawAll()
 	for(multimap<float, Drawable*>::iterator i = drawList.begin(); i != drawList.end(); i++)
 		i->second->draw(m_bObjDebugDraw);
 
-	m_particleSystemManager->drawParticles();	//TODO: Better draw order
+	m_entityManager->render(mat);	//TODO: Better draw order
 }
 
 void Engine::cleanupObjects()

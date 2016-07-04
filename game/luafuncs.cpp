@@ -3,6 +3,8 @@
 #include "GameEngine.h"
 #include "Image.h"
 #include "ResourceLoader.h"
+#include "EntityManager.h"
+#include "ParticleSystem.h"
 
 extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 
@@ -88,7 +90,7 @@ public:
 	static ParticleSystem* createParticles(string sName)
 	{
 		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);
-		g_pGlobalEngine->getParticleSystemManager()->addParticles(pSys);
+		g_pGlobalEngine->getEntityManager()->addParticles(pSys);
 		return pSys;
 	}
 	

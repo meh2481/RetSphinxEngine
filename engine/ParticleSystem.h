@@ -12,7 +12,7 @@
 #include "Subject.h"
 
 #ifndef PARTICLES_H
-#define PARICLES_H
+#define PARTICLES_H
 
 extern float g_fParticleFac;
 

@@ -6,6 +6,7 @@
 #include "Image.h"
 #include "ResourceTypes.h"
 #include "ResourceLoader.h"
+#include "EntityManager.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -452,7 +453,7 @@ Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
 void GameEngine::loadScene(string sXMLFilename)
 {
 	cleanupObjects();
-	getParticleSystemManager()->cleanupParticles();
+	getEntityManager()->cleanupParticles();
 	player = NULL;
 	LOG(INFO) << "Loading scene " << sXMLFilename;
 	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
@@ -601,7 +602,7 @@ void GameEngine::loadScene(string sXMLFilename)
 		if(cFilename != NULL)
 		{
 			ParticleSystem* pSys = getResourceLoader()->getParticleSystem(cFilename);
-			getParticleSystemManager()->addParticles(pSys);
+			getEntityManager()->addParticles(pSys);
 		}
 	}
 	

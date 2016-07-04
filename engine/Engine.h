@@ -8,7 +8,6 @@
 #include "Object.h"
 #include "Text.h"
 #include "HUD.h"
-#include "ParticleSystemManager.h"
 #include "MouseCursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
@@ -17,6 +16,7 @@
 class b2World;
 class Image;
 class ResourceLoader;
+class EntityManager;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -82,7 +82,7 @@ private:
 	bool m_bSteppingPhysics;
 #endif
 	ResourceLoader* m_resourceLoader;
-	ParticleSystemManager* m_particleSystemManager;
+	EntityManager* m_entityManager;
 	
 	
 	//multimap<string, FMOD_CHANNEL*> m_channels;
@@ -225,11 +225,12 @@ public:
 	void setGamma(float fGamma)	{m_fGamma = fGamma;};
 	float getGamma()				{return m_fGamma;};
 	
-	//TODO Put this underneath the proper manager
-	ParticleSystemManager* getParticleSystemManager() { return m_particleSystemManager; };
+	//---------------------------------------------------------
+	// Entity manager
+	EntityManager* getEntityManager() { return m_entityManager; };
 	
 	//---------------------------------------------------------
-	// ResourceLoader
+	// Resource loader
 	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
 
 };

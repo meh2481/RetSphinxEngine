@@ -68,6 +68,8 @@ events/Subject.h
 set(engine_manager_src
 managers/ParticleSystemManager.h
 managers/ParticleSystemManager.cpp
+managers/EntityManager.h
+managers/EntityManager.cpp
 )
 
 include_directories (.)

@@ -1,7 +1,5 @@
 ResourceManager stuff:
--Remove getImage() stuff
--Split ResourceManager into multiple classes, one per resource type?
--ParticleSystem can use ParticleManager/whatever it'll be called class to load other particle systems on explosion
+-Split ResourceManager into multiple classes, one per resource type
 
 Overall TODO list:
 - Fix noise loading so it's not crazy slow
@@ -9,17 +7,16 @@ Overall TODO list:
 - Use GLM for math stuff instead of glPushMatrix() and friends
 - Implement newer OpenGL shaders and such
 - Use shaders rather than lattice animations where possible
-- IO in separate thread
-- PCG algorithm for random numbers
+- IO in separate thread?
 - Replace string w/utf-8 compatible things
 - Disable exceptions/rtti?
-- Add ImGUI - super-simple GUI for editing
+- Add ImGUI editor stuff
 - rip out displaylists for 3D objects - vertex buffers are better
 - class predeclaration - don't have to include headers
 - Ortho HUD
 - Research SDL gamecontroller stuff
 - Definitely ortho for mouse cursor
-
+- Remove globaldefs.h - start segmenting out into utility classes as relevant
 
 
 Refactoring thoughts:
@@ -37,9 +34,8 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 	-- Don't want to bother with bones/3D animation; math too complicated. Does this make the 3D too limited?
 	-- How much do I care about 3D eye candy and does that just make the 2D stuff look like crap?
 - Simplified resource managment
-	-- Resources compressed into smaller formats - ZLIB or such
-		--- Images should be readable directly into OpenGL
-			---- Look into OpenGL image compression, or just use ZLIB and throw the decompressed byte buffer into OpenGL directly
+	-- Resources compressed into smaller formats w/ WFLZ or similar
+		--- Images/3D models/etc should be readable directly into OpenGL
 	-- Paged in with memory mapping if intelligent enough for performance gains
 	-- Packaged into larger files, but intelligently; don't want huge Steam updates for small changes because EVERYTHING recompressed
 - XML vs. Lua - when to use one over the other? Can XML be removed intelligently?

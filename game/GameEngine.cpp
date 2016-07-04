@@ -11,6 +11,7 @@
 #include "easylogging++.h"
 #include "DebugUI.h"
 #include "ResourceLoader.h"
+#include "EntityManager.h"
 
 //Keybinding stuff!
 uint32_t JOY_BUTTON_BACK;
@@ -135,7 +136,7 @@ void GameEngine::frame(float dt)
 	handleKeys();
 
 	stepPhysics(dt);
-	getParticleSystemManager()->updateParticles(dt);
+	getEntityManager()->update(dt);
 	updateObjects(dt);
 	
 	//Add any objects created during updating this frame
