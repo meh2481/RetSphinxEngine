@@ -97,7 +97,6 @@ protected:
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
-	virtual Object* objFromXML(string sXMLFilename, Point ptOffset, Point ptVel) = 0;	//Function called when an object should be created
 
 public:
 	//Constructor/destructor

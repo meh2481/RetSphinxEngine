@@ -28,7 +28,10 @@ public:
 	
 	static Object* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
 	{
-		return g_pGlobalEngine->objFromXML(sClassName, ptOffset, ptVel);
+		Object* o = g_pGlobalEngine->getResourceLoader()->objFromXML(sClassName, ptOffset, ptVel);
+		if(o)
+			o->lua = g_pGlobalEngine->Lua;	//TODO Better way to load lua
+		return o;
 	}
 	
 	static void addObject(Object* o)

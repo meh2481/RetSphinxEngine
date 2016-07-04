@@ -72,7 +72,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fTimeScale = 1.0f;
 	
 	LOG(INFO) << "Creating resource loader";
-	m_resourceLoader = new ResourceLoader();
+	m_resourceLoader = new ResourceLoader(m_physicsWorld);
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
 
 	LOG(INFO) << "Initializing FMOD...";

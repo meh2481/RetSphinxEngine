@@ -49,7 +49,7 @@ class Object : public Drawable
 	map<string, string> propertyValues;
 public:
 	enum { TYPE = OT_OBJECT };
-    vector<ObjSegment*> 	segments;
+    vector<ObjSegment*> 	segments;	//TODO Should be private
 	Lattice*				meshLattice;
 	LatticeAnim*			meshAnim;
 	Point					meshSize;

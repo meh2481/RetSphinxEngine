@@ -207,247 +207,6 @@ void GameEngine::saveConfig(string sFilename)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-// Load object from XML
-//---------------------------------------------------------------------------------------------------------------------------
-
-//TODO: This should be engine-specific, not game-specific
-Object* GameEngine::objFromXML(string sType, Point ptOffset, Point ptVel)
-{
-	ostringstream oss;
-	oss << "res/obj/" << sType << ".xml";
-	string sXMLFilename = oss.str();
-	
-	LOG(INFO) << "Parsing object XML file " << sXMLFilename;
-	//Open file
-	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
-	int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != tinyxml2::XML_NO_ERROR)
-	{
-		LOG(ERROR) << "Error parsing object XML file: Error " << iErr;
-		delete doc;
-		return NULL;
-	}
-	
-	//Grab root element
-	tinyxml2::XMLElement* root = doc->RootElement();
-	if(root == NULL)
-	{
-		LOG(ERROR) << "Error: Root element NULL in XML file.";
-		delete doc;
-		return NULL;
-	}
-	
-	Object* o = new Object;
-	
-	const char* cLuaClass = root->Attribute("luaclass");
-	if(cLuaClass != NULL)
-		o->luaClass = cLuaClass;
-	
-	map<string, b2Body*> mBodyNames;
-	
-	//Add segments
-	for(tinyxml2::XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
-	{
-		ObjSegment* seg;
-		//TODO Unify this. It looks like we're loading from XML multiple ways
-		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
-		if(layer != NULL)
-			seg= getResourceLoader()->getObjSegment(layer);
-		else
-			seg = new ObjSegment;
-		seg->parent = o;
-		tinyxml2::XMLElement* body = segment->FirstChildElement("body");
-		if(body != NULL)
-		{
-			string sBodyName;
-			const char* cBodyName = body->Attribute("name");
-			if(cBodyName)
-				sBodyName = cBodyName;
-			
-			Point pos = ptOffset;
-			const char* cBodyPos = body->Attribute("pos");
-			if(cBodyPos)
-			{
-				Point p = pointFromString(cBodyPos);
-				pos.x += p.x;
-				pos.y += p.y;
-			}
-			
-			string sBodyType = "dynamic";
-			const char* cBodyType = body->Attribute("type");
-			if(cBodyType)
-				sBodyType = cBodyType;
-			
-			b2BodyDef bodyDef;
-			
-			if(sBodyType == "dynamic")
-				bodyDef.type = b2_dynamicBody;
-			else if(sBodyType == "kinematic")
-				bodyDef.type = b2_kinematicBody;
-			else
-				bodyDef.type = b2_staticBody;
-			bodyDef.position = b2Vec2(pos.x, pos.y);
-			
-			bodyDef.linearDamping = 0;
-			body->QueryFloatAttribute("linearDamping", &bodyDef.linearDamping);
-			
-			//Fixed rotation (true for sprites, false for physical objects)
-			bodyDef.fixedRotation = false;
-			body->QueryBoolAttribute("fixedrot", &bodyDef.fixedRotation);
-			
-			//Create body now
-			b2Body* bod = getWorld()->CreateBody(&bodyDef);
-			seg->body = bod;
-			bod->SetUserData((void*)seg);	//Store user data, so when collisions occur we know what segments are colliding
-			mBodyNames[sBodyName] = bod;
-			
-			//Create body fixtures
-			for(tinyxml2::XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
-				readFixture(fixture, bod);
-		}
-		o->addSegment(seg);
-	}
-	//Create joints
-	for(tinyxml2::XMLElement* joint = root->FirstChildElement("joint"); joint != NULL; joint = joint->NextSiblingElement("joint"))
-	{
-		const char* cJointType = joint->Attribute("type");
-		if(cJointType)
-		{
-			string sJointType = cJointType;
-			
-			if(sJointType == "distance")
-			{
-				b2DistanceJointDef jd;
-				const char* cBodyA = joint->Attribute("bodyA");
-				const char* cBodyB = joint->Attribute("bodyB");
-				if(!cBodyA || !cBodyB) continue;
-				if(!mBodyNames.count(cBodyA) || !mBodyNames.count(cBodyB)) continue;
-				
-				jd.bodyA = mBodyNames[cBodyA];
-				jd.bodyB = mBodyNames[cBodyB];
-				
-				jd.frequencyHz = 2.0f;
-				jd.dampingRatio = 0.0f;
-				
-				joint->QueryFloatAttribute("frequencyHz", &jd.frequencyHz);
-				joint->QueryFloatAttribute("dampingRatio", &jd.dampingRatio);
-				
-				const char* cAnchorA = joint->Attribute("anchorA");
-				const char* cAnchorB = joint->Attribute("anchorB");
-				
-				jd.localAnchorA.Set(0,0);
-				jd.localAnchorB.Set(0,0);
-				if(cAnchorA)
-                {
-                    Point p = pointFromString(cAnchorA);
-					jd.localAnchorA = b2Vec2(p.x, p.y);
-                }
-				if(cAnchorB)
-                {
-                    Point p = pointFromString(cAnchorB);
-					jd.localAnchorB = b2Vec2(p.x, p.y);
-                }
-				
-				b2Vec2 p1, p2, d;
-				p1 = jd.bodyA->GetWorldPoint(jd.localAnchorA);
-				p2 = jd.bodyB->GetWorldPoint(jd.localAnchorB);
-				d = p2 - p1;
-				jd.length = d.Length();
-				
-				getWorld()->CreateJoint(&jd);
-			}
-			//else TODO
-		}
-	}
-	
-	
-	tinyxml2::XMLElement* latticeElem = root->FirstChildElement("lattice");
-	if(latticeElem)
-	{
-		const char* cMeshImg = latticeElem->Attribute("img");
-		const char* cBodyRes = latticeElem->Attribute("resolution");
-		const char* cMeshImgSize = latticeElem->Attribute("size");
-		
-		//Default lattice resolution = 10, 10
-		Point pMeshSize(10,10);
-		
-		if(cMeshImg && cMeshImgSize)
-		{
-			o->img = getResourceLoader()->getImage(cMeshImg);
-			o->meshSize = pointFromString(cMeshImgSize);
-			
-			const char* cLatticeType = latticeElem->Attribute("type");
-			if(cLatticeType)
-			{
-				if(cBodyRes)
-					pMeshSize = pointFromString(cBodyRes);
-				
-				o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
-				
-				string sLatticeType = cLatticeType;
-				if(sLatticeType == "softbody")
-				{
-					const char* cBodyCenter = latticeElem->Attribute("centerbody");
-					if(cBodyCenter && mBodyNames.count(cBodyCenter))
-					{
-						//Override default mesh size if we've provided one
-						
-						SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
-						manim->addBody(mBodyNames[cBodyCenter], true);
-						manim->size = o->meshSize;
-						for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
-						{
-							if(i->first != cBodyCenter)
-								manim->addBody(i->second);
-						}
-						manim->init();
-						o->meshAnim = manim;
-						//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
-					}
-				}
-				else if(sLatticeType == "sin")
-				{
-					SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
-					
-					latticeElem->QueryFloatAttribute("amp", &manim->amp);
-					latticeElem->QueryFloatAttribute("freq", &manim->freq);
-					latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
-					
-					manim->init();
-					o->meshAnim = manim;
-				}
-				else if(sLatticeType == "wobble")
-				{
-					WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
-					
-					latticeElem->QueryFloatAttribute("speed", &manim->speed);
-					latticeElem->QueryFloatAttribute("dist", &manim->startdist);
-					latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
-					latticeElem->QueryFloatAttribute("angle", &manim->startangle);
-					latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
-					latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
-					latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
-					
-					manim->init();
-					o->meshAnim = manim;
-				}
-				//else TODO
-			}
-			
-		}
-	}
-	
-	
-	
-	//------------------------------------------------------------------------
-	//Done
-	
-	delete doc;
-	o->lua = Lua;
-	return o;
-}
-
-//---------------------------------------------------------------------------------------------------------------------------
 // Load scene from XML
 //---------------------------------------------------------------------------------------------------------------------------
 void GameEngine::loadScene(string sXMLFilename)
@@ -559,11 +318,11 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(cVel != NULL)
 				vel = pointFromString(cVel);
 			
-			Object* o = objFromXML(cObjType, pos, vel);
+			Object* o = getResourceLoader()->objFromXML(cObjType, pos, vel);
 			
 			if(o != NULL)
 			{
-			
+				o->lua = Lua;	//TODO better Lua handling
 				if(cName != NULL)
 				{
 					string s = cName;
@@ -621,6 +380,7 @@ void GameEngine::loadScene(string sXMLFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Load Box2D fixture from XML
 //---------------------------------------------------------------------------------------------------------------------------
+//TODO: Remove since it exists in ResourceLoader
 void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
 	b2FixtureDef fixtureDef;
