@@ -2,7 +2,6 @@
 #include "ParticleSystemManager.h"
 #include "ResourceLoader.h"
 #include "NodeManager.h"
-#include "globaldefs.h"	//TODO Remove
 #include "Object.h"
 #include "ObjectManager.h"
 #include "SceneryManager.h"

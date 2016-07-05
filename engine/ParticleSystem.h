@@ -4,14 +4,14 @@
 */
 #pragma once
 
-#include "globaldefs.h"
 #include "Image.h"
 #include "Drawable.h"
 #include "luafuncs.h"
 #include "luainterface.h"
 #include "Subject.h"
-
-#pragma once
+#include "Rect.h"
+#include <vector>
+using namespace std;
 
 extern float g_fParticleFac;
 

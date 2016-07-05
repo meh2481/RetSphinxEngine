@@ -5,11 +5,15 @@
 
 #pragma once
 
-#include "globaldefs.h"
 #include "Mesh3D.h"
 #include "Drawable.h"
 #include "LuaInterface.h"
 #include "luafuncs.h"
+#include "Rect.h"
+#include <vector>
+#include <string>
+#include <map>
+using namespace std;
 
 class Object;
 class ObjSegment;

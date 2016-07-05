@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include "tinyxml2.h"
-#include "globaldefs.h" //TODO Remove
+#include "Rect.h"
 using namespace std;
 
 class Image;

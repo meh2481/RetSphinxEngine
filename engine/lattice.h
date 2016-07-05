@@ -1,6 +1,8 @@
 #pragma once
 
-#include "globaldefs.h"
+#include <list>
+#include "Box2D/Box2D.h"
+#include "Rect.h"
 
 #define NUMLATTICEPOINTS(x)		x*12
 
@@ -32,9 +34,6 @@ public:
 	void renderDebug();
 	void bind();
 	void reset(float sx = 1.0f, float sy = 1.0f);
-	
-	//Vec2 getVertex(uint32 x, uint32 y);
-	//void setVertex(uint32 x, uint32 y);
 };
 
 class LatticeAnim

@@ -1,7 +1,6 @@
 #include "luainterface.h"
 #include "luadefines.h"
 #include "luafuncs.h"
-#include "globaldefs.h"
 #include "easylogging++.h"
 
 #include <assert.h>

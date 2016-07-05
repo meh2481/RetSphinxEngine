@@ -1,6 +1,6 @@
 #include "Color.h"
 #include <sstream>
-#include "globaldefs.h"	//TODO ony parsing
+#include "Parse.h"
 
 Color::Color()
 {

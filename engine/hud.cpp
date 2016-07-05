@@ -3,8 +3,8 @@
  Copyright (c) 2014 Mark Hutcheson
 */
 
-#include "hud.h"
-//#include "GameEngine.h"
+#include "HUD.h"
+#include "Parse.h"
 #include <sstream>
 
 #include "tinyxml2.h"

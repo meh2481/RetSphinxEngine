@@ -4,7 +4,6 @@
 */
 #pragma once
 
-#include "globaldefs.h"
 #include "lattice.h"
 
 class Image

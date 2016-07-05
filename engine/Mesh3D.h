@@ -3,8 +3,8 @@
  Copyright (c) 2013 Mark Hutcheson
 */
 #pragma once
-
-#include "globaldefs.h"
+#include <string>
+using namespace std;
 
 #define NO_TEXTURE 	"image_none"	//Invalid image
 #define NO_MESH		"mesh_none"		//Invalid 3D mesh

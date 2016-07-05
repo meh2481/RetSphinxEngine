@@ -26,8 +26,6 @@ MouseCursor.h
 engine_gl.cpp
 engine_sound.cpp
 engine_window.cpp
-globaldefs.cpp
-globaldefs.h
 HUD.cpp
 HUD.h
 Lattice.cpp
@@ -41,8 +39,12 @@ mtrand.h
 opengl-api.cpp
 opengl-api.h
 opengl-stubs.h
+Parse.cpp
+Parse.h
 ParticleSystem.cpp
 ParticleSystem.h
+Rect.cpp
+Rect.h
 simplexnoise1234.cpp
 simplexnoise1234.h
 tiny3d.h

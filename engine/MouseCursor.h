@@ -5,8 +5,7 @@
 */
 
 #pragma once
-
-#include "globaldefs.h"
+#include "Rect.h"
 
 class Image;
  

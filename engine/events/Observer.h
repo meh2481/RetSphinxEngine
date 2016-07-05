@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "globaldefs.h"
+#include "Rect.h"
+using namespace std;
 
 
 class Observer

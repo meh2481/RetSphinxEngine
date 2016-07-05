@@ -1,6 +1,6 @@
 #pragma once
 #include <list>
-#include "globaldefs.h"	//TODO Remove
+#include "Rect.h"
 #include "glmx.h"
 using namespace std;
 

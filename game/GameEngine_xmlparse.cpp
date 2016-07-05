@@ -63,13 +63,13 @@ bool GameEngine::loadConfig(string sFilename)
 //		window->QueryBoolAttribute("textureantialias", &bTexAntialias);
 		window->QueryFloatAttribute("brightness", &fGamma);
 		window->QueryBoolAttribute("pauseminimized", &bPausesOnFocus);
-		
-		const char* cWindowPos = window->Attribute("pos");
-		if(cWindowPos != NULL)
-		{
-			Vec2 pos = pointFromString(cWindowPos);
+
+		Vec2 pos(0, 0);
+		window->QueryFloatAttribute("posx", &pos.x);
+		window->QueryFloatAttribute("posy", &pos.y);
+		if(pos.x || pos.y)
 			setWindowPos(pos);
-		}
+
 		setFullscreen(bFullscreen);
 		changeScreenResolution((float)width, (float)height);
 		if(bMaximized && !isMaximized() && !bFullscreen)
@@ -158,7 +158,8 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("height", getHeight());
 	window->SetAttribute("fullscreen", isFullscreen());
 	window->SetAttribute("maximized", isMaximized());
-	window->SetAttribute("pos", pointToString(getWindowPos()).c_str());
+	window->SetAttribute("posx", getWindowPos().x);
+	window->SetAttribute("posy", getWindowPos().y);
 	window->SetAttribute("fps", getFramerate());
 	window->SetAttribute("vsync", getVsync());
 	window->SetAttribute("doublebuf", getDoubleBuffered());

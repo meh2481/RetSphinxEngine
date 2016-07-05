@@ -3,6 +3,8 @@
 #include "Box2D/Dynamics/b2WorldCallbacks.h"
 #include "Object.h"
 #include "Node.h"
+#include <set>
+using namespace std;
 
 typedef struct {
 	Object* objA;

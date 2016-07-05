@@ -4,9 +4,13 @@
 */
 #pragma once
 
-#include "globaldefs.h"
 #include "tinyxml2.h"
 #include "Color.h"
+#include "Rect.h"
+#include "SDL.h"
+#include <list>
+#include <map>
+using namespace std;
 
 class Image;
 class Text;

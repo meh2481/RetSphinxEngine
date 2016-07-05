@@ -5,8 +5,10 @@
 */
 #pragma once
 
-#include "globaldefs.h"
 #include "Drawable.h"
+#include "Rect.h"
+#include <string>
+using namespace std;
 
 class Image;
 

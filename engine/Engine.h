@@ -4,7 +4,6 @@
 */
 #pragma once
 
-#include "globaldefs.h"
 #include "Object.h"
 #include "Text.h"
 #include "HUD.h"

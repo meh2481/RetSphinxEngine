@@ -1,6 +1,5 @@
 #pragma once
 
-#include "globaldefs.h"
 #include "Color.h"
 #include <map>
 
