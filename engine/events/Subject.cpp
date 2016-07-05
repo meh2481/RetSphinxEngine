@@ -17,7 +17,7 @@ void Subject::removeObserver(Observer * o)
 	}
 }
 
-void Subject::notify(string sMsg, Point pos)
+void Subject::notify(string sMsg, Vec2 pos)
 {
 	for(list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
 	{

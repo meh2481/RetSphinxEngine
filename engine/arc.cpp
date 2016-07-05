@@ -45,7 +45,7 @@ void Arc::draw()
 	float fSegWidth = fDistance / (float)(numSegments-1);
     for(int i = 0; i < int(numSegments)-1; i++)
     {
-      Point ul, ur, bl, br;
+      Vec2 ul, ur, bl, br;
       ul.x = bl.x = (float)i*fSegWidth;
       ur.x = br.x = bl.x + fSegWidth;
       ul.y = segmentPos[i];

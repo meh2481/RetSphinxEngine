@@ -62,10 +62,10 @@ Node* NodeManager::getNode(string sNodeName)
 //	return NULL;
 //}
 
-Node* NodeManager::getNode(Point p)
+Node* NodeManager::getNode(Vec2 p)
 {
 	Node* closest = NULL;
-	Point closestPt;
+	Vec2 closestPt;
 	for(map<string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
 	{
 		float distClosest = glm::length(p - closestPt);

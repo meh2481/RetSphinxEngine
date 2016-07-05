@@ -19,9 +19,9 @@ public:
 	MouseCursor();
 	~MouseCursor();
 	
-	Point pos;
-	Point size;
-	Point hotSpot;
+	Vec2 pos;
+	Vec2 size;
+	Vec2 hotSpot;
 	Image* img;
 	float rot;
 	

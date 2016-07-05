@@ -122,7 +122,7 @@ void ParticleSystem::_newParticle()
 	}
 	else
 		m_imgRect[num] = imgRect[Random::random(imgRect.size()-1)];
-	m_pos[num] = Point(Random::randomFloat(emitFrom.left, emitFrom.right),
+	m_pos[num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right),
 						 Random::randomFloat(emitFrom.top, emitFrom.bottom));
 	float sizediff = Random::randomFloat(-sizeVar,sizeVar);
 	m_sizeStart[num].x = sizeStart.x + sizediff;
@@ -218,13 +218,13 @@ void ParticleSystem::_rmParticle(const unsigned idx)
 
 void ParticleSystem::_initValues()
 {
-	sizeStart = Point(1,1);
-	sizeEnd = Point(1,1);
+	sizeStart = Vec2(1,1);
+	sizeEnd = Vec2(1,1);
 	sizeVar = 0;
 	speed = 0.0;
 	speedVar = 0.0;
-	accel = Point(0,0);
-	accelVar = Point(0,0);
+	accel = Vec2(0,0);
+	accelVar = Vec2(0,0);
 	rotStart = 0.0;
 	rotStartVar = 0.0;
 	rotVel = 0.0;
@@ -291,8 +291,8 @@ void ParticleSystem::update(float dt)
 	}
 	
 	//Update particle fields (In separate for loops to cut down on cache thrashing)
-	Point* ptPos = m_pos;
-	Point* ptVel = m_vel;
+	Vec2* ptPos = m_pos;
+	Vec2* ptVel = m_vel;
 	for(unsigned int i = 0; i < m_num; i++, ptPos++, ptVel++)
 	{
 		ptPos->x += ptVel->x * dt;
@@ -300,7 +300,7 @@ void ParticleSystem::update(float dt)
 	}
 	
 	ptVel = m_vel;
-	Point* ptAccel = m_accel;
+	Vec2* ptAccel = m_accel;
 	float* normAccel = m_normalAccel;
 	float* tanAccel = m_tangentialAccel;
 	for(unsigned int i = 0; i < m_num; i++, ptVel++, ptAccel++, normAccel++, tanAccel++)
@@ -310,14 +310,14 @@ void ParticleSystem::update(float dt)
 		
 		if(*normAccel)
 		{
-			Point ptNorm = glm::normalize(m_pos[i] - emitFrom.center());
+			Vec2 ptNorm = glm::normalize(m_pos[i] - emitFrom.center());
 			ptNorm *= *normAccel * dt;
 			*ptVel += ptNorm;
 		}
 		if(*tanAccel)
 		{
-			Point ptTemp = glm::normalize(m_pos[i] - emitFrom.center());
-			Point ptTan(-ptTemp.y, ptTemp.x);	//Tangent vector is just rotated 90 degrees
+			Vec2 ptTemp = glm::normalize(m_pos[i] - emitFrom.center());
+			Vec2 ptTan(-ptTemp.y, ptTemp.x);	//Tangent vector is just rotated 90 degrees
 			ptTan *= *tanAccel * dt;
 			*ptVel += ptTan;
 		}
@@ -373,7 +373,7 @@ void ParticleSystem::draw()
 		if(curTime - m_created[i] <= m_lifePreFade[i])	//Particle hasn't started fading yet
 			fLifeFac = 0.0f;
 		Color drawcol;
-		Point drawsz;
+		Vec2 drawsz;
 		if(changeColor)	//If we should fade color, do so
 		{
 			drawcol.r = (m_colEnd[i].r - m_colStart[i].r) * fLifeFac + m_colStart[i].r;
@@ -415,11 +415,11 @@ void ParticleSystem::init()
 	if(!m_totalAmt) return;
 	
 	m_imgRect = new Rect[m_totalAmt];
-	m_pos = new Point[m_totalAmt];
-	m_sizeStart = new Point[m_totalAmt];
-	m_sizeEnd = new Point[m_totalAmt];
-	m_vel = new Point[m_totalAmt];
-	m_accel = new Point[m_totalAmt];
+	m_pos = new Vec2[m_totalAmt];
+	m_sizeStart = new Vec2[m_totalAmt];
+	m_sizeEnd = new Vec2[m_totalAmt];
+	m_vel = new Vec2[m_totalAmt];
+	m_accel = new Vec2[m_totalAmt];
 	m_rot = new float[m_totalAmt];
 	m_rotVel = new float[m_totalAmt];
 	m_rotAccel = new float[m_totalAmt];

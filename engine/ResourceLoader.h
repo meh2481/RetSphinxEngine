@@ -40,5 +40,5 @@ public:
 	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);
 
-	Object* objFromXML(string sType, Point ptOffset, Point ptVel);
+	Object* objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel);
 };

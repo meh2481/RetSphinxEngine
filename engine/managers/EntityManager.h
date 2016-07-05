@@ -36,13 +36,13 @@ public:
 
 	//Node functions
 	void add(Node* n);
-	Node* getNode(Point pos);
+	Node* getNode(Vec2 pos);
 	Node* getNode(string sNodeName);
 
 	//Object funtions
 	void add(Object* o);
-	Object* getObject(Point p);
-	Object* getClosestObject(Point p);
+	Object* getObject(Vec2 p);
+	Object* getClosestObject(Vec2 p);
 
 	//Scenery functions
 	void add(ObjSegment* o);

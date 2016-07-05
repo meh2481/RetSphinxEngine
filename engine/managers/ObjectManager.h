@@ -24,7 +24,7 @@ public:
 	void update(float dt);
 
 	//TODO What are the differences between these two? Why do we need two?
-	Object* get(Point p);	//Get first object at this point
-	Object* getClosest(Point p);	//Get closest object to this point
+	Object* get(Vec2 p);	//Get first object at this point
+	Object* getClosest(Vec2 p);	//Get closest object to this point
 
 };

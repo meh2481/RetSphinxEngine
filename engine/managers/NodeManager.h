@@ -18,7 +18,7 @@ public:
 	void update(float dt);
 	void cleanup();
 	Node* getNode(string sNodeName);
-	Node* getNode(Point p);
+	Node* getNode(Vec2 p);
 
 
 };

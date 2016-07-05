@@ -31,11 +31,11 @@ class ParticleSystem
 	//Should not directly set or modify these
 	//Arrays of particle fields (structure-of-array format rather than array-of structure for speed)
 	Rect* 		m_imgRect;			//Rectangle of the image to draw
-	Point* 		m_pos;				//Position, in 2D space, of particle
-	Point* 		m_sizeStart;		//Size at start of particle's life
-	Point* 		m_sizeEnd;			//Size at end of particle's life
-	Point* 		m_vel;				//Linear velocity
-	Point* 		m_accel;			//Linear acceleration
+	Vec2* 		m_pos;				//Position, in 2D space, of particle
+	Vec2* 		m_sizeStart;		//Size at start of particle's life
+	Vec2* 		m_sizeEnd;			//Size at end of particle's life
+	Vec2* 		m_vel;				//Linear velocity
+	Vec2* 		m_accel;			//Linear acceleration
 	float* 	m_rot;				//Angle to draw image at
 	float* 	m_rotVel;			//Rotational velocity (spinning speed of image)
 	float* 	m_rotAccel;			//Rotational acceleration (if spinning speed increases or decreases)
@@ -73,13 +73,13 @@ public:
 	~ParticleSystem();
 	
 	//Variables used to determine starting values for each particle
-	Point			sizeStart;			//Drawing size on particle spawn
-	Point			sizeEnd;			//Drawing size at end of particle life
+	Vec2			sizeStart;			//Drawing size on particle spawn
+	Vec2			sizeEnd;			//Drawing size at end of particle life
 	float			sizeVar;			//Random variation in particle size
 	float			speed;				//Speed at which particles are initially launched along emissionAngle
 	float			speedVar;
-	Point			accel;				//Linear acceleration
-	Point			accelVar;
+	Vec2			accel;				//Linear acceleration
+	Vec2			accelVar;
 	float			rotStart;			//Starting angle
 	float			rotStartVar;
 	float 		rotVel;				//Starting rotational velocity
@@ -116,7 +116,7 @@ public:
 	bool				velRotate;			//If these particles should rotate according to their velocity
 	bool				changeColor;		//If these particles change color as they update, or just alpha
 	vector<string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
-	Point				emissionVel;		//Move the emission point every frame
+	Vec2				emissionVel;		//Move the emission point every frame
 	bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
 	
 	void update(float dt);

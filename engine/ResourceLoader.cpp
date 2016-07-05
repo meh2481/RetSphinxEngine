@@ -77,7 +77,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	const char* emfrom = root->Attribute("emitfrom");
 	if(emfrom != NULL)
-		ps->emitFrom = rectFromString(emfrom);
+		ps->emitFrom.fromString(emfrom);
 	const char* emfromvel = root->Attribute("emitfromvel");
 	if(emfromvel != NULL)
 		ps->emissionVel = pointFromString(emfromvel);
@@ -119,7 +119,8 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 					const char* cVal = rect->Attribute("val");
 					if(cVal != NULL)
 					{
-						Rect rc = rectFromString(cVal);
+						Rect rc;
+						rc.fromString(cVal);
 						ps->imgRect.push_back(rc);
 					}
 				}
@@ -308,7 +309,7 @@ ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 	return seg;
 }
 
-Object* ResourceLoader::objFromXML(string sType, Point ptOffset, Point ptVel)
+Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 {
 	ostringstream oss;
 	oss << "res/obj/" << sType << ".xml";
@@ -361,11 +362,11 @@ Object* ResourceLoader::objFromXML(string sType, Point ptOffset, Point ptVel)
 			if(cBodyName)
 				sBodyName = cBodyName;
 
-			Point pos = ptOffset;
+			Vec2 pos = ptOffset;
 			const char* cBodyPos = body->Attribute("pos");
 			if(cBodyPos)
 			{
-				Point p = pointFromString(cBodyPos);
+				Vec2 p = pointFromString(cBodyPos);
 				pos.x += p.x;
 				pos.y += p.y;
 			}
@@ -436,12 +437,12 @@ Object* ResourceLoader::objFromXML(string sType, Point ptOffset, Point ptVel)
 				jd.localAnchorB.Set(0, 0);
 				if(cAnchorA)
 				{
-					Point p = pointFromString(cAnchorA);
+					Vec2 p = pointFromString(cAnchorA);
 					jd.localAnchorA = b2Vec2(p.x, p.y);
 				}
 				if(cAnchorB)
 				{
-					Point p = pointFromString(cAnchorB);
+					Vec2 p = pointFromString(cAnchorB);
 					jd.localAnchorB = b2Vec2(p.x, p.y);
 				}
 
@@ -466,7 +467,7 @@ Object* ResourceLoader::objFromXML(string sType, Point ptOffset, Point ptVel)
 		const char* cMeshImgSize = latticeElem->Attribute("size");
 
 		//Default lattice resolution = 10, 10
-		Point pMeshSize(10, 10);
+		Vec2 pMeshSize(10, 10);
 
 		if(cMeshImg && cMeshImgSize)
 		{
@@ -550,7 +551,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 	b2CircleShape dynamicCircle;
 	b2ChainShape dynamicChain;
 
-	Point pos;
+	Vec2 pos;
 
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
@@ -569,7 +570,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		}
 
 		//Get position (center of box)
-		Point p(0, 0);
+		Vec2 p(0, 0);
 		const char* cPos = fixture->Attribute("pos");
 		if(cPos)
 		{
@@ -584,7 +585,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		bool bHollow = false;
 		fixture->QueryBoolAttribute("hollow", &bHollow);
 
-		Point pBoxSize = pointFromString(cBoxSize);
+		Vec2 pBoxSize = pointFromString(cBoxSize);
 		if(bHollow)
 		{
 			//Create hollow box

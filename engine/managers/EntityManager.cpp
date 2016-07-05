@@ -60,7 +60,7 @@ void EntityManager::add(Node * n)
 	nodeManager->add(n);
 }
 
-Node* EntityManager::getNode(Point pos)
+Node* EntityManager::getNode(Vec2 pos)
 {
 	return nodeManager->getNode(pos);
 }
@@ -76,12 +76,12 @@ void EntityManager::add(Object * o)
 	objectManager->add(o);
 }
 
-Object* EntityManager::getObject(Point p)
+Object* EntityManager::getObject(Vec2 p)
 {
 	return objectManager->get(p);
 }
 
-Object* EntityManager::getClosestObject(Point p)
+Object* EntityManager::getClosestObject(Vec2 p)
 {
 	return objectManager->getClosest(p);
 }

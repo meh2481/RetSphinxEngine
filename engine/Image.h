@@ -48,9 +48,9 @@ public:
 	//bool reloadEachTime()	{return m_bReloadEachTime;};
 	
 	//Drawing methods for texel-based coordinates
-	void render(Point size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
-	void renderLattice(Lattice* l, Point size);	//Render at 0,0 with specified lattice
-	void render(Point size, Rect rcImg);
-	void render4V(Point ul, Point ur, Point bl, Point br);
+	void render(Vec2 size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
+	void renderLattice(Lattice* l, Vec2 size);	//Render at 0,0 with specified lattice
+	void render(Vec2 size, Rect rcImg);
+	void render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br);
 };
 

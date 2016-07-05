@@ -6,6 +6,7 @@
 
 #include "globaldefs.h"
 #include "tinyxml2.h"
+#include "Color.h"
 
 class Image;
 class Text;
@@ -22,7 +23,7 @@ private:
 protected:
 	string		  m_sName;
 	string		  m_sSignal;  //What signal this generates
-	Point		   m_ptPos;
+	Vec2		   m_ptPos;
 	list<HUDItem*>  m_lChildren;
 	void (*m_signalHandler)(string);	//Function for handling signals this class creates
 
@@ -41,8 +42,8 @@ public:
 	//Accessor methods
 	string		  getName()				   {return m_sName;};
 	void			setName(string sName)	   {m_sName = sName;};
-	Point		   getPos()					{return m_ptPos;};
-	void			setPos(Point ptPos)		 {m_ptPos = ptPos;};
+	Vec2		   getPos()					{return m_ptPos;};
+	void			setPos(Vec2 ptPos)		 {m_ptPos = ptPos;};
 	void			setSignal(string sSignal)   {m_sSignal = sSignal;};
 	string		  getSignal()				 {return m_sSignal;};
 	void			setSignalHandler(void (*signalHandler)(string));
@@ -56,7 +57,7 @@ protected:
 	Image* m_img;
 
 public:
-	Point pos, size;
+	Vec2 pos, size;
 	
 	HUDImage(string sName);
 	~HUDImage();

@@ -335,105 +335,26 @@ bool HUDMenu::event(SDL_Event event)
 	if(hidden) return false;
 	bool bRet = HUDItem::event(event);
 	
-	switch(event.type)
-	{
-		case SDL_KEYDOWN:
-			if(event.key.keysym.scancode == KEY_UP1 || event.key.keysym.scancode == KEY_UP2)
-			{
-				_moveUp();
-				bRet = true;
-			}
-			else if(event.key.keysym.scancode == KEY_DOWN1 || event.key.keysym.scancode == KEY_DOWN2)
-			{
-				_moveDown();
-				bRet = true;
-			}
-			else if(event.key.keysym.scancode == KEY_ENTER1 || event.key.keysym.scancode == KEY_ENTER2)
-			{
-				_enter();
-				bRet = true;
-			}
-			break;
-		
-		case SDL_MOUSEBUTTONDOWN:
-			if(m_selected != m_menu.end() && event.button.button == SDL_BUTTON_LEFT)
-			{
-				_enter();
-				bRet = true;
-			}
-			break;
-			
-		case SDL_MOUSEMOTION:
-		{
-			Point ptMousePos(0,0);//g_pGlobalEngine->worldPosFromCursor(Point(event.motion.x, event.motion.y));	//TODO: Engine should not depend on GameEngine!!!
-			float fTotalY = m_menu.size() * pt + (m_menu.size()-1) * vspacing;
-			float fCurY = m_ptPos.y + fTotalY/2.0f;
-			for(list<menuItem>::iterator i = m_menu.begin(); i != m_menu.end(); i++)
-			{
-				float fWidth = m_txtFont->size(i->text, pt);
-				Rect rcTest(m_ptPos.x - fWidth/2.0f, fCurY + pt/2.0f, m_ptPos.x + fWidth/2.0f, fCurY - pt/2.0f);
-				if(rcTest.inside(ptMousePos))
-				{
-					if(i != m_selected && selectsignal.size())
-						m_signalHandler(selectsignal);
-					m_selected = i;
-					bRet = true;
-					break;
-				}
-				fCurY -= pt + vspacing;
-			}
-			break;
-		}
-		
-		case SDL_JOYBUTTONDOWN:
-			if(event.jbutton.button == JOY_BUTTON_A)
-			{
-				_enter();
-				bRet = true;
-			}
-			break;
-			
-		case SDL_JOYAXISMOTION:
-			if(event.jaxis.axis == JOY_AXIS_VERT)	//Vertical axis
-			{
-				if(event.jaxis.value < -JOY_AXIS_TRIP)	//Up
-				{
-					if(!bJoyMoved)
-					{
-						_moveUp();
-						bRet = true;
-					}
-					bJoyMoved = true;
-				}
-				else if(event.jaxis.value > JOY_AXIS_TRIP)	//Down
-				{
-					if(!bJoyMoved)
-					{
-						_moveDown();
-						bRet = true;
-					}
-					bJoyMoved = true;
-				}
-				else
-					bJoyMoved = false;
-			}
-			break;
-			
-		case SDL_JOYHATMOTION:
-			switch(event.jhat.value)
-			{
-				case SDL_HAT_UP:
-					_moveUp();
-					bRet = true;
-					break;
-					
-				case SDL_HAT_DOWN:
-					_moveDown();
-					bRet = true;
-					break;
-			}
-			break;
-	}
+	//switch(event.type)
+	//{
+	//	case SDL_KEYDOWN:
+	//		break;
+	//	
+	//	case SDL_MOUSEBUTTONDOWN:
+	//		break;
+	//		
+	//	case SDL_MOUSEMOTION:
+	//		break;
+	//	
+	//	case SDL_JOYBUTTONDOWN:
+	//		break;
+	//		
+	//	case SDL_JOYAXISMOTION:
+	//		break;
+	//		
+	//	case SDL_JOYHATMOTION:
+	//		break;
+	//}
 	return bRet;
 }
 
@@ -576,7 +497,7 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
         const char* cPosi = elem->Attribute("pos");
         if(cPosi != NULL)
         {
-            Point ptPos = pointFromString(cPosi);
+            Vec2 ptPos = pointFromString(cPosi);
             tog->setPos(ptPos);
         }
         const char* cSig = elem->Attribute("signal");

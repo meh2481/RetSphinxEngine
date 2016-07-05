@@ -33,7 +33,7 @@ public:
 	void bind();
 	void reset(float sx = 1.0f, float sy = 1.0f);
 	
-	//Point getVertex(uint32 x, uint32 y);
+	//Vec2 getVertex(uint32 x, uint32 y);
 	//void setVertex(uint32 x, uint32 y);
 };
 
@@ -98,7 +98,7 @@ public:
 struct BodyPos
 {
 	b2Body* b;			//Body
-	Point pos;			//Starting body pos
+	Vec2 pos;			//Starting body pos
 	
 	
 	//float angle;		//Starting angle
@@ -112,18 +112,18 @@ protected:
 	list<BodyPos> bodies;
 	BodyPos center;
 	
-	Point getCenter();
+	Vec2 getCenter();
 	void setEffect();
-	Point relOffset(b2Body* b);	//returns angle, dist relative to center body
-	Point distMoved(BodyPos* bp);	//returns angle, dist that the body has moved relative to starting pos
-	Point getVertex(LatticeVert* v);	//Get vertex in box2d coordinates
-	void setVertex(Point p, LatticeVert* v);	//Set vertex position from box2d coordinates
+	Vec2 relOffset(b2Body* b);	//returns angle, dist relative to center body
+	Vec2 distMoved(BodyPos* bp);	//returns angle, dist that the body has moved relative to starting pos
+	Vec2 getVertex(LatticeVert* v);	//Get vertex in box2d coordinates
+	void setVertex(Vec2 p, LatticeVert* v);	//Set vertex position from box2d coordinates
 	
 public:
 	SoftBodyAnim(Lattice* l);
 	~SoftBodyAnim();
 	
-	Point size;
+	Vec2 size;
 	
 	void init();
 	void update(float dt);

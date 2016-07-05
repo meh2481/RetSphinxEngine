@@ -6,6 +6,10 @@
 #include "EntityManager.h"
 #include "ParticleSystem.h"
 
+//Defined by SDL
+#define JOY_AXIS_MIN	-32768
+#define JOY_AXIS_MAX	32767
+
 extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
 
 //-----------------------------------------------------------------------------------------------------------
@@ -20,13 +24,13 @@ public:
 		g_pGlobalEngine->rumbleController(fAmt, len, priority);
 	}
 	
-	static void camera_centerOnXY(Point pt)
+	static void camera_centerOnXY(Vec2 pt)
 	{
 		g_pGlobalEngine->CameraPos.x = -pt.x;
 		g_pGlobalEngine->CameraPos.y = -pt.y;
 	}
 	
-	static Object* xmlParseObj(string sClassName, Point ptOffset = Point(0,0), Point ptVel = Point(0,0))
+	static Object* xmlParseObj(string sClassName, Vec2 ptOffset = Vec2(0,0), Vec2 ptVel = Vec2(0,0))
 	{
 		Object* o = g_pGlobalEngine->getResourceLoader()->objFromXML(sClassName, ptOffset, ptVel);
 		if(o)
@@ -74,7 +78,7 @@ public:
 		return 0;
 	}
 	
-	static Point getMousePos()
+	static Vec2 getMousePos()
 	{
 		return g_pGlobalEngine->getCursorPos();
 	}
@@ -84,7 +88,7 @@ public:
 		return g_pGlobalEngine->getCursorDown(button);
 	}
 	
-	static Point getWorldMousePos(Point p)
+	static Vec2 getWorldMousePos(Vec2 p)
 	{
 		return g_pGlobalEngine->worldPosFromCursor(p, g_pGlobalEngine->CameraPos);
 	}
@@ -106,12 +110,12 @@ public:
 		return g_pGlobalEngine->getFramerate();
 	}
 	
-	static Object* getObjAtPoint(Point p)
+	static Object* getObjAtPoint(Vec2 p)
 	{
 		return g_pGlobalEngine->getEntityManager()->getObject(p);
 	}
 	
-	static Node* getNodeAtPoint(Point p)
+	static Node* getNodeAtPoint(Vec2 p)
 	{
 		return g_pGlobalEngine->getEntityManager()->getNode(p);
 	}
@@ -126,7 +130,7 @@ public:
 		return g_pGlobalEngine->getEntityManager()->getNode(sNodeName);
 	}
 	
-	static Object* getClosestObject(Point p)
+	static Object* getClosestObject(Vec2 p)
 	{
 		return g_pGlobalEngine->getEntityManager()->getClosestObject(p);
 	}
@@ -259,7 +263,7 @@ luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
 {
 	Object *o = getObj<Object>(L);
-	Point p(lua_tonumber(L,2), lua_tonumber(L,3));
+	Vec2 p(lua_tonumber(L,2), lua_tonumber(L,3));
 	if(o)
 		o->setPosition(p);
 	luaReturnNil();
@@ -269,8 +273,8 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 {
 	if(!lua_isstring(L,1)) luaReturnNil();
 	
-	Point ptPos(0,0);
-	Point ptVel(0,0);
+	Vec2 ptPos(0,0);
+	Vec2 ptVel(0,0);
 	if(lua_isnumber(L, 2))
 		ptPos.x = (float)lua_tonumber(L, 2);
 	if(lua_isnumber(L, 3))
@@ -306,7 +310,7 @@ luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
 
 luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 {
-	Point p(lua_tonumber(L,1), lua_tonumber(L,2));
+	Vec2 p(lua_tonumber(L,1), lua_tonumber(L,2));
 	Object* o = GameEngineLua::getObjAtPoint(p);
 	if(o == NULL)
 		luaReturnNil();
@@ -355,7 +359,7 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(camera_centerOnXY)	//camera_centerOnXY(float x, float y)
 {
-	Point pt(lua_tonumber(L, 1), lua_tonumber(L, 2));
+	Vec2 pt(lua_tonumber(L, 1), lua_tonumber(L, 2));
 	GameEngineLua::camera_centerOnXY(pt);
 	luaReturnNil();
 }
@@ -374,7 +378,7 @@ luaFunc(node_getProperty)	//string node_getProperty(Node* n, string propName)
 
 luaFunc(node_getVec2Property)	//float x, float y node_getVec2Property(Node* n, string propName)
 {
-	Point pt(0,0);
+	Vec2 pt(0,0);
 	Node* n = getObj<Node>(L);
 	if(n)
 		pt = pointFromString(n->getProperty(lua_tostring(L, 2)));
@@ -383,7 +387,7 @@ luaFunc(node_getVec2Property)	//float x, float y node_getVec2Property(Node* n, s
 
 luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 {
-	Point pos(0,0);
+	Vec2 pos(0,0);
 	Node* n = getObj<Node>(L);
 	if(n)
 		pos = n->pos;
@@ -450,7 +454,7 @@ luaFunc(node_isInside) //bool node_isInside(Node* n, float x, float y)
 	Node* n = getObj<Node>(L);
 	if(n)
 	{
-		Node* test = GameEngineLua::getNodeAtPoint(Point(lua_tonumber(L, 2), lua_tonumber(L, 3)));
+		Node* test = GameEngineLua::getNodeAtPoint(Vec2(lua_tonumber(L, 2), lua_tonumber(L, 3)));
 		if(test && test == n)
 			bInside = true;
 	}
@@ -490,7 +494,7 @@ luaFunc(particles_setEmitPos)	//void particles_setEmitPos(ParticleSystem* p, flo
 {
 	ParticleSystem* ps = getObj<ParticleSystem>(L);
 	if(ps)
-		ps->emitFrom.centerOn(Point((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3)));
+		ps->emitFrom.centerOn(Vec2((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3)));
 	luaReturnNil();
 }
 
@@ -525,7 +529,7 @@ luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 
 luaFunc(mouse_getPos) //int x, int y mouse_getPos()
 {
-	Point p = GameEngineLua::getMousePos();
+	Vec2 p = GameEngineLua::getMousePos();
 	luaReturnVec2(p.x, p.y);
 }
 
@@ -538,8 +542,8 @@ luaFunc(mouse_isDown) //bool mouse_isDown(int button)
 
 luaFunc(mouse_transformToWorld) // float x, float y mouse_transformToWorld(int x, int y)
 {
-	Point pMouse(lua_tointeger(L, 1), lua_tointeger(L, 2));
-	Point p = GameEngineLua::getWorldMousePos(pMouse);
+	Vec2 pMouse(lua_tointeger(L, 1), lua_tointeger(L, 2));
+	Vec2 p = GameEngineLua::getWorldMousePos(pMouse);
 	luaReturnVec2(p.x, p.y);
 }
 

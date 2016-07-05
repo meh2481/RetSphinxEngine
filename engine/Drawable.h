@@ -1,6 +1,5 @@
 #pragma once
-
-class Color;
+#include "Color.h"
 class Image;
 
 class Drawable

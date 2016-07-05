@@ -29,7 +29,7 @@ void MouseCursor::draw()
 {
 	if(img != NULL)
 	{
-		Point ptDrawPos = pos;
+		Vec2 ptDrawPos = pos;
 		ptDrawPos.x += size.x / 2.0f;
 		ptDrawPos.x -= hotSpot.x/(float)img->getWidth() * size.x;
 		ptDrawPos.y -= size.y / 2.0f;

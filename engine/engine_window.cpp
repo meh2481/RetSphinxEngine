@@ -116,9 +116,9 @@ bool Engine::isMaximized()
 #endif
 }
 
-Point Engine::getWindowPos()
+Vec2 Engine::getWindowPos()
 {
-	Point p;
+	Vec2 p;
 	int x, y;
 	SDL_GetWindowPosition(m_Window, &x, &y);
 	p.x = x;
@@ -127,7 +127,7 @@ Point Engine::getWindowPos()
 }
 
 //If we used to be fullscreen, and now we're not, we don't want to be in the upper-left corner.
-void Engine::setWindowPos(Point pos)
+void Engine::setWindowPos(Vec2 pos)
 {
 	if(pos.x > 0 && pos.y > 0)
 		SDL_SetWindowPosition(m_Window, pos.x, pos.y);

@@ -256,7 +256,7 @@ void Image::_loadNoise(string sXMLFilename)
 <fgenesis> also have a look at glOrtho() and glMatrixMode(), you'll need those
 */
 
-void Image::render(Point size, float tilex, float tiley)
+void Image::render(Vec2 size, float tilex, float tiley)
 {
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
@@ -281,7 +281,7 @@ void Image::render(Point size, float tilex, float tiley)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void Image::renderLattice(Lattice* l, Point size)
+void Image::renderLattice(Lattice* l, Vec2 size)
 {
 	glPushMatrix();
 	
@@ -291,7 +291,7 @@ void Image::renderLattice(Lattice* l, Point size)
 	glPopMatrix();
 }
 
-void Image::render(Point size, Rect rcImg)
+void Image::render(Vec2 size, Rect rcImg)
 {
 	rcImg.left = rcImg.left / (float)m_iWidth;
 	rcImg.right = rcImg.right / (float)m_iWidth;
@@ -320,7 +320,7 @@ void Image::render(Point size, Rect rcImg)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
 }
 
-void Image::render4V(Point ul, Point ur, Point bl, Point br)
+void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
 {
 	float maxx, maxy;
 #ifdef __BIG_ENDIAN__

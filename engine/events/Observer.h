@@ -6,5 +6,5 @@
 class Observer
 {
 public:
-	virtual void onNotify(string sMsg, Point pos) = 0;
+	virtual void onNotify(string sMsg, Vec2 pos) = 0;
 };

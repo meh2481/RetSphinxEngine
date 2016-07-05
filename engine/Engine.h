@@ -21,8 +21,13 @@ class EntityManager;
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
 
+//SDL codes that should be defined but aren't
 #define SDL_BUTTON_FORWARD	SDL_BUTTON_X2
 #define SDL_BUTTON_BACK		SDL_BUTTON_X1
+#define SDL_SCANCODE_CTRL	(SDL_NUM_SCANCODES)
+#define SDL_SCANCODE_SHIFT 	(SDL_NUM_SCANCODES+1)
+#define SDL_SCANCODE_ALT	(SDL_NUM_SCANCODES+2)
+#define SDL_SCANCODE_GUI	(SDL_NUM_SCANCODES+3)
 
 const float soundFreqDefault = 44100.0;
 
@@ -45,7 +50,7 @@ private:
 	DebugDraw m_debugDraw;
 	bool m_bDebugDraw;
 	bool m_bObjDebugDraw;
-	Point m_ptCursorPos;
+	Vec2 m_ptCursorPos;
 	bool  m_bShowCursor;
 	float m_fFramerate;
 	float m_fAccumulatedTime;
@@ -109,8 +114,8 @@ public:
 	void quit() {m_bQuitting = true;};  //Stop the engine and quit nicely
 	string getSaveLocation();		//Get good location to save config files/save files
 	Rect getCameraView(Vec3 Camera);		//Return the rectangle, in world position z=0, that the camera can see
-	Point worldPosFromCursor(Point cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
-	Point worldMovement(Point cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
+	Vec2 worldPosFromCursor(Vec2 cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
+	Vec2 worldMovement(Vec2 cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
 	
 	//Drawing functions
 	Rect getScreenRect()	{Rect rc(0,0,getWidth(),getHeight()); return rc;};
@@ -125,8 +130,8 @@ public:
 	void setInitialFullscreen() {SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);};
 	bool isFullscreen()	{return m_bFullscreen;};
 	bool isMaximized();	
-	Point getWindowPos();	//Get the window position
-	void setWindowPos(Point pos);	//Set window position
+	Vec2 getWindowPos();	//Get the window position
+	void setWindowPos(Vec2 pos);	//Set window position
 	void maximizeWindow();								//Call window manager to maximize application window
 	void pauseOnKeyboard(bool p)	{m_bPauseOnKeyboardFocus = p;};
 	bool pausesOnFocusLost()		{return m_bPauseOnKeyboardFocus;};
@@ -156,7 +161,7 @@ public:
 	
 	//Physics functions
 	b2Body* createBody(b2BodyDef* bdef);
-	void setGravity(Point ptGravity);
+	void setGravity(Vec2 ptGravity);
 	void setGravity(float x, float y);
 	void stepPhysics(float dt);	//Update our physics world and handle collisions
 	void setDebugDraw(bool b) {m_bDebugDraw = b;};
@@ -173,7 +178,7 @@ public:
 #endif
 	
 	//Mouse functions
-	Point getCursorPos()	{return m_ptCursorPos;};
+	Vec2 getCursorPos()	{return m_ptCursorPos;};
 	void setCursorPos(int32_t x, int32_t y);
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};

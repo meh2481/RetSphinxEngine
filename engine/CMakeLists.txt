@@ -1,6 +1,8 @@
 set(engine_src
 Mesh3D.cpp
 Mesh3D.h
+Color.cpp
+Color.h
 DebugDraw.cpp
 Drawable.h
 Engine.cpp

@@ -290,7 +290,7 @@ void WobbleLatticeAnim::setEffect()
 
 
 
-Point SoftBodyAnim::getCenter()
+Vec2 SoftBodyAnim::getCenter()
 {
 	b2Vec2 centroid(0,0);
 	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
@@ -303,13 +303,13 @@ Point SoftBodyAnim::getCenter()
 	centroid.x /= 2.0f;
 	centroid.y /= 2.0f;
 	
-	return Point(centroid.x, centroid.y);
+	return Vec2(centroid.x, centroid.y);
 }
 
 SoftBodyAnim::SoftBodyAnim(Lattice* l) : LatticeAnim(l)
 {
 	center.b = NULL;
-	size = Point(0, 0);
+	size = Vec2(0, 0);
 }
 
 SoftBodyAnim::~SoftBodyAnim()
@@ -328,22 +328,22 @@ void SoftBodyAnim::setEffect()
 	{
 		for(uint32 ix = 0; ix <= m_l->numx; ix++)
 		{
-			Point vertPos = getVertex(ptr);
+			Vec2 vertPos = getVertex(ptr);
 			
 			//Find total distance between this vertex and all bodies
 			float totalDist = 0.0;
 			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
-				Point dist = vertPos - i->pos;
+				Vec2 dist = vertPos - i->pos;
 				totalDist += glmx::lensqr(dist);
 			}
 			
 			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
-				Point pMoved = distMoved(&(*i));
+				Vec2 pMoved = distMoved(&(*i));
 				
 				//Distance between this vertex and this body, in resting position
-				Point diff = vertPos - i->pos;
+				Vec2 diff = vertPos - i->pos;
 				float distance = glmx::lensqr(diff);
 				
 				//Mul fac for moving this point
@@ -361,15 +361,15 @@ void SoftBodyAnim::setEffect()
 	m_l->bind();
 }
 
-Point SoftBodyAnim::relOffset(b2Body* b)
+Vec2 SoftBodyAnim::relOffset(b2Body* b)
 {
     b2Vec2 p = b->GetPosition();
-	return Point(p.x, p.y) - getCenter();
+	return Vec2(p.x, p.y) - getCenter();
 }
 
-Point SoftBodyAnim::distMoved(BodyPos* bp)
+Vec2 SoftBodyAnim::distMoved(BodyPos* bp)
 {
-	Point rel = relOffset(bp->b);
+	Vec2 rel = relOffset(bp->b);
 	rel = rel - bp->pos;
 	return rel;
 }
@@ -379,7 +379,7 @@ void SoftBodyAnim::init()
 	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		i->pos = relOffset(i->b);
     b2Vec2 p = center.b->GetPosition();
-	center.pos = Point(p.x, p.y);
+	center.pos = Vec2(p.x, p.y);
 }
 
 void SoftBodyAnim::update(float dt)
@@ -401,14 +401,14 @@ void SoftBodyAnim::addBody(b2Body* b, bool bCenter)
 	}
 }
 
-Point SoftBodyAnim::getVertex(LatticeVert* v)
+Vec2 SoftBodyAnim::getVertex(LatticeVert* v)
 {
-	Point p(v->x * size.x, v->y * size.y);
+	Vec2 p(v->x * size.x, v->y * size.y);
 	
 	return p + getCenter();
 }
 
-void SoftBodyAnim::setVertex(Point p, LatticeVert* v)
+void SoftBodyAnim::setVertex(Vec2 p, LatticeVert* v)
 {
 	p = p - getCenter();
 	

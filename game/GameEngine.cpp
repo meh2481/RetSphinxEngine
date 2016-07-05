@@ -13,35 +13,6 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 
-//Keybinding stuff!
-uint32_t JOY_BUTTON_BACK;
-uint32_t JOY_BUTTON_START;
-uint32_t JOY_BUTTON_X;
-uint32_t JOY_BUTTON_Y;
-uint32_t JOY_BUTTON_A;
-uint32_t JOY_BUTTON_B;
-uint32_t JOY_BUTTON_LB;
-uint32_t JOY_BUTTON_RB;
-uint32_t JOY_BUTTON_LSTICK;
-uint32_t JOY_BUTTON_RSTICK;
-uint32_t JOY_AXIS_HORIZ;
-uint32_t JOY_AXIS_VERT;
-uint32_t JOY_AXIS2_HORIZ;
-uint32_t JOY_AXIS2_VERT;
-uint32_t JOY_AXIS_LT;
-uint32_t JOY_AXIS_RT;
-int32_t JOY_AXIS_TRIP;
-SDL_Scancode KEY_UP1;
-SDL_Scancode KEY_UP2;
-SDL_Scancode KEY_DOWN1;
-SDL_Scancode KEY_DOWN2;
-SDL_Scancode KEY_LEFT1;
-SDL_Scancode KEY_LEFT2;
-SDL_Scancode KEY_RIGHT1;
-SDL_Scancode KEY_RIGHT2;
-SDL_Scancode KEY_ENTER1;
-SDL_Scancode KEY_ENTER2;
-
 //#define DEBUG_INPUT
 
 //For our engine functions to be able to call our Engine class functions

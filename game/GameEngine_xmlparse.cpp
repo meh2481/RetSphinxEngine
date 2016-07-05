@@ -67,7 +67,7 @@ bool GameEngine::loadConfig(string sFilename)
 		const char* cWindowPos = window->Attribute("pos");
 		if(cWindowPos != NULL)
 		{
-			Point pos = pointFromString(cWindowPos);
+			Vec2 pos = pointFromString(cWindowPos);
 			setWindowPos(pos);
 		}
 		setFullscreen(bFullscreen);
@@ -259,7 +259,7 @@ void GameEngine::loadScene(string sXMLFilename)
 		return;
 	}
 	
-	Point pGravity(0, -9.8);
+	Vec2 pGravity(0, -9.8);
 	const char* cGravity = root->Attribute("gravity");
 	if(cGravity)
 		pGravity = pointFromString(cGravity);
@@ -276,7 +276,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	if(cCamBounds != NULL)
 	{
 		//Save bounds for camera
-		rcSceneBounds = rectFromString(cCamBounds);
+		rcSceneBounds.fromString(cCamBounds);
 		
 		//Create boundary lines in physics
 		b2FixtureDef fixtureDef;
@@ -309,8 +309,8 @@ void GameEngine::loadScene(string sXMLFilename)
 		const char* cVel = object->Attribute("vel");
 		if(cObjType != NULL)
 		{
-			Point pos(0,0);
-			Point vel(0,0);
+			Vec2 pos(0,0);
+			Vec2 vel(0,0);
 			
 			if(cPos != NULL)
 				pos = pointFromString(cPos);
@@ -388,7 +388,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 	b2CircleShape dynamicCircle;
 	b2ChainShape dynamicChain;
 	
-	Point pos;
+	Vec2 pos;
 	
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
@@ -407,7 +407,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		}
 		
 		//Get position (center of box)
-		Point p(0,0);
+		Vec2 p(0,0);
 		const char* cPos = fixture->Attribute("pos");
 		if(cPos)
 		{
@@ -422,7 +422,7 @@ void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		bool bHollow = false;
 		fixture->QueryBoolAttribute("hollow", &bHollow);
 		
-		Point pBoxSize = pointFromString(cBoxSize);
+		Vec2 pBoxSize = pointFromString(cBoxSize);
 		if(bHollow)
 		{
 			//Create hollow box

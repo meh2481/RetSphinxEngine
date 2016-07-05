@@ -21,7 +21,7 @@ protected:
 	void average();	//Helper function to average the values for a less jittery arc
 	
 public:
-	Point p1, p2;
+	Vec2 p1, p2;
 	float add;
 	float max;
 	float height;

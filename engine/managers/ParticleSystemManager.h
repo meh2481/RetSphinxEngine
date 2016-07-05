@@ -27,6 +27,6 @@ public:
 	void render(glm::mat4 mat);
 	void update(float dt);
 
-	virtual void onNotify(string sParticleFilename, Point pos);
+	virtual void onNotify(string sParticleFilename, Vec2 pos);
 };
 

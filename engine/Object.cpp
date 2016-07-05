@@ -114,11 +114,11 @@ void Object::setImage(Image* img, unsigned int seg)
 		segments[seg]->img = img;
 }
 
-Point Object::getPos()
+Vec2 Object::getPos()
 {
 	b2Body* b = getBody();
 	b2Vec2 p = b ? b->GetPosition() : b2Vec2(0,0);
-	return Point(p.x, p.y);
+	return Vec2(p.x, p.y);
 }
 
 void Object::collide(Object* other)
@@ -127,7 +127,7 @@ void Object::collide(Object* other)
 		lua->callMethod(this, "collide", other);
 }
 
-void Object::collideWall(Point ptNormal)
+void Object::collideWall(Vec2 ptNormal)
 {
 	if(lua)
 		lua->callMethod(this, "collidewall", ptNormal.x, ptNormal.y);
@@ -147,7 +147,7 @@ void Object::initLua()
 	}
 }
 
-void Object::setPosition(Point p)
+void Object::setPosition(Vec2 p)
 {
 	b2Body* b = getBody();
 	if(b != NULL)

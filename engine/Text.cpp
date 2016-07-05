@@ -51,8 +51,7 @@ Text::Text(string sXMLFilename)
 			if(cChar == NULL) return;
 			const char* cRect = elem->Attribute("rect");
 			if(cRect == NULL) return;
-			Rect rc = rectFromString(cRect);
-			m_mRectangles[cChar[0]] = rc;   //Stick this into the list
+			m_mRectangles[cChar[0]].fromString(cRect); //Stick this into the list
 			float kern = 0.0f;
 			elem->QueryFloatAttribute("kern", &kern);
 			m_mKerning[cChar[0]] = kern;
@@ -92,7 +91,7 @@ void Text::render(string sText, float x, float y, float pt)
 		glPushMatrix();
 		x -= rc.width() * (pt / rc.height())/2.0f;	//Add half the width to get the center (whyyy are we drawing from the center plz dood I fan)
 		glTranslatef(-x, -y, 0.0);
-		Point sz(rc.width() * (pt / rc.height()), pt);	//Ignore kerning when drawing; we only care about that when computing position
+		Vec2 sz(rc.width() * (pt / rc.height()), pt);	//Ignore kerning when drawing; we only care about that when computing position
 		m_imgFont->render(sz, rc);
 		glPopMatrix();
 		x -= (rc.width() - m_mKerning[c]*2.0f) * (pt / rc.height())/2.0f;	//Add second half of the width, plus kerning (times 2 because divided by 2... it all works out)

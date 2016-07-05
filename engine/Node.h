@@ -9,7 +9,7 @@ public:
 	enum { TYPE = OT_NODE };
 	string 			luaClass;
 	LuaInterface* 	lua;
-	Point 			pos;
+	Vec2 			pos;
 	string 			name;
 	
 	Node();

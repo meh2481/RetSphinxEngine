@@ -485,7 +485,7 @@ Rect Engine::getCameraView(Vec3 Camera)
 	return rcCamera;
 }
 
-Point Engine::worldMovement(Point cursormove, Vec3 Camera)
+Vec2 Engine::worldMovement(Vec2 cursormove, Vec3 Camera)
 {
 	cursormove.x /= (float)getWidth();
 	cursormove.y /= (float)getHeight();
@@ -497,7 +497,7 @@ Point Engine::worldMovement(Point cursormove, Vec3 Camera)
 	return cursormove;
 }
 
-Point Engine::worldPosFromCursor(Point cursorpos, Vec3 Camera)
+Vec2 Engine::worldPosFromCursor(Vec2 cursorpos, Vec3 Camera)
 {
 	//Rectangle that the camera can see in world space
 	Rect rcCamera = getCameraView(Camera);
@@ -538,11 +538,11 @@ void Engine::stepPhysics(float dt)
 		else if(c.objA && !c.nodeB)
 		{
 			b2Vec2 pt = -worldManifold.normal;	//Flip this, since a Box2D normal is defined from A->B, and we want a wall->obj normal
-			c.objA->collideWall(Point(pt.x, pt.y));
+			c.objA->collideWall(Vec2(pt.x, pt.y));
 		}
 		else if(c.objB && !c.nodeA)
 		{
-			c.objB->collideWall(Point(worldManifold.normal.x, worldManifold.normal.y));
+			c.objB->collideWall(Vec2(worldManifold.normal.x, worldManifold.normal.y));
 		}
 		//Don't care about two non-object fixtures colliding
 		
@@ -585,14 +585,14 @@ b2Body* Engine::createBody(b2BodyDef* bdef)
     return m_physicsWorld->CreateBody(bdef);
 }
 
-void Engine::setGravity(Point ptGravity)
+void Engine::setGravity(Vec2 ptGravity)
 {
     m_physicsWorld->SetGravity(b2Vec2(ptGravity.x, ptGravity.y));
 }
 
 void Engine::setGravity(float x, float y)
 {
-    setGravity(Point(x,y));
+    setGravity(Vec2(x,y));
 }
 
 bool Engine::isMouseGrabbed()

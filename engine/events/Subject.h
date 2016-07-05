@@ -13,6 +13,6 @@ public:
 	void addObserver(Observer* o);
 	void removeObserver(Observer* o);
 
-	void notify(string sMsg, Point pos);
+	void notify(string sMsg, Vec2 pos);
 
 };

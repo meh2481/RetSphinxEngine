@@ -7,6 +7,7 @@
 
 #include "globaldefs.h"
 #include "Image.h"
+#include "Color.h"
 #include <map>
 
 enum TextAlignment

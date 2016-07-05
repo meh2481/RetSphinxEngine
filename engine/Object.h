@@ -30,10 +30,10 @@ public:
 	Object* 		parent;		//Parent object
 	Mesh3D*		obj3D;		//3D object
 	
-	Point pos;		//Offset (after rotation)
-	Point tile;		//tile image in x and y
+	Vec2 pos;		//Offset (after rotation)
+	Vec2 tile;		//tile image in x and y
 	float rot;
-	Point size;	//Actual texel size; not pixels
+	Vec2 size;	//Actual texel size; not pixels
 
     ObjSegment();
     ~ObjSegment();
@@ -52,7 +52,7 @@ public:
     vector<ObjSegment*> 	segments;	//TODO Should be private
 	Lattice*				meshLattice;
 	LatticeAnim*			meshAnim;
-	Point					meshSize;
+	Vec2					meshSize;
 	LuaInterface* 			lua;
 	string 					luaClass;
     
@@ -63,11 +63,11 @@ public:
     void addSegment(ObjSegment* seg);
 	void update(float dt);
 	b2Body* getBody();
-	Point getPos();
+	Vec2 getPos();
 	void collide(Object* other);
-	void collideWall(Point ptNormal);	//ptNormal will be a normal vector from the wall to this object
+	void collideWall(Vec2 ptNormal);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
-	void setPosition(Point p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
+	void setPosition(Vec2 p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
 	
 	void setProperty(string prop, string value)	{propertyValues[prop] = value;};
 	void addProperty(string prop, string value) {setProperty(prop, value);};
