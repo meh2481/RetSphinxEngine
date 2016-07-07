@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <string>
+#include <inttypes.h>
 #include "tinyxml2.h"
 #include "Rect.h"
 using namespace std;
@@ -20,7 +21,7 @@ class ResourceLoader
 	b2World* m_world;
 	ResourceCache* m_cache;
 
-	int hash(string sHashStr);
+	uint64_t hash(string sHashStr);
 
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 	ResourceLoader() {};

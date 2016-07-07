@@ -8,7 +8,6 @@
 #include "Object.h"
 #include "Box2D/Box2D.h"
 #include "ResourceCache.h"
-#include <functional>
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld)
 {
@@ -21,17 +20,22 @@ ResourceLoader::~ResourceLoader()
 	delete m_cache;
 }
 
-int ResourceLoader::hash(string sHashStr)
+//From http://stackoverflow.com/a/13487193
+uint64_t ResourceLoader::hash(string sHashStr)
 {
-	//C++11 ftw
-	std::hash<std::string> hash_fn;
-	size_t hash = hash_fn(sHashStr);
+	const char* str = sHashStr.c_str();
+	uint64_t hash = 5381;
+	int c;
+
+	while(c = *str++)
+		hash = ((hash << 5) + hash) + c;
+
 	return hash;
 }
 
 Image* ResourceLoader::getImage(string sID)
 {
-	int hashVal = hash(sID);
+	uint64_t hashVal = hash(sID);
 	Image* img = m_cache->findImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
@@ -44,7 +48,7 @@ Image* ResourceLoader::getImage(string sID)
 
 Mesh3D* ResourceLoader::getMesh(string sID)
 {
-	int hashVal = hash(sID);
+	uint64_t hashVal = hash(sID);
 	Mesh3D* mesh = m_cache->findMesh(hashVal);
 	if(!mesh)	//This mesh isn't here; load it
 	{

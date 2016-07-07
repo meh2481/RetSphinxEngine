@@ -8,10 +8,10 @@ class Mesh3D;
 class ResourceCache
 {
 	map<Image*, uint32_t> imageUses;
-	map<uint32_t, Image*> imageIDMap;
+	map<uint64_t, Image*> imageIDMap;
 
 	map<Mesh3D*, uint32_t> meshUses;
-	map<uint32_t, Mesh3D*> meshIDMap;
+	map<uint64_t, Mesh3D*> meshIDMap;
 
 	void clearImages();
 	void clearMeshes();
@@ -19,11 +19,11 @@ class ResourceCache
 public:
 	~ResourceCache();
 
-	Image* findImage(uint32_t id);
-	void addImage(uint32_t id, Image* img);
+	Image* findImage(uint64_t id);
+	void addImage(uint64_t id, Image* img);
 
-	Mesh3D* findMesh(uint32_t id);
-	void addMesh(uint32_t id, Mesh3D* mesh);
+	Mesh3D* findMesh(uint64_t id);
+	void addMesh(uint64_t id, Mesh3D* mesh);
 
 #ifdef _DEBUG
 	void reloadImages();
