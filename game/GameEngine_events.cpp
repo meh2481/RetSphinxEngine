@@ -55,6 +55,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_F5:
 					Lua->call("clearClasses"); //Reload Lua classes
 					getResourceLoader()->getCache()->reloadImages();
+					getResourceLoader()->getCache()->reloadMeshes();
 					loadScene(m_sLastScene);	//Reload current scene
 					break;
 					

@@ -25,7 +25,6 @@ Mesh3D::Mesh3D(string sOBJFile)
 	else
 		_fromTiny3DFile(sOBJFile);
     m_sObjFilename = sOBJFile;
-    _add3DObjReload(this);
 	wireframe = false;
 	shaded = true;
 }
@@ -33,14 +32,12 @@ Mesh3D::Mesh3D(string sOBJFile)
 Mesh3D::Mesh3D()
 {
   m_obj = 0;
-  _add3DObjReload(this);
   wireframe = false;
   shaded = true;
 }
 
 Mesh3D::~Mesh3D()
 {
-	_remove3DObjReload(this);
 	//Free OpenGL graphics memory
 	if(m_obj)
 		glDeleteLists(m_obj, 1);
@@ -291,8 +288,6 @@ void Mesh3D::_fromTiny3DFile(string sFilename)
 
 void Mesh3D::render(Image* img)
 {
-	//glRotatef(45, 1.0f, 0.0f, 0.0f);
-	//float saveLight[4];
 	if(!useGlobalLight)
 	{
 		glEnable(GL_LIGHT1);
@@ -304,7 +299,6 @@ void Mesh3D::render(Image* img)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if(img != NULL)
 		glBindTexture(GL_TEXTURE_2D, img->_getTex());
-	//glRotatef(rot[0],rot[1],rot[2],rot[3]);
     glCallList(m_obj);
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
@@ -320,46 +314,4 @@ void Mesh3D::_reload()
     _fromOBJFile(m_sObjFilename);
   else
     _fromTiny3DFile(m_sObjFilename);
-}
-
-static set<Mesh3D*> sg_objs;
-
-void reload3DObjects()
-{
-  for(set<Mesh3D*>::iterator i = sg_objs.begin(); i != sg_objs.end(); i++)
-  {
-    (*i)->_reload();
-  }
-}
-
-void _add3DObjReload(Mesh3D* obj)
-{
-  sg_objs.insert(obj);
-}
-
-void _remove3DObjReload(Mesh3D* obj)
-{
-  sg_objs.erase(obj);
-}
-
-static map<string, Mesh3D*> g_mObj;
-Mesh3D* getObject(string sFilename)
-{
-	if(sFilename == "model_none") return NULL;
-	
-	map<string, Mesh3D*>::iterator i = g_mObj.find(sFilename);
-	if(i == g_mObj.end())   //This model isn't here; load it
-	{
-		Mesh3D* img = new Mesh3D(sFilename);
-		g_mObj[sFilename] = img; //Add to the map
-		return img;
-	}
-	return i->second; //Return it
-}
-
-void clearObjects()
-{
-	for(map<string, Mesh3D*>::iterator i = g_mObj.begin(); i != g_mObj.end(); i++)
-		delete (i->second);    //Delete every object
-	g_mObj.clear();
 }

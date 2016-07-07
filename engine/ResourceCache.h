@@ -3,22 +3,30 @@
 using namespace std;
 
 class Image;
+class Mesh3D;
 
 class ResourceCache
 {
-	map<Image*, int> imageUses;
-	map<int, Image*> imageIDMap;
+	map<Image*, uint32_t> imageUses;
+	map<uint32_t, Image*> imageIDMap;
+
+	map<Mesh3D*, uint32_t> meshUses;
+	map<uint32_t, Mesh3D*> meshIDMap;
 
 	void clearImages();
+	void clearMeshes();
 
 public:
 	~ResourceCache();
 
-	Image* findImage(int id);
-	void addImage(int id, Image* img);
+	Image* findImage(uint32_t id);
+	void addImage(uint32_t id, Image* img);
+
+	Mesh3D* findMesh(uint32_t id);
+	void addMesh(uint32_t id, Mesh3D* mesh);
 
 #ifdef _DEBUG
-	//TODO See if we even need this or not; shouldn't outside of F5 reloading
 	void reloadImages();
+	void reloadMeshes();
 #endif //_DEBUG
 };

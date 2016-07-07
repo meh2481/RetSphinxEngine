@@ -7,7 +7,7 @@ void Engine::changeScreenResolution(float w, float h)
 	LOG(INFO) << "Changing screen resolution to " << w << ", " << h;
 	int vsync = SDL_GL_GetSwapInterval();
 //In Windoze, we copy the graphics memory to our new context, so we don't have to reload all of our images and stuff every time the resolution changes
-//TODO: Look into SDL_GL_SHARE_WITH_CURRENT_CONTEXT for newer versions of Windows instead
+//TODO: Look into SDL_GL_SHARE_WITH_CURRENT_CONTEXT for newer versions of SDL instead
 #ifdef _WIN32
 	SDL_SysWMinfo info;
  
@@ -77,11 +77,8 @@ void Engine::changeScreenResolution(float w, float h)
 		return;
 	}
 #else
-	//Reload images & models
-#ifdef IMG_RELOAD
-	reloadImages();
-	reload3DObjects();
-#endif
+	//TODO See what can be done on Linux/Mac about this
+	#error need to research OpenGL context sharing for Linux/Mac
 #endif
 }
 

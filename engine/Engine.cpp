@@ -115,8 +115,6 @@ Engine::~Engine()
 
 	SDL_DestroyWindow(m_Window);
 
-	clearObjects();	//TODO Remove
-
 	//Clean up our sound effects
 	/*if(!m_bSoundDied)
 	{

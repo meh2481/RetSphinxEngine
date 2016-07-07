@@ -42,6 +42,19 @@ Image* ResourceLoader::getImage(string sID)
 	return img;
 }
 
+Mesh3D* ResourceLoader::getMesh(string sID)
+{
+	int hashVal = hash(sID);
+	Mesh3D* mesh = m_cache->findMesh(hashVal);
+	if(!mesh)	//This mesh isn't here; load it
+	{
+		//TODO: Load from here, not from Mesh3D class
+		mesh = new Mesh3D(sID);				//Create this mesh
+		m_cache->addMesh(hashVal, mesh);	//Add to the cache
+	}
+	return mesh;
+}
+
 //Particle system
 ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 {
@@ -299,7 +312,7 @@ ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 
 	const char* cSegObj = layer->Attribute("obj");
 	if(cSegObj != NULL)
-		seg->obj3D = getObject(cSegObj);
+		seg->obj3D = getMesh(cSegObj);
 
 	return seg;
 }

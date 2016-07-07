@@ -13,6 +13,7 @@ class ObjSegment;
 class b2World;
 class b2Body;
 class ResourceCache;
+class Mesh3D;
 
 class ResourceLoader
 {
@@ -32,10 +33,13 @@ public:
 	//Images
 	Image* getImage(string sID);
 
+	//Meshes
+	Mesh3D* getMesh(string sID);
+
 	//Particles
 	ParticleSystem* getParticleSystem(string sID);
 
-	//Mouse cursor
+	//Mouse cursors
 	MouseCursor* getCursor(string sID);
 
 	//TODO: Private

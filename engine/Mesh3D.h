@@ -34,7 +34,6 @@ class Mesh3D
 {
 protected:
     unsigned m_obj;   //The object in 3D memory
-	//GLImage* mImg;
     string m_sObjFilename;
 	
 	
@@ -46,16 +45,13 @@ public:
 	bool shaded;	//If we're drawing this with OpenGL shading or not
 	
 	float lightPos[4];
-	//float rot[4];
 	bool useGlobalLight;	//Use global lighting scheme (set false if we're to use lightPos)
     
     void _reload();  //Reload memory associated with this object
 
-    Mesh3D(string sOBJFile);//, GLImage* sImg);
+    Mesh3D(string sOBJFile);
     Mesh3D();
     ~Mesh3D();
-
-    //void setTexture(GLImage* sImg);
 
     void render(Image* img);
 	
@@ -63,15 +59,6 @@ public:
 	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
 
 };
-
-//TODO SHOULD BE A CLASS
-//Object3D reloading handler functions
-void reload3DObjects();
-void _add3DObjReload(Mesh3D* obj);
-void _remove3DObjReload(Mesh3D* obj);
-
-Mesh3D* getObject(string sFilename);	//TODO NEEDS LESS GENERIC NAME
-void clearObjects();	//TODO NEEDS LESS GENERIC NAME
 
 
 
