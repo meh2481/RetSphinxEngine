@@ -8,6 +8,7 @@
 #include <SDL_thread.h>
 #include "DebugUI.h"
 #include "ResourceLoader.h"
+#include "ResourceCache.h"
 
 typedef struct
 {
@@ -50,15 +51,17 @@ void GameEngine::handleEvent(SDL_Event event)
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.scancode)
 			{
+#ifdef _DEBUG
 				case SDL_SCANCODE_F5:
 					Lua->call("clearClasses"); //Reload Lua classes
-					getResourceLoader()->reloadImages();
+					getResourceLoader()->getCache()->reloadImages();
 					loadScene(m_sLastScene);	//Reload current scene
 					break;
 					
 				case SDL_SCANCODE_F6:
 					Lua->call("loadStartingMap");	//Start from initial map
 					break;
+#endif //_DEBUG
 
 				case SDL_SCANCODE_ESCAPE:
 					if(m_debugUI->visible)

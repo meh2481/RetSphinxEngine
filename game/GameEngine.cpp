@@ -112,7 +112,6 @@ void GameEngine::frame(float dt)
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
 	{
-		getResourceLoader()->reloadImages();
 		loadScene(m_sLoadScene);
 		m_sLoadScene.clear();
 		if(m_sLoadNode.size())

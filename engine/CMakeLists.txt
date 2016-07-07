@@ -60,6 +60,8 @@ MemoryEditor.cpp
 MemoryEditor.h
 ResourceLoader.cpp
 ResourceLoader.h
+ResourceCache.h
+ResourceCache.cpp
 )
 
 set(engine_events_src

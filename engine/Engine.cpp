@@ -109,15 +109,13 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 Engine::~Engine()
 {
 	delete m_entityManager;
+	delete m_resourceLoader;
 
 	ImGui_Impl_GL2_Shutdown();
 
 	SDL_DestroyWindow(m_Window);
 
-	//Clean up our image map
-	LOG(INFO) << "Clearing images";
-	getResourceLoader()->clearImages();
-	clearObjects();
+	clearObjects();	//TODO Remove
 
 	//Clean up our sound effects
 	/*if(!m_bSoundDied)

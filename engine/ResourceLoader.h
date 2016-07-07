@@ -12,24 +12,25 @@ class MouseCursor;
 class ObjSegment;
 class b2World;
 class b2Body;
+class ResourceCache;
 
 class ResourceLoader
 {
-	map<string, Image*> m_mImages;
 	b2World* m_world;
+	ResourceCache* m_cache;
+
+	int hash(string sHashStr);
 
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
-	unsigned char* getResource(string sID);
 	ResourceLoader() {};
 public:
 	ResourceLoader(b2World* physicsWorld);
+	~ResourceLoader();
+
+	ResourceCache* getCache() { return m_cache; };
 
 	//Images
 	Image* getImage(string sID);
-
-	//TODO: These should be implemented in a cache, not here
-	void clearImages();
-	void reloadImages();
 
 	//Particles
 	ParticleSystem* getParticleSystem(string sID);

@@ -42,7 +42,6 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 Other misc unordered TODO:
 - Scene editor / XML exporter
 - Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
-- Unify log, so messages go to console & errlog file	//What does this even mean?
 
 
 

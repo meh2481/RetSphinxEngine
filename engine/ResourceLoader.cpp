@@ -7,44 +7,39 @@
 #include "MouseCursor.h"
 #include "Object.h"
 #include "Box2D/Box2D.h"
+#include "ResourceCache.h"
+#include <functional>
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld)
 {
 	m_world = physicsWorld;
+	m_cache = new ResourceCache();
 }
 
-unsigned char* ResourceLoader::getResource(string sID)
+ResourceLoader::~ResourceLoader()
 {
-	//TODO: Map resources to specific .pak files or whatever
-	return NULL;
+	delete m_cache;
+}
+
+int ResourceLoader::hash(string sHashStr)
+{
+	//C++11 ftw
+	std::hash<std::string> hash_fn;
+	size_t hash = hash_fn(sHashStr);
+	return hash;
 }
 
 Image* ResourceLoader::getImage(string sID)
 {
-	if(sID == "image_none") return NULL;
-
-	map<string, Image*>::iterator i = m_mImages.find(sID);
-	if(i == m_mImages.end())// || i->second->reloadEachTime())   //This image isn't here; load it
+	int hashVal = hash(sID);
+	Image* img = m_cache->findImage(hashVal);
+	if(!img)	//This image isn't here; load it
 	{
-		Image* img = new Image(sID);   //Create this image
-											 //g_mImages[sFilename] = img; //Add to the map
-		m_mImages.insert(std::pair<string, Image*>(sID, img));
-		return img;
+		//TODO: Load from here, not from Image class
+		img = new Image(sID);				//Create this image
+		m_cache->addImage(hashVal, img);	//Add to the cache
 	}
-	return i->second; //Return this image
-}
-
-void ResourceLoader::clearImages()
-{
-	for(map<string, Image*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
-		delete (i->second);    //Delete each image
-	m_mImages.clear();
-}
-
-void ResourceLoader::reloadImages()
-{
-	for(map<string, Image*>::iterator i = m_mImages.begin(); i != m_mImages.end(); i++)
-		i->second->_reload();
+	return img;
 }
 
 //Particle system
