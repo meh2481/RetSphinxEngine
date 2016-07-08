@@ -8,6 +8,9 @@ ResourceTypes.h
 ResourceTypes.cpp
 wfLZ.c
 wfLZ.h
+tinydir.h
+PakLoader.h
+PakLoader.cpp
 )
 
 add_library(io ${io_src})

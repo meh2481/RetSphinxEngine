@@ -31,9 +31,9 @@ typedef struct
 
 typedef struct
 {
-	uint32_t id;
+	uint64_t id;
 	uint32_t type;		//One of the resource types above
-	uint64_t offset;	//Offset from start of file to CompressionHeader
+	uint32_t offset;	//Offset from start of file to CompressionHeader
 } ResourcePtr;
 
 
