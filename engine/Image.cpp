@@ -34,7 +34,8 @@ Image::Image(string sFilename)
 Image::~Image()
 {
 	//image cleanup
-	LOG(INFO) << "Free " << m_sFilename;
+	if(m_sFilename.length())
+		LOG(INFO) << "Free " << m_sFilename;
 	if(m_hTex)
 		glDeleteTextures(1, &m_hTex);	//Free OpenGL graphics memory
 }
@@ -358,7 +359,7 @@ void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
 
 void Image::_load(string sFilename)
 {
-	LOG(INFO) << "Load " << sFilename;
+	//LOG(INFO) << "Load " << sFilename;
 	if(sFilename.find(".img", sFilename.size() - 4) != string::npos)
 		_loadIMG(sFilename);
 	else

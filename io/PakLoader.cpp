@@ -2,9 +2,12 @@
 #include "tinydir.h"
 #include "wfLZ.h"
 #include "easylogging++.h"
+#include <sstream>
+using namespace std;
 
-PakLoader::PakLoader(string sDirName)
+void PakLoader::loadPaksFromDir(string sDirName)
 {
+	LOG(TRACE) << "Parse pak files from dir " << sDirName;
 	tinydir_dir dir;
 	tinydir_open(&dir, sDirName.c_str());
 
@@ -15,15 +18,31 @@ PakLoader::PakLoader(string sDirName)
 
 		if(!file.is_dir)
 		{
-			LOG(INFO) << "opening pak file " << file.name;
-			//TODO Test filename for including ".pak" at least
-			parseFile(file.name);
+			char* point;
+			if((point = strrchr(file.name, '.')) != NULL)
+			{
+				ostringstream oss;
+				oss << sDirName << "/" << file.name;
+				if(strcmp(point, ".pak") == 0)
+				{
+					//should be pak file
+					LOG(TRACE) << "open pak file " << sDirName << "/" << file.name;
+					parseFile(oss.str());
+				}
+				else
+					LOG(TRACE) << "Ignoring non-pak file " << oss.str();
+			}
 		}
 
 		tinydir_next(&dir);
 	}
 
 	tinydir_close(&dir);
+}
+
+PakLoader::PakLoader(string sDirName)
+{
+	loadPaksFromDir(sDirName);
 }
 
 PakLoader::~PakLoader()
@@ -37,6 +56,7 @@ PakLoader::~PakLoader()
 
 void PakLoader::parseFile(string sFileName)
 {
+	LOG(TRACE) << "Parse pak file " << sFileName;
 	FILE* fp = fopen(sFileName.c_str(), "rb");
 	if(fp)
 	{
@@ -44,6 +64,7 @@ void PakLoader::parseFile(string sFileName)
 		PakFileHeader header;
 		if(fread(&header, 1, sizeof(PakFileHeader), fp) != sizeof(PakFileHeader))
 		{
+			LOG(TRACE) << "couldn't read header";
 			fclose(fp);
 			return;
 		}
@@ -51,6 +72,7 @@ void PakLoader::parseFile(string sFileName)
 		//Check file signature
 		if(header.sig[0] != 'P' || header.sig[1] != 'A' || header.sig[2] != 'K' || header.sig[3] != 'C')
 		{
+			LOG(TRACE) << "sig incorrect";
 			fclose(fp);
 			return;
 		}
@@ -61,6 +83,7 @@ void PakLoader::parseFile(string sFileName)
 			ResourcePtr resPtr;
 			if(fread(&resPtr, 1, sizeof(ResourcePtr), fp) != sizeof(ResourcePtr))
 			{
+				LOG(TRACE) << "couldn't read resptr";
 				fclose(fp);
 				return;
 			}
@@ -74,14 +97,20 @@ void PakLoader::parseFile(string sFileName)
 
 		openedFiles.push_back(fp);	//Hang onto this to close later
 	}
+	else
+		LOG(TRACE) << "unable to open file";
 }
 
 //TODO: File size error checking and such here
 unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 {
+	LOG(TRACE) << "load resource with id " << id;
 	map<uint64_t, PakPtr>::iterator it = m_pakFiles.find(id);
 	if(it == m_pakFiles.end())
+	{
+		LOG(TRACE) << "resource was not in pak files";
 		return NULL;
+	}
 
 	//Load resource
 	fseek(it->second.fp, it->second.ptr.offset, SEEK_SET);
@@ -89,7 +118,10 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 	//Read file
 	CompressionHeader compHeader;
 	if(fread(&compHeader, 1, sizeof(CompressionHeader), it->second.fp) != sizeof(CompressionHeader))
+	{
+		LOG(TRACE) << "couldn\'t read compression header";
 		return NULL;
+	}
 
 	if(compHeader.compressionType == COMPRESSION_FLAGS_UNCOMPRESSED)
 	{
@@ -97,7 +129,10 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		if(!compHeader.decompressedSize)
 		{
 			if(!compHeader.compressedSize)
+			{
+				LOG(TRACE) << "compressed size 0";
 				return NULL;
+			}
 			
 			compHeader.decompressedSize = compHeader.compressedSize;
 		}
@@ -112,6 +147,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		if(len)
 			*len = compHeader.decompressedSize;
 
+		LOG(TRACE) << "all good uncompressed";
 		return uncompressedData;
 	}
 	else if(compHeader.compressionType == COMPRESSION_FLAGS_WFLZ)
@@ -122,6 +158,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		unsigned char* compressedData = new unsigned char[compHeader.compressedSize];
 		if(fread(compressedData, 1, compHeader.compressedSize, it->second.fp) != compHeader.compressedSize)
 		{
+			LOG(TRACE) << "couldn\'t read compressed data";
 			delete[] compressedData;
 			return NULL;
 		}
@@ -132,6 +169,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 
 		if(!compHeader.decompressedSize)
 		{
+			LOG(TRACE) << "decompressed size wrong";
 			delete[] compressedData;
 			return NULL;
 		}
@@ -144,9 +182,11 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		if(len)
 			*len = compHeader.decompressedSize;
 
+		LOG(TRACE) << "all good wflz";
 		delete[] compressedData;
 		return decompressedData;
 	}
 
+	LOG(TRACE) << "some kind of error or something";
 	return NULL;
 }

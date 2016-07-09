@@ -38,25 +38,31 @@ uint64_t ResourceLoader::hash(string sHashStr)
 
 Image* ResourceLoader::getImage(string sID)
 {
+	LOG(TRACE) << "Loading image " << sID;
 	uint64_t hashVal = hash(sID);
+	LOG(TRACE) << "Image has ID " << hashVal;
 	Image* img = m_cache->findImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
+		LOG(TRACE) << "Cache miss";
 		unsigned int len = 0;
 		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 		if(!resource || !len)
 		{
 			//TODO: Load from here, not from Image class
+			LOG(TRACE) << "Pak miss - load from file";
 			img = new Image(sID);				//Create this image
 			m_cache->addImage(hashVal, img);	//Add to the cache
 		}
 		else
 		{
 			//TODO: Load from here, not from Image class
+			LOG(TRACE) << "pak hit - load from data";
 			img = new Image(resource, len);
 			m_cache->addImage(hashVal, img);
 		}
 	}
+	LOG(TRACE) << "Cache hit";
 	return img;
 }
 

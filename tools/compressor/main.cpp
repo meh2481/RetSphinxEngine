@@ -21,6 +21,7 @@ typedef struct
 	uint8_t* data;
 	unsigned int size;
 	uint64_t id;
+	string filename;
 } compressionHelper;
 
 uint64_t hashString(string sHashStr)
@@ -120,10 +121,17 @@ list<string> readFilenames(string filelistFile)
 		getline(infile, s);
 		if(!s.length())
 			continue;	//Ignore blank lines
+		if(s.find('#') != string::npos)
+			continue;	//Ignore comment lines
 		lFilenames.push_back(s);	//Add this to our list of files to package
 	}
 	infile.close();
 	return lFilenames;
+}
+
+uint32_t getResourceType(string sFilename)
+{
+	return RESOURCE_TYPE_IMAGE;	//TODO Support other resource types
 }
 
 void compress(list<string> filesToPak, string pakFilename)
@@ -149,6 +157,7 @@ void compress(list<string> filesToPak, string pakFilename)
 		}
 
 		compressionHelper helper;
+		helper.filename = *i;
 		helper.header.pad = PAD_32BIT;
 		helper.header.compressionType = COMPRESSION_FLAGS_WFLZ;
 		helper.header.decompressedSize = size;
@@ -201,7 +210,7 @@ void compress(list<string> filesToPak, string pakFilename)
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
 		resPtr.offset = curOffset;
-		resPtr.type = RESOURCE_TYPE_IMAGE;	//TODO Support other resource types
+		resPtr.type = getResourceType(i->filename);
 
 		fwrite(&resPtr, 1, sizeof(ResourcePtr), fOut);
 		curOffset += sizeof(CompressionHeader) + i->header.compressedSize;

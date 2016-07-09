@@ -22,6 +22,8 @@ class PakLoader
 
 	PakLoader() {};
 
+	void loadPaksFromDir(string sDirName);
+
 public:
 	PakLoader(string sDirName);
 	~PakLoader();
