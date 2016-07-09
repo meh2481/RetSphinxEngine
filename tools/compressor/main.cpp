@@ -42,7 +42,7 @@ string remove_extension(const string& filename)
 	return filename.substr(0, lastdot);
 }
 
-unsigned char* extractImage(string filename)
+unsigned char* extractImage(string filename, unsigned int* fileSize)
 {
 	int comp = 0;
 	int width = 0;
@@ -62,12 +62,15 @@ unsigned char* extractImage(string filename)
 	if(comp == 3)
 		textureHeader.bpp = TEXTURE_BPP_RGB;
 
-	int size = textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
+	int size = sizeof(TextureHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
 
-	unsigned char* finalBuf = (unsigned char*)malloc(size + sizeof(TextureHeader));
+	if(fileSize)
+		*fileSize = size;
+
+	unsigned char* finalBuf = (unsigned char*)malloc(size);
 
 	memcpy(finalBuf, &textureHeader, sizeof(TextureHeader));
-	memcpy(&finalBuf[sizeof(TextureHeader)], imageBuf, size);
+	memcpy(&finalBuf[sizeof(TextureHeader)], imageBuf, size - sizeof(TextureHeader));
 
 	stbi_image_free(imageBuf);
 	return finalBuf;
@@ -77,12 +80,13 @@ unsigned char* readFile(string filename, unsigned int* fileSize)
 {
 	//Extract an image from this file if it is one
 	if(filename.find(".png") != string::npos)
-		return extractImage(filename);
+		return extractImage(filename, fileSize);
 
 	//Otherwise, fall back on writing raw file
 	FILE *f = fopen(filename.c_str(), "rb");
 	if(f == NULL)
 	{
+		cout << "unable to open? " << filename << endl;
 		return NULL;
 	}
 	fseek(f, 0, SEEK_END);
@@ -118,6 +122,7 @@ list<string> readFilenames(string filelistFile)
 			continue;	//Ignore blank lines
 		lFilenames.push_back(s);	//Add this to our list of files to package
 	}
+	infile.close();
 	return lFilenames;
 }
 
@@ -137,7 +142,7 @@ void compress(list<string> filesToPak, string pakFilename)
 		unsigned int size = 0;
 		unsigned char* decompressed = readFile(*i, &size);
 
-		if(size == 0)
+		if(!size)
 		{
 			cout << "Unable to load file " << *i << endl;
 			continue;
@@ -163,8 +168,10 @@ void compress(list<string> filesToPak, string pakFilename)
 		else
 			free(decompressed);
 
+		//TODO: Pad to end of 16-bit row
+
 		//Add this compression helper to our list
-		helper.size = size;
+		helper.size = helper.header.compressedSize;
 		helper.id = hashString(*i);
 
 		compressedFiles.push_back(helper);
@@ -181,6 +188,7 @@ void compress(list<string> filesToPak, string pakFilename)
 	fileHeader.sig[3] = 'C';
 	fileHeader.version = VERSION_1_0;
 	fileHeader.numResources = compressedFiles.size();
+	fileHeader.pad = PAD_32BIT;
 
 	//Write header
 	fwrite(&fileHeader, 1, sizeof(PakFileHeader), fOut);
