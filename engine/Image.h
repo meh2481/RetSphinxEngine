@@ -22,7 +22,6 @@ private:
 
 	void _load(string sFilename);
 	void _loadPNG(string sFilename);
-	void _loadIMG(string sFilename);
 	void _loadBlob(unsigned char* blob, unsigned int size);
 	void _bind(unsigned char* data, unsigned int width, unsigned int height, int mode);
 	//void _loadNoise(string sXMLFilename);

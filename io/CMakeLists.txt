@@ -5,7 +5,6 @@ tinyxml2.cpp
 tinyxml2.h
 easylogging++.h
 ResourceTypes.h
-ResourceTypes.cpp
 wfLZ.c
 wfLZ.h
 tinydir.h

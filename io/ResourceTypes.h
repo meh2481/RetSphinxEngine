@@ -68,8 +68,3 @@ typedef struct
 	//Followed by image data
 } TextureHeader;
 
-
-//TODO Move these to resource loader
-unsigned char* decompressResource(unsigned char* resource, unsigned int* decompressedSize = NULL, unsigned int len = 0);
-void freeResource(unsigned char* resource);
-unsigned char* readFile(const char* filename, unsigned int* fileSize = NULL);	//TODO do whatever with this

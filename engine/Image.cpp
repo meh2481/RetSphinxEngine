@@ -84,37 +84,6 @@ void Image::_loadBlob(unsigned char* blob, unsigned int size)
 	_bind(blob, header.width, header.height, mode);
 }
 
-//TODO: This should be split out into a resource loader
-void Image::_loadIMG(string sFilename)
-{
-	//Read file
-	unsigned int size = 0;
-	unsigned char* compressed = readFile(sFilename.c_str(), &size);
-
-	if(!compressed) return;
-	if(!size)
-	{
-		freeResource(compressed);
-		return;
-	}
-
-	unsigned int decompressedSize = 0;
-	unsigned char* decompressed = decompressResource(compressed, &decompressedSize, size);
-
-	freeResource(compressed);
-
-	if(!decompressed) return;
-	if(!decompressedSize)
-	{
-		freeResource(decompressed);
-		return;
-	}
-
-	_loadBlob(decompressed, decompressedSize);
-
-	freeResource(decompressed);
-}
-
 void Image::_loadPNG(string sFilename)
 {
 	int comp = 0;
@@ -359,11 +328,8 @@ void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
 
 void Image::_load(string sFilename)
 {
-	//LOG(INFO) << "Load " << sFilename;
-	if(sFilename.find(".img", sFilename.size() - 4) != string::npos)
-		_loadIMG(sFilename);
-	else
-		_loadPNG(sFilename);
+	LOG(INFO) << "Load " << sFilename;
+	_loadPNG(sFilename);
 }
 
 void Image::_reload()
