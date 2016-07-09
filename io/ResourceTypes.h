@@ -45,7 +45,7 @@ typedef struct
 
 typedef struct
 {
-	uint32_t flags;	//One of the compression flags above
+	uint32_t compressionType;	//One of the compression flags above
 	uint32_t compressedSize;
 	uint32_t decompressedSize;
 	uint32_t pad;

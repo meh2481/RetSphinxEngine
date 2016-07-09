@@ -15,11 +15,13 @@ class b2World;
 class b2Body;
 class ResourceCache;
 class Mesh3D;
+class PakLoader;
 
 class ResourceLoader
 {
 	b2World* m_world;
 	ResourceCache* m_cache;
+	PakLoader* m_pakLoader;
 
 	uint64_t hash(string sHashStr);
 

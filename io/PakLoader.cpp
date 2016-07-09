@@ -1,6 +1,7 @@
 #include "PakLoader.h"
 #include "tinydir.h"
 #include "wfLZ.h"
+#include "easylogging++.h"
 
 PakLoader::PakLoader(string sDirName)
 {
@@ -13,7 +14,11 @@ PakLoader::PakLoader(string sDirName)
 		tinydir_readfile(&dir, &file);
 
 		if(!file.is_dir)
+		{
+			LOG(INFO) << "opening pak file " << file.name;
+			//TODO Test filename for including ".pak" at least
 			parseFile(file.name);
+		}
 
 		tinydir_next(&dir);
 	}
@@ -86,26 +91,62 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 	if(fread(&compHeader, 1, sizeof(CompressionHeader), it->second.fp) != sizeof(CompressionHeader))
 		return NULL;
 
-	//TODO: Support uncompressed resources
-	unsigned char* compressed = new unsigned char[compHeader.compressedSize];
-	if(fread(compressed, 1, compHeader.compressedSize, it->second.fp) != compHeader.compressedSize)
+	if(compHeader.compressionType == COMPRESSION_FLAGS_UNCOMPRESSED)
 	{
-		delete[] compressed;
-		return NULL;
+		//Make sure we don't have an empty resource
+		if(!compHeader.decompressedSize)
+		{
+			if(!compHeader.compressedSize)
+				return NULL;
+			
+			compHeader.decompressedSize = compHeader.compressedSize;
+		}
+
+		unsigned char* uncompressedData = new unsigned char[compHeader.decompressedSize];
+		if(fread(uncompressedData, 1, compHeader.decompressedSize, it->second.fp) != compHeader.decompressedSize)
+		{
+			delete[] uncompressedData;
+			return NULL;
+		}
+
+		if(len)
+			*len = compHeader.decompressedSize;
+
+		return uncompressedData;
+	}
+	else if(compHeader.compressionType == COMPRESSION_FLAGS_WFLZ)
+	{
+		if(!compHeader.compressedSize)
+			return NULL;
+
+		unsigned char* compressedData = new unsigned char[compHeader.compressedSize];
+		if(fread(compressedData, 1, compHeader.compressedSize, it->second.fp) != compHeader.compressedSize)
+		{
+			delete[] compressedData;
+			return NULL;
+		}
+
+		//If for some reason we don't have the decompressed size, generate it now
+		if(!compHeader.decompressedSize)
+			compHeader.decompressedSize = wfLZ_GetDecompressedSize(compressedData);
+
+		if(!compHeader.decompressedSize)
+		{
+			delete[] compressedData;
+			return NULL;
+		}
+
+		//Allocate memory and decompress
+		unsigned char* decompressedData = new unsigned char[compHeader.decompressedSize];
+		wfLZ_Decompress(compressedData, decompressedData);
+
+		//Clean up
+		if(len)
+			*len = compHeader.decompressedSize;
+
+		delete[] compressedData;
+		return decompressedData;
 	}
 
-	//If for some reason we don't have the decompressed size, generate it now
-	if(!compHeader.decompressedSize)
-		compHeader.decompressedSize = wfLZ_GetDecompressedSize(compressed);
-
-	//Allocate memory and decompress
-	unsigned char* decompressedBuf = new unsigned char[compHeader.decompressedSize];
-	wfLZ_Decompress(compressed, decompressedBuf);
-
-	//Clean up
-	if(len)
-		*len = compHeader.decompressedSize;
-
-	delete[] compressed;
-	return decompressedBuf;
+	return NULL;
 }

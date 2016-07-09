@@ -16,6 +16,11 @@
 #include "easylogging++.h"
 #include "ResourceTypes.h"
 
+Image::Image(unsigned char* blob, unsigned int size)
+{
+	m_sFilename = "";	//Can't reload? Is this a problem?
+	_loadBlob(blob, size);
+}
 
 Image::Image(string sFilename)
 {
@@ -362,7 +367,9 @@ void Image::_load(string sFilename)
 
 void Image::_reload()
 {
-	_load(m_sFilename);
+	//TODO: Support reloading images loaded from buffers
+	if(m_sFilename.length())
+		_load(m_sFilename);
 }
 
 

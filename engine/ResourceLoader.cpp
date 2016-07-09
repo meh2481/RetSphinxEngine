@@ -8,16 +8,19 @@
 #include "Object.h"
 #include "Box2D/Box2D.h"
 #include "ResourceCache.h"
+#include "PakLoader.h"
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld)
 {
 	m_world = physicsWorld;
 	m_cache = new ResourceCache();
+	m_pakLoader = new PakLoader("./res/pak");
 }
 
 ResourceLoader::~ResourceLoader()
 {
 	delete m_cache;
+	delete m_pakLoader;
 }
 
 //From http://stackoverflow.com/a/13487193
@@ -39,9 +42,20 @@ Image* ResourceLoader::getImage(string sID)
 	Image* img = m_cache->findImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
-		//TODO: Load from here, not from Image class
-		img = new Image(sID);				//Create this image
-		m_cache->addImage(hashVal, img);	//Add to the cache
+		unsigned int len = 0;
+		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+		if(!resource || !len)
+		{
+			//TODO: Load from here, not from Image class
+			img = new Image(sID);				//Create this image
+			m_cache->addImage(hashVal, img);	//Add to the cache
+		}
+		else
+		{
+			//TODO: Load from here, not from Image class
+			img = new Image(resource, len);
+			m_cache->addImage(hashVal, img);
+		}
 	}
 	return img;
 }
