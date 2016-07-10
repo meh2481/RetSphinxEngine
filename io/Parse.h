@@ -6,12 +6,13 @@
 #pragma once
 
 #include <string>
-using namespace std;
 
 //--------------------------------------------------
 // Parsing functions
 //--------------------------------------------------
-
-string stripCommas(string s);	   //Strip all the commas from s, leaving spaces in their place
-
+namespace Parse
+{
+	std::string stripCommas(std::string s);	   //Strip all the commas from s, leaving spaces in their place
+	std::string getExtension(std::string filename);	//Get the file extension from a filename, or empty string if there is none
+}
 

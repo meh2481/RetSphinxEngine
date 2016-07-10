@@ -4,7 +4,6 @@
 #include "Object.h"
 #include "Node.h"
 #include <set>
-using namespace std;
 
 typedef struct {
 	Object* objA;
@@ -15,10 +14,10 @@ typedef struct {
 	
 class EngineContactListener : public b2ContactListener
 {
-	set<b2Contact*> m_tmpFrameContacts;
+	std::set<b2Contact*> m_tmpFrameContacts;
 public:
-	set<b2Contact*> frameContacts;
-	set<b2Contact*> currentContacts;
+	std::set<b2Contact*> frameContacts;
+	std::set<b2Contact*> currentContacts;
 	
 	//Implementations from Box2D
 	virtual void BeginContact(b2Contact *contact);

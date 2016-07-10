@@ -1,14 +1,13 @@
 #pragma once
 #include "glmx.h"
 #include <string>
-using namespace std;
 
 //------------------------------------------------------
 // Other helpful things
 //------------------------------------------------------
 typedef glm::vec2 Vec2;
 typedef glm::vec3 Vec3;
-Vec2 pointFromString(string s);	//Get a point from comma-separated values in a string
+Vec2 pointFromString(std::string s);	//Get a point from comma-separated values in a string
 
 //------------------------------------------------------
 // Rect class
@@ -39,6 +38,6 @@ public:
 	bool inside(Vec2 p);
 
 	//Setter methods
-	void fromString(string s);	  //Get a rectangle from comma-separated values in a string
+	void fromString(std::string s);	  //Get a rectangle from comma-separated values in a string
 	void set(float fleft, float ftop, float fright, float fbottom);
 };

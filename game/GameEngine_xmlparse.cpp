@@ -7,6 +7,7 @@
 #include "ResourceTypes.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
+using namespace std;
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML

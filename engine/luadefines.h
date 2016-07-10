@@ -2,7 +2,6 @@
 
 #include <lua.hpp>
 #include <string>
-using namespace std;
 
 
 #define luaFunc(func)       static int l_##func(lua_State *L)

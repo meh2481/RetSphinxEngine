@@ -8,7 +8,6 @@
 #include "Drawable.h"
 #include "Rect.h"
 #include <string>
-using namespace std;
 
 class Image;
 
@@ -37,7 +36,7 @@ public:
 	void update(float dt);
 	
 	//Accessor methods
-	const string& getImageFilename();
+	const std::string& getImageFilename();
 	unsigned getNumber()	{return numSegments;};
 	
 

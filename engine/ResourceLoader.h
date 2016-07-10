@@ -4,7 +4,6 @@
 #include <inttypes.h>
 #include "tinyxml2.h"
 #include "Rect.h"
-using namespace std;
 
 class Image;
 class Object;
@@ -23,7 +22,7 @@ class ResourceLoader
 	ResourceCache* m_cache;
 	PakLoader* m_pakLoader;
 
-	uint64_t hash(string sHashStr);
+	uint64_t hash(std::string sHashStr);
 
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 	ResourceLoader() {};
@@ -34,19 +33,19 @@ public:
 	ResourceCache* getCache() { return m_cache; };
 
 	//Images
-	Image* getImage(string sID);
+	Image* getImage(std::string sID);
 
 	//Meshes
-	Mesh3D* getMesh(string sID);
+	Mesh3D* getMesh(std::string sID);
 
 	//Particles
-	ParticleSystem* getParticleSystem(string sID);
+	ParticleSystem* getParticleSystem(std::string sID);
 
 	//Mouse cursors
-	MouseCursor* getCursor(string sID);
+	MouseCursor* getCursor(std::string sID);
 
 	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);
 
-	Object* objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel);
+	Object* objFromXML(std::string sType, Vec2 ptOffset, Vec2 ptVel);
 };

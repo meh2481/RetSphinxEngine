@@ -25,12 +25,12 @@ void Color::from256(int ir, int ig, int ib, int ia)
 	a = (float)ia / 255.0;
 }
 
-void Color::fromString(string s)
+void Color::fromString(std::string s)
 {
-	s = stripCommas(s);
+	s = Parse::stripCommas(s);
 
 	//Now, parse
-	istringstream iss(s);
+	std::istringstream iss(s);
 	int r, g, b, a;
 	if(iss >> r >> g >> b)
 	{

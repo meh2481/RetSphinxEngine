@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-using namespace std;
 
 class Color
 {
@@ -14,5 +13,5 @@ public:
 	void set(float fr, float fg, float fb, float fa = 1.0);
 	void clear() { r = g = b = a = 1.0f; };
 
-	void fromString(string s);	//Set values from comma-separated values in a string
+	void fromString(std::string s);	//Set values from comma-separated values in a string
 };

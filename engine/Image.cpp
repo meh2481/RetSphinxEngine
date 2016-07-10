@@ -15,6 +15,7 @@
 #include "stb_image_write.h"
 #include "easylogging++.h"
 #include "ResourceTypes.h"
+using namespace std;
 
 Image::Image(unsigned char* blob, unsigned int size)
 {

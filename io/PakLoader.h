@@ -5,7 +5,6 @@
 #include <string>
 #include <list>
 #include "ResourceTypes.h"
-using namespace std;
 
 class PakLoader
 {
@@ -15,17 +14,17 @@ class PakLoader
 		FILE* fp;
 	} PakPtr;
 
-	map<uint64_t, PakPtr> m_pakFiles;
-	list<FILE*> openedFiles;
+	std::map<uint64_t, PakPtr> m_pakFiles;
+	std::list<FILE*> openedFiles;
 
-	void parseFile(string sFileName);
+	void parseFile(std::string sFileName);
 
 	PakLoader() {};
 
-	void loadPaksFromDir(string sDirName);
+	void loadPaksFromDir(std::string sDirName);
 
 public:
-	PakLoader(string sDirName);
+	PakLoader(std::string sDirName);
 	~PakLoader();
 
 	unsigned char* loadResource(uint64_t id, unsigned int* len = NULL);

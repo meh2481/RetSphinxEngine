@@ -1,6 +1,7 @@
 #include "Gradient.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
+using namespace std;
 
 Gradient::Gradient(string sXMLFilename)
 {

@@ -11,7 +11,6 @@
 #include "Subject.h"
 #include "Rect.h"
 #include <vector>
-using namespace std;
 
 extern float g_fParticleFac;
 
@@ -59,7 +58,7 @@ class ParticleSystem
 	float spawnCounter;
 	float startedFiring;			//When we started firing (to keep track of decay)
 
-	string m_sXMLFrom;	//So we know what XML file we should reload from
+	std::string m_sXMLFrom;	//So we know what XML file we should reload from
 
 	Subject* m_subject;
 
@@ -103,7 +102,7 @@ public:
 	
 	//Particle system variables
 	Image*				img;				//Image to use for all of these particles
-	vector<Rect>		imgRect;			//Possible positions in this image to use for each particle
+	std::vector<Rect>		imgRect;			//Possible positions in this image to use for each particle
 	unsigned 			max;				//Max # of particles
 	float 			rate;				//How many particles to emit per second
 	float				curRate;			//[0,1.0] Factor for how many particles we spawn per second
@@ -115,7 +114,7 @@ public:
 	bool				show;				//If this should draw or not
 	bool				velRotate;			//If these particles should rotate according to their velocity
 	bool				changeColor;		//If these particles change color as they update, or just alpha
-	vector<string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
+	std::vector<std::string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
 	Vec2				emissionVel;		//Move the emission point every frame
 	bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
 	

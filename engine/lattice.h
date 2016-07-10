@@ -108,7 +108,7 @@ struct BodyPos
 class SoftBodyAnim : public LatticeAnim
 {
 protected:
-	list<BodyPos> bodies;
+	std::list<BodyPos> bodies;
 	BodyPos center;
 	
 	Vec2 getCenter();

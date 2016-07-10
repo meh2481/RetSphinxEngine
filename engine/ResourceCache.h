@@ -1,17 +1,16 @@
 #pragma once
 #include <map>
-using namespace std;
 
 class Image;
 class Mesh3D;
 
 class ResourceCache
 {
-	map<Image*, uint32_t> imageUses;
-	map<uint64_t, Image*> imageIDMap;
+	std::map<Image*, uint32_t> imageUses;
+	std::map<uint64_t, Image*> imageIDMap;
 
-	map<Mesh3D*, uint32_t> meshUses;
-	map<uint64_t, Mesh3D*> meshIDMap;
+	std::map<Mesh3D*, uint32_t> meshUses;
+	std::map<uint64_t, Mesh3D*> meshIDMap;
 
 	void clearImages();
 	void clearMeshes();

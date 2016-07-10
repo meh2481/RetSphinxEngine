@@ -5,6 +5,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "ParticleSystem.h"
+using namespace std;
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768

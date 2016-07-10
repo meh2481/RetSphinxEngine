@@ -7,6 +7,7 @@
 #include "tinyxml2.h"
 #include <float.h>
 #include <sstream>
+using namespace std;
 
 void GameEngine::updateColors(float dt)
 {

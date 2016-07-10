@@ -3,6 +3,7 @@
 
 #include "Box2D/Box2D.h"
 #include "Random.h"
+using namespace std;
 
 void Lattice::reset(float sx, float sy)
 {	
@@ -275,21 +276,6 @@ void WobbleLatticeAnim::setEffect()
 
 //-------------------------------------------------------------------------
 //Soft body animation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Vec2 SoftBodyAnim::getCenter()
 {
 	b2Vec2 centroid(0,0);

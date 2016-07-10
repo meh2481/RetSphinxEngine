@@ -8,6 +8,8 @@
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <fstream>
 #include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"

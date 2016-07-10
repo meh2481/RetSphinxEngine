@@ -5,6 +5,7 @@
 
 #include "GameEngine.h"
 #include "easylogging++.h"
+using namespace std;
 
 //Define constants for logger
 INITIALIZE_EASYLOGGINGPP

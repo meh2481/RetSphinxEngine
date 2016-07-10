@@ -18,7 +18,7 @@ LuaInterface::LuaInterface(const char *script, int argc, const char * const *arg
  : script(script), argc(argc), argv(argv), _lua(NULL)
 {
 #ifdef _DEBUG
-	cout
+	std::cout
 #else
 	LOG(INFO)
 #endif

@@ -98,7 +98,7 @@ void Rect::centerOn(Vec2 p)
 
 void Rect::fromString(string s)
 {
-	s = stripCommas(s);
+	s = Parse::stripCommas(s);
 
 	//Now, parse
 	istringstream iss(s);
@@ -108,7 +108,7 @@ void Rect::fromString(string s)
 
 Vec2 pointFromString(string s)
 {
-	s = stripCommas(s);
+	s = Parse::stripCommas(s);
 
 	//Now, parse
 	istringstream iss(s);

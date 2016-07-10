@@ -13,6 +13,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
+using namespace std;
 
 extern int screenDrawWidth;
 extern int screenDrawHeight;
@@ -465,7 +466,7 @@ HUDItem* HUD::_getItem(tinyxml2::XMLElement* elem)
         const char* cKeys = elem->Attribute("keys");
         if(cKeys != NULL && iNumKeys)
         {
-            string sKeys = stripCommas(cKeys);
+            string sKeys = Parse::stripCommas(cKeys);
             istringstream iss(sKeys);
             for(int i = 0; i < iNumKeys; i++)
             {

@@ -8,6 +8,7 @@
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
+using namespace std;
 
 
 Text::Text(string sXMLFilename)

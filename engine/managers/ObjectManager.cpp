@@ -1,6 +1,7 @@
 #include "ObjectManager.h"
 #include "Object.h"
 #include "Box2D/Box2D.h"
+using namespace std;
 
 //-----------------------------------------------------
 // Callback helper class for finding objects

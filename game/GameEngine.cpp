@@ -12,6 +12,7 @@
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
+using namespace std;
 
 //#define DEBUG_INPUT
 

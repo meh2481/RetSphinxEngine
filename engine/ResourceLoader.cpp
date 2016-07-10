@@ -9,6 +9,7 @@
 #include "Box2D/Box2D.h"
 #include "ResourceCache.h"
 #include "PakLoader.h"
+using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld)
 {

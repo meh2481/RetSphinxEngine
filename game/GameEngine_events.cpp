@@ -9,6 +9,7 @@
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "ResourceCache.h"
+using namespace std;
 
 typedef struct
 {

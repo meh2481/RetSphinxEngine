@@ -32,18 +32,18 @@ const float soundFreqDefault = 44100.0;
 
 typedef struct
 {
-	string sSwitch, sValue;
+	std::string sSwitch, sValue;
 } commandlineArg;
 
 class Engine
 {
 private:
 	//Variables for use by the engine
-	string m_sTitle;
-	string m_sAppName;
-	string m_sIcon;
+	std::string m_sTitle;
+	std::string m_sAppName;
+	std::string m_sIcon;
 	SDL_Window* m_Window;
-	list<commandlineArg> lCommandLine;
+	std::list<commandlineArg> lCommandLine;
 	b2World* m_physicsWorld;
 	EngineContactListener m_clContactListener;
 	DebugDraw m_debugDraw;
@@ -97,21 +97,21 @@ protected:
 	//Functions to override in your own class definition
 	virtual void frame(float dt) = 0;   //Function that's called every frame
 	virtual void draw() = 0;	//Actual function that draws stuff
-	virtual void init(list<commandlineArg> sArgs) = 0;	//So we can load all our images and such
+	virtual void init(std::list<commandlineArg> sArgs) = 0;	//So we can load all our images and such
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
 
 public:
 	//Constructor/destructor
-	Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable = false);
+	Engine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sAppName, std::string sIcon, bool bResizable = false);
 	~Engine();
 
 	//Misc. methods
-	void commandline(list<string> argv);	//Pass along commandline arguments for the engine to use
+	void commandline(std::list<std::string> argv);	//Pass along commandline arguments for the engine to use
 	void start();   //Runs engine and doesn't exit until the engine ends
 	void quit() {m_bQuitting = true;};  //Stop the engine and quit nicely
-	string getSaveLocation();		//Get good location to save config files/save files
+	std::string getSaveLocation();		//Get good location to save config files/save files
 	Rect getCameraView(Vec3 Camera);		//Return the rectangle, in world position z=0, that the camera can see
 	Vec2 worldPosFromCursor(Vec2 cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
 	Vec2 worldMovement(Vec2 cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
@@ -138,10 +138,10 @@ public:
 	uint16_t getHeight() {return m_iHeight;};
 	
 	//Sound functions - engine_sound.cpp
-	void createSound(string sPath, string sName);   //Creates a sound from this name and file path
-	virtual void playSound(string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play a sound
+	void createSound(std::string sPath, std::string sName);   //Creates a sound from this name and file path
+	virtual void playSound(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play a sound
 	//FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
-	void playMusic(string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play looping music, or resume paused music
+	void playMusic(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play looping music, or resume paused music
 	void musicLoop(float startSec, float endSec);	//Set the starting and ending loop points for the currently-playing song
 	void pauseMusic();									//Pause music that's currently playing
 	void resumeMusic();									//Resume music that was paused

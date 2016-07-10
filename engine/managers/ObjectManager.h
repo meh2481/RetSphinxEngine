@@ -2,7 +2,6 @@
 #include <list>
 #include "Rect.h"
 #include "glmx.h"
-using namespace std;
 
 class Object;
 class b2World;
@@ -10,8 +9,8 @@ class b2World;
 class ObjectManager
 {
 	bool updating;
-	list<Object*> m_lObjects;	//Object list
-	list<Object*> m_lUpdateObjects;	//Temp holder for objects added while iterating over the object list
+	std::list<Object*> m_lObjects;	//Object list
+	std::list<Object*> m_lUpdateObjects;	//Temp holder for objects added while iterating over the object list
 	b2World* m_physicsWorld;
 
 public:

@@ -1,5 +1,6 @@
 #include "SceneryManager.h"
 #include "Object.h"
+using namespace std;
 
 SceneryManager::~SceneryManager()
 {

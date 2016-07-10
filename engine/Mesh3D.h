@@ -4,7 +4,6 @@
 */
 #pragma once
 #include <string>
-using namespace std;
 
 #define NO_TEXTURE 	"image_none"	//Invalid image
 #define NO_MESH		"mesh_none"		//Invalid 3D mesh
@@ -34,11 +33,11 @@ class Mesh3D
 {
 protected:
     unsigned m_obj;   //The object in 3D memory
-    string m_sObjFilename;
+	std::string m_sObjFilename;
 	
 	
-    void _fromOBJFile(string sFilename);
-	void _fromTiny3DFile(string sFilename);
+    void _fromOBJFile(std::string sFilename);
+	void _fromTiny3DFile(std::string sFilename);
 
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
@@ -49,14 +48,14 @@ public:
     
     void _reload();  //Reload memory associated with this object
 
-    Mesh3D(string sOBJFile);
+    Mesh3D(std::string sOBJFile);
     Mesh3D();
     ~Mesh3D();
 
     void render(Image* img);
 	
 	//Accessor methods
-	string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
+	std::string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
 
 };
 

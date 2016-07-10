@@ -66,7 +66,7 @@ private:
 	Vec3 CameraPos;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
-	list<ColorPhase> m_ColorsChanging;
+	std::list<ColorPhase> m_ColorsChanging;
 	SDL_Joystick *m_joy;	//TODO: Handle more than one gamepad at a time, also manage with Engine
 	SDL_Haptic* m_rumble;
 	
@@ -77,16 +77,16 @@ private:
 	Rect rcSceneBounds;
 	
 	//Testing stuff that should eventually be finalized/fixed!
-	string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map	TODO: Better way of doing this
-	string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
-	string m_sLastScene;
+	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map	TODO: Better way of doing this
+	std::string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
+	std::string m_sLastScene;
 
 	DebugUI *m_debugUI;
 
 protected:
 	void frame(float dt);
 	void draw();
-	void init(list<commandlineArg> sArgs);
+	void init(std::list<commandlineArg> sArgs);
 	void pause();
 	void resume();
 	
@@ -95,7 +95,7 @@ protected:
 
 public:
 	//GameEngine.cpp functions - fairly generic 
-	GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable = false);
+	GameEngine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sAppName, std::string sIcon, bool bResizable = false);
 	~GameEngine();
 	
 	void setLua(LuaInterface* l)	{Lua = l;};
@@ -104,9 +104,9 @@ public:
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
-	bool loadConfig(string sFilename);
-	void saveConfig(string sFilename);
-	void loadScene(string sXMLFilename);	//Load scene from file
+	bool loadConfig(std::string sFilename);
+	void saveConfig(std::string sFilename);
+	void loadScene(std::string sXMLFilename);	//Load scene from file
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp

@@ -10,13 +10,12 @@
 #include "SDL.h"
 #include <list>
 #include <map>
-using namespace std;
 
 class Image;
 class Text;
 
 //Global functions for use with HUD objects
-inline void stubSignal(string sSignal) { }; //For stubbing out HUD signal handling functions
+inline void stubSignal(std::string sSignal) { }; //For stubbing out HUD signal handling functions
 
 // HUDItem class -- base class for HUD items
 class HUDItem
@@ -25,32 +24,32 @@ private:
 	HUDItem(){};
 
 protected:
-	string		  m_sName;
-	string		  m_sSignal;  //What signal this generates
+	std::string		  m_sName;
+	std::string		  m_sSignal;  //What signal this generates
 	Vec2		   m_ptPos;
-	list<HUDItem*>  m_lChildren;
-	void (*m_signalHandler)(string);	//Function for handling signals this class creates
+	std::list<HUDItem*>  m_lChildren;
+	void (*m_signalHandler)(std::string);	//Function for handling signals this class creates
 
 public:
 	Color col;
 	bool hidden;
 
-	HUDItem(string sName);
+	HUDItem(std::string sName);
 	~HUDItem();
 
 	virtual bool	event(SDL_Event event);						 //For handling input events as they come in
 	virtual void	draw(float fCurTime);						   //For drawing to the screen
 	void			addChild(HUDItem* hiChild);						 //Add this child to this HUDItem
-	HUDItem*		getChild(string sName);							 //Get the first child that has this name (return NULL if none)
+	HUDItem*		getChild(std::string sName);							 //Get the first child that has this name (return NULL if none)
 
 	//Accessor methods
-	string		  getName()				   {return m_sName;};
-	void			setName(string sName)	   {m_sName = sName;};
+	std::string		  getName()				   {return m_sName;};
+	void			setName(std::string sName)	   {m_sName = sName;};
 	Vec2		   getPos()					{return m_ptPos;};
 	void			setPos(Vec2 ptPos)		 {m_ptPos = ptPos;};
-	void			setSignal(string sSignal)   {m_sSignal = sSignal;};
-	string		  getSignal()				 {return m_sSignal;};
-	void			setSignalHandler(void (*signalHandler)(string));
+	void			setSignal(std::string sSignal)   {m_sSignal = sSignal;};
+	std::string		  getSignal()				 {return m_sSignal;};
+	void			setSignalHandler(void (*signalHandler)(std::string));
 
 };
 
@@ -63,7 +62,7 @@ protected:
 public:
 	Vec2 pos, size;
 	
-	HUDImage(string sName);
+	HUDImage(std::string sName);
 	~HUDImage();
 
 	void draw(float fCurTime);
@@ -76,21 +75,21 @@ class HUDTextbox : public HUDItem
 {
 protected:
 	Text* m_txtFont;
-	string m_sValue;
+	std::string m_sValue;
 
 public:
 	float pt;
 
-	HUDTextbox(string sName);
+	HUDTextbox(std::string sName);
 	~HUDTextbox();
 
 	void draw(float fCurTime);
 
 	void	setFont(Text* txt)			{m_txtFont = txt;};	 //Set the font used by this textbox
 	Text*   getFont()					{return m_txtFont;};
-	void	setText(string s)			{m_sValue = s;};		//Set the text to display
+	void	setText(std::string s)			{m_sValue = s;};		//Set the text to display
 	void	setText(uint32_t iNum);							 //Set the text from an integer
-	string  getText()					{return m_sValue;};
+	std::string  getText()					{return m_sValue;};
 	float getWidth();
 
 };
@@ -105,7 +104,7 @@ protected:
 	bool		m_bValue;	   //Enabled/Disabled
 
 public:
-	HUDToggle(string sName);
+	HUDToggle(std::string sName);
 	~HUDToggle();
 
 	bool event(SDL_Event event);						//This will create a signal if the event matches our set key
@@ -128,10 +127,10 @@ typedef struct
 class HUDGeom : public HUDItem
 {
 protected:
-	list<Quad> m_lQuads;
+	std::list<Quad> m_lQuads;
 	
 public:
-	HUDGeom(string sName);
+	HUDGeom(std::string sName);
 	~HUDGeom();
 	
 	void draw(float fCurTime);
@@ -145,10 +144,10 @@ protected:
 	float m_fFadeDelay;
 	float m_fFadeTime;
 	float m_fStartTime;
-	map<int,bool> m_mKeys;  //The keys our children are responding to, that we'll set our alpha to 255 for
+	std::map<int,bool> m_mKeys;  //The keys our children are responding to, that we'll set our alpha to 255 for
 
 public:
-	HUDGroup(string sName);
+	HUDGroup(std::string sName);
 	~HUDGroup();
 
 	bool event(SDL_Event event);						//If this event matches any of our keys, set alpha to 255
@@ -172,7 +171,7 @@ protected:
 	void _enter();
 	
 public:
-	HUDMenu(string sName);
+	HUDMenu(std::string sName);
 	~HUDMenu();
 	
 	float pt, selectedpt;
@@ -181,14 +180,14 @@ public:
 	float selectedX;	//Width of selected menu item
 	Color m_sSelected, m_sSelected2, m_sNormal;
 	Text* m_txtFont;
-	string selectsignal;
+	std::string selectsignal;
 	typedef struct
 	{
-		string signal;
-		string text;
+		std::string signal;
+		std::string text;
 	} menuItem;
-	list<menuItem> m_menu;
-	list<menuItem>::iterator m_selected;
+	std::list<menuItem> m_menu;
+	std::list<menuItem>::iterator m_selected;
 	
 	bool event(SDL_Event event);
 	void draw(float fCurTime);
@@ -200,21 +199,21 @@ public:
 class HUD : public HUDItem
 {
 protected:
-	map<string, Image*> m_mImages;
-	map<string, Text*>  m_mFonts;
-	map<string, list<HUDItem*> > m_mScenes;
-	string m_sScene;
+	std::map<std::string, Image*> m_mImages;
+	std::map<std::string, Text*>  m_mFonts;
+	std::map<std::string, std::list<HUDItem*> > m_mScenes;
+	std::string m_sScene;
 
 	HUDItem* _getItem(tinyxml2::XMLElement* elem);	//Load the specific item pointed to (assumes elem != NULL)
 
 public:
-	HUD(string sName);
+	HUD(std::string sName);
 	~HUD();
 
-	void create(string sXMLFilename);   //Create this HUD from an XML file
+	void create(std::string sXMLFilename);   //Create this HUD from an XML file
 	void destroy(); //Free memory associated with HUD items
-	void setScene(string sScene);
-	string getScene()	{return m_sScene;};
+	void setScene(std::string sScene);
+	std::string getScene()	{return m_sScene;};
 };
 
 

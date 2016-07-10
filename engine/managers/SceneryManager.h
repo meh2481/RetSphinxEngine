@@ -3,7 +3,6 @@
 #include "glmx.h"
 #include <set>
 #include "Object.h"
-using namespace std;
 
 //TODO: Use SceneryLayer rather than ObjSegment
 class SceneryManager
@@ -17,8 +16,8 @@ class SceneryManager
 		}
 	};
 
-	multiset<ObjSegment*, DepthComparator> m_lSceneryFg;
-	multiset<ObjSegment*, DepthComparator> m_lSceneryBg;
+	std::multiset<ObjSegment*, DepthComparator> m_lSceneryFg;
+	std::multiset<ObjSegment*, DepthComparator> m_lSceneryBg;
 
 public:
 	~SceneryManager();

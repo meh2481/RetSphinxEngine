@@ -2,7 +2,6 @@
 #include "glmx.h"
 #include <string>
 #include "Rect.h"
-using namespace std;
 
 class ParticleSystemManager;
 class ResourceLoader;
@@ -37,7 +36,7 @@ public:
 	//Node functions
 	void add(Node* n);
 	Node* getNode(Vec2 pos);
-	Node* getNode(string sNodeName);
+	Node* getNode(std::string sNodeName);
 
 	//Object funtions
 	void add(Object* o);

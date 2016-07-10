@@ -12,6 +12,7 @@
 #include <Box2D/Box2D.h>
 #include "tinyxml2.h"
 using namespace tinyxml2;
+using namespace std;
 
 //----------------------------------------------------------------------------------------------------
 // obj class

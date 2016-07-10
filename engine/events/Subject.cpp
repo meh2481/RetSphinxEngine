@@ -7,7 +7,7 @@ void Subject::addObserver(Observer * o)
 
 void Subject::removeObserver(Observer * o)
 {
-	for(list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
+	for(std::list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
 	{
 		if(*i == o)
 		{
@@ -17,9 +17,9 @@ void Subject::removeObserver(Observer * o)
 	}
 }
 
-void Subject::notify(string sMsg, Vec2 pos)
+void Subject::notify(std::string sMsg, Vec2 pos)
 {
-	for(list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
+	for(std::list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
 	{
 		(*i)->onNotify(sMsg, pos);
 	}

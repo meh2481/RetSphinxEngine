@@ -1,5 +1,6 @@
 #include "ParticleSystemManager.h"
 #include "ParticleSystem.h"
+using namespace std;
 
 ParticleSystemManager::ParticleSystemManager(ResourceLoader* loader)
 {

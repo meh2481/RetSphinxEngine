@@ -4,7 +4,6 @@
 #include "Subject.h"
 #include "ResourceLoader.h"
 #include "glmx.h"
-using namespace std;
 
 class ParticleSystem;
 
@@ -12,8 +11,8 @@ class ParticleSystemManager : public Observer
 {
 	ParticleSystemManager() {};
 
-	list<ParticleSystem*> m_particles;
-	list<ParticleSystem*> m_updateParticles;
+	std::list<ParticleSystem*> m_particles;
+	std::list<ParticleSystem*> m_updateParticles;
 	Subject* m_notifySubject;
 	ResourceLoader* m_loader;	//TODO This should just be a ParticleSystemLoader, not ResourceLoader?
 	bool updating;
@@ -27,6 +26,6 @@ public:
 	void render(glm::mat4 mat);
 	void update(float dt);
 
-	virtual void onNotify(string sParticleFilename, Vec2 pos);
+	virtual void onNotify(std::string sParticleFilename, Vec2 pos);
 };
 

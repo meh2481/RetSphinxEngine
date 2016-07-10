@@ -9,6 +9,7 @@
 #include "tinyxml2.h"
 #include "easylogging++.h"
 #include "Random.h"
+using namespace std;
 
 ParticleSystem::ParticleSystem()
 {

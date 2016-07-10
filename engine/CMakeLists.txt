@@ -39,8 +39,6 @@ mtrand.h
 opengl-api.cpp
 opengl-api.h
 opengl-stubs.h
-Parse.cpp
-Parse.h
 ParticleSystem.cpp
 ParticleSystem.h
 Rect.cpp

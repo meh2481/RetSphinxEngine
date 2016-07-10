@@ -13,6 +13,7 @@
 #include "imgui_impl_sdl.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
+using namespace std;
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {

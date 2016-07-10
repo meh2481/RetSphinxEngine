@@ -1,5 +1,6 @@
 #include "NodeManager.h"
 #include "Node.h"
+using namespace std;
 
 NodeManager::~NodeManager()
 {

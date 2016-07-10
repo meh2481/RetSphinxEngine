@@ -2,6 +2,7 @@
 #include "tinydir.h"
 #include "wfLZ.h"
 #include "easylogging++.h"
+#include "Parse.h"
 #include <sstream>
 using namespace std;
 
@@ -18,20 +19,17 @@ void PakLoader::loadPaksFromDir(string sDirName)
 
 		if(!file.is_dir)
 		{
-			char* point;
-			if((point = strrchr(file.name, '.')) != NULL)
+			string fileExt = Parse::getExtension(file.name);
+			ostringstream oss;
+			oss << sDirName << "/" << file.name;
+			if(fileExt == "pak")
 			{
-				ostringstream oss;
-				oss << sDirName << "/" << file.name;
-				if(strcmp(point, ".pak") == 0)
-				{
-					//should be pak file
-					LOG(TRACE) << "open pak file " << sDirName << "/" << file.name;
-					parseFile(oss.str());
-				}
-				else
-					LOG(TRACE) << "Ignoring non-pak file " << oss.str();
+				//should be pak file
+				LOG(TRACE) << "open pak file " << sDirName << "/" << file.name;
+				parseFile(oss.str());
 			}
+			else
+				LOG(TRACE) << "Ignoring non-pak file " << oss.str();
 		}
 
 		tinydir_next(&dir);

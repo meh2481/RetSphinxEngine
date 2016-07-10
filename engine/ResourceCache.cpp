@@ -1,6 +1,7 @@
 #include "ResourceCache.h"
 #include "Image.h"
 #include "Mesh3D.h"
+using namespace std;
 
 ResourceCache::~ResourceCache()
 {

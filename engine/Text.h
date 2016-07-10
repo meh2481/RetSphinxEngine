@@ -26,23 +26,23 @@ class Text
 private:
 	Text(){};								//Default constructor cannot be called
 	Image* m_imgFont;						//Image for this bitmap font
-	map<unsigned char, Rect> m_mRectangles;	//Rectangles for drawing each character
-	map<unsigned char, float> m_mKerning;	//Kerning info for font glyphs
-	string m_sName;
+	std::map<unsigned char, Rect> m_mRectangles;	//Rectangles for drawing each character
+	std::map<unsigned char, float> m_mKerning;	//Kerning info for font glyphs
+	std::string m_sName;
 
 public:
 	Color col;
 
-	Text(string sXMLFilename);  //Create the font from this XML file
+	Text(std::string sXMLFilename);  //Create the font from this XML file
 	~Text();
 
 	//Render this text to the screen, centered on x and y
-	void render(string sText, float x, float y, float pt);
+	void render(std::string sText, float x, float y, float pt);
 
 	//Find the size of a given string of text
-	float size(string sText, float pt);
-	string getName()	{return m_sName;};
-	void   setName(string sName)	{m_sName = sName;};
+	float size(std::string sText, float pt);
+	std::string getName()	{return m_sName;};
+	void   setName(std::string sName)	{m_sName = sName;};
 
 };
 

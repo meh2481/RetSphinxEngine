@@ -4,13 +4,13 @@
 
 class Node {
 	LuaObjGlue* 		glueObj;
-	map<string, string> propertyValues;	//This can be populated by XML and called from Lua! For userdata and such
+	std::map<std::string, std::string> propertyValues;	//This can be populated by XML and called from Lua! For userdata and such
 public:
 	enum { TYPE = OT_NODE };
-	string 			luaClass;
+	std::string 			luaClass;
 	LuaInterface* 	lua;
 	Vec2 			pos;
-	string 			name;
+	std::string 			name;
 	
 	Node();
 	~Node();
@@ -19,8 +19,8 @@ public:
 	void collided(Object* o);		//Collided with an object
 	void init();				//Create stuff in lua for this object
 	
-	void setProperty(string prop, string value)	{propertyValues[prop] = value;};
-	void addProperty(string prop, string value) {setProperty(prop, value);};
-	string getProperty(string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
+	void setProperty(std::string prop, std::string value)	{propertyValues[prop] = value;};
+	void addProperty(std::string prop, std::string value) {setProperty(prop, value);};
+	std::string getProperty(std::string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 };
 

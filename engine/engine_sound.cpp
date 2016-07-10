@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "easylogging++.h"
-
+using namespace std;
 
 void Engine::createSound(string sPath, string sName)
 {

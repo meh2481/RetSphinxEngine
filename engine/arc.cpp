@@ -110,7 +110,7 @@ void Arc::average()
 	free(temp);
 }
 
-const string& Arc::getImageFilename()
+const std::string& Arc::getImageFilename()
 {
     return img->getFilename();
 }

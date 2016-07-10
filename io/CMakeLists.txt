@@ -10,6 +10,8 @@ wfLZ.h
 tinydir.h
 PakLoader.h
 PakLoader.cpp
+Parse.cpp
+Parse.h
 )
 
 add_library(io ${io_src})
