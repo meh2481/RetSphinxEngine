@@ -50,14 +50,13 @@ Image* ResourceLoader::getImage(string sID)
 		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 		if(!resource || !len)
 		{
-			//TODO: Load from here, not from Image class
 			LOG(TRACE) << "Pak miss - load from file";
 			img = new Image(sID);				//Create this image
 			m_cache->addImage(hashVal, img);	//Add to the cache
+			free(resource);						//Free memory
 		}
 		else
 		{
-			//TODO: Load from here, not from Image class
 			LOG(TRACE) << "pak hit - load from data";
 			img = new Image(resource, len);
 			m_cache->addImage(hashVal, img);
@@ -73,9 +72,17 @@ Mesh3D* ResourceLoader::getMesh(string sID)
 	Mesh3D* mesh = m_cache->findMesh(hashVal);
 	if(!mesh)	//This mesh isn't here; load it
 	{
-		//TODO: Load from here, not from Mesh3D class
-		mesh = new Mesh3D(sID);				//Create this mesh
-		m_cache->addMesh(hashVal, mesh);	//Add to the cache
+		unsigned int len = 0;
+		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+		if(!resource || !len)
+		{
+			mesh = new Mesh3D(sID);				//Create this mesh
+			m_cache->addMesh(hashVal, mesh);	//Add to the cache
+		}
+		else
+		{
+
+		}
 	}
 	return mesh;
 }

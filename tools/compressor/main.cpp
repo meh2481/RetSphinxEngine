@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <list>
 #include "Parse.h"
+#include "FileOperations.h"
 using namespace std;
 
 #define PAD_32BIT 0x50444150
@@ -78,34 +79,6 @@ unsigned char* extractImage(string filename, unsigned int* fileSize)
 	return finalBuf;
 }
 
-unsigned char* readFile(string filename, unsigned int* fileSize)
-{
-	//Extract an image from this file if it is one
-	if(filename.find(".png") != string::npos)
-		return extractImage(filename, fileSize);
-
-	//Otherwise, fall back on writing raw file
-	FILE *f = fopen(filename.c_str(), "rb");
-	if(f == NULL)
-	{
-		cout << "unable to open? " << filename << endl;
-		return NULL;
-	}
-	fseek(f, 0, SEEK_END);
-	long size = ftell(f);
-	fseek(f, 0, SEEK_SET);  //same as rewind(f);
-
-	unsigned char *buf = (unsigned char*)malloc(size);
-	fread(buf, 1, size, f);
-	fclose(f);
-
-	if(fileSize)
-		*fileSize = size;
-
-
-	return buf;
-}
-
 list<string> readFilenames(string filelistFile)
 {
 	list<string> lFilenames;
@@ -170,7 +143,13 @@ void compress(list<string> filesToPak, string pakFilename)
 	{
 		cout << "Compressing \"" << *i << "\"..." << endl;
 		unsigned int size = 0;
-		unsigned char* decompressed = readFile(*i, &size);
+		unsigned char* decompressed;
+
+		//Extract an image from this file if it is one
+		if(i->find(".png") != string::npos)
+			decompressed = extractImage(*i, &size);
+		else
+			decompressed = FileOperations::readFile(*i, &size);
 
 		if(!size)
 		{
@@ -186,20 +165,21 @@ void compress(list<string> filesToPak, string pakFilename)
 		uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper.header.decompressedSize));
 		helper.header.compressedSize = wfLZ_CompressFast(decompressed, size, compressed, workMem, 0);
 
-		helper.data = compressed;
-
 		//See if compression made the file larger
 		if(helper.header.compressedSize >= helper.header.decompressedSize)
 		{
+			//It did; use the uncompressed data instead
 			helper.header.compressionType = COMPRESSION_FLAGS_UNCOMPRESSED;
 			helper.header.compressedSize = helper.header.decompressedSize;
 			helper.data = decompressed;
 			free(compressed);
 		}
 		else
+		{
+			//It didn't; use the compressed data
+			helper.data = compressed;
 			free(decompressed);
-
-		//TODO: Pad to end of 16-bit row
+		}
 
 		//Add this compression helper to our list
 		helper.size = helper.header.compressedSize;

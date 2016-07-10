@@ -14,18 +14,19 @@ class PakLoader
 		FILE* fp;
 	} PakPtr;
 
-	std::map<uint64_t, PakPtr> m_pakFiles;
-	std::list<FILE*> openedFiles;
+	std::map<uint64_t, PakPtr> m_pakFiles;	//Maps resource IDs to particular pak files
+	std::list<FILE*> openedFiles;			//Keeps track of all opened file handles so we can close them easily
 
 	void parseFile(std::string sFileName);
+	void loadPaksFromDir(std::string sDirName);
 
 	PakLoader() {};
-
-	void loadPaksFromDir(std::string sDirName);
 
 public:
 	PakLoader(std::string sDirName);
 	~PakLoader();
 
+	//Load a resource from the opened pak files. Returns NULL if it's not here or on error,
+	// returns a pointer to the data otherwise. This pointer must be free()d.
 	unsigned char* loadResource(uint64_t id, unsigned int* len = NULL);
 };
