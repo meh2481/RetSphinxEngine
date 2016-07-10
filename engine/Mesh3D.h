@@ -1,5 +1,5 @@
 /*
- CutsceneEditor source - 3DObject.h
+ RetSphinxEngine source - Mesh3D.h
  Copyright (c) 2013 Mark Hutcheson
 */
 #pragma once
@@ -38,6 +38,7 @@ protected:
 	
     void _fromOBJFile(std::string sFilename);
 	void _fromTiny3DFile(std::string sFilename);
+	void _fromData(const unsigned char* data, unsigned int len);
 
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not

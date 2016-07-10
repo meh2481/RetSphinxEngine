@@ -13,6 +13,7 @@
 #include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
+#include "FileOperations.h"
 using namespace std;
 using namespace tiny3d;
 
@@ -192,59 +193,38 @@ void Mesh3D::_fromOBJFile(string sFilename)
 void Mesh3D::_fromTiny3DFile(string sFilename)
 {
 	LOG(INFO) << "Loading 3D object " << sFilename;
-	FILE* fp = fopen(sFilename.c_str(), "rb");
-	if(fp == NULL)
+	unsigned int sz = 0;
+	unsigned char* data = FileOperations::readFile(sFilename, &sz);
+	if(data == NULL)
 	{
 		LOG(ERROR) << "Error: Input tiny3d file " << sFilename << " does not exist.";
 		return;
 	}
-	
+	_fromData(data, sz);
+	free(data);
+}
+
+void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
+{
 	//Read header
 	tiny3dHeader header;
-	if(fread(&header, 1, sizeof(tiny3dHeader), fp) != sizeof(tiny3dHeader))
-	{
-		LOG(ERROR) << "Error: Unable to read in tiny3d header from file " << sFilename;
-		fclose(fp);
-		return;
-	}
+	memcpy(&header, data, sizeof(tiny3dHeader));
+
+	data += sizeof(tiny3dHeader);
 	
-	//Read in normals
-	normal* normals = (normal*)malloc(sizeof(normal) * header.numNormals);
-	if(fread(normals, 1, sizeof(normal)*header.numNormals, fp) != sizeof(normal) * header.numNormals)
-	{
-		LOG(ERROR) << "Error: Unable to read normals from tiny3d file " << sFilename;
-		fclose(fp);
-		return;
-	}
-	
-	//Read in UVs
-	uv* uvs = (uv*)malloc(sizeof(uv) * header.numUVs);
-	if(fread(uvs, 1, sizeof(uv)*header.numUVs, fp) != sizeof(uv) * header.numUVs)
-	{
-		LOG(ERROR) << "Error: Unable to read UVs from tiny3d file " << sFilename;
-		fclose(fp);
-		return;
-	}
-	
-	//Read in vertices
-	vert* vertices = (vert*)malloc(sizeof(vert) * header.numVertices);
-	if(fread(vertices, 1, sizeof(vert)*header.numVertices, fp) != sizeof(vert) * header.numVertices)
-	{
-		LOG(ERROR) << "Error: Unable to read vertices from tiny3d file " << sFilename;
-		fclose(fp);
-		return;
-	}
-	
-	//Read in faces
-	face* faces = (face*)malloc(sizeof(face) * header.numFaces);
-	if(fread(faces, 1, sizeof(face)*header.numFaces, fp) != sizeof(face) * header.numFaces)
-	{
-		LOG(ERROR) << "Error: Unable to read faces from tiny3d file " << sFilename;
-		fclose(fp);
-		return;
-	}
-	
-	fclose(fp);
+	normal* normals = (normal*)data;
+
+	data += sizeof(normal) * header.numNormals;
+
+	uv* uvs = (uv*)data;
+
+	data += sizeof(uv) * header.numUVs;
+
+	vert* vertices = (vert*)data;
+
+	data += sizeof(vert) * header.numVertices;
+
+	face* faces = (face*)data;
 	
 	//Construct OpenGL object
     m_obj = glGenLists(1);
@@ -281,11 +261,6 @@ void Mesh3D::_fromTiny3DFile(string sFilename)
 
     glEnd();
     glEndList();
-	
-	free(normals);
-	free(vertices);
-	free(uvs);
-	free(faces);
 }
 
 void Mesh3D::render(Image* img)
