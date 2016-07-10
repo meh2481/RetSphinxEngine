@@ -106,7 +106,25 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	ps->_initValues();
 
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-	int iErr = doc->LoadFile(sID.c_str());
+
+	//Load file
+	uint64_t hashVal = hash(sID);
+	//TODO Check cache first
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	int iErr;
+	if(!resource || !len)
+	{
+		LOG(TRACE) << "Pak miss";
+		iErr = doc->LoadFile(sID.c_str());
+	}
+	else
+	{
+		LOG(TRACE) << "Loading from pak";
+		iErr = doc->Parse((const char*)resource, len);
+		free(resource);
+	}
+	
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
 		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
@@ -294,7 +312,24 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 	cur->_init();
 
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-	int iErr = doc->LoadFile(sID.c_str());
+
+	uint64_t hashVal = hash(sID);
+	//TODO Check cache first
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	int iErr;
+	if(!resource || !len)
+	{
+		LOG(TRACE) << "Pak miss";
+		iErr = doc->LoadFile(sID.c_str());
+	}
+	else
+	{
+		LOG(TRACE) << "loading from pak";
+		iErr = doc->Parse((const char*)resource, len);
+		free(resource);
+	}
+
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
 		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
@@ -369,7 +404,24 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	LOG(INFO) << "Parsing object XML file " << sXMLFilename;
 	//Open file
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
-	int iErr = doc->LoadFile(sXMLFilename.c_str());
+	
+	uint64_t hashVal = hash(sXMLFilename);
+	//TODO Check cache first
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	int iErr;
+	if(!resource || !len)
+	{
+		LOG(TRACE) << "Pak miss";
+		iErr = doc->LoadFile(sXMLFilename.c_str());
+	}
+	else
+	{
+		LOG(TRACE) << "load from pak";
+		iErr = doc->Parse((const char*)resource, len);
+		free(resource);
+	}
+
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
 		LOG(ERROR) << "Error parsing object XML file: Error " << iErr;
