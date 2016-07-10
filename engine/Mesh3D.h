@@ -40,6 +40,8 @@ protected:
 	void _fromTiny3DFile(std::string sFilename);
 	void _fromData(const unsigned char* data, unsigned int len);
 
+	Mesh3D() {};
+
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
 	bool shaded;	//If we're drawing this with OpenGL shading or not
@@ -50,7 +52,7 @@ public:
     void _reload();  //Reload memory associated with this object
 
     Mesh3D(std::string sOBJFile);
-    Mesh3D();
+	Mesh3D(const unsigned char* data, unsigned int len);
     ~Mesh3D();
 
     void render(Image* img);

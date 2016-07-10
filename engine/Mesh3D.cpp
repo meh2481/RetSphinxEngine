@@ -32,11 +32,13 @@ Mesh3D::Mesh3D(string sOBJFile)
 	shaded = true;
 }
 
-Mesh3D::Mesh3D()
+Mesh3D::Mesh3D(const unsigned char* data, unsigned int len)
 {
-  m_obj = 0;
-  wireframe = false;
-  shaded = true;
+	m_obj = 0;
+	wireframe = false;
+	shaded = true;
+
+	_fromData(data, len);
 }
 
 Mesh3D::~Mesh3D()
@@ -206,23 +208,32 @@ void Mesh3D::_fromTiny3DFile(string sFilename)
 
 void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 {
-	//Read header
-	tiny3dHeader header;
-	memcpy(&header, data, sizeof(tiny3dHeader));
+	//Make sure this is large enough to hold a header
+	if(len < sizeof(tiny3dHeader)) return;
+
+	tiny3dHeader*  header = (tiny3dHeader*) data;
+
+	//Make sure this is large enough to hold all the data
+	if(len < sizeof(tiny3dHeader) +
+		sizeof(normal) * header->numNormals +
+		sizeof(uv) * header->numUVs +
+		sizeof(vert) * header->numVertices +
+		sizeof(face) * header->numFaces)
+		return;
 
 	data += sizeof(tiny3dHeader);
 	
 	normal* normals = (normal*)data;
 
-	data += sizeof(normal) * header.numNormals;
+	data += sizeof(normal) * header->numNormals;
 
 	uv* uvs = (uv*)data;
 
-	data += sizeof(uv) * header.numUVs;
+	data += sizeof(uv) * header->numUVs;
 
 	vert* vertices = (vert*)data;
 
-	data += sizeof(vert) * header.numVertices;
+	data += sizeof(vert) * header->numVertices;
 
 	face* faces = (face*)data;
 	
@@ -233,7 +244,7 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
     //Loop through and add faces
     glBegin(GL_TRIANGLES);
 	face* facePtr = faces;
-    for(unsigned i = 0; i < header.numFaces; i++)
+    for(unsigned i = 0; i < header->numFaces; i++)
     {
 		vert v = vertices[facePtr->v1];
 		uv UV = uvs[facePtr->uv1];
@@ -265,6 +276,8 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 
 void Mesh3D::render(Image* img)
 {
+	if(!m_obj) return;
+
 	if(!useGlobalLight)
 	{
 		glEnable(GL_LIGHT1);
@@ -287,8 +300,11 @@ void Mesh3D::render(Image* img)
 
 void Mesh3D::_reload()
 {
-  if(m_sObjFilename.find(".obj", m_sObjFilename.size()-4) != string::npos)
-    _fromOBJFile(m_sObjFilename);
-  else
-    _fromTiny3DFile(m_sObjFilename);
+	if(m_sObjFilename.length())	//TODO Support reloading from data?
+	{
+		if(m_sObjFilename.find(".obj", m_sObjFilename.size() - 4) != string::npos)
+			_fromOBJFile(m_sObjFilename);
+		else
+			_fromTiny3DFile(m_sObjFilename);
+	}
 }

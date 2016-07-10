@@ -69,11 +69,11 @@ void Engine::setup_sdl()
 	for(int display = 0; display < numDisplays; display++)
 	{
 		int num = SDL_GetNumDisplayModes(display);
-		LOG(INFO) << "Available modes for display " << display + 1 << ':';
+		LOG(TRACE) << "Available modes for display " << display + 1 << ':';
 		for(int i = 0; i < num; i++)
 		{
 			SDL_GetDisplayMode(display, i, &mode);
-			LOG(INFO) << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz";
+			LOG(TRACE) << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz";
 		}
 	}
 	
