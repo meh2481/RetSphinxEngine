@@ -1,2 +1,1 @@
-add_subdirectory(imgExtractor)
 add_subdirectory(compressor)

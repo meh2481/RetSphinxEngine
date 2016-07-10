@@ -86,8 +86,6 @@ void PakLoader::parseFile(string sFileName)
 				return;
 			}
 
-			//TODO Validate resource type
-
 			PakPtr pakPtr = {resPtr, fp};
 			m_pakFiles[resPtr.id] = pakPtr;
 
@@ -185,6 +183,6 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		return decompressedData;
 	}
 
-	LOG(TRACE) << "some kind of error or something";
+	LOG(WARNING) << "Unknown compression header type " << compHeader.compressionType;
 	return NULL;
 }

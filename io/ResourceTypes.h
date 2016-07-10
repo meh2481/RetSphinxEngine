@@ -21,19 +21,10 @@ typedef struct
 // Pointer to resource within file
 //------------------------------------
 
-// Resource types
-#define RESOURCE_TYPE_XML		1
-#define RESOURCE_TYPE_MESH3D	2
-#define RESOURCE_TYPE_IMAGE		3
-#define RESOURCE_TYPE_LUASCRIPT	4
-#define RESOURCE_TYPE_SHADER	5
-#define RESOURCE_TYPE_SOUND		6
-
 typedef struct
 {
-	uint64_t id;
-	uint32_t type;		//One of the resource types above
-	uint32_t offset;	//Offset from start of file to CompressionHeader
+	uint64_t id;		//Resource ID
+	uint64_t offset;	//Offset from start of file to CompressionHeader
 } ResourcePtr;
 
 

@@ -5,7 +5,7 @@ Overall TODO list:
 - Implement newer OpenGL shaders and such
 - Use shaders rather than lattice animations where possible
 - IO in separate thread?
-- Replace string w/utf-8 compatible things
+- Replace string w/utf-8 compatible things?
 - Disable exceptions/rtti?
 - Add ImGUI editor stuff
 - rip out displaylists for 3D objects - vertex buffers are better
@@ -18,9 +18,6 @@ Overall TODO list:
 Refactoring thoughts:
 - Image class is bloated with too much junk; once shaders are implemented see what can be cropped out
 - lots of classes are in files for other classes; move to own files
-- rename files as needed to match class names
-- use UpperCase for class names to avoid confusion
-- use camelCase for variable names
 
 
 
@@ -61,6 +58,10 @@ Other misc unordered TODO:
 
 
 
+
+
+
+
 notes from talk with fg:
 - if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
 	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
@@ -73,3 +74,6 @@ notes from talk with fg:
 	v' = mat4 * (x,y,z,1) --> transforms point (translate)
 	m = scale * translate * rot --> rotate first, then translate, then scale
 	projmat = cameramat * objmat (can be recursive by passing proj to child objects)
+	
+Endianness testing:
+	union { char c[2], short s; } u; u.s = 1; return u.c[0];

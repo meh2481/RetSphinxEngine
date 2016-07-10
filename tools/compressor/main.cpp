@@ -109,25 +109,6 @@ list<string> readFilenames(string filelistFile)
 	return lFilenames;
 }
 
-uint32_t getResourceType(string sFilename)
-{
-	string extension = Parse::getExtension(sFilename);
-	if(extension == "png")
-		return RESOURCE_TYPE_IMAGE;
-	else if(extension == "xml")
-		return RESOURCE_TYPE_XML;
-	else if(extension == "tiny3d")
-		return RESOURCE_TYPE_MESH3D;
-	else if(extension == "lua")
-		return RESOURCE_TYPE_LUASCRIPT;
-	//TODO Other resource types
-	//else if(extension == "")
-	//	return RESOURCE_TYPE_;
-
-	cout << "Warning: unknown resource type " << extension << endl;
-	return 0;
-}
-
 void compress(list<string> filesToPak, string pakFilename)
 {
 	pakFilename = remove_extension(pakFilename);
@@ -204,7 +185,8 @@ void compress(list<string> filesToPak, string pakFilename)
 	//Write header
 	fwrite(&fileHeader, 1, sizeof(PakFileHeader), fOut);
 
-	uint32_t curOffset = sizeof(PakFileHeader) + compressedFiles.size() * sizeof(ResourcePtr);	//Start after both these
+	//Make sure we're doing 64-bit math on the current offset
+	uint64_t curOffset = (uint64_t)sizeof(PakFileHeader) + (uint64_t)compressedFiles.size() * (uint64_t)sizeof(ResourcePtr);	//Start after both these
 
 	//Write resource pointers
 	for(list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
@@ -212,7 +194,6 @@ void compress(list<string> filesToPak, string pakFilename)
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
 		resPtr.offset = curOffset;
-		resPtr.type = getResourceType(i->filename);
 
 		fwrite(&resPtr, 1, sizeof(ResourcePtr), fOut);
 		curOffset += sizeof(CompressionHeader) + i->header.compressedSize;
