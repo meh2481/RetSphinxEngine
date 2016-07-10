@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <list>
+#include "Parse.h"
 using namespace std;
 
 #define PAD_32BIT 0x50444150
@@ -131,7 +132,21 @@ list<string> readFilenames(string filelistFile)
 
 uint32_t getResourceType(string sFilename)
 {
-	return RESOURCE_TYPE_IMAGE;	//TODO Support other resource types
+	string extension = Parse::getExtension(sFilename);
+	if(extension == "png")
+		return RESOURCE_TYPE_IMAGE;
+	else if(extension == "xml")
+		return RESOURCE_TYPE_XML;
+	else if(extension == "tiny3d")
+		return RESOURCE_TYPE_MESH3D;
+	else if(extension == "lua")
+		return RESOURCE_TYPE_LUASCRIPT;
+	//TODO Other resource types
+	//else if(extension == "")
+	//	return RESOURCE_TYPE_;
+
+	cout << "Warning: unknown resource type " << extension << endl;
+	return 0;
 }
 
 void compress(list<string> filesToPak, string pakFilename)

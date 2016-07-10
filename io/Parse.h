@@ -13,6 +13,9 @@
 namespace Parse
 {
 	std::string stripCommas(std::string s);	   //Strip all the commas from s, leaving spaces in their place
-	std::string getExtension(std::string filename);	//Get the file extension from a filename, or empty string if there is none
+
+	//Get the file extension (not including the dot) from a filename, or empty string if there is none
+	// For example: if filename is "image.png", then getExtension(filename) will be "png"
+	std::string getExtension(std::string filename);
 }
 
