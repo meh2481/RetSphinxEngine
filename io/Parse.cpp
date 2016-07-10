@@ -6,17 +6,45 @@
 
 namespace Parse
 {
+	const std::string delimiters = " \n\r\t";
+	std::string trim(std::string s)
+	{
+		s.erase(s.find_last_not_of(delimiters) + 1);
+		return s.erase(0, s.find_first_not_of(delimiters));
+	}
+
+	std::string removeWhitespace(std::string s)
+	{
+		for(size_t i = 0; i < s.length(); i++)
+		{
+			if(s.at(i) == ' ' || 
+				s.at(i) == '\n' || 
+				s.at(i) == '\t' ||
+				s.at(i) == '\r')
+			{
+				s.erase(i, 1);
+				i--;
+			}
+		}
+		return s;
+	}
 
 	std::string stripCommas(std::string s)
 	{
 		//Replace all ',' characters with ' '
+		return replaceWith(s, ',', ' ');
+	}
+
+	std::string replaceWith(std::string s, char from, char to)
+	{
+		//Replace all from characters with to
 		while(true)
 		{
-			size_t iPos = s.find(',');
+			size_t iPos = s.find(from);
 			if(iPos == s.npos)
 				break;  //Done
 
-			s.replace(iPos, 1, " ");
+			s.replace(iPos, 1, 1, to);
 		}
 		return s;
 	}

@@ -120,10 +120,16 @@ list<string> readFilenames(string filelistFile)
 	{
 		string s;
 		getline(infile, s);
+		s = Parse::trim(s);
 		if(!s.length())
 			continue;	//Ignore blank lines
 		if(s.find('#') != string::npos)
 			continue;	//Ignore comment lines
+		if(s.find(' ') != string::npos)
+		{
+			cout << "Ignoring file \"" << s << "\" because it contains spaces" << endl;
+			continue;	//Ignore lines with spaces
+		}
 		lFilenames.push_back(s);	//Add this to our list of files to package
 	}
 	infile.close();
@@ -153,7 +159,7 @@ void compress(list<string> filesToPak, string pakFilename)
 {
 	pakFilename = remove_extension(pakFilename);
 	pakFilename += ".pak";
-	cout << "Compressing " << pakFilename << "..." << endl;
+	cout << "Packing pak file \"" << pakFilename << "\"..." << endl;
 
 	uint8_t* workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 
@@ -162,6 +168,7 @@ void compress(list<string> filesToPak, string pakFilename)
 
 	for(list<string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
+		cout << "Compressing \"" << *i << "\"..." << endl;
 		unsigned int size = 0;
 		unsigned char* decompressed = readFile(*i, &size);
 
