@@ -9,6 +9,7 @@
 #include "Box2D/Box2D.h"
 #include "ResourceCache.h"
 #include "PakLoader.h"
+#include "Parse.h"
 using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld)
@@ -222,12 +223,12 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		}
 		else if(sName == "rotaxis")
 		{
-			//const char* cAxis = elem->Attribute("value");
-			//if(cAxis && strlen(cAxis))
-			//	ps->rotAxis = vec3FromString(cAxis);
-			//const char* cAxisVar = elem->Attribute("var");
-			//if(cAxisVar && strlen(cAxisVar))
-			//	ps->rotAxisVar = vec3FromString(cAxisVar);
+			const char* cAxis = elem->Attribute("value");
+			if(cAxis && strlen(cAxis))
+				ps->rotAxis = vec3FromString(cAxis);
+			const char* cAxisVar = elem->Attribute("var");
+			if(cAxisVar && strlen(cAxisVar))
+				ps->rotAxisVar = vec3FromString(cAxisVar);
 		}
 		else if(sName == "col")
 		{

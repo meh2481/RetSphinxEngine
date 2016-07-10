@@ -1,5 +1,5 @@
-#include "Rect.h"
 #include "Parse.h"
+#include "Rect.h"
 #include <sstream>
 using namespace std;
 
@@ -106,14 +106,26 @@ void Rect::fromString(string s)
 		set(0, 0, 0, 0);
 }
 
-Vec2 pointFromString(string s)
+Vec2 pointFromString(std::string s)
 {
 	s = Parse::stripCommas(s);
 
 	//Now, parse
-	istringstream iss(s);
+	std::istringstream iss(s);
 	Vec2 pt;
 	if(!(iss >> pt.x >> pt.y))
 		pt = Vec2(0, 0);
+	return pt;
+}
+
+Vec3 vec3FromString(std::string s)
+{
+	s = Parse::stripCommas(s);
+
+	//Now, parse
+	std::istringstream iss(s);
+	Vec3 pt;
+	if(!(iss >> pt.x >> pt.y))
+		pt = Vec3(0, 0, 0);
 	return pt;
 }

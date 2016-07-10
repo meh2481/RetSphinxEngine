@@ -5,6 +5,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "ParticleSystem.h"
+#include "Parse.h"
 using namespace std;
 
 //Defined by SDL

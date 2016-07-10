@@ -7,7 +7,11 @@
 //------------------------------------------------------
 typedef glm::vec2 Vec2;
 typedef glm::vec3 Vec3;
-Vec2 pointFromString(std::string s);	//Get a point from comma-separated values in a string
+
+//Can't have these in Parse unfortunately due to cross-inclusion issues
+//TODO: move somewhere sanes
+Vec2 pointFromString(std::string s);
+Vec3 vec3FromString(std::string s);
 
 //------------------------------------------------------
 // Rect class
