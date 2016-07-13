@@ -24,8 +24,5 @@ public:
 	Mesh3D* findMesh(uint64_t id);
 	void addMesh(uint64_t id, Mesh3D* mesh);
 
-#ifdef _DEBUG
-	void reloadImages();
-	void reloadMeshes();
-#endif //_DEBUG
+	void clear() { clearImages(); clearMeshes(); };
 };

@@ -5,8 +5,7 @@ using namespace std;
 
 ResourceCache::~ResourceCache()
 {
-	clearImages();
-	clearMeshes();
+	clear();
 }
 
 Image* ResourceCache::findImage(uint64_t id)
@@ -29,15 +28,6 @@ void ResourceCache::clearImages()
 	imageIDMap.clear();
 }
 
-#ifdef _DEBUG
-void ResourceCache::reloadImages()
-{
-	for(map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
-		i->second->_reload();
-}
-#endif //_DEBUG
-
-
 Mesh3D* ResourceCache::findMesh(uint64_t id)
 {
 	map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
@@ -57,11 +47,3 @@ void ResourceCache::clearMeshes()
 		delete (i->second);
 	meshIDMap.clear();
 }
-
-#ifdef _DEBUG
-void ResourceCache::reloadMeshes()
-{
-	for(map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
-		i->second->_reload();
-}
-#endif //_DEBUG

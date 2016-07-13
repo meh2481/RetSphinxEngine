@@ -12,11 +12,12 @@
 #include "Parse.h"
 using namespace std;
 
-ResourceLoader::ResourceLoader(b2World* physicsWorld)
+ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
 {
 	m_world = physicsWorld;
 	m_cache = new ResourceCache();
-	m_pakLoader = new PakLoader("./res/pak");
+	m_sPakDir = sPakDir;
+	m_pakLoader = new PakLoader(m_sPakDir);
 }
 
 ResourceLoader::~ResourceLoader()
@@ -36,6 +37,12 @@ uint64_t ResourceLoader::hash(string sHashStr)
 		hash = ((hash << 5) + hash) + c;
 
 	return hash;
+}
+
+void ResourceLoader::clearCache()
+{
+	m_cache->clear();
+	m_pakLoader->clear();
 }
 
 Image* ResourceLoader::getImage(string sID)

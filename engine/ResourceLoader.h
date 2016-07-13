@@ -21,16 +21,17 @@ class ResourceLoader
 	b2World* m_world;
 	ResourceCache* m_cache;
 	PakLoader* m_pakLoader;
+	std::string m_sPakDir;
 
 	uint64_t hash(std::string sHashStr);
 
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 	ResourceLoader() {};
 public:
-	ResourceLoader(b2World* physicsWorld);
+	ResourceLoader(b2World* physicsWorld, std::string sPakDir);
 	~ResourceLoader();
 
-	ResourceCache* getCache() { return m_cache; };
+	void clearCache();
 
 	//Images
 	Image* getImage(std::string sID);

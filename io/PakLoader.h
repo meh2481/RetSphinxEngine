@@ -18,13 +18,15 @@ class PakLoader
 	std::list<FILE*> openedFiles;			//Keeps track of all opened file handles so we can close them easily
 
 	void parseFile(std::string sFileName);
-	void loadPaksFromDir(std::string sDirName);
 
 	PakLoader() {};
 
 public:
 	PakLoader(std::string sDirName);
 	~PakLoader();
+
+	void clear();
+	void loadFromDir(std::string sDirName);
 
 	//Load a resource from the opened pak files. Returns NULL if it's not here or on error,
 	// returns a pointer to the data otherwise. This pointer must be free()d.

@@ -6,7 +6,7 @@
 #include <sstream>
 using namespace std;
 
-void PakLoader::loadPaksFromDir(string sDirName)
+void PakLoader::loadFromDir(string sDirName)
 {
 	LOG(TRACE) << "Parse pak files from dir " << sDirName;
 	tinydir_dir dir;
@@ -40,10 +40,15 @@ void PakLoader::loadPaksFromDir(string sDirName)
 
 PakLoader::PakLoader(string sDirName)
 {
-	loadPaksFromDir(sDirName);
+	loadFromDir(sDirName);
 }
 
 PakLoader::~PakLoader()
+{
+	clear();
+}
+
+void PakLoader::clear()
 {
 	for(list<FILE*>::iterator i = openedFiles.begin(); i != openedFiles.end(); i++)
 		fclose(*i);	//Close all our opened files
@@ -97,7 +102,6 @@ void PakLoader::parseFile(string sFileName)
 		LOG(TRACE) << "unable to open file";
 }
 
-//TODO: File size error checking and such here
 unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 {
 	LOG(TRACE) << "load resource with id " << id;
@@ -109,7 +113,11 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 	}
 
 	//Load resource
-	fseek(it->second.fp, it->second.ptr.offset, SEEK_SET);
+	if(fseek(it->second.fp, it->second.ptr.offset, SEEK_SET))
+	{
+		LOG(WARNING) << "Unable to seek to proper location in resource file for resource ID " << id;
+		return NULL;
+	}
 
 	//Read file
 	CompressionHeader compHeader;
