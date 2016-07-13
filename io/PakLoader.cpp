@@ -1,41 +1,20 @@
 #include "PakLoader.h"
-#include "tinydir.h"
 #include "wfLZ.h"
 #include "easylogging++.h"
 #include "Parse.h"
+#include "FileOperations.h"
 #include <sstream>
 using namespace std;
 
 void PakLoader::loadFromDir(string sDirName)
 {
-	LOG(TRACE) << "Parse pak files from dir " << sDirName;
-	tinydir_dir dir;
-	tinydir_open(&dir, sDirName.c_str());
+	set<string> pakFiles = FileOperations::readFilesFromDir(sDirName);
 
-	while(dir.has_next)
+	for(set<string>::iterator i = pakFiles.begin(); i != pakFiles.end(); i++)
 	{
-		tinydir_file file;
-		tinydir_readfile(&dir, &file);
-
-		if(!file.is_dir)
-		{
-			string fileExt = Parse::getExtension(file.name);
-			ostringstream oss;
-			oss << sDirName << "/" << file.name;
-			if(fileExt == "pak")
-			{
-				//should be pak file
-				LOG(TRACE) << "open pak file " << sDirName << "/" << file.name;
-				parseFile(oss.str());
-			}
-			else
-				LOG(TRACE) << "Ignoring non-pak file " << oss.str();
-		}
-
-		tinydir_next(&dir);
+		if(Parse::getExtension(*i) == PAK_FILE_TYPE)
+			parseFile(*i);
 	}
-
-	tinydir_close(&dir);
 }
 
 PakLoader::PakLoader(string sDirName)

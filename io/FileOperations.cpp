@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <cstdio>
+#include <sstream>
 #include "FileOperations.h"
+#include "tinydir.h"
 using namespace std;
 
 namespace FileOperations
@@ -23,6 +25,33 @@ namespace FileOperations
 			*fileSize = size;
 
 		return buf;
+	}
+
+	set<string> readFilesFromDir(string sDirPath)
+	{
+		set<string> returnedFiles;
+
+		tinydir_dir dir;
+		tinydir_open(&dir, sDirPath.c_str());
+
+		while(dir.has_next)
+		{
+			tinydir_file file;
+			tinydir_readfile(&dir, &file);
+
+			if(!file.is_dir)
+			{
+				ostringstream oss;
+				oss << sDirPath << "/" << file.name;
+				returnedFiles.insert(oss.str());
+			}
+
+			tinydir_next(&dir);
+		}
+
+		tinydir_close(&dir);
+
+		return returnedFiles;
 	}
 
 }

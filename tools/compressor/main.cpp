@@ -79,6 +79,16 @@ unsigned char* extractImage(string filename, unsigned int* fileSize)
 	return finalBuf;
 }
 
+bool hasUpper(string s)
+{
+	for(unsigned int i = 0; i < s.length(); i++)
+	{
+		if(isupper(s.at(i)))
+			return true;
+	}
+	return false;
+}
+
 list<string> readFilenames(string filelistFile)
 {
 	list<string> lFilenames;
@@ -100,8 +110,13 @@ list<string> readFilenames(string filelistFile)
 			continue;	//Ignore comment lines
 		if(s.find(' ') != string::npos)
 		{
-			cout << "Ignoring file \"" << s << "\" because it contains spaces" << endl;
+			cout << "Ignoring file \"" << s << "\" because it contains spaces." << endl;
 			continue;	//Ignore lines with spaces
+		}
+		if(hasUpper(s))
+		{
+			cout << "Ignoring file \"" << s << "\" because it contains uppercase characters." << endl;
+			continue;
 		}
 		lFilenames.push_back(s);	//Add this to our list of files to package
 	}

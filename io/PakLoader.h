@@ -6,6 +6,8 @@
 #include <list>
 #include "ResourceTypes.h"
 
+#define PAK_FILE_TYPE "pak"
+
 class PakLoader
 {
 	typedef struct
