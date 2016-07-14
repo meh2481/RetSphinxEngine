@@ -47,7 +47,9 @@ public:
 	//Drawing methods for texel-based coordinates
 	void render(Vec2 size, float tilex = 1.0f, float tiley = 1.0f);				//Render at 0,0 with specified texel size
 	void renderLattice(Lattice* l, Vec2 size);	//Render at 0,0 with specified lattice
-	void render(Vec2 size, Rect rcImg);
+	void render(Vec2 size, Rect rcImg);			//NOTE: Doesn't bind texture!
 	void render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br);
+
+	void bindTexture();	//Bind texture to OpenGL (so we don't have to bind each draw call)
 };
 

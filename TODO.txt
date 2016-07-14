@@ -13,6 +13,7 @@ Overall TODO list:
 - Ortho HUD
 - Research SDL gamecontroller stuff
 - Definitely ortho for mouse cursor
+- Use allocator / choose one to use rather than mixing malloc & new
 
 
 Refactoring thoughts:

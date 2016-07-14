@@ -33,6 +33,10 @@ ParticleSystem::ParticleSystem()
 	m_num = 0;
 	glue = NULL;
 	lua = NULL;
+
+	m_vertexPtr = NULL;
+	m_colorPtr = NULL;
+	m_texCoordPtr = NULL;
 	
 	_initValues();
 	
@@ -86,6 +90,13 @@ void ParticleSystem::_deleteAll()
 		delete [] m_lifePreFade;
 	if(m_rotAxis != NULL)
 		delete [] m_rotAxis;
+
+	if(m_vertexPtr != NULL)
+		delete [] m_vertexPtr;
+	if(m_colorPtr != NULL)
+		delete [] m_colorPtr;
+	if(m_texCoordPtr != NULL)
+		delete [] m_texCoordPtr;
 	
 	m_imgRect = NULL;
 	m_pos = NULL;
@@ -105,6 +116,10 @@ void ParticleSystem::_deleteAll()
 	m_lifePreFade = NULL;
 	m_rotAxis = NULL;
 	m_num = 0;
+
+	m_vertexPtr = NULL;
+	m_colorPtr = NULL;
+	m_texCoordPtr = NULL;
 }
 
 void ParticleSystem::_newParticle()
@@ -112,90 +127,113 @@ void ParticleSystem::_newParticle()
 	if(m_num == m_totalAmt) return;	//Don't create more particles than we can!
 	if(!firing) return;
 	
-	const uint32_t num = m_num;
-	
 	if(!imgRect.size())
 	{
 		if(img != NULL)
-			m_imgRect[num] = Rect(0,0,img->getWidth(),img->getHeight());
+			m_imgRect[m_num] = Rect(0,0,img->getWidth(),img->getHeight());
 		else
-			m_imgRect[num] = Rect(0,0,0,0);
+			m_imgRect[m_num] = Rect(0,0,0,0);
 	}
 	else
-		m_imgRect[num] = imgRect[Random::random(imgRect.size()-1)];
-	m_pos[num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right),
+		m_imgRect[m_num] = imgRect[Random::random(imgRect.size()-1)];
+	m_pos[m_num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right),
 						 Random::randomFloat(emitFrom.top, emitFrom.bottom));
+
+	//Add proper locations from m_imgRect to tex coord ptr array here
+	float* particleTexCoord = &m_texCoordPtr[m_num * 8];
+	float left = m_imgRect[m_num].left / (float)img->getWidth();
+	float right = m_imgRect[m_num].right / (float)img->getWidth();
+	float top = 1.0f - m_imgRect[m_num].top / (float)img->getHeight();
+	float bottom = 1.0f - m_imgRect[m_num].bottom / (float)img->getHeight();
+
+	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
+	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
+
 	float sizediff = Random::randomFloat(-sizeVar,sizeVar);
-	m_sizeStart[num].x = sizeStart.x + sizediff;
-	m_sizeStart[num].y = sizeStart.y + sizediff;
-	m_sizeEnd[num].x = sizeEnd.x + sizediff;
-	m_sizeEnd[num].y = sizeEnd.y + sizediff;
+	m_sizeStart[m_num].x = sizeStart.x + sizediff;
+	m_sizeStart[m_num].y = sizeStart.y + sizediff;
+	m_sizeEnd[m_num].x = sizeEnd.x + sizediff;
+	m_sizeEnd[m_num].y = sizeEnd.y + sizediff;
 	float angle = emissionAngle + Random::randomFloat(-emissionAngleVar,emissionAngleVar);
 	float amt = speed + Random::randomFloat(-speedVar,speedVar);
-	m_vel[num].x = amt*cos(glm::radians(angle));
-	m_vel[num].y = amt*sin(glm::radians(angle));
-	m_accel[num].x = accel.x + Random::randomFloat(-accelVar.x,accelVar.x);
-	m_accel[num].y = accel.y + Random::randomFloat(-accelVar.y,accelVar.y);
-	m_rot[num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
-	m_rotVel[num] = rotVel + Random::randomFloat(-rotVelVar,rotVelVar);
-	m_rotAccel[num] = rotAccel + Random::randomFloat(-rotAccelVar,rotAccelVar);
-	m_colStart[num].r = colStart.r + Random::randomFloat(-colVar.r,colVar.r);
-	if(m_colStart[num].r > 1)
-		m_colStart[num].r = 1;
-	if(m_colStart[num].r < 0)
-		m_colStart[num].r = 0;
-	m_colStart[num].g = colStart.g + Random::randomFloat(-colVar.g,colVar.g);
-	if(m_colStart[num].g > 1)
-		m_colStart[num].g = 1;
-	if(m_colStart[num].g < 0)
-		m_colStart[num].g = 0;
-	m_colStart[num].b = colStart.b + Random::randomFloat(-colVar.b,colVar.b);
-	if(m_colStart[num].b > 1)
-		m_colStart[num].b = 1;
-	if(m_colStart[num].b < 0)
-		m_colStart[num].b = 0;
-	m_colStart[num].a = colStart.a + Random::randomFloat(-colVar.a,colVar.a);
-	if(m_colStart[num].a > 1)
-		m_colStart[num].a = 1;
-	if(m_colStart[num].a < 0)
-		m_colStart[num].a = 0;
-	m_colEnd[num].r = colEnd.r + Random::randomFloat(-colVar.r,colVar.r);
-	if(m_colEnd[num].r > 1)
-		m_colEnd[num].r = 1;
-	if(m_colEnd[num].r < 0)
-		m_colEnd[num].r = 0;
-	m_colEnd[num].g = colEnd.g + Random::randomFloat(-colVar.g,colVar.g);
-	if(m_colEnd[num].g > 1)
-		m_colEnd[num].g = 1;
-	if(m_colEnd[num].g < 0)
-		m_colEnd[num].g = 0;
-	m_colEnd[num].b = colEnd.b + Random::randomFloat(-colVar.b,colVar.b);
-	if(m_colEnd[num].b > 1)
-		m_colEnd[num].b = 1;
-	if(m_colEnd[num].b < 0)
-		m_colEnd[num].b = 0;
-	m_colEnd[num].a = colEnd.a + Random::randomFloat(-colVar.a,colVar.a);
-	if(m_colEnd[num].a > 1)
-		m_colEnd[num].a = 1;
-	if(m_colEnd[num].a < 0)
-		m_colEnd[num].a = 0;
-	m_tangentialAccel[num] = tangentialAccel + Random::randomFloat(-tangentialAccelVar,tangentialAccelVar);
-	m_normalAccel[num] = normalAccel + Random::randomFloat(-normalAccelVar,normalAccelVar);
-	m_lifetime[num] = lifetime + Random::randomFloat(-lifetimeVar,lifetimeVar);
-	m_created[num] = curTime;
-	m_lifePreFade[num] = lifetimePreFade + Random::randomFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
-	m_rotAxis[num].x = rotAxis.x + Random::randomFloat(-rotAxisVar.x,rotAxisVar.x);
-	m_rotAxis[num].y = rotAxis.y + Random::randomFloat(-rotAxisVar.y,rotAxisVar.y);
-	m_rotAxis[num].z = rotAxis.z + Random::randomFloat(-rotAxisVar.z,rotAxisVar.z);
+	m_vel[m_num].x = amt*cos(glm::radians(angle));
+	m_vel[m_num].y = amt*sin(glm::radians(angle));
+	m_accel[m_num].x = accel.x + Random::randomFloat(-accelVar.x,accelVar.x);
+	m_accel[m_num].y = accel.y + Random::randomFloat(-accelVar.y,accelVar.y);
+	m_rot[m_num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
+	m_rotVel[m_num] = rotVel + Random::randomFloat(-rotVelVar,rotVelVar);
+	m_rotAccel[m_num] = rotAccel + Random::randomFloat(-rotAccelVar,rotAccelVar);
+	m_colStart[m_num].r = colStart.r + Random::randomFloat(-colVar.r,colVar.r);
+	if(m_colStart[m_num].r > 1)
+		m_colStart[m_num].r = 1;
+	if(m_colStart[m_num].r < 0)
+		m_colStart[m_num].r = 0;
+	m_colStart[m_num].g = colStart.g + Random::randomFloat(-colVar.g,colVar.g);
+	if(m_colStart[m_num].g > 1)
+		m_colStart[m_num].g = 1;
+	if(m_colStart[m_num].g < 0)
+		m_colStart[m_num].g = 0;
+	m_colStart[m_num].b = colStart.b + Random::randomFloat(-colVar.b,colVar.b);
+	if(m_colStart[m_num].b > 1)
+		m_colStart[m_num].b = 1;
+	if(m_colStart[m_num].b < 0)
+		m_colStart[m_num].b = 0;
+	m_colStart[m_num].a = colStart.a + Random::randomFloat(-colVar.a,colVar.a);
+	if(m_colStart[m_num].a > 1)
+		m_colStart[m_num].a = 1;
+	if(m_colStart[m_num].a < 0)
+		m_colStart[m_num].a = 0;
+	m_colEnd[m_num].r = colEnd.r + Random::randomFloat(-colVar.r,colVar.r);
+	if(m_colEnd[m_num].r > 1)
+		m_colEnd[m_num].r = 1;
+	if(m_colEnd[m_num].r < 0)
+		m_colEnd[m_num].r = 0;
+	m_colEnd[m_num].g = colEnd.g + Random::randomFloat(-colVar.g,colVar.g);
+	if(m_colEnd[m_num].g > 1)
+		m_colEnd[m_num].g = 1;
+	if(m_colEnd[m_num].g < 0)
+		m_colEnd[m_num].g = 0;
+	m_colEnd[m_num].b = colEnd.b + Random::randomFloat(-colVar.b,colVar.b);
+	if(m_colEnd[m_num].b > 1)
+		m_colEnd[m_num].b = 1;
+	if(m_colEnd[m_num].b < 0)
+		m_colEnd[m_num].b = 0;
+	m_colEnd[m_num].a = colEnd.a + Random::randomFloat(-colVar.a,colVar.a);
+	if(m_colEnd[m_num].a > 1)
+		m_colEnd[m_num].a = 1;
+	if(m_colEnd[m_num].a < 0)
+		m_colEnd[m_num].a = 0;
+	m_tangentialAccel[m_num] = tangentialAccel + Random::randomFloat(-tangentialAccelVar,tangentialAccelVar);
+	m_normalAccel[m_num] = normalAccel + Random::randomFloat(-normalAccelVar,normalAccelVar);
+	m_lifetime[m_num] = lifetime + Random::randomFloat(-lifetimeVar,lifetimeVar);
+	m_created[m_num] = curTime;
+	m_lifePreFade[m_num] = lifetimePreFade + Random::randomFloat(-lifetimePreFadeVar, lifetimePreFadeVar);
+	m_rotAxis[m_num].x = rotAxis.x + Random::randomFloat(-rotAxisVar.x,rotAxisVar.x);
+	m_rotAxis[m_num].y = rotAxis.y + Random::randomFloat(-rotAxisVar.y,rotAxisVar.y);
+	m_rotAxis[m_num].z = rotAxis.z + Random::randomFloat(-rotAxisVar.z,rotAxisVar.z);
 	
 	m_num++;
 }
 
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
-	if(particleDeathSpawn && spawnOnDeath.size())
-		m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
+	//if(particleDeathSpawn && spawnOnDeath.size())
+	//	m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
 	//Order doesn't matter, so just shift the newest particle over to replace this one
+
+	float* particleTexCoord = &m_texCoordPtr[idx * 8];
+	float left = m_imgRect[m_num - 1].left / (float)img->getWidth();
+	float right = m_imgRect[m_num - 1].right / (float)img->getWidth();
+	float top = 1.0f - m_imgRect[m_num - 1].top / (float)img->getHeight();
+	float bottom = 1.0f - m_imgRect[m_num - 1].bottom / (float)img->getHeight();
+
+	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
+	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
+
 	m_imgRect[idx] = m_imgRect[m_num-1];
 	m_pos[idx] = m_pos[m_num-1];
 	m_sizeStart[idx] = m_sizeStart[m_num-1];
@@ -254,17 +292,17 @@ void ParticleSystem::_initValues()
 	emissionAngle = 0;
 	emissionAngleVar = 0;
 	firing = true;
-	show = true;
-	velRotate = false;
-	changeColor = true;
+	//show = true;
+	//velRotate = false;
+	//changeColor = true;
 	lifetimePreFade = 0.0f;
 	lifetimePreFadeVar = 0.0f;
-	particleDeathSpawn = true;
+	//particleDeathSpawn = true;
 }
 
 void ParticleSystem::update(float dt)
 {
-	if(!show) return;
+	//if(!show) return;
 	curTime += dt;
 	if(startedFiring)
 	{
@@ -272,7 +310,7 @@ void ParticleSystem::update(float dt)
 		{
 			firing = false;
 			startedFiring = 0.0f;
-			if(!particleDeathSpawn && spawnOnDeath.size())
+			if(spawnOnDeath.size())
 				m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());	//TODO This should be a shout
 		}
 	}
@@ -366,43 +404,87 @@ void ParticleSystem::draw()
 			glBlendFunc(GL_DST_COLOR, GL_ONE); 
 			break;
 	}
+
+	//Pointers for speed
+	float* created = m_created;
+	float* preFade = m_lifePreFade;
+	float* lifetime = m_lifetime;
+	Color* colStart = m_colStart;
+	Color* colEnd = m_colEnd;
+	Vec2* sizeStart = m_sizeStart;
+	Vec2* sizeEnd = m_sizeEnd;
+	Vec2* pos = m_pos;
+	float* rot = m_rot;
+	Vec3* rotAxis = m_rotAxis;
+	Vec2* vel = m_vel;
+	Rect* imgRect = m_imgRect;
+	
+	float* vertexPos = m_vertexPtr;
+	float* colorPtr = m_colorPtr;
+
+	glColor4f(1, 1, 1, 1);
 	
 	for(unsigned int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
-		float fLifeFac = (curTime - m_created[i] - m_lifePreFade[i]) / (m_lifetime[i] - m_lifePreFade[i]);
-		if(fLifeFac > 1.0) continue;	//Particle is already dead
-		if(curTime - m_created[i] <= m_lifePreFade[i])	//Particle hasn't started fading yet
+		float fLifeFac = (curTime - *created - *preFade) / (*lifetime - *preFade);
+		if(fLifeFac > 1.0) //Particle is already dead
+			fLifeFac = 1.0;
+		if(curTime - *created <= *preFade)	//Particle hasn't started fading yet
 			fLifeFac = 0.0f;
 		Color drawcol;
 		Vec2 drawsz;
-		if(changeColor)	//If we should fade color, do so
-		{
-			drawcol.r = (m_colEnd[i].r - m_colStart[i].r) * fLifeFac + m_colStart[i].r;
-			drawcol.g = (m_colEnd[i].g - m_colStart[i].g) * fLifeFac + m_colStart[i].g;
-			drawcol.b = (m_colEnd[i].b - m_colStart[i].b) * fLifeFac + m_colStart[i].b;
-		}
-		else
-			drawcol = m_colStart[i];
-		drawcol.a = (m_colEnd[i].a - m_colStart[i].a) * fLifeFac + m_colStart[i].a;
-		drawsz.x = (m_sizeEnd[i].x - m_sizeStart[i].x) * fLifeFac + m_sizeStart[i].x;
-		drawsz.y = (m_sizeEnd[i].y - m_sizeStart[i].y) * fLifeFac + m_sizeStart[i].y;
-		glPushMatrix();
-		glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);
-		glTranslatef(m_pos[i].x, m_pos[i].y, 0);
-		if(!velRotate)
-		{
-			glRotatef(m_rot[i], m_rotAxis[i].x, m_rotAxis[i].y, m_rotAxis[i].z);
-			if(m_rotAxis[i].x || m_rotAxis[i].y)
-				glClear(GL_DEPTH_BUFFER_BIT);	//Rotating intersecting particles is a pain
-		}
-		else
-			glRotatef(glm::degrees(atan2(m_vel[i].y, m_vel[i].x)), 0, 0, 1);
-		img->render(drawsz, m_imgRect[i]);	//TODO: NO NO NO NO NO this should generate a list of vertices and draw them all in one opengl call!
-		glPopMatrix();
+		drawcol.r = (colEnd->r - colStart->r) * fLifeFac + colStart->r;
+		drawcol.g = (colEnd->g - colStart->g) * fLifeFac + colStart->g;
+		drawcol.b = (colEnd->b - colStart->b) * fLifeFac + colStart->b;
+		drawcol.a = (colEnd->a - colStart->a) * fLifeFac + colStart->a;
+
+		drawsz.x = (sizeEnd->x - sizeStart->x) * fLifeFac + sizeStart->x;
+		drawsz.y = (sizeEnd->y - sizeStart->y) * fLifeFac + sizeStart->y;
+
+		//Set coordinates
+		*vertexPos++ = pos->x + -drawsz.x / 2.0f; *vertexPos++ = pos->y + drawsz.y / 2.0f; // upper left
+		*vertexPos++ = pos->x + drawsz.x / 2.0f; *vertexPos++ = pos->y + drawsz.y / 2.0f; // upper right
+		*vertexPos++ = pos->x + drawsz.x / 2.0f; *vertexPos++ = pos->y + -drawsz.y / 2.0f; // lower right
+		*vertexPos++ = pos->x + -drawsz.x / 2.0f; *vertexPos++ = pos->y + -drawsz.y / 2.0f; // lower left
+
+		//Set color
+		for(int j = 0; j < 4; j++)
+			*colorPtr++ = drawcol.r; *colorPtr++ = drawcol.g; *colorPtr++ = drawcol.b; *colorPtr++ = drawcol.a;
+
+		//glPushMatrix();
+		//glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);	//TODO: Use glColorPointer() instead
+		//glTranslatef(pos->x, pos->y, 0);						//TODO: Use glVertexPointer() instead
+		//glRotatef(*rot, rotAxis->x, rotAxis->y, rotAxis->z);	//TODO: Handle rotating somehow else
+
+		//img->render(drawsz, *imgRect);	//TODO: NO NO NO NO NO this should generate a list of vertices and draw them all in one opengl call!
+		//glPopMatrix();
+
+		//Increment pointers
+		created++;
+		preFade++;
+		lifetime++;
+		colStart++;
+		colEnd++;
+		sizeStart++;
+		sizeEnd++;
+		pos++;
+		rot++;
+		rotAxis++;
+		vel++;
+		imgRect++;
 	}
+
+	//Render everything in one pass
+	img->bindTexture();	//Bind once before we draw since all our particles will use one texture
+
+	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
+	glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
+	glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
+
+	glDrawArrays(GL_QUADS, 0, m_num*4);
 	
 	//Reset OpenGL stuff
-	glColor4f(1,1,1,1);
+	//glColor4f(1,1,1,1);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -432,6 +514,10 @@ void ParticleSystem::init()
 	m_created = new float[m_totalAmt];
 	m_lifePreFade = new float[m_totalAmt];
 	m_rotAxis = new Vec3[m_totalAmt];
+
+	m_vertexPtr = new float[m_totalAmt * 8];	//2 per vert * 4 per quad = 8 per particle
+	m_texCoordPtr = new float[m_totalAmt * 8];	//2 per vert * 4 per quad = 8 per particle
+	m_colorPtr = new float[m_totalAmt * 16];	//4 per vert * 4 per quad = 16 per particle
 }
 
 

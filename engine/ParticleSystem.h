@@ -27,6 +27,11 @@ class ParticleSystem
 {
 	friend class ResourceLoader;
 
+	//Drawing helper arrays
+	float* m_vertexPtr;
+	float* m_colorPtr;
+	float* m_texCoordPtr;
+
 	//Should not directly set or modify these
 	//Arrays of particle fields (structure-of-array format rather than array-of structure for speed)
 	Rect* 		m_imgRect;			//Rectangle of the image to draw
@@ -111,12 +116,12 @@ public:
 	float 			emissionAngle;		//Angle particles are emitted at (degrees)
 	float 			emissionAngleVar;	//Variation in emission angle
 	bool				firing;				//If we're creating new particles or not
-	bool				show;				//If this should draw or not
-	bool				velRotate;			//If these particles should rotate according to their velocity
-	bool				changeColor;		//If these particles change color as they update, or just alpha
+	//bool				show;				//If this should draw or not
+	//bool				velRotate;			//If these particles should rotate according to their velocity
+	//bool				changeColor;		//If these particles change color as they update, or just alpha
 	std::vector<std::string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
 	Vec2				emissionVel;		//Move the emission point every frame
-	bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
+	//bool				particleDeathSpawn;	//If we spawn new particle systems on particle death or system death
 	
 	void update(float dt);
 	void draw();

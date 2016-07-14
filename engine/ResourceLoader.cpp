@@ -159,7 +159,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		ps->emissionVel = pointFromString(emfromvel);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
-	root->QueryBoolAttribute("changecolor", &ps->changeColor);
+//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
 
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)
@@ -175,7 +175,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	root->QueryUnsignedAttribute("max", &ps->max);
 	root->QueryFloatAttribute("rate", &ps->rate);
-	root->QueryBoolAttribute("velrotate", &ps->velRotate);
+//	root->QueryBoolAttribute("velrotate", &ps->velRotate);
 	root->QueryFloatAttribute("decay", &ps->decay);
 	float fDecayVar = 0.0f;
 	root->QueryFloatAttribute("decayvar", &fDecayVar);
@@ -286,15 +286,15 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		}
 		else if(sName == "spawnondeath")
 		{
-			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
-			if(cDeathSpawnType && strlen(cDeathSpawnType))
-			{
-				string sDeathSpawntype = cDeathSpawnType;
-				if(sDeathSpawntype == "system")
-					ps->particleDeathSpawn = false;
-				else if(sDeathSpawntype == "particle")
-					ps->particleDeathSpawn = true;
-			}
+//			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
+//			if(cDeathSpawnType && strlen(cDeathSpawnType))
+//			{
+//				string sDeathSpawntype = cDeathSpawnType;
+//				if(sDeathSpawntype == "system")
+//					ps->particleDeathSpawn = false;
+//				else if(sDeathSpawntype == "particle")
+//					ps->particleDeathSpawn = true;
+//			}
 
 			for(tinyxml2::XMLElement* particle = elem->FirstChildElement("particle"); particle != NULL; particle = particle->NextSiblingElement("particle"))
 			{

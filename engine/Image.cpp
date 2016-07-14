@@ -242,19 +242,19 @@ void Image::render(Vec2 size, float tilex, float tiley)
     {
         -size.x/2.0f, size.y/2.0f, // upper left
         size.x/2.0f, size.y/2.0f, // upper right
+		size.x / 2.0f, -size.y / 2.0f, // lower right
         -size.x/2.0f, -size.y/2.0f, // lower left
-        size.x/2.0f, -size.y/2.0f, // lower right
     };
     const float texCoords[] =
     {
 		0.0f, 0.0f, // lower left
 		tilex, 0.0f, // lower right
+		tilex, tiley, // upper right
         0.0f, tiley, // upper left
-        tilex, tiley, // upper right
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_QUADS, 0, 4);
 }
 
 void Image::renderLattice(Lattice* l, Vec2 size)
@@ -274,26 +274,29 @@ void Image::render(Vec2 size, Rect rcImg)
 	rcImg.top = 1.0f - rcImg.top / (float)m_iHeight;
 	rcImg.bottom = 1.0f - rcImg.bottom / (float)m_iHeight;
 	
-	// tell opengl to use the generated texture
-	glBindTexture(GL_TEXTURE_2D, m_hTex);
-	
 	const float vertexData[] =
-    {
-        -size.x/2.0f, size.y/2.0f, // upper left
-        size.x/2.0f, size.y/2.0f, // upper right
-        -size.x/2.0f, -size.y/2.0f, // lower left
-        size.x/2.0f, -size.y/2.0f, // lower right
-    };
+	{
+		-size.x / 2.0f, size.y / 2.0f, // upper left
+		size.x / 2.0f, size.y / 2.0f, // upper right
+		size.x / 2.0f, -size.y / 2.0f, // lower right
+		-size.x / 2.0f, -size.y / 2.0f, // lower left
+	};
     const float texCoords[] =
     {
 		rcImg.left, rcImg.bottom, // lower left
 		rcImg.right, rcImg.bottom, // lower right
+		rcImg.right, rcImg.top, // upper right
         rcImg.left, rcImg.top, // upper left
-        rcImg.right, rcImg.top, // upper right
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
+    glDrawArrays(GL_QUADS, 0, 4);
+}
+
+void Image::bindTexture()
+{
+	// tell opengl to use the generated texture
+	glBindTexture(GL_TEXTURE_2D, m_hTex);
 }
 
 void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
