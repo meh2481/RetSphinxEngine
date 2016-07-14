@@ -421,8 +421,6 @@ void ParticleSystem::draw()
 	
 	float* vertexPos = m_vertexPtr;
 	float* colorPtr = m_colorPtr;
-
-	glColor4f(1, 1, 1, 1);
 	
 	for(unsigned int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
@@ -449,7 +447,9 @@ void ParticleSystem::draw()
 
 		//Set color
 		for(int j = 0; j < 4; j++)
+		{
 			*colorPtr++ = drawcol.r; *colorPtr++ = drawcol.g; *colorPtr++ = drawcol.b; *colorPtr++ = drawcol.a;
+		}
 
 		//glPushMatrix();
 		//glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);	//TODO: Use glColorPointer() instead
@@ -477,6 +477,9 @@ void ParticleSystem::draw()
 	//Render everything in one pass
 	img->bindTexture();	//Bind once before we draw since all our particles will use one texture
 
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	//glEnableClientState(GL_COLOR_ARRAY);
 	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
 	glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
 	glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
@@ -484,7 +487,7 @@ void ParticleSystem::draw()
 	glDrawArrays(GL_QUADS, 0, m_num*4);
 	
 	//Reset OpenGL stuff
-	//glColor4f(1,1,1,1);
+	glDisableClientState(GL_COLOR_ARRAY);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
