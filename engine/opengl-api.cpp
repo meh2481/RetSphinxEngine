@@ -15,9 +15,10 @@
     static ret (GLAPIENTRY *p##fn) params = NULL; \
     ret GLAPIENTRY fn params { rt p##fn call; } \
     }
+#define GL_PTR(pty, fn) pty fn = NULL;
 
 #include "opengl-stubs.h"
-#undef GL_FUNC
+
 
 static bool lookup_glsym(const char *funcname, void **func)
 {
@@ -35,8 +36,9 @@ static bool lookup_all_glsyms(void)
     bool retval = true;
 #define GL_FUNC(ret,fn,params,call,rt) \
     if (!lookup_glsym(#fn, (void **) &p##fn)) retval = false;
+#define GL_PTR(_, fn) \
+    if (!lookup_glsym(#fn, (void **) &fn)) retval = false;
 #include "opengl-stubs.h"
-#undef GL_FUNC
     return retval;
 }
 
@@ -55,8 +57,8 @@ void ClearSymbols()
     // reset all the entry points to NULL, so we know exactly what happened
     //  if we call a GL function after shutdown.
     #define GL_FUNC(ret,fn,params,call,rt) p##fn = NULL;
+    #define GL_PTR(pty, fn) fn = NULL;
     #include "opengl-stubs.h"
-    #undef GL_FUNC
 }
 
 

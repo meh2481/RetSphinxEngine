@@ -9,6 +9,11 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
+#define GL_FUNC(ret,fn,params,call,rt)
+#define GL_PTR(pty, fn) extern pty fn;
+#include "opengl-stubs.h"
+
+
 #ifdef WASDLL
 #define _DLL
 #undef WASDLL
