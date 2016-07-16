@@ -219,10 +219,6 @@ void ParticleSystem::_newParticle()
 
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
-	//if(particleDeathSpawn && spawnOnDeath.size())
-	//	m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], m_pos[idx]);
-	//Order doesn't matter, so just shift the newest particle over to replace this one
-
 	float* particleTexCoord = &m_texCoordPtr[idx * 8];
 	float left = m_imgRect[m_num - 1].left / (float)img->getWidth();
 	float right = m_imgRect[m_num - 1].right / (float)img->getWidth();
@@ -292,17 +288,12 @@ void ParticleSystem::_initValues()
 	emissionAngle = 0;
 	emissionAngleVar = 0;
 	firing = true;
-	//show = true;
-	//velRotate = false;
-	//changeColor = true;
 	lifetimePreFade = 0.0f;
 	lifetimePreFadeVar = 0.0f;
-	//particleDeathSpawn = true;
 }
 
 void ParticleSystem::update(float dt)
 {
-	//if(!show) return;
 	curTime += dt;
 	if(startedFiring)
 	{
@@ -448,16 +439,13 @@ void ParticleSystem::draw()
 		//Set color
 		for(int j = 0; j < 4; j++)
 		{
-			*colorPtr++ = drawcol.r; *colorPtr++ = drawcol.g; *colorPtr++ = drawcol.b; *colorPtr++ = drawcol.a;
+			*colorPtr++ = drawcol.r; 
+			*colorPtr++ = drawcol.g; 
+			*colorPtr++ = drawcol.b; 
+			*colorPtr++ = drawcol.a;
 		}
 
-		//glPushMatrix();
-		//glColor4f(drawcol.r, drawcol.g, drawcol.b, drawcol.a);	//TODO: Use glColorPointer() instead
-		//glTranslatef(pos->x, pos->y, 0);						//TODO: Use glVertexPointer() instead
 		//glRotatef(*rot, rotAxis->x, rotAxis->y, rotAxis->z);	//TODO: Handle rotating somehow else
-
-		//img->render(drawsz, *imgRect);	//TODO: NO NO NO NO NO this should generate a list of vertices and draw them all in one opengl call!
-		//glPopMatrix();
 
 		//Increment pointers
 		created++;
@@ -479,7 +467,6 @@ void ParticleSystem::draw()
 
 	glEnableClientState(GL_COLOR_ARRAY);
 
-	//glEnableClientState(GL_COLOR_ARRAY);
 	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
 	glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
 	glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
