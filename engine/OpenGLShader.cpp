@@ -1,4 +1,5 @@
 #include "OpenGLShader.h"
+#include "opengl-api.h"
 #include "easylogging++.h"
 #include <string>
 #include <fstream>
