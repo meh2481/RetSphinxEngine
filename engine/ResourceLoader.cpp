@@ -45,33 +45,41 @@ void ResourceLoader::clearCache()
 	m_pakLoader->clear();
 }
 
-Image* ResourceLoader::getImage(string sID)
+Image* ResourceLoader::getImage(uint64_t hashID)
 {
-	LOG(TRACE) << "Loading image " << sID;
-	uint64_t hashVal = hash(sID);
-	LOG(TRACE) << "Image has ID " << hashVal;
-	Image* img = m_cache->findImage(hashVal);
+	LOG(TRACE) << "Loading Image from ID " << hashID;
+	Image* img = m_cache->findImage(hashID);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
 		unsigned int len = 0;
-		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
-		if(!resource || !len)
+		unsigned char* resource = m_pakLoader->loadResource(hashID, &len);
+		if(resource && len)
 		{
-			LOG(TRACE) << "Pak miss - load from file";
-			img = new Image(sID);				//Create this image
-			m_cache->addImage(hashVal, img);	//Add to the cache
-		}
-		else
-		{
-			LOG(TRACE) << "Pak hit - load from data";
+			LOG(TRACE) << "Pak hit - load " << hashID << " from data";
 			img = new Image(resource, len);
-			m_cache->addImage(hashVal, img);
+			m_cache->addImage(hashID, img);
 			free(resource);						//Free memory
 		}
+		else
+			LOG(TRACE) << "Pak miss " << hashID;
 	}
 	else
-		LOG(TRACE) << "Cache hit" << sID;
+		LOG(TRACE) << "Cache hit " << hashID;
+	return img;
+}
+
+Image* ResourceLoader::getImage(string sID)
+{
+	LOG(TRACE) << "Loading image " << sID;
+	uint64_t hashVal = hash(sID);
+	Image* img = getImage(hashVal);
+	if(!img)	//This image isn't here; load it
+	{
+		LOG(TRACE) << "Attempting to load from file";
+		img = new Image(sID);				//Create this image
+		m_cache->addImage(hashVal, img);	//Add to the cache
+	}
 	return img;
 }
 

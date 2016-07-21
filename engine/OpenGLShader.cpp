@@ -3,6 +3,10 @@
 #include "easylogging++.h"
 #include <string>
 #include <fstream>
+#ifdef _DEBUG
+#include <iostream>
+using namespace std;
+#endif
 
 
 namespace OpenGLShader
@@ -26,6 +30,9 @@ namespace OpenGLShader
 		else
 		{
 			LOG(WARNING) << "Unable to open vertex shader " << vertex_file_path;
+#ifdef _DEBUG
+			cout << "Unable to open vertex shader " << vertex_file_path << endl;
+#endif // _DEBUG
 			return 0;
 		}
 
@@ -58,6 +65,9 @@ namespace OpenGLShader
 			std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
 			glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
 			LOG(ERROR) << "Error: " << &VertexShaderErrorMessage[0];
+#ifdef _DEBUG
+			cout << "Error: " << &VertexShaderErrorMessage[0] << endl;
+#endif
 		}
 
 
@@ -76,12 +86,15 @@ namespace OpenGLShader
 			std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
 			glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
 			LOG(ERROR) << "Error: " << &FragmentShaderErrorMessage[0];
+#ifdef _DEBUG
+			cout << "Error: " << &FragmentShaderErrorMessage[0] << endl;
+#endif
 		}
 
 
 
 		// Link the program
-		printf("Linking program\n");
+		LOG(TRACE) << "Linking program";
 		GLuint ProgramID = glCreateProgram();
 		glAttachShader(ProgramID, VertexShaderID);
 		glAttachShader(ProgramID, FragmentShaderID);
@@ -95,6 +108,9 @@ namespace OpenGLShader
 			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
 			glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 			LOG(ERROR) << "Error: " << &ProgramErrorMessage[0];
+#ifdef _DEBUG
+			cout << "Error: " << &ProgramErrorMessage[0] << endl;
+#endif
 		}
 
 

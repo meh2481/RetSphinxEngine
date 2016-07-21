@@ -35,6 +35,7 @@ public:
 
 	//Images
 	Image* getImage(std::string sID);
+	Image* getImage(uint64_t hashID);
 
 	//Meshes
 	Mesh3D* getMesh(std::string sID);

@@ -9,6 +9,7 @@
 #include "tinyxml2.h"
 #include "easylogging++.h"
 #include "Random.h"
+#include "OpenGLShader.h"
 using namespace std;
 
 ParticleSystem::ParticleSystem()
@@ -43,6 +44,8 @@ ParticleSystem::ParticleSystem()
 	curTime = 0;
 	spawnCounter = 0;
 	curRate = 1.0f;
+
+	program = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
 }
 
 ParticleSystem::~ParticleSystem()
@@ -120,6 +123,8 @@ void ParticleSystem::_deleteAll()
 	m_vertexPtr = NULL;
 	m_colorPtr = NULL;
 	m_texCoordPtr = NULL;
+
+	glDeleteProgram(program);
 }
 
 void ParticleSystem::_newParticle()
@@ -380,6 +385,8 @@ void ParticleSystem::update(float dt)
 void ParticleSystem::draw()
 {
 	if(img == NULL) return;
+
+	glUseProgram(program);
 	
 	switch(blend)
 	{
@@ -476,6 +483,8 @@ void ParticleSystem::draw()
 	//Reset OpenGL stuff
 	glDisableClientState(GL_COLOR_ARRAY);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glUseProgram(0);
 }
 
 void ParticleSystem::init()

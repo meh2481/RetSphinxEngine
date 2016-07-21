@@ -45,7 +45,7 @@ typedef struct
 
 
 //--------------------------------------------------------------
-// Textures - RESOURCE_TYPE_IMAGE
+// Textures
 //--------------------------------------------------------------
 #define TEXTURE_BPP_RGBA	32
 #define TEXTURE_BPP_RGB		24
@@ -58,4 +58,20 @@ typedef struct
 	uint32_t pad;
 	//Followed by image data
 } TextureHeader;
+
+
+//--------------------------------------------------------------
+// Fonts
+//--------------------------------------------------------------
+
+typedef struct
+{
+	uint32_t numChars;
+	uint64_t textureId;	//ID of texture resource to use
+	uint32_t pad;
+	//Followed by numChars uint32_t's (aka 32-bit UTF-8 codepoints), sorted from lowest to highest
+	//Followed by numChars * 8 float32s (the rectangles for the characters)
+} FontHeader;
+
+
 
