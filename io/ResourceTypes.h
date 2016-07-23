@@ -70,7 +70,7 @@ typedef struct
 	uint64_t textureId;	//ID of texture resource to use
 	uint32_t pad;
 	//Followed by numChars uint32_t's (aka 32-bit UTF-8 codepoints), sorted from lowest to highest
-	//Followed by numChars * 8 float32s (the rectangles for the characters)
+	//Followed by numChars * 8 floats (the UV coordinate rectangles for the characters, each float in range [0..1])
 } FontHeader;
 
 
