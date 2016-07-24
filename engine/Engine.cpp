@@ -176,7 +176,7 @@ bool Engine::_frame()
 			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				if (m_bResizable)
-					changeScreenResolution((float)event.window.data1, (float)event.window.data2);
+					changeScreenResolution(event.window.data1, event.window.data2);
 				else
 					LOG(ERROR) << "Error! Resize event generated, but resizable flag not set.";
 			}
@@ -472,7 +472,7 @@ string Engine::getSaveLocation()
 Rect Engine::getCameraView(Vec3 Camera)
 {
 	Rect rcCamera;
-	const float tan45_2 = 0.4142135623;// tan(glm::radians(45.0f / 2.0f));
+	const float tan45_2 = 0.4142135623f;// tan(glm::radians(45.0f / 2.0f));
 	const float fAspect = (float)getWidth() / (float)getHeight();
 	rcCamera.top = (tan45_2 * Camera.z);
 	rcCamera.bottom = -(tan45_2 * Camera.z);
@@ -563,7 +563,8 @@ void Engine::setDoubleBuffered(bool bDoubleBuffered)
 
 bool Engine::getDoubleBuffered()
 {
-    int val = 1; SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
+    int val = 1;
+	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
     return val;
 }
 

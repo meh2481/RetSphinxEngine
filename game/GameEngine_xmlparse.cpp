@@ -73,7 +73,7 @@ bool GameEngine::loadConfig(string sFilename)
 			setWindowPos(pos);
 
 		setFullscreen(bFullscreen);
-		changeScreenResolution((float)width, (float)height);
+		changeScreenResolution(width, height);
 		if(bMaximized && !isMaximized() && !bFullscreen)
 			maximizeWindow();
 		setFramerate(framerate);

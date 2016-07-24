@@ -11,14 +11,14 @@ void Lattice::reset(float sx, float sy)
 	LatticeVert* ptruv = UV;
 	float segsizex = 1.0f/(float)(numx);
 	float segsizey = 1.0f/(float)(numy);
-	for(int iy = 0; iy <= numy; iy++)
+	for(unsigned int iy = 0; iy <= numy; iy++)
 	{
-		for(int ix = 0; ix <= numx; ix++)
+		for(unsigned int ix = 0; ix <= numx; ix++)
 		{
 			(*ptruv).x = (float)(ix) * segsizex;
-			(*ptruv).y = 1.0 - (float)(iy) * segsizey;
-			(*ptr).x = ((float)(ix) * segsizex - 0.5)*sx;
-			(*ptr).y = ((float)(iy) * segsizey - 0.5)*sy;
+			(*ptruv).y = 1.0f - (float)(iy) * segsizey;
+			(*ptr).x = ((float)(ix) * segsizex - 0.5f)*sx;
+			(*ptr).y = ((float)(iy) * segsizey - 0.5f)*sy;
 			ptr++;
 			ptruv++;
 		}
@@ -30,9 +30,9 @@ void Lattice::bind()
 	float* ptr = m_vertex;
 	float* ptruv = m_UV;
 	
-	for(int iy = 0; iy < numy; iy++)
+	for(unsigned int iy = 0; iy < numy; iy++)
 	{
-		for(int ix = 0; ix < numx; ix++)
+		for(unsigned int ix = 0; ix < numx; ix++)
 		{
 			//Tex coords
 			LatticeVert* uvul = &UV[ix+iy*(numx+1)];
@@ -82,7 +82,7 @@ void Lattice::bind()
 	}
 }
 
-void Lattice::setup(int x, int y)
+void Lattice::setup(unsigned int x, unsigned int y)
 {
 	m_vertex = new float[NUMLATTICEPOINTS(x*y)];
 	m_UV = new float[NUMLATTICEPOINTS(x*y)];
@@ -129,9 +129,9 @@ void Lattice::renderDebug()
 	//glColor3f(color.r, color.g, color.b);
 	//glBegin(GL_LINES);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	for(int iy = 0; iy < numy; iy++)
+	for(unsigned int iy = 0; iy < numy; iy++)
 	{
-		for(int ix = 0; ix < numx; ix++)
+		for(unsigned int ix = 0; ix < numx; ix++)
 		{
 			glBegin(GL_LINES);
 			LatticeVert* vertul = &vertex[ix+iy*(numx+1)];
@@ -182,9 +182,9 @@ void SinLatticeAnim::setEffect()
 	
 	float relTime = curtime;
 	LatticeVert* ptr = m_l->vertex;
-	for(int iy = 0; iy <= m_l->numy; iy++)
+	for(unsigned int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(int ix = 0; ix <= m_l->numx; ix++)
+		for(unsigned int ix = 0; ix <= m_l->numx; ix++)
 		{
 			(*ptr).x += amp * sin(freq*relTime);
 			ptr++;
@@ -221,9 +221,9 @@ void WobbleLatticeAnim::init()
 	
 	float* angptr = angle;
 	float* distptr = dist;
-	for(int iy = 0; iy <= m_l->numy; iy++)
+	for(unsigned int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(int ix = 0; ix <= m_l->numx; ix++)
+		for(unsigned int ix = 0; ix <= m_l->numx; ix++)
 		{
 			*angptr++ = Random::randomFloat(startangle-anglevar, startangle + anglevar);
 			*distptr++ = Random::randomFloat(startdist-distvar, startdist+distvar);
@@ -236,9 +236,9 @@ void WobbleLatticeAnim::init()
 void WobbleLatticeAnim::update(float dt)
 {
 	float* angptr = angle;
-	for(int iy = 0; iy <= m_l->numy; iy++)
+	for(unsigned int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(int ix = 0; ix <= m_l->numx; ix++)
+		for(unsigned int ix = 0; ix <= m_l->numx; ix++)
 		{
 			*angptr++ += dt * speed;
 		}
@@ -254,9 +254,9 @@ void WobbleLatticeAnim::setEffect()
 	LatticeVert* ptr = m_l->UV;
 	float* angptr = angle;
 	float* distptr = dist;
-	for(int iy = 0; iy <= m_l->numy; iy++)
+	for(unsigned int iy = 0; iy <= m_l->numy; iy++)
 	{
-		for(int ix = 0; ix <= m_l->numx; ix++)
+		for(unsigned int ix = 0; ix <= m_l->numx; ix++)
 		{
 			//X = D * cos(A) and Y = D * sin(A)
 			(*ptr).x += (*distptr * cos(*angptr))*hfac;
@@ -317,7 +317,7 @@ void SoftBodyAnim::setEffect()
 			Vec2 vertPos = getVertex(ptr);
 			
 			//Find total distance between this vertex and all bodies
-			float totalDist = 0.0;
+			float totalDist = 0.0f;
 			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Vec2 dist = vertPos - i->pos;
@@ -333,7 +333,7 @@ void SoftBodyAnim::setEffect()
 				float distance = glmx::lensqr(diff);
 				
 				//Mul fac for moving this point
-				float fac = 1.0 - (distance / totalDist);
+				float fac = 1.0f - (distance / totalDist);
 				
 				
 				//TODO Better deformation

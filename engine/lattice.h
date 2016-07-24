@@ -15,7 +15,7 @@ struct LatticeVert
 
 class Lattice
 {
-	void setup(int x, int y);
+	void setup(unsigned int x, unsigned int y);
 	
 	float* m_vertex;
 	float* m_UV;
@@ -24,9 +24,9 @@ public:
 	LatticeVert* vertex;
 	LatticeVert* UV;
 	
-	int numx, numy;
+	unsigned int numx, numy;
 	
-	Lattice(int x, int y) {setup(x,y);};
+	Lattice(unsigned int x, unsigned int y) {setup(x,y);};
 	Lattice() {setup(10,10);};
 	~Lattice();
 	

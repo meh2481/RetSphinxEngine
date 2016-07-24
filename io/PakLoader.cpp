@@ -60,7 +60,7 @@ void PakLoader::parseFile(string sFileName)
 		}
 
 		//Load ResourcePtrs
-		for(int i = 0; i < header.numResources; i++)
+		for(unsigned int i = 0; i < header.numResources; i++)
 		{
 			ResourcePtr resPtr;
 			if(fread(&resPtr, 1, sizeof(ResourcePtr), fp) != sizeof(ResourcePtr))
@@ -92,7 +92,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 	}
 
 	//Load resource
-	if(fseek(it->second.fp, it->second.ptr.offset, SEEK_SET))
+	if(fseek(it->second.fp, (long)it->second.ptr.offset, SEEK_SET))
 	{
 		LOG(WARNING) << "Unable to seek to proper location in resource file for resource ID " << id;
 		return NULL;

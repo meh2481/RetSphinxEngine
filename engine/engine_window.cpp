@@ -2,7 +2,7 @@
 #include <SDL_syswm.h>
 #include "easylogging++.h"
 
-void Engine::changeScreenResolution(float w, float h)
+void Engine::changeScreenResolution(int w, int h)
 {
 	LOG(INFO) << "Changing screen resolution to " << w << ", " << h;
 	int vsync = SDL_GL_GetSwapInterval();
@@ -118,8 +118,8 @@ Vec2 Engine::getWindowPos()
 	Vec2 p;
 	int x, y;
 	SDL_GetWindowPosition(m_Window, &x, &y);
-	p.x = x;
-	p.y = y;
+	p.x = (float)x;
+	p.y = (float)y;
 	return p;
 }
 
@@ -127,7 +127,7 @@ Vec2 Engine::getWindowPos()
 void Engine::setWindowPos(Vec2 pos)
 {
 	if(pos.x > 0 && pos.y > 0)
-		SDL_SetWindowPosition(m_Window, pos.x, pos.y);
+		SDL_SetWindowPosition(m_Window, (int)pos.x, (int)pos.y);
 	else
 		SDL_SetWindowPosition(m_Window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);	//Center if we're upper-left corner or above or some such.
 }

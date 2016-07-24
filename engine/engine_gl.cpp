@@ -96,7 +96,7 @@ void Engine::setup_sdl()
 	SDL_GetDisplayMode(0, 0, &mode);
 	if(!mode.refresh_rate)	//If 0, display doesn't care, so default to 60
 		mode.refresh_rate = 60;
-	setFramerate(mode.refresh_rate);
+	setFramerate((float)mode.refresh_rate);
 	
 	int numDisplays = SDL_GetNumVideoDisplays();
 	LOG(INFO) << "Available displays: " << numDisplays;

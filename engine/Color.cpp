@@ -19,10 +19,10 @@ Color::Color(float fr, float fg, float fb, float fa)
 
 void Color::from256(int ir, int ig, int ib, int ia)
 {
-	r = (float)ir / 255.0;
-	g = (float)ig / 255.0;
-	b = (float)ib / 255.0;
-	a = (float)ia / 255.0;
+	r = (float)ir / 255.0f;
+	g = (float)ig / 255.0f;
+	b = (float)ib / 255.0f;
+	a = (float)ia / 255.0f;
 }
 
 void Color::fromString(std::string s)

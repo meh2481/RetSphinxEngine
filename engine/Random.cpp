@@ -2,7 +2,7 @@
 #include "mtrand.h"
 
 static MTRand_int32 irand;
-static MTRand drand;
+static MTRand_closed drand;
 
 int Random::random()
 {
@@ -29,7 +29,7 @@ int Random::random(int max)
 
 float Random::randomFloat()
 {
-	return drand();
+	return (float)drand();
 }
 
 float Random::randomFloat(float min, float max)
@@ -41,7 +41,7 @@ float Random::randomFloat(float min, float max)
 		min = max;
 		max = temp;
 	}
-	return (drand() * (max - min) + min);
+	return (float)(drand() * (max - min) + min);
 }
 
 float Random::randomFloat(float max)

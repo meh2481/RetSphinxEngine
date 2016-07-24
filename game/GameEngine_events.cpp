@@ -222,9 +222,9 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		//Key released
 		case SDL_KEYUP:
-			switch(event.key.keysym.scancode)
-			{
-			}
+			//switch(event.key.keysym.scancode)
+			//{
+			//}
 			break;
 		
 		case SDL_MOUSEBUTTONDOWN:

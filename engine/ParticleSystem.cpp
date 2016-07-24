@@ -135,9 +135,9 @@ void ParticleSystem::_newParticle()
 	if(!imgRect.size())
 	{
 		if(img != NULL)
-			m_imgRect[m_num] = Rect(0,0,img->getWidth(),img->getHeight());
+			m_imgRect[m_num] = Rect(0.0f, 0.0f, (float)img->getWidth(), (float)img->getHeight());
 		else
-			m_imgRect[m_num] = Rect(0,0,0,0);
+			m_imgRect[m_num] = Rect(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else
 		m_imgRect[m_num] = imgRect[Random::random(imgRect.size()-1)];
@@ -315,7 +315,7 @@ void ParticleSystem::update(float dt)
 	
 	spawnCounter += dt * rate * curRate * g_fParticleFac;
 
-	int iSpawnAmt = floor(spawnCounter);
+	int iSpawnAmt = (int)floor(spawnCounter);
 	spawnCounter -= iSpawnAmt;
 	if(!iSpawnAmt)
 		emitFrom.offset(emissionVel.x * dt, emissionVel.y * dt);	//Move our emission point as needed
@@ -494,7 +494,7 @@ void ParticleSystem::init()
 	if(m_num)
 		_deleteAll();
 	
-	m_totalAmt = ceilf(max * g_fParticleFac);
+	m_totalAmt = (unsigned int)ceilf(max * g_fParticleFac);
 	
 	if(!m_totalAmt) return;
 	

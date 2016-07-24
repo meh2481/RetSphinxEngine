@@ -57,7 +57,7 @@ private:
 	
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
-	uint16_t m_iWidth, m_iHeight;
+	int m_iWidth, m_iHeight;
 	const Uint8 *m_iKeystates;	//Keep track of keys that are pressed/released so we can poll as needed
 	int m_iNumScreenModes;	  //Number of screen modes that are available
 	bool m_bFullscreen;
@@ -123,7 +123,7 @@ public:
 	void fillScreen(Color col);
 	
 	//Window functions - engine_window.cpp
-	void changeScreenResolution(float w, float h);  //Change resolution mid-game and reload OpenGL textures as needed
+	void changeScreenResolution(int w, int h);  //Change resolution mid-game and reload OpenGL textures as needed
 	//void toggleFullscreen();							//Switch between fullscreen/windowed modes
 	void setFullscreen(bool bFullscreen);				//Set fullscreen to true or false as needed
 	void setInitialFullscreen() {SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);};
