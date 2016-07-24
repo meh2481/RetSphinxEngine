@@ -239,6 +239,7 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 	
 	//Construct OpenGL object
     m_obj = glGenLists(1);
+	//TODO: Remove displaylists and replace with VBOs/VBAs
     glNewList(m_obj,GL_COMPILE);
 	
     //Loop through and add faces

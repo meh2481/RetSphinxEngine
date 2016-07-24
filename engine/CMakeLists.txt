@@ -16,8 +16,6 @@ Font.cpp
 Font.h
 Gradient.cpp
 Gradient.h
-HUD.cpp
-HUD.h
 Image.cpp
 Image.h
 imgui_impl_opengl2.cpp

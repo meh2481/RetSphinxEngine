@@ -6,11 +6,11 @@
 
 #include "Object.h"
 #include "Text.h"
-#include "HUD.h"
 #include "MouseCursor.h"
 #include "EngineContactListener.h"
 #include "Node.h"
 #include "DebugDraw.h"
+#include "SDL.h"
 
 class b2World;
 class Image;
