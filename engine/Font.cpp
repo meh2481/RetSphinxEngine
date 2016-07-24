@@ -5,7 +5,7 @@
 
 Font::Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
-	//TODO Make sure num > 1
+	//TODO Make sure count > 1
 
 	num = count;
 	img = image;

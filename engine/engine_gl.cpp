@@ -2,6 +2,29 @@
 #include "opengl-api.h"
 #include "easylogging++.h"
 
+static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
+
+
+static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+{
+
+	switch(severity)
+	{
+	case GL_DEBUG_SEVERITY_MEDIUM:
+	case GL_DEBUG_SEVERITY_LOW:
+		printf("GL[%u]: %s\n", severity, message);
+		LOG(WARNING) << "GL[" << severity << "]: " << message;
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		printf("GL[%u]: %s\n", severity, message);
+		LOG(ERROR) << "GL[" << severity << "]: " << message;
+		break;
+	default:
+		assert(false);
+	}
+}
+
+
 void Engine::setup_sdl()
 {
 
@@ -33,9 +56,6 @@ void Engine::setup_sdl()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	
-	//Vsync and stuff	//TODO: Toggle? Figure out what it's actually doing? My pathetic gfx card doesn't do anything with any of these values
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);	//Apparently double-buffering or something
-	
 	// Create SDL window
 	Uint32 flags = SDL_WINDOW_OPENGL;
 	if(m_bResizable)
@@ -53,6 +73,20 @@ void Engine::setup_sdl()
 		LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);	//TODO: Toggle/figure out what this is actually doing
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+
+	//TODO: Switch to core instead of compat
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+#ifdef _DEBUG
+	//TODO: Add back forward compatibility flag once removal of deprecated stuff is complete
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG);
+#else
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+#endif
+
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1); //Share objects between OpenGL contexts
 	SDL_GL_CreateContext(m_Window);
 	if(SDL_GL_SetSwapInterval(-1) == -1) //Apparently Vsync or something
@@ -89,6 +123,19 @@ void Engine::setup_sdl()
 	LOG(INFO) << "GL version: " << ver;
     const char *ven = (const char*)glGetString(GL_VENDOR);
 	LOG(INFO) << "GL vendor: " << ven;
+
+	glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
+
+#ifdef _DEBUG
+	if(glDebugMessageCallback)
+	{
+		puts("Using GL debug callbacks");
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(debugCallback, NULL);
+	}
+	else
+		puts("glDebugMessageCallback() not supported");
+#endif
 }
 
 //Set up OpenGL

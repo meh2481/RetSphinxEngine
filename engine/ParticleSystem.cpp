@@ -385,9 +385,8 @@ void ParticleSystem::update(float dt)
 void ParticleSystem::draw()
 {
 	if(img == NULL) return;
-
-	glUseProgram(program);
 	
+	//TODO: Test and make sure blend types still work after shaders
 	switch(blend)
 	{
 		case ADDITIVE:
@@ -468,6 +467,9 @@ void ParticleSystem::draw()
 		vel++;
 		imgRect++;
 	}
+
+	//Use this OpenGL program
+	glUseProgram(program);
 
 	//Render everything in one pass
 	img->bindTexture();	//Bind once before we draw since all our particles will use one texture
