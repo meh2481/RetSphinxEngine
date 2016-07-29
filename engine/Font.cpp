@@ -47,10 +47,11 @@ uint32_t Font::getIndex(uint32_t codepoint)
 
 void Font::renderChar(float drawPt, Vec2 offset, float* rect)
 {
+	float fac = (float)img->getWidth() / (float)img->getHeight();
 	//TODO Store vertex data & don't re-send this to the gfx card every frame
 
-	float charHeight = rect[3] - rect[1];
-	float charWidth = rect[2] - rect[0];
+	float charHeight = rect[5] - rect[3];
+	float charWidth = (rect[2] - rect[0]) * fac;
 	if(charWidth <= 0.0f || charHeight <= 0.0f) return;
 
 	float sizeX = (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
@@ -99,6 +100,7 @@ uint32_t Font::getNextCodepoint(const char** strpos)
 
 void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
+	float fac = (float)img->getWidth() / (float)img->getHeight();
 	img->bindTexture();
 	const char* strptr = str;
 	while(*strptr)
@@ -109,8 +111,8 @@ void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 		//Increase offset by this char's width
 		//TODO Why am I calculating this both here and inside renderChar()?
 
-		float charHeight = rectPos[3] - rectPos[1];
-		float charWidth = rectPos[2] - rectPos[0];
+		float charHeight = rectPos[5] - rectPos[3];
+		float charWidth = (rectPos[2] - rectPos[0]) * fac;
 		if(charWidth > 0.0f && charHeight > 0.0f)
 			drawOffset.x += (drawPt/charHeight)*charWidth;	//TODO Kerning & word wrap
 
@@ -121,6 +123,7 @@ void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 
 float Font::stringWidth(const char* str, float drawPt)
 {
+	float fac = (float)img->getWidth() / (float)img->getHeight();
 	float width = 0.0f;
 	const char* strptr = str;
 	while(*strptr)
@@ -128,8 +131,8 @@ float Font::stringWidth(const char* str, float drawPt)
 		//Grab the index of this char
 		float* rectPos = getNextRect(&strptr);
 		//Increase offset by this char's width
-		float charHeight = rectPos[3] - rectPos[1];
-		float charWidth = rectPos[2] - rectPos[0];
+		float charHeight = rectPos[5] - rectPos[3];
+		float charWidth = (rectPos[2] - rectPos[0]) * fac;
 		if(charWidth > 0.0f && charHeight > 0.0f)
 			width += (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
 

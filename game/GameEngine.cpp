@@ -220,9 +220,9 @@ void GameEngine::draw()
 	drawDebug();
 
 	Vec2 textPos;
-	textPos.x = CameraPos.x;
-	textPos.y = CameraPos.y + 0.5f;
-	m_font->renderString("asdfaaaaaa", 0.5f, textPos);
+	textPos.x = -CameraPos.x - 5.0f;
+	textPos.y = -CameraPos.y + 0.5f;
+	m_font->renderString("i can has text", 0.5f, textPos);
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
