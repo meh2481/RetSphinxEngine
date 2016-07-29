@@ -13,7 +13,7 @@ class Font
 
 	Font() {};
 
-	void renderChar(float drawPt, Vec2 offset, float* rect);
+	void renderChar(Vec2 drawSz, Vec2 offset, float* rect);
 	uint32_t getIndex(uint32_t codepoint);
 	uint32_t getNextCodepoint(const char** strpos);	//Get the next codepoint from the given string & increment the pointer
 	float* getNextRect(const char** str);			//Get the next image rect for the given string position & increment the pointer

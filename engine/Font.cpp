@@ -45,23 +45,21 @@ uint32_t Font::getIndex(uint32_t codepoint)
 	return 0;
 }
 
-void Font::renderChar(float drawPt, Vec2 offset, float* rect)
+void Font::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 {
-	float fac = (float)img->getWidth() / (float)img->getHeight();
 	//TODO Store vertex data & don't re-send this to the gfx card every frame
-
-	float charHeight = rect[5] - rect[3];
-	float charWidth = (rect[2] - rect[0]) * fac;
-	if(charWidth <= 0.0f || charHeight <= 0.0f) return;
-
-	float sizeX = (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
+	Rect rc(
+		-drawSz.x / 2.0f + offset.x,
+		drawSz.y / 2.0f + offset.y,
+		drawSz.x / 2.0f + offset.x,
+		-drawSz.y / 2.0f + offset.y);
 
 	const float vertexData[] =
 	{
-		-sizeX / 2.0f + offset.x, drawPt / 2.0f + offset.y, // upper left
-		sizeX / 2.0f + offset.x, drawPt / 2.0f + offset.y, // upper right
-		sizeX / 2.0f + offset.x, -drawPt / 2.0f + offset.y, // lower right
-		-sizeX / 2.0f + offset.x, -drawPt / 2.0f + offset.y, // lower left
+		rc.left, rc.top, // upper left
+		rc.right, rc.top, // upper right
+		rc.right, rc.bottom, // lower right
+		rc.left, rc.bottom // lower left
 	};
 
 	glVertexPointer(2, GL_FLOAT, 0, &vertexData);
@@ -105,14 +103,18 @@ void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 	const char* strptr = str;
 	while(*strptr)
 	{
-		//Render this character
+		//Get the rect for this character
 		float* rectPos = getNextRect(&strptr);
-		renderChar(drawPt, drawOffset, rectPos);
-		//Increase offset by this char's width
-		//TODO Why am I calculating this both here and inside renderChar()?
-
 		float charHeight = rectPos[5] - rectPos[3];
 		float charWidth = (rectPos[2] - rectPos[0]) * fac;
+
+		//Render this character
+		Vec2 drawSz;
+		drawSz.y = drawPt;
+		drawSz.x = (drawPt / charHeight)*charWidth;
+		renderChar(drawSz, drawOffset, rectPos);
+
+		//Increase offset by this char's width
 		if(charWidth > 0.0f && charHeight > 0.0f)
 			drawOffset.x += (drawPt/charHeight)*charWidth;	//TODO Kerning & word wrap
 
