@@ -11,6 +11,7 @@
 #include "LuaInterface.h"
 
 #include "Mesh3D.h"
+#include "Font.h"
 #include "tinyxml2.h"
 
 class DebugUI;
@@ -80,6 +81,7 @@ private:
 	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map	TODO: Better way of doing this
 	std::string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 	std::string m_sLastScene;
+	Font* m_font;
 
 	DebugUI *m_debugUI;
 

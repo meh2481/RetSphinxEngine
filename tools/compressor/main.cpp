@@ -148,6 +148,8 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	int imgWidth = 0;
 	int imgHeight = 0;
 	unsigned char* imageBuf = stbi_load(imgFileName, &imgWidth, &imgHeight, &comp, 0);
+	imgWidth--;
+	imgHeight--;
 	if(!imageBuf || imgWidth < 1 || imgHeight < 1)
 	{
 		cout << "Unable to load image " << imgFileName << " for font " << filename << endl;
@@ -190,6 +192,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		rc.right = rc.right / (float)imgWidth;
 		rc.top = 1.0f - rc.top / (float)imgHeight;
 		rc.bottom = 1.0f - rc.bottom / (float)imgHeight;
+		cout << "Image rect: " << rc.left << ", " << rc.right << ", " << rc.top << ", " << rc.bottom << endl;
 
 		imgRects.push_back(rc);
 		codepoints.push_back(codepoint);
@@ -219,7 +222,8 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		memcpy(&fontBuf[pos], texCoords, sizeof(float) * 8);
 		pos += sizeof(float) * 8;
 	}
-
+	if(fileSize)
+		*fileSize = pos;
 	return fontBuf;
 }
 
@@ -287,7 +291,7 @@ void compress(list<string> filesToPak, string pakFilename)
 		//Package these file types properly if needed
 		if(i->find(".png") != string::npos)
 			decompressed = extractImage(*i, &size);
-		if(i->find(".font") != string::npos)
+		else if(i->find(".font") != string::npos)
 			decompressed = extractFont(*i, &size);
 		else
 			decompressed = FileOperations::readFile(*i, &size);

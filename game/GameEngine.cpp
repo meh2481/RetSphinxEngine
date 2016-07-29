@@ -212,11 +212,17 @@ void GameEngine::draw()
     //Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
     //glm::mat4 look = glm::lookAt(eye, center, up);
     //glLoadMatrixf(glm::value_ptr(look));
+
 	
 	glDisable(GL_LIGHTING);
 	glm::mat4 mat;	//TODO Use real mat
 	getEntityManager()->render(mat);
 	drawDebug();
+
+	Vec2 textPos;
+	textPos.x = CameraPos.x;
+	textPos.y = CameraPos.y + 0.5f;
+	m_font->renderString("asdfaaaaaa", 0.5f, textPos);
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
@@ -272,6 +278,8 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(KEY_ENTER2);
 	
 	Lua->call("loadStartingMap");
+
+	m_font = getResourceLoader()->getFont("res/font/test.font");
 }
 
 void GameEngine::pause()
