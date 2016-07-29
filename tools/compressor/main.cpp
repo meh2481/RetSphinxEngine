@@ -18,7 +18,6 @@ using namespace std;
 
 #include "stb_image.h"
 #include "ResourceTypes.h"
-#include "main.h"
 
 //Helper struct for compression
 typedef struct
@@ -144,6 +143,18 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		return NULL;
 	}
 
+	//Load image just to get width/height
+	int comp = 0;
+	int imgWidth = 0;
+	int imgHeight = 0;
+	unsigned char* imageBuf = stbi_load(imgFileName, &imgWidth, &imgHeight, &comp, 0);
+	if(!imageBuf || imgWidth < 1 || imgHeight < 1)
+	{
+		cout << "Unable to load image " << imgFileName << " for font " << filename << endl;
+		return NULL;
+	}
+	stbi_image_free(imageBuf);
+
 	//Create font header
 	FontHeader fontHeader;
 	fontHeader.pad = PAD_32BIT;
@@ -175,6 +186,10 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		}
 
 		cRect rc = rectFromString(imgRectStr);
+		rc.left = rc.left / (float)imgWidth;
+		rc.right = rc.right / (float)imgWidth;
+		rc.top = 1.0f - rc.top / (float)imgHeight;
+		rc.bottom = 1.0f - rc.bottom / (float)imgHeight;
 
 		imgRects.push_back(rc);
 		codepoints.push_back(codepoint);
