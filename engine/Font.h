@@ -19,7 +19,7 @@ class Font
 	float* getNextRect(const char** str);			//Get the next image rect for the given string position & increment the pointer
 
 public:
-	Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion
+	Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
 	~Font();
 
 	void renderString(const char* str, float drawPt, Vec2 drawOffset);

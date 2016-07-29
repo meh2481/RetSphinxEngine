@@ -10,6 +10,7 @@
 #include "ResourceCache.h"
 #include "PakLoader.h"
 #include "Parse.h"
+#include "Font.h"
 using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
@@ -139,7 +140,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		iErr = doc->Parse((const char*)resource, len);
 		free(resource);
 	}
-	
+
 	if(iErr != tinyxml2::XML_NO_ERROR)
 	{
 		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
@@ -167,7 +168,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		ps->emissionVel = pointFromString(emfromvel);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
-//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
+	//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
 
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)
@@ -183,7 +184,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	root->QueryUnsignedAttribute("max", &ps->max);
 	root->QueryFloatAttribute("rate", &ps->rate);
-//	root->QueryBoolAttribute("velrotate", &ps->velRotate);
+	//	root->QueryBoolAttribute("velrotate", &ps->velRotate);
 	root->QueryFloatAttribute("decay", &ps->decay);
 	float fDecayVar = 0.0f;
 	root->QueryFloatAttribute("decayvar", &fDecayVar);
@@ -294,15 +295,15 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		}
 		else if(sName == "spawnondeath")
 		{
-//			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
-//			if(cDeathSpawnType && strlen(cDeathSpawnType))
-//			{
-//				string sDeathSpawntype = cDeathSpawnType;
-//				if(sDeathSpawntype == "system")
-//					ps->particleDeathSpawn = false;
-//				else if(sDeathSpawntype == "particle")
-//					ps->particleDeathSpawn = true;
-//			}
+			//			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
+			//			if(cDeathSpawnType && strlen(cDeathSpawnType))
+			//			{
+			//				string sDeathSpawntype = cDeathSpawnType;
+			//				if(sDeathSpawntype == "system")
+			//					ps->particleDeathSpawn = false;
+			//				else if(sDeathSpawntype == "particle")
+			//					ps->particleDeathSpawn = true;
+			//			}
 
 			for(tinyxml2::XMLElement* particle = elem->FirstChildElement("particle"); particle != NULL; particle = particle->NextSiblingElement("particle"))
 			{
@@ -376,6 +377,52 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 	return cur;
 }
 
+Font* ResourceLoader::getFont(std::string sID)
+{
+	LOG(TRACE) << "Loading Font " << sID;
+	uint64_t hashVal = hash(sID);
+	LOG(TRACE) << "Font has ID " << hashVal;
+	Font* font = m_cache->findFont(hashVal);
+	if(!font)	//This font isn't here; load it
+	{
+		unsigned int len = 0;
+		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+		if(!resource || !len)
+		{
+			LOG(ERROR) << "Pak miss - TODO Implement font loading from file...";
+			//font = new Mesh3D(sID);				//Create this mesh
+			//m_cache->addMesh(hashVal, mesh);	//Add to the cache
+		}
+		else
+		{
+			LOG(TRACE) << "Pak hit - load from data";
+			assert(len > sizeof(FontHeader));
+
+			FontHeader fontHeader;
+			memcpy(&fontHeader, resource, sizeof(FontHeader));
+
+			uint32_t offset = sizeof(FontHeader);
+			uint32_t codePointSz = fontHeader.numChars * sizeof(uint32_t);
+			uint32_t imgRectSz = fontHeader.numChars * 8 * sizeof(float);
+			assert(len >= offset + codePointSz + imgRectSz);
+
+			uint32_t* codePoints = (uint32_t*)malloc(codePointSz);
+			memcpy(codePoints, &resource[offset], codePointSz);
+			offset += codePointSz;
+
+			float* imgRects = (float*)malloc(imgRectSz);
+			memcpy(imgRects, &resource[offset], imgRectSz);
+
+			font = new Font(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
+			m_cache->addFont(hashVal, font);
+			free(resource);						//Free memory
+		}
+	}
+	else
+		LOG(TRACE) << "Cache hit " << sID;
+	return font;
+}
+
 ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 {
 	ObjSegment* seg = new ObjSegment();
@@ -419,7 +466,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	LOG(INFO) << "Parsing object XML file " << sXMLFilename;
 	//Open file
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
-	
+
 	uint64_t hashVal = hash(sXMLFilename);
 	//TODO Check cache first
 	unsigned int len = 0;

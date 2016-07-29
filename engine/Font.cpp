@@ -5,7 +5,11 @@
 
 Font::Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
-	//TODO Make sure count > 1
+	//Make sure data is valid
+	assert(count > 1);
+	assert(image != NULL);
+	assert(codePoints != NULL);
+	assert(imgRects != NULL);
 
 	num = count;
 	img = image;
@@ -15,8 +19,8 @@ Font::Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRec
 
 Font::~Font()
 {
-	delete[] codepoints;
-	delete[] rects;
+	free(codepoints);
+	free(rects);
 }
 
 uint32_t Font::getIndex(uint32_t codepoint)
@@ -43,9 +47,26 @@ uint32_t Font::getIndex(uint32_t codepoint)
 
 void Font::renderChar(float drawPt, Vec2 offset, float* rect)
 {
+	//TODO Store vertex data & don't re-send this to the gfx card every frame
+
 	float charHeight = rect[3] - rect[1];
 	float charWidth = rect[2] - rect[0];
-	//TODO
+	if(charWidth <= 0.0f || charHeight <= 0.0f) return;
+
+	float sizeX = (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
+
+	const float vertexData[] =
+	{
+		-sizeX / 2.0f + offset.x, drawPt / 2.0f + offset.y, // upper left
+		sizeX / 2.0f + offset.x, drawPt / 2.0f + offset.y, // upper right
+		sizeX / 2.0f + offset.x, -drawPt / 2.0f + offset.y, // lower right
+		-sizeX / 2.0f + offset.x, -drawPt / 2.0f + offset.y, // lower left
+	};
+
+	glVertexPointer(2, GL_FLOAT, 0, &vertexData);
+	glTexCoordPointer(2, GL_FLOAT, 0, rect);
+	glDrawArrays(GL_QUADS, 0, 4);
+
 }
 
 float* Font::getNextRect(const char** str)
@@ -54,7 +75,7 @@ float* Font::getNextRect(const char** str)
 	return &rects[idx * 8];
 }
 
-uint32_t getNextCodepoint(const char** strpos)
+uint32_t Font::getNextCodepoint(const char** strpos)
 {
 	//Determine UTF-8 codepoint
 	int seqlen = 0;
@@ -78,6 +99,7 @@ uint32_t getNextCodepoint(const char** strpos)
 
 void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
+	img->bindTexture();
 	const char* strptr = str;
 	while(*strptr)
 	{
@@ -85,9 +107,12 @@ void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 		float* rectPos = getNextRect(&strptr);
 		renderChar(drawPt, drawOffset, rectPos);
 		//Increase offset by this char's width
+		//TODO Why am I calculating this both here and inside renderChar()?
+
 		float charHeight = rectPos[3] - rectPos[1];
 		float charWidth = rectPos[2] - rectPos[0];
-		drawOffset.x += (drawPt/charHeight)*charWidth;	//TODO Kerning & word wrap
+		if(charWidth > 0.0f && charHeight > 0.0f)
+			drawOffset.x += (drawPt/charHeight)*charWidth;	//TODO Kerning & word wrap
 
 		//Next loop
 		strptr++;
@@ -105,7 +130,8 @@ float Font::stringWidth(const char* str, float drawPt)
 		//Increase offset by this char's width
 		float charHeight = rectPos[3] - rectPos[1];
 		float charWidth = rectPos[2] - rectPos[0];
-		width += (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
+		if(charWidth > 0.0f && charHeight > 0.0f)
+			width += (drawPt / charHeight)*charWidth;	//TODO Kerning & word wrap
 
 		//Next loop
 		strptr++;

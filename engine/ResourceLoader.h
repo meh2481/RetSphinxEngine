@@ -15,6 +15,7 @@ class b2Body;
 class ResourceCache;
 class Mesh3D;
 class PakLoader;
+class Font;
 
 class ResourceLoader
 {
@@ -45,6 +46,9 @@ public:
 
 	//Mouse cursors
 	MouseCursor* getCursor(std::string sID);
+
+	//Fonts
+	Font* getFont(std::string sID);
 
 	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);

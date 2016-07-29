@@ -6,8 +6,11 @@
 #include <cstdlib>
 #include <cstdio>
 #include <list>
+#include <vector>
+#include <sstream>
 #include "Parse.h"
 #include "FileOperations.h"
+#include "tinyxml2.h"
 using namespace std;
 
 #define PAD_32BIT 0x50444150
@@ -15,6 +18,7 @@ using namespace std;
 
 #include "stb_image.h"
 #include "ResourceTypes.h"
+#include "main.h"
 
 //Helper struct for compression
 typedef struct
@@ -25,6 +29,24 @@ typedef struct
 	uint64_t id;
 	string filename;
 } compressionHelper;
+
+typedef struct
+{
+	float left, right, top, bottom;
+}cRect;
+
+cRect rectFromString(string s)
+{
+	cRect rc;
+	s = Parse::stripCommas(s);
+
+	//Now, parse
+	istringstream iss(s);
+	if(!(iss >> rc.left >> rc.top >> rc.right >> rc.bottom))
+		rc.left = rc.top = rc.right = rc.bottom = 0.0f;
+
+	return rc;
+}
 
 uint64_t hashString(string sHashStr)
 {
@@ -43,6 +65,28 @@ string remove_extension(const string& filename)
 	size_t lastdot = filename.find_last_of(".");
 	if(lastdot == string::npos) return filename;
 	return filename.substr(0, lastdot);
+}
+
+uint32_t getCodepoint(const char* str)
+{
+	//Determine UTF-8 codepoint
+	int seqlen = 0;
+	uint8_t pointHeader = *((uint8_t*)str);
+	//Determine how many characters in this UTF-8 codepoint
+	while(pointHeader & 0x80)
+	{
+		seqlen++;
+		pointHeader <<= 1;
+	}
+	//Build codepoint by combining bits
+	uint32_t codepoint = pointHeader >> seqlen;
+	for(int i = 1; i < seqlen; i++)
+	{
+		codepoint <<= 6;
+		str++;
+		codepoint |= (*str & 0x3F);
+	}
+	return codepoint;
 }
 
 unsigned char* extractImage(string filename, unsigned int* fileSize)
@@ -77,6 +121,91 @@ unsigned char* extractImage(string filename, unsigned int* fileSize)
 
 	stbi_image_free(imageBuf);
 	return finalBuf;
+}
+
+unsigned char* extractFont(string filename, unsigned int* fileSize)
+{
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+	tinyxml2::XMLError err = doc->LoadFile(filename.c_str());
+	if(err != tinyxml2::XML_NO_ERROR)
+	{
+		cout << "Unable to open font XML " << filename << endl;
+		delete doc;
+		return NULL;
+	}
+
+	tinyxml2::XMLElement* root = doc->RootElement();
+
+	const char* imgFileName = root->Attribute("img");
+	if(!imgFileName)
+	{
+		cout << "No img for font XML " << filename << endl;
+		delete doc;
+		return NULL;
+	}
+
+	//Create font header
+	FontHeader fontHeader;
+	fontHeader.pad = PAD_32BIT;
+	fontHeader.textureId = hashString(imgFileName);
+	fontHeader.numChars = 1;
+
+	vector<uint32_t> codepoints;
+	vector<cRect> imgRects;
+
+	//First codepoint (0) is always 0,0,0,0
+	codepoints.push_back(0);
+	imgRects.push_back({ 0,0,0,0 });
+
+	for(tinyxml2::XMLElement* elem = root->FirstChildElement("char"); elem != NULL; elem = elem->NextSiblingElement())
+	{
+		const char* codepointStr = elem->Attribute("codepoint");
+		if(!codepointStr)
+		{
+			cout << "Skipping char missing codepoint " << fontHeader.numChars << endl;
+			continue;
+		}
+		uint32_t codepoint = getCodepoint(codepointStr);
+
+		const char* imgRectStr = elem->Attribute("rect");
+		if(!imgRectStr)
+		{
+			cout << "Skipping char missing rect " << fontHeader.numChars << endl;
+			continue;
+		}
+
+		cRect rc = rectFromString(imgRectStr);
+
+		imgRects.push_back(rc);
+		codepoints.push_back(codepoint);
+		fontHeader.numChars++;
+	}
+	delete doc;
+
+
+	unsigned char* fontBuf = (unsigned char*)malloc(sizeof(FontHeader) + fontHeader.numChars * sizeof(uint32_t) + fontHeader.numChars * 8 * sizeof(float));
+
+	memcpy(fontBuf, &fontHeader, sizeof(FontHeader));
+	uint32_t pos = sizeof(FontHeader);
+
+	memcpy(&fontBuf[pos], codepoints.data(), sizeof(uint32_t)*fontHeader.numChars);
+	pos += sizeof(uint32_t)*fontHeader.numChars;
+
+	for(vector<cRect>::iterator i = imgRects.begin(); i != imgRects.end(); i++)
+	{
+		const float texCoords[] =
+		{
+			i->left, i->bottom, // lower left
+			i->right, i->bottom, // lower right
+			i->right, i->top, // upper right
+			i->left, i->top, // upper left
+		};
+
+		memcpy(&fontBuf[pos], texCoords, sizeof(float) * 8);
+		pos += sizeof(float) * 8;
+	}
+
+	return fontBuf;
 }
 
 bool hasUpper(string s)
@@ -134,20 +263,21 @@ void compress(list<string> filesToPak, string pakFilename)
 
 	list<compressionHelper> compressedFiles;
 
-
 	for(list<string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
 		cout << "Compressing \"" << *i << "\"..." << endl;
 		unsigned int size = 0;
 		unsigned char* decompressed;
 
-		//Extract an image from this file if it is one
+		//Package these file types properly if needed
 		if(i->find(".png") != string::npos)
 			decompressed = extractImage(*i, &size);
+		if(i->find(".font") != string::npos)
+			decompressed = extractFont(*i, &size);
 		else
 			decompressed = FileOperations::readFile(*i, &size);
 
-		if(!size)
+		if(!size || !decompressed)
 		{
 			cout << "Unable to load file " << *i << endl;
 			continue;
