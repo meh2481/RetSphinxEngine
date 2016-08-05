@@ -190,9 +190,9 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		cRect rc = rectFromString(imgRectStr);
 		rc.left = rc.left / (float)imgWidth;
 		rc.right = rc.right / (float)imgWidth;
-		rc.top = 1.0f - rc.top / (float)imgHeight;
-		rc.bottom = 1.0f - rc.bottom / (float)imgHeight;
-		cout << "Image rect: " << rc.left << ", " << rc.right << ", " << rc.top << ", " << rc.bottom << endl;
+		rc.top = rc.top / (float)imgHeight;
+		rc.bottom = rc.bottom / (float)imgHeight;
+		cout << "Image rect for " << codepointStr << ": " << rc.left << ", " << rc.right << ", " << rc.top << ", " << rc.bottom << endl;
 
 		imgRects.push_back(rc);
 		codepoints.push_back(codepoint);
@@ -211,12 +211,13 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 
 	for(vector<cRect>::iterator i = imgRects.begin(); i != imgRects.end(); i++)
 	{
+		//CW winding from upper left
 		const float texCoords[] =
 		{
-			i->left, i->bottom, // lower left
-			i->right, i->bottom, // lower right
-			i->right, i->top, // upper right
 			i->left, i->top, // upper left
+			i->right, i->top, // upper right
+			i->right, i->bottom, // lower right
+			i->left, i->bottom, // lower left
 		};
 
 		memcpy(&fontBuf[pos], texCoords, sizeof(float) * 8);

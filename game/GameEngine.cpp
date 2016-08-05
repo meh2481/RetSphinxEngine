@@ -222,7 +222,7 @@ void GameEngine::draw()
 	Vec2 textPos;
 	textPos.x = -CameraPos.x - 5.0f;
 	textPos.y = -CameraPos.y + 0.5f;
-	m_font->renderString("i can has text", 0.5f, textPos);
+	m_font->renderString("no s\xC3\xA9 qu\xC3\xA9 aqu\xC3\xAD traducir\xC3\xA1n ", 0.25f, textPos);
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position

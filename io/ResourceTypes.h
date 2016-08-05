@@ -90,7 +90,7 @@ typedef struct
 //See https://www.loc.gov/standards/iso639-2/php/code_list.php for ISO 639 codes
 typedef struct
 {
-	uint8_t languageID[4];	//ISO 639-1 (if existing) or 639-2 language code in all-caps (EN for English, ES for Spanish, etc). Should only be two or three chars, others '\0'
+	char languageID[4];	//ISO 639-1 (if existing) or 639-2 language code in all-caps (EN for English, ES for Spanish, etc). Should only be two or three chars, others '\0'
 	uint32_t offset;		//Offset from first StringDataPointer for a string's ID to the StringDataPointer for this language
 
 //For example, for languages EN=0 and ES=1, for a StringID that's number 7 in the list (8th entry), 
