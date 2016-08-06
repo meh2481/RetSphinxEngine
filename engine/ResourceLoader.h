@@ -24,8 +24,6 @@ class ResourceLoader
 	PakLoader* m_pakLoader;
 	std::string m_sPakDir;
 
-	uint64_t hash(std::string sHashStr);
-
 	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 	ResourceLoader() {};
 public:

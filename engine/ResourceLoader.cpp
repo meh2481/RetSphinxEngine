@@ -11,6 +11,7 @@
 #include "PakLoader.h"
 #include "Parse.h"
 #include "Font.h"
+#include "Hash.h"
 using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
@@ -25,19 +26,6 @@ ResourceLoader::~ResourceLoader()
 {
 	delete m_cache;
 	delete m_pakLoader;
-}
-
-//From http://stackoverflow.com/a/13487193
-uint64_t ResourceLoader::hash(string sHashStr)
-{
-	const char* str = sHashStr.c_str();
-	uint64_t hash = 5381;
-	int c;
-
-	while(c = *str++)
-		hash = ((hash << 5) + hash) + c;
-
-	return hash;
 }
 
 void ResourceLoader::clearCache()
@@ -73,7 +61,7 @@ Image* ResourceLoader::getImage(uint64_t hashID)
 Image* ResourceLoader::getImage(string sID)
 {
 	LOG(TRACE) << "Loading image " << sID;
-	uint64_t hashVal = hash(sID);
+	uint64_t hashVal = Hash::hash(sID.c_str());
 	Image* img = getImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
@@ -87,7 +75,7 @@ Image* ResourceLoader::getImage(string sID)
 Mesh3D* ResourceLoader::getMesh(string sID)
 {
 	LOG(TRACE) << "Loading 3D object " << sID;
-	uint64_t hashVal = hash(sID);
+	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Mesh has ID " << hashVal;
 	Mesh3D* mesh = m_cache->findMesh(hashVal);
 	if(!mesh)	//This mesh isn't here; load it
@@ -124,7 +112,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 
 	//Load file
-	uint64_t hashVal = hash(sID);
+	uint64_t hashVal = Hash::hash(sID.c_str());
 	//TODO Check cache first
 	unsigned int len = 0;
 	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
@@ -329,7 +317,7 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 
-	uint64_t hashVal = hash(sID);
+	uint64_t hashVal = Hash::hash(sID.c_str());
 	//TODO Check cache first
 	unsigned int len = 0;
 	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
@@ -380,7 +368,7 @@ MouseCursor* ResourceLoader::getCursor(string sID)
 Font* ResourceLoader::getFont(std::string sID)
 {
 	LOG(TRACE) << "Loading Font " << sID;
-	uint64_t hashVal = hash(sID);
+	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Font has ID " << hashVal;
 	Font* font = m_cache->findFont(hashVal);
 	if(!font)	//This font isn't here; load it
@@ -467,7 +455,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	//Open file
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 
-	uint64_t hashVal = hash(sXMLFilename);
+	uint64_t hashVal = Hash::hash(sXMLFilename.c_str());
 	//TODO Check cache first
 	unsigned int len = 0;
 	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);

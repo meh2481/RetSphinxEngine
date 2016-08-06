@@ -2,6 +2,8 @@ set(io_src
 easylogging++.h
 FileOperations.h
 FileOperations.cpp
+Hash.cpp
+Hash.h
 PakLoader.h
 PakLoader.cpp
 Parse.cpp

@@ -81,6 +81,8 @@ managers/ObjectManager.h
 managers/ObjectManager.cpp
 managers/SceneryManager.cpp
 managers/SceneryManager.h
+managers/Stringbank.cpp
+managers/Stringbank.h
 )
 
 include_directories (.)

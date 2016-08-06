@@ -11,6 +11,7 @@
 #include "Parse.h"
 #include "FileOperations.h"
 #include "tinyxml2.h"
+#include "Hash.h"
 using namespace std;
 
 #define PAD_32BIT 0x50444150
@@ -45,18 +46,6 @@ cRect rectFromString(string s)
 		rc.left = rc.top = rc.right = rc.bottom = 0.0f;
 
 	return rc;
-}
-
-uint64_t hashString(string sHashStr)
-{
-	const char* str = sHashStr.c_str();
-	uint64_t hash = 5381;
-	int c;
-
-	while(c = *str++)
-		hash = ((hash << 5) + hash) + c;
-
-	return hash;
 }
 
 string remove_extension(const string& filename)
@@ -160,7 +149,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	//Create font header
 	FontHeader fontHeader;
 	fontHeader.pad = PAD_32BIT;
-	fontHeader.textureId = hashString(imgFileName);
+	fontHeader.textureId = Hash::hash(imgFileName);
 	fontHeader.numChars = 1;
 
 	vector<uint32_t> codepoints;
@@ -329,7 +318,7 @@ void compress(list<string> filesToPak, string pakFilename)
 
 		//Add this compression helper to our list
 		helper.size = helper.header.compressedSize;
-		helper.id = hashString(*i);
+		helper.id = Hash::hash(i->c_str());
 
 		compressedFiles.push_back(helper);
 	}
