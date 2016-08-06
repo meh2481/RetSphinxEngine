@@ -13,6 +13,7 @@
 #include "imgui_impl_sdl.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
+#include "Stringbank.h"
 using namespace std;
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
@@ -75,6 +76,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	LOG(INFO) << "Creating resource loader";
 	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");	//TODO: pass in pak folder from somewhere else
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
+	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml");
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;

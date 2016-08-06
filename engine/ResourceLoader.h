@@ -16,6 +16,7 @@ class ResourceCache;
 class Mesh3D;
 class PakLoader;
 class Font;
+class Stringbank;
 
 class ResourceLoader
 {
@@ -47,6 +48,8 @@ public:
 
 	//Fonts
 	Font* getFont(std::string sID);
+
+	Stringbank* getStringbank(std::string sID);
 
 	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);

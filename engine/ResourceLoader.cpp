@@ -12,6 +12,7 @@
 #include "Parse.h"
 #include "Font.h"
 #include "Hash.h"
+#include "Stringbank.h"
 using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
@@ -409,6 +410,21 @@ Font* ResourceLoader::getFont(std::string sID)
 	else
 		LOG(TRACE) << "Cache hit " << sID;
 	return font;
+}
+
+Stringbank * ResourceLoader::getStringbank(std::string sID)
+{
+	LOG(TRACE) << "Loading stringbank " << sID;
+	uint64_t hashVal = Hash::hash(sID.c_str());
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	if(!resource || !len)
+	{
+		LOG(ERROR) << "Unable to load " << sID << " from pak";
+		return NULL;
+	}
+	Stringbank* sb = new Stringbank(resource, len);
+	return sb;
 }
 
 ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)

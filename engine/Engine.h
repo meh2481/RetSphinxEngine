@@ -16,6 +16,7 @@ class b2World;
 class Image;
 class ResourceLoader;
 class EntityManager;
+class Stringbank;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -76,6 +77,7 @@ private:
 #endif
 	ResourceLoader* m_resourceLoader;
 	EntityManager* m_entityManager;
+	Stringbank* m_stringBank;
 	
 	
 	//multimap<string, FMOD_CHANNEL*> m_channels;
@@ -212,4 +214,5 @@ public:
 	// Resource loader
 	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
 
+	Stringbank* getStringbank() { return m_stringBank; };
 };
