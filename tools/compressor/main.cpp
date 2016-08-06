@@ -33,7 +33,144 @@ typedef struct
 typedef struct
 {
 	float left, right, top, bottom;
-}cRect;
+} cRect;
+
+typedef struct
+{
+	uint64_t id;
+	vector<const char*> strings;
+} StringBankHelper;
+
+bool compare_stringID(const StringBankHelper& first, const StringBankHelper& second)
+{
+	return (first.id < second.id);
+}
+
+unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
+{
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+	tinyxml2::XMLError err = doc->LoadFile(sFilename.c_str());
+	if(err != tinyxml2::XML_NO_ERROR)
+	{
+		cout << "Unable to open font XML " << sFilename << endl;
+		delete doc;
+		return NULL;
+	}
+
+	tinyxml2::XMLElement* root = doc->RootElement();
+	if(root == NULL)
+	{
+		cout << "Unable to find root element in XML " << sFilename << endl;
+		delete doc;
+		return NULL;
+	}
+	tinyxml2::XMLElement* languages = root->FirstChildElement("languages");
+	tinyxml2::XMLElement* strings = root->FirstChildElement("strings");
+	if(strings == NULL || languages == NULL)
+	{
+		cout << "Unable to find languages and strings elements in XML " << sFilename << endl;
+		delete doc;
+		return NULL;
+	}
+
+	//Read in languages and offsets
+	list<LanguageOffset> offsets;
+	for(tinyxml2::XMLElement* language = languages->FirstChildElement("language"); language != NULL; language = language->NextSiblingElement())
+	{
+		LanguageOffset offset;
+		memset(offset.languageID, 0, 4);	//Fill this language ID with '\0' to start
+		const char* langCode = language->Attribute("code");
+		assert(langCode != NULL);
+		assert(strlen(langCode) < 4);		//Language codes can't be more than 3 characters
+		strcpy(offset.languageID, langCode);
+		int off = 0;	//Offset for the strings in this language
+		language->QueryIntAttribute("offset", &off);
+		offset.offset = off;
+		offsets.push_back(offset);
+	}
+
+	//Read in actual strings
+	list<StringBankHelper> sbHelpers;
+	for(tinyxml2::XMLElement* stringid = strings->FirstChildElement("string"); stringid != NULL; stringid = stringid->NextSiblingElement())
+	{
+		StringBankHelper sbHelper;
+		const char* idStr = stringid->Attribute("id");
+		assert(idStr != NULL);
+		sbHelper.id = Hash::hash(idStr);
+		for(tinyxml2::XMLElement* locString = stringid->FirstChildElement("loc"); locString != NULL; locString = locString->NextSiblingElement())
+		{
+			const char* loc = locString->Attribute("text");
+			assert(loc != NULL);
+			sbHelper.strings.push_back(loc);
+		}
+		sbHelpers.push_back(sbHelper);
+	}
+
+	//Sort by ID
+	sbHelpers.sort(compare_stringID);
+
+	//Calculate final file size
+	*fileSize = sizeof(StringBankHeader);
+	*fileSize += offsets.size() * sizeof(LanguageOffset);
+	*fileSize += sbHelpers.size() * sizeof(StringID);
+	*fileSize += sbHelpers.size() * offsets.size() * sizeof(StringDataPointer);
+	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)	//Add in length of all strings
+	{
+		for(vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
+		{
+			*fileSize += strlen(*j) + 1;	//Each string will have an additional null char appended
+		}
+	}
+
+	//Allocate memory
+	unsigned char* buf = (unsigned char*)malloc(*fileSize);
+
+	//Write header
+	StringBankHeader header;
+	header.numLanguages = offsets.size();
+	header.numStrings = sbHelpers.size();
+	memcpy(buf, &header, sizeof(StringBankHeader));
+	uint64_t offset = sizeof(StringBankHeader);
+
+	//Write LanguageOffsets
+	for(list<LanguageOffset>::iterator i = offsets.begin(); i != offsets.end(); i++)
+	{
+		memcpy(&buf[offset], &(*i), sizeof(LanguageOffset));
+		offset += sizeof(LanguageOffset);
+	}
+
+	//Write StringIDs
+	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
+	{
+		memcpy(&buf[offset], &(i->id), sizeof(StringID));
+		offset += sizeof(StringID);
+	}
+
+	//Write string pointers
+	uint64_t stringWriteOffset = offset;	//Offset we're writing the strings to 
+	uint64_t actualStringOffset = 0;		//Offset from start of string data to the pointer we're currently writing
+	stringWriteOffset += sizeof(StringDataPointer)*header.numLanguages*header.numStrings;
+	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
+	{
+		for(vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
+		{
+			//Write the pointer
+			memcpy(&buf[offset], &actualStringOffset, sizeof(StringDataPointer));
+			offset += sizeof(StringDataPointer);
+
+			//Write the string data
+			uint32_t stringLen = strlen(*j)+1;	//Write '\0' char also
+			memcpy(&buf[stringWriteOffset], *j, stringLen);
+
+			stringWriteOffset += stringLen;
+			actualStringOffset += stringLen;
+		}
+	}
+
+	//Done
+	delete doc;
+	return buf;
+}
 
 cRect rectFromString(string s)
 {
@@ -181,7 +318,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		rc.right = rc.right / (float)imgWidth;
 		rc.top = rc.top / (float)imgHeight;
 		rc.bottom = rc.bottom / (float)imgHeight;
-		cout << "Image rect for " << codepointStr << ": " << rc.left << ", " << rc.right << ", " << rc.top << ", " << rc.bottom << endl;
+		//cout << "Image rect for " << codepointStr << ": " << rc.left << ", " << rc.right << ", " << rc.top << ", " << rc.bottom << endl;
 
 		imgRects.push_back(rc);
 		codepoints.push_back(codepoint);
@@ -283,6 +420,8 @@ void compress(list<string> filesToPak, string pakFilename)
 			decompressed = extractImage(*i, &size);
 		else if(i->find(".font") != string::npos)
 			decompressed = extractFont(*i, &size);
+		else if(i->find("stringbank.xml") != string::npos)
+			decompressed = extractStringbank(*i, &size);
 		else
 			decompressed = FileOperations::readFile(*i, &size);
 

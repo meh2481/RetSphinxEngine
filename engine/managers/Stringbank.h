@@ -25,6 +25,6 @@ public:
 	const char* getString(const char* stringID);
 	const char* getString(uint64_t stringHash);
 
-	void setLanguage(const char* langID);
+	bool setLanguage(const char* langID);	//Set to a particular language. Returns true on success, false on failure
 	const char* getLanguage();
 };

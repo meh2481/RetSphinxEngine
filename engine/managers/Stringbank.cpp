@@ -43,7 +43,7 @@ const char* Stringbank::getString(uint64_t stringHash)
 	return NULL;
 }
 
-void Stringbank::setLanguage(const char* langID)
+bool Stringbank::setLanguage(const char* langID)
 {
 	LanguageOffset* offset = offsets;
 	for(unsigned int i = 0; i < header->numLanguages; i++)
@@ -51,10 +51,11 @@ void Stringbank::setLanguage(const char* langID)
 		if(strcmp(offset->languageID, langID) == 0)
 		{
 			curLangOffset = offset->offset;
-			return;
+			return true;
 		}
 		offset++;
 	}
+	return false;
 }
 
 const char* Stringbank::getLanguage()

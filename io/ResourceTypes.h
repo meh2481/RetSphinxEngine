@@ -83,7 +83,7 @@ typedef struct
 	uint32_t numLanguages;
 	//Followed by numLangages LanguageOffsets
 	//Followed by numStrings StringIDs (sorted from least to greatest)
-	//Followed by numStrings*numLanguages StringPointers
+	//Followed by numStrings*numLanguages StringDataPointers
 	//Followed by actual string data
 } StringBankHeader;
 
