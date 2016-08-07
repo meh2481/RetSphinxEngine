@@ -75,6 +75,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 
 	//Read in languages and offsets
 	list<LanguageOffset> offsets;
+	uint32_t off = 0;
 	for(tinyxml2::XMLElement* language = languages->FirstChildElement("language"); language != NULL; language = language->NextSiblingElement())
 	{
 		LanguageOffset offset;
@@ -83,9 +84,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 		assert(langCode != NULL);
 		assert(strlen(langCode) < 4);		//Language codes can't be more than 3 characters
 		strcpy(offset.languageID, langCode);
-		int off = 0;	//Offset for the strings in this language
-		language->QueryIntAttribute("offset", &off);
-		offset.offset = off;
+		offset.offset = off++;
 		offsets.push_back(offset);
 	}
 
