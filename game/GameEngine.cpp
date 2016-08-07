@@ -223,11 +223,11 @@ void GameEngine::draw()
 	Vec2 textPos;
 	textPos.x = -CameraPos.x - 7.0f;
 	textPos.y = -CameraPos.y + 0.75f;
-	getStringbank()->setLanguage("EN");
+	getStringbank()->setLanguage("en");
 	m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 
 	textPos.y -= 0.25;
-	getStringbank()->setLanguage("ES");
+	getStringbank()->setLanguage("es");
 	m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 	
 	glLoadIdentity();

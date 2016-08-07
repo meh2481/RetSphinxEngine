@@ -41,6 +41,16 @@ typedef struct
 	vector<const char*> strings;
 } StringBankHelper;
 
+bool hasUpper(string s)
+{
+	for(unsigned int i = 0; i < s.length(); i++)
+	{
+		if(isupper(s.at(i)))
+			return true;
+	}
+	return false;
+}
+
 bool compare_stringID(const StringBankHelper& first, const StringBankHelper& second)
 {
 	return (first.id < second.id);
@@ -83,6 +93,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 		const char* langCode = language->Attribute("code");
 		assert(langCode != NULL);
 		assert(strlen(langCode) < 4);		//Language codes can't be more than 3 characters
+		assert(!hasUpper(langCode));		//Language codes should be all lowercase
 		strcpy(offset.languageID, langCode);
 		offset.offset = off++;
 		offsets.push_back(offset);
@@ -351,16 +362,6 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	if(fileSize)
 		*fileSize = pos;
 	return fontBuf;
-}
-
-bool hasUpper(string s)
-{
-	for(unsigned int i = 0; i < s.length(); i++)
-	{
-		if(isupper(s.at(i)))
-			return true;
-	}
-	return false;
 }
 
 list<string> readFilenames(string filelistFile)
