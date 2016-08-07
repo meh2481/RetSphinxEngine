@@ -113,6 +113,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 			assert(loc != NULL);
 			sbHelper.strings.push_back(loc);
 		}
+		assert(sbHelper.strings.size() == offsets.size());	//Shouldn't be missing any translations for any strings
 		sbHelpers.push_back(sbHelper);
 	}
 
