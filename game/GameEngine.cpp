@@ -13,6 +13,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "Stringbank.h"
+#include "SystemUtils.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -223,12 +224,12 @@ void GameEngine::draw()
 	Vec2 textPos;
 	textPos.x = -CameraPos.x - 7.0f;
 	textPos.y = -CameraPos.y + 0.75f;
-	getStringbank()->setLanguage("en");
+	//getStringbank()->setLanguage("en");
 	m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 
-	textPos.y -= 0.25;
-	getStringbank()->setLanguage("es");
-	m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
+	//textPos.y -= 0.25;
+	//getStringbank()->setLanguage("es");
+	//m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
@@ -286,6 +287,11 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	Lua->call("loadStartingMap");
 
 	m_font = getResourceLoader()->getFont("res/font/test.font");
+
+	char* cLocale = SystemUtils::getCurLocale();
+	LOG(INFO) << "Current system locale: " << cLocale;
+	getStringbank()->setLanguage(cLocale);
+	free(cLocale);
 }
 
 void GameEngine::pause()

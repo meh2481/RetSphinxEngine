@@ -59,6 +59,8 @@ ResourceCache.h
 ResourceCache.cpp
 simplexnoise1234.cpp
 simplexnoise1234.h
+SystemUtils.cpp
+SystemUtils.h
 tiny3d.h
 Text.cpp
 Text.h
