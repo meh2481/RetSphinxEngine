@@ -1,6 +1,7 @@
 #pragma once
+#include <string>
 
 namespace SystemUtils
 {
-	char* getCurLocale();	//Returns current system locale. NOTE: Return val must be free()'d
+	std::string getCurLocale();	//Returns current system locale.
 }

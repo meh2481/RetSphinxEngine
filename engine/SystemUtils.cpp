@@ -1,14 +1,16 @@
 #include "SystemUtils.h"
 #ifdef _WIN32
 #include <Windows.h>
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 100
 #else
 #error TODO Get locale in UNIX/POSIX using those functions
 #endif
 
+//See OSFunctions.cpp in Aquaria for inspiration
+
 namespace SystemUtils
 {
-	char* getCurLocale()
+	std::string getCurLocale()
 	{
 #ifdef _WIN32
 		WCHAR wcBuffer[BUFFER_SIZE];
@@ -34,10 +36,12 @@ namespace SystemUtils
 			if(firstDash != NULL)
 				*firstDash = '\0';
 
-			return cBuf;
+			std::string s(cBuf);
+			free(cBuf);
+			return s;
 		}
 		
 #endif
-		return NULL;
+		return std::string("");
 	}
 }

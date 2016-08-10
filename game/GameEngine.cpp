@@ -288,10 +288,12 @@ void GameEngine::init(list<commandlineArg> sArgs)
 
 	m_font = getResourceLoader()->getFont("res/font/test.font");
 
-	char* cLocale = SystemUtils::getCurLocale();
-	LOG(INFO) << "Current system locale: " << cLocale;
-	getStringbank()->setLanguage(cLocale);
-	free(cLocale);
+	string sLocale = SystemUtils::getCurLocale();
+	if(sLocale.size())
+	{
+		LOG(INFO) << "Current system locale: " << sLocale;
+		getStringbank()->setLanguage(sLocale.c_str());
+	}
 }
 
 void GameEngine::pause()
