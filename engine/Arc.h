@@ -1,5 +1,5 @@
 /*
-    GameEngine header - arc.h
+    GameEngine header - Arc.h
     Class for creating electric-looking arcs between two points
     Copyright (c) 2014 Mark Hutcheson
 */

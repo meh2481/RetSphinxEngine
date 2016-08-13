@@ -1,5 +1,5 @@
 /*
-    GameEngine source - arc.cpp
+    GameEngine source - Arc.cpp
     Copyright (c) 2014 Mark Hutcheson
 */
 
