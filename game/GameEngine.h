@@ -35,6 +35,7 @@ class GameEngine : public Engine
 	friend class GameEngineLua;
 private:
 	//Keybinding stuff
+	//TODO Keybinding class
 	uint32_t JOY_BUTTON_BACK;
 	uint32_t JOY_BUTTON_START;
 	uint32_t JOY_BUTTON_X;

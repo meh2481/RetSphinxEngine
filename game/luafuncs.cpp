@@ -136,6 +136,11 @@ public:
 	{
 		return g_pGlobalEngine->getEntityManager()->getClosestObject(p);
 	}
+
+	static void setCursor(string s)
+	{
+		g_pGlobalEngine->setCursor(g_pGlobalEngine->getResourceLoader()->getCursor(s));
+	}
 };
 
 
@@ -464,7 +469,7 @@ luaFunc(node_isInside) //bool node_isInside(Node* n, float x, float y)
 }
 
 //-----------------------------------------------------------------------------------------------------------
-// Particles functions
+// Particle functions
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(particles_create)	//ParticleSystem* particles_create(string sXMLFile)
 {
@@ -549,6 +554,16 @@ luaFunc(mouse_transformToWorld) // float x, float y mouse_transformToWorld(int x
 	luaReturnVec2(p.x, p.y);
 }
 
+luaFunc(mouse_setCursor)	//void mouse_setCursor(string cursorFile)
+{
+	if(!lua_isstring(L, 1)) 
+		luaReturnNil();
+
+	GameEngineLua::setCursor(lua_tostring(L, 1));
+
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
@@ -590,6 +605,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(mouse_isDown),
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),
+	luaRegister(mouse_setCursor),
 	{NULL, NULL}
 };
 

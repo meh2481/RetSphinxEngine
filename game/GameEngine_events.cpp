@@ -56,8 +56,8 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_F5:
 					Lua->call("clearClasses"); //Reload Lua classes
 					getResourceLoader()->clearCache();
-					setCursor(getResourceLoader()->getCursor("res/cursor/arrow.xml"));	//Reload cursor (since it's in the cache we cleared)
-					loadScene(m_sLastScene);	//Reload current scene
+					Lua->call("loadLua");	//Restart Lua
+					//loadScene(m_sLastScene);	//Reload current scene
 					break;
 					
 				case SDL_SCANCODE_F6:

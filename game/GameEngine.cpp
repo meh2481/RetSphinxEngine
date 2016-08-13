@@ -37,9 +37,6 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 #endif
 	showCursor();
 	
-	//TODO: Not hardcoded
-	setCursor(getResourceLoader()->getCursor("res/cursor/arrow.xml"));
-	
 	m_joy = NULL;
 	m_rumble = NULL;
 	player = NULL;
@@ -218,18 +215,6 @@ void GameEngine::draw()
 	glm::mat4 mat;	//TODO Use real mat
 	getEntityManager()->render(mat);
 	drawDebug();
-
-	Vec2 textPos;
-	textPos.x = -CameraPos.x - 7.0f;
-	textPos.y = -CameraPos.y + 0.75f;
-	//getStringbank()->setLanguage("en");
-	Font* fon = getResourceLoader()->getFont("res/font/test.font");
-	if(fon)
-		fon->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
-
-	//textPos.y -= 0.25;
-	//getStringbank()->setLanguage("es");
-	//m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 	
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
@@ -284,7 +269,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(KEY_ENTER1);
 	luaSetGlobal(KEY_ENTER2);
 	
-	Lua->call("loadStartingMap");
+	Lua->call("loadLua");
 
 	string sLocale = SystemUtils::getCurLocale();
 	if(sLocale.size())
