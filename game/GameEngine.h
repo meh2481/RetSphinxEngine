@@ -74,11 +74,11 @@ private:
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
-	Object* player;
+	Object* player;		//TODO Support multiple players
 	Rect rcSceneBounds;
 	
 	//Testing stuff that should eventually be finalized/fixed!
-	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map	TODO: Better way of doing this
+	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
 	std::string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 	std::string m_sLastScene;
 
@@ -108,7 +108,6 @@ public:
 	bool loadConfig(std::string sFilename);
 	void saveConfig(std::string sFilename);
 	void loadScene(std::string sXMLFilename);	//Load scene from file
-	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);	//Load a fixture from an XML element & add it to the given body
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller

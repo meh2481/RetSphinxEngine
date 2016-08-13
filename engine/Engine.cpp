@@ -70,7 +70,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fAccumulatedTime = 0.0;
 	//m_bFirstMusic = true;
 	m_bQuitting = false;
-	Random::seed(SDL_GetTicks());	//TODO fix RNG or no?
+	Random::seed(SDL_GetTicks());
 	m_fTimeScale = 1.0f;
 	
 	LOG(INFO) << "Creating resource loader";
@@ -80,7 +80,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
-	//TODO: Fix FMOD
+	//TODO: Fix FMOD or find replacement
 	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
 	{
 		LOG(ERROR) << "Failed to init FMOD."
@@ -366,7 +366,7 @@ void Engine::setMSAA(int iMSAA)
 	}
 }
 
-//TODO: This needs to be extracted into its own function for loading an SDL_Surface from an image
+//TODO: Fix
 void Engine::_loadicon()	//Load icon into SDL window
 {
 	/*LOG(INFO) << "Load icon " << m_sIcon
@@ -430,10 +430,6 @@ void Engine::setCursorPos(Vec2 pos)
 {
 	if(m_cursor)
 		m_cursor->pos = pos;
-	//	SDL_WarpMouseInWindow(m_Window, pos.x, pos.y);
-	//#ifdef __APPLE__
-	//	hideCursor(); //TODO: Warping the mouse shows it again in Mac, and this doesn't work. Debug.
-	//#endif
 }
 
 bool Engine::getCursorDown(int iButtonCode)
@@ -476,7 +472,7 @@ string Engine::getSaveLocation()
 	if(cPath)
 		s = cPath;
 	else
-		s = "./";	//TODO: Err or such
+		s = "./";
 	SDL_free(cPath);
 	return s;
 }

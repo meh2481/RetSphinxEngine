@@ -288,7 +288,6 @@ void GameEngine::handleKeys()
 }
 
 //TODO: Controller haptic shouldn't be game specific
-//TODO: This is also not an event
 void GameEngine::rumbleController(float strength, float sec, int priority)
 {
 	static float fLastRumble = 0.0f;

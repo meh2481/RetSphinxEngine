@@ -3,6 +3,7 @@
 #include <string>
 #include <inttypes.h>
 #include "tinyxml2.h"
+#include "Box2D/Box2D.h"
 #include "Rect.h"
 
 class Image;
@@ -10,8 +11,6 @@ class Object;
 class ParticleSystem;
 class MouseCursor;
 class ObjSegment;
-class b2World;
-class b2Body;
 class ResourceCache;
 class Mesh3D;
 class PakLoader;
@@ -25,7 +24,6 @@ class ResourceLoader
 	PakLoader* m_pakLoader;
 	std::string m_sPakDir;
 
-	void readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 	ResourceLoader() {};
 public:
 	ResourceLoader(b2World* physicsWorld, std::string sPakDir);
@@ -51,8 +49,8 @@ public:
 
 	Stringbank* getStringbank(std::string sID);
 
-	//TODO: Private
 	ObjSegment* getObjSegment(tinyxml2::XMLElement* layer);
+	b2Fixture* readFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 
 	Object* objFromXML(std::string sType, Vec2 ptOffset, Vec2 ptVel);
 };

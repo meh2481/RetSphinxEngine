@@ -34,10 +34,6 @@ public:
 	Image(unsigned char* blob, unsigned int size);
 	//Image(uint32_t width, uint32_t height, float sizex = 1.0f, float sizey = 1.0f, float xoffset = 0.0f, float yoffset = 0.0f);	//Create image from random noise
 	~Image();
-    
-	//Engine use functions
-	void _reload();  //Reload memory associated with this image
-	void _setFilename(std::string s) {m_sFilename = s;};	//Potentially dangerous; use with caution
 
 	//Accessor methods
 	uint32_t getWidth()     {return m_iWidth;};

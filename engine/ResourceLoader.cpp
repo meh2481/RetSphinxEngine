@@ -6,7 +6,6 @@
 #include "Random.h"
 #include "MouseCursor.h"
 #include "Object.h"
-#include "Box2D/Box2D.h"
 #include "ResourceCache.h"
 #include "PakLoader.h"
 #include "Parse.h"
@@ -115,7 +114,6 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	//Load file
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	//TODO Check cache first
 	unsigned int len = 0;
 	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 	int iErr;
@@ -385,7 +383,7 @@ Font* ResourceLoader::getFont(std::string sID)
 		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 		if(!resource || !len)
 		{
-			LOG(ERROR) << "Pak miss - TODO Implement font loading from file...";
+			LOG(ERROR) << "Pak miss, and font files cannot be loaded from file";
 			//font = new Mesh3D(sID);				//Create this mesh
 			//m_cache->addMesh(hashVal, mesh);	//Add to the cache
 		}
@@ -440,7 +438,7 @@ ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 
 	const char* cLayerFilename = layer->Attribute("img");
 	if(cLayerFilename != NULL)
-		seg->img = getImage(cLayerFilename);	//TODO REMOVE
+		seg->img = getImage(cLayerFilename);
 
 	const char* cSegPos = layer->Attribute("pos");
 	if(cSegPos != NULL)
@@ -479,7 +477,6 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 
 	uint64_t hashVal = Hash::hash(sXMLFilename.c_str());
-	//TODO Check cache first
 	unsigned int len = 0;
 	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 	int iErr;
@@ -522,8 +519,8 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	//Add segments
 	for(tinyxml2::XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
 	{
+		//Load segment as normal, then add physics to it
 		ObjSegment* seg;
-		//TODO Unify this. It looks like we're loading from XML multiple ways
 		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
 		if(layer != NULL)
 			seg = getObjSegment(layer);
@@ -630,7 +627,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 
 				m_world->CreateJoint(&jd);
 			}
-			//else TODO
+			//else TODO add more joint types
 		}
 	}
 
@@ -705,7 +702,6 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 					manim->init();
 					o->meshAnim = manim;
 				}
-				//else TODO
 			}
 
 		}
@@ -720,7 +716,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	return o;
 }
 
-void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
+b2Fixture* ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
 	b2FixtureDef fixtureDef;
 	b2PolygonShape dynamicBox;
@@ -733,7 +729,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 	if(!cFixType)
 	{
 		LOG(ERROR) << "readFixture ERR: No fixture type";
-		return;
+		return NULL;
 	}
 	string sFixType = cFixType;
 	if(sFixType == "box")
@@ -742,7 +738,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		if(!cBoxSize)
 		{
 			LOG(ERROR) << "readFixture ERR: No box size";
-			return;
+			return NULL;
 		}
 
 		//Get position (center of box)
@@ -806,7 +802,7 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 		dynamicChain.CreateChain(verts, 2);
 		fixtureDef.shape = &dynamicChain;
 	}
-	//else TODO
+	//else TODO add other fixture types
 
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
@@ -815,28 +811,5 @@ void ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 	fixture->QueryFloatAttribute("density", &fixtureDef.density);
 	fixture->QueryBoolAttribute("sensor", &fixtureDef.isSensor);
 
-	//TODO: Figure out how to do this if map ends up in here
-
-	//Create node if this is one
-	//const char* cLua = fixture->Attribute("luaclass");
-	//if(cLua)
-	//{
-	//	Node* n = new Node();
-	//	n->luaClass = cLua;
-	//	n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
-	//	n->pos = pos;
-
-	//	const char* cName = fixture->Attribute("name");
-	//	if(cName)
-	//		n->name = cName;
-
-	//	//Populate this node with ALL THE INFO in case Lua wants it
-	//	for(const tinyxml2::XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
-	//		n->setProperty(attrib->Name(), attrib->Value());
-
-	//	getEntityManager()->add(n);
-	//	fixtureDef.userData = (void*)n;	//TODO: Use heavy userdata
-	//}
-
-	bod->CreateFixture(&fixtureDef);
+	return bod->CreateFixture(&fixtureDef);
 }

@@ -307,7 +307,7 @@ void ParticleSystem::update(float dt)
 			firing = false;
 			startedFiring = 0.0f;
 			if(spawnOnDeath.size())
-				m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());	//TODO This should be a shout
+				m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());
 		}
 	}
 	else if(firing)

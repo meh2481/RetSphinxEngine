@@ -23,7 +23,7 @@ class LatticeAnim;
 class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
-//TODO: Why would they just be images unless they're scenery? Make second class for scenery?
+//TODO Make SceneryLayer class that this can contain
 class ObjSegment : public Drawable
 {
 public:
@@ -50,9 +50,10 @@ class Object : public Drawable
 {
 	LuaObjGlue* glueObj;
 	std::map<std::string, std::string> propertyValues;
+	std::vector<ObjSegment*> 	segments;
+
 public:
 	enum { TYPE = OT_OBJECT };
-	std::vector<ObjSegment*> 	segments;	//TODO Should be private
 	Lattice*				meshLattice;
 	LatticeAnim*			meshAnim;
 	Vec2					meshSize;

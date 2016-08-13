@@ -78,7 +78,7 @@ void ObjectManager::update(float dt)
 	m_lUpdateObjects.clear();
 }
 
-Object* ObjectManager::get(Vec2 p)
+Object* ObjectManager::getAt(Vec2 p)
 {
 	PointQueryCallback pqc;
 	b2AABB aabb;
@@ -115,7 +115,7 @@ Object* ObjectManager::getClosest(Vec2 p)
 	{
 		Vec2 offset = (*i)->getPos() - p;
 		float dist = glmx::lensqr(offset);
-		if(dist < len2)
+		if(dist < len2 || !closest)
 		{
 			closest = *i;
 			len2 = dist;

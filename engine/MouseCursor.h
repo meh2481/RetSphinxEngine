@@ -9,7 +9,6 @@
 
 class Image;
  
-//TODO This should be some derivative of Drawable or some child thereof
 class MouseCursor
 {
 public:

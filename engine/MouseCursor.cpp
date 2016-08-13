@@ -8,7 +8,7 @@
 #include "tinyxml2.h"
 #include "easylogging++.h"
 
-//TODO: Get rid. Use built-in SDL cursor functionality instead. Unless we want animated cursors?
+//TODO: Get rid. Use built-in SDL cursor functionality instead.
 MouseCursor::MouseCursor()
 {
 	_init();

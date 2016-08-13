@@ -9,7 +9,6 @@
 //   static MemoryEditor memory_editor;                                                     // save your state somewhere
 //   memory_editor.Draw("Memory Editor", mem_block, mem_block_size, (size_t)mem_block);     // run
 //
-// TODO: better resizing policy (ImGui doesn't have flexible window resizing constraints yet)
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 	#define _CRT_SECURE_NO_WARNINGS

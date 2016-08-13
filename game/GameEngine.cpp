@@ -136,7 +136,7 @@ void GameEngine::draw()
 	glColor4f(1,1,1,1);
 	
 	//Set up OpenGL lights
-	//TODO: Remove
+	//TODO: Remove or move to an actual class
 	float lightPosition[] = {0.0, 0.0, 0.0, 1.0};
 	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};

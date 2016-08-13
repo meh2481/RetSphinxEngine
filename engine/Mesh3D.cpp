@@ -19,8 +19,6 @@ using namespace tiny3d;
 
 Mesh3D::Mesh3D(string sOBJFile)
 {
-	useGlobalLight = true;
-	
     m_obj = 0;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
@@ -277,35 +275,21 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 
 void Mesh3D::render(Image* img)
 {
-	if(!m_obj) return;
+	assert(m_obj);
+	assert(img);
 
-	if(!useGlobalLight)
-	{
-		glEnable(GL_LIGHT1);
-		glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
-	}
 	if(shaded)
 		glEnable(GL_LIGHTING);
+
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if(img != NULL)
-		glBindTexture(GL_TEXTURE_2D, img->_getTex());
+
+	glBindTexture(GL_TEXTURE_2D, img->_getTex());
     glCallList(m_obj);
+
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
-	if(!useGlobalLight)
-		glDisable(GL_LIGHT1);
+	
 	if(!shaded)
 		glDisable(GL_LIGHTING);
-}
-
-void Mesh3D::_reload()
-{
-	if(m_sObjFilename.length())	//TODO Support reloading from data?
-	{
-		if(m_sObjFilename.find(".obj", m_sObjFilename.size() - 4) != string::npos)
-			_fromOBJFile(m_sObjFilename);
-		else
-			_fromTiny3DFile(m_sObjFilename);
-	}
 }

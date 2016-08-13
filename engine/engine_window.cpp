@@ -88,29 +88,14 @@ void Engine::setFullscreen(bool bFullscreen)
 		return;
 	m_bFullscreen = !m_bFullscreen;
 	if(m_bFullscreen)
-		SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);	//TODO: Does this work?
+		SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);	//TODO: Make this a borderless fullscreen window instead
 	else
 		SDL_SetWindowFullscreen(m_Window, 0);
 }
 
 bool Engine::isMaximized()
 {
-#ifdef _WIN32	//Apparently SDL_GetWindowFlags() is completely broken in SDL2 for determining maximization. See: https://bugzilla.libsdl.org/show_bug.cgi?id=2282
-				//TODO: This bug has been marked as fixed in SDL 2.0.4, test and see if it is!
-	SDL_SysWMinfo info;
- 
-	//Get window handle from SDL
-	SDL_VERSION(&info.version);
-	if(SDL_GetWindowWMInfo(m_Window, &info) == -1) 
-	{
-		LOG(ERROR) << "SDL_GetWMInfo failed";
-		return false;
-	}
-	
-	return IsZoomed(info.info.win.window);
-#else
-	return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);	//TODO: Test in Mac/Linux
-#endif
+	return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);
 }
 
 Vec2 Engine::getWindowPos()

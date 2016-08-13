@@ -300,26 +300,26 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(o != NULL)
 			{
 				o->lua = Lua;	//TODO better Lua handling
-				if(cName != NULL)
-				{
-					string s = cName;
-					if(s == "ship")	//TODO: Remove & move logic elsewhere
-					{
-						vector<ObjSegment*>::iterator segiter = o->segments.begin();
-						if(segiter != o->segments.end())
-						{
-							ObjSegment* sg = *segiter;
-							if(sg->obj3D != NULL)
-							{
-								sg->obj3D->useGlobalLight = false;
-								sg->obj3D->lightPos[0] = 0.0f;
-								sg->obj3D->lightPos[1] = 0.0f;
-								sg->obj3D->lightPos[2] = 3.0f;
-								sg->obj3D->lightPos[3] = 1.0f;
-							}
-						}
-					}
-				}
+				//if(cName != NULL)
+				//{
+				//	string s = cName;
+				//	if(s == "ship")
+				//	{
+				//		vector<ObjSegment*>::iterator segiter = o->segments.begin();
+				//		if(segiter != o->segments.end())
+				//		{
+				//			ObjSegment* sg = *segiter;
+				//			if(sg->obj3D != NULL)
+				//			{
+				//				sg->obj3D->useGlobalLight = false;
+				//				sg->obj3D->lightPos[0] = 0.0f;
+				//				sg->obj3D->lightPos[1] = 0.0f;
+				//				sg->obj3D->lightPos[2] = 3.0f;
+				//				sg->obj3D->lightPos[3] = 1.0f;
+				//			}
+				//		}
+				//	}
+				//}
 				
 				//Populate this obj with ALL THE INFO in case Lua wants it
 				for(const tinyxml2::XMLAttribute* attrib = object->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
@@ -344,135 +344,40 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load level geometry
 	for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
 	{
-		readFixture(geom, groundBody);
+		b2Fixture* fixture = getResourceLoader()->readFixture(geom, groundBody);
+		if(fixture)
+		{
+			Vec2 pos;
+
+			//Create node if this is one
+			const char* cLua = geom->Attribute("luaclass");
+			const char* cPos = geom->Attribute("pos");
+			if(cPos)
+				pos = pointFromString(cPos);
+
+			if(cLua)
+			{
+				Node* n = new Node();
+				n->luaClass = cLua;
+				n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
+				n->pos = pos;
+
+				const char* cName = geom->Attribute("name");
+				if(cName)
+					n->name = cName;
+
+				//Populate this node with ALL THE INFO in case Lua wants it
+				for(const tinyxml2::XMLAttribute* attrib = geom->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
+					n->setProperty(attrib->Name(), attrib->Value());
+
+				getEntityManager()->add(n);
+				fixture->SetUserData((void*)n);
+			}
+		}
 	}
-	
-	//TODO: Load other things
 	
 	delete doc;
 	
 	m_sLastScene = sXMLFilename;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------
-// Load Box2D fixture from XML
-//---------------------------------------------------------------------------------------------------------------------------
-//TODO: Remove since it exists in ResourceLoader
-void GameEngine::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
-{
-	b2FixtureDef fixtureDef;
-	b2PolygonShape dynamicBox;
-	b2CircleShape dynamicCircle;
-	b2ChainShape dynamicChain;
-	
-	Vec2 pos;
-	
-	const char* cFixType = fixture->Attribute("type");
-	if(!cFixType)
-	{
-		LOG(ERROR) << "readFixture ERR: No fixture type";
-		return;
-	}
-	string sFixType = cFixType;
-	if(sFixType == "box")
-	{
-		const char* cBoxSize = fixture->Attribute("size");
-		if(!cBoxSize)
-		{
-			LOG(ERROR) << "readFixture ERR: No box size";
-			return;
-		}
-		
-		//Get position (center of box)
-		Vec2 p(0,0);
-		const char* cPos = fixture->Attribute("pos");
-		if(cPos)
-		{
-			p = pointFromString(cPos);
-			pos = p;
-		}
-		
-		//Get rotation (angle) of box
-		float fRot = 0.0f;
-		fixture->QueryFloatAttribute("rot", &fRot);
-		
-		bool bHollow = false;
-		fixture->QueryBoolAttribute("hollow", &bHollow);
-		
-		Vec2 pBoxSize = pointFromString(cBoxSize);
-		if(bHollow)
-		{
-			//Create hollow box
-			b2Vec2 verts[4];
-			verts[0].Set(pBoxSize.x/2.0f, pBoxSize.y/2.0f);
-			verts[1].Set(-pBoxSize.x/2.0f, pBoxSize.y/2.0f);
-			verts[2].Set(-pBoxSize.x/2.0f, -pBoxSize.y/2.0f);
-			verts[3].Set(pBoxSize.x/2.0f, -pBoxSize.y/2.0f);
-			dynamicChain.CreateLoop(verts, 4);
-			fixtureDef.shape = &dynamicChain;
-		}
-		else
-		{
-			//Create box
-			dynamicBox.SetAsBox(pBoxSize.x/2.0f, pBoxSize.y/2.0f, b2Vec2(p.x, p.y), fRot);
-			fixtureDef.shape = &dynamicBox;
-		}
-	}
-	else if(sFixType == "circle")
-	{
-		dynamicCircle.m_p.SetZero();
-		const char* cCircPos = fixture->Attribute("pos");
-		if(cCircPos)
-		{
-            pos = pointFromString(cCircPos);
-			dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
-		}
-			
-		dynamicCircle.m_radius = 1.0f;
-		fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
-		fixtureDef.shape = &dynamicCircle;
-	}
-	else if(sFixType == "line")
-	{
-		float fLen = 1.0f;
-		fixture->QueryFloatAttribute("length", &fLen);
-		
-		b2Vec2 verts[2];
-		verts[0].Set(0, fLen/2.0f);
-		verts[1].Set(0, -fLen/2.0f);
-		
-		dynamicChain.CreateChain(verts, 2);
-		fixtureDef.shape = &dynamicChain;
-	}
-	//else TODO
-	
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
-	fixtureDef.isSensor = false;
-	fixture->QueryFloatAttribute("friction", &fixtureDef.friction);
-	fixture->QueryFloatAttribute("density", &fixtureDef.density);
-	fixture->QueryBoolAttribute("sensor", &fixtureDef.isSensor);
-	
-	//Create node if this is one
-	const char* cLua = fixture->Attribute("luaclass");
-	if(cLua)
-	{
-		Node* n = new Node();
-		n->luaClass = cLua;
-		n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
-		n->pos = pos;
-		
-		const char* cName = fixture->Attribute("name");
-		if(cName)
-			n->name = cName;
-		
-		//Populate this node with ALL THE INFO in case Lua wants it
-		for(const tinyxml2::XMLAttribute* attrib = fixture->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
-			n->setProperty(attrib->Name(), attrib->Value());
-		
-		getEntityManager()->add(n);
-		fixtureDef.userData = (void*)n;	//TODO: Use heavy userdata
-	}
-	
-	bod->CreateFixture(&fixtureDef);
-}

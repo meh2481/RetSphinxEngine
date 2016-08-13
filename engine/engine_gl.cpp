@@ -73,11 +73,11 @@ void Engine::setup_sdl()
 		LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);	//TODO: Toggle/figure out what this is actually doing
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);	//TODO: Figure out vsync and add way to enable/disable
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	//TODO: Switch to core instead of compat
+	//TODO: Switch to core instead of compat once all drawing uses VBOs
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 #ifdef _DEBUG

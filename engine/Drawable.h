@@ -2,6 +2,7 @@
 #include "Color.h"
 class Image;
 
+//TODO Remove
 class Drawable
 {
 public:
@@ -13,6 +14,6 @@ public:
 	bool active;
 	Color col;
 	
-	virtual void draw(bool bDebugInfo = false) = 0;	//TODO This shouldn't have a debug thing?
+	virtual void draw(bool bDebugInfo = false) = 0;
 
 };

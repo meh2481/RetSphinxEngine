@@ -336,12 +336,5 @@ void Image::_load(string sFilename)
 	_loadPNG(sFilename);
 }
 
-void Image::_reload()
-{
-	//TODO: Support reloading images loaded from buffers
-	if(m_sFilename.length())
-		_load(m_sFilename);
-}
-
 
 

@@ -78,7 +78,7 @@ void EntityManager::add(Object * o)
 
 Object* EntityManager::getObject(Vec2 p)
 {
-	return objectManager->get(p);
+	return objectManager->getAt(p);
 }
 
 Object* EntityManager::getClosestObject(Vec2 p)

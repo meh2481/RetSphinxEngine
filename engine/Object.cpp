@@ -58,15 +58,15 @@ void Object::draw(bool bDebugInfo)
 	}
 	if(img)
 	{
-		//TODO Jeepers this is messy. I totally thought this was a for loop. Make this look sane
+		//TODO Clarify need for object mesh image rather than ObjSegment image
 		vector<ObjSegment*>::iterator i = segments.begin();
-		if(i != segments.end())
+		if(i != segments.end())	//Not a for loop!
 		{
 			ObjSegment* seg = *i;
 			if(seg != NULL && seg->body != NULL)
 			{
 				b2Vec2 pos = seg->body->GetPosition();
-				//float fAngle = seg->body->GetAngle();	//TODO Is this needed?
+				//float fAngle = seg->body->GetAngle();
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
 				if(meshLattice)

@@ -14,7 +14,7 @@ class ParticleSystemManager : public Observer
 	std::list<ParticleSystem*> m_particles;
 	std::list<ParticleSystem*> m_updateParticles;
 	Subject* m_notifySubject;
-	ResourceLoader* m_loader;	//TODO This should just be a ParticleSystemLoader, not ResourceLoader?
+	ResourceLoader* m_loader;
 	bool updating;
 
 public:

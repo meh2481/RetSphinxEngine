@@ -45,11 +45,6 @@ protected:
 public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
 	bool shaded;	//If we're drawing this with OpenGL shading or not
-	
-	float lightPos[4];
-	bool useGlobalLight;	//Use global lighting scheme (set false if we're to use lightPos)
-    
-    void _reload();  //Reload memory associated with this object
 
     Mesh3D(std::string sOBJFile);
 	Mesh3D(const unsigned char* data, unsigned int len);

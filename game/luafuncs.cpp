@@ -12,7 +12,7 @@ using namespace std;
 #define JOY_AXIS_MIN	-32768
 #define JOY_AXIS_MAX	32767
 
-extern GameEngine* g_pGlobalEngine; //TODO Would love to get rid of this
+extern GameEngine* g_pGlobalEngine;
 
 //-----------------------------------------------------------------------------------------------------------
 //Class for interfacing between GameEngine and Lua
@@ -158,6 +158,7 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 
 //-----------------------------------------------------------------------------------------------------------
 // Lua interface functions (can be called from lua)
+// TODO Error checking in these
 //-----------------------------------------------------------------------------------------------------------
 
 luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --force is range [0,1]
@@ -401,7 +402,7 @@ luaFunc(node_getPos)	//float x, float y node_getPos(Node* n)
 	luaReturnVec2(pos.x, pos.y);
 }
 
-luaFunc(node_getNearestObj) //obj* node_getNearestObj(Node* n/*, string sObjName*/)
+luaFunc(node_getNearestObj) //obj* node_getNearestObj(Node* n)
 {
 	Node* n = getObj<Node>(L);
 	if(n)
