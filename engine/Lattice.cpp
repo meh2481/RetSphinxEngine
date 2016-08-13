@@ -1,4 +1,4 @@
-#include "lattice.h"
+#include "Lattice.h"
 #include "opengl-api.h"
 
 #include "Box2D/Box2D.h"

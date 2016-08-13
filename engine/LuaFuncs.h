@@ -1,5 +1,5 @@
 #pragma once
-#include "luadefines.h"
+#include "LuaDefines.h"
 
 struct lua_State;
 

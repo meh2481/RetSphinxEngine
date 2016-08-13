@@ -8,7 +8,7 @@
 #include "Mesh3D.h"
 #include "Drawable.h"
 #include "LuaInterface.h"
-#include "luafuncs.h"
+#include "LuaFuncs.h"
 #include "Rect.h"
 #include <vector>
 #include <string>

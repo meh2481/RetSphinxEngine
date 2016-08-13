@@ -6,8 +6,8 @@
 
 #include "Image.h"
 #include "Drawable.h"
-#include "luafuncs.h"
-#include "luainterface.h"
+#include "LuaFuncs.h"
+#include "LuaInterface.h"
 #include "Subject.h"
 #include "Rect.h"
 #include <vector>

@@ -26,8 +26,8 @@ Interpolator.cpp
 Interpolator.h
 Lattice.cpp
 Lattice.h
-luadefines.h
-luafuncs.h
+LuaDefines.h
+LuaFuncs.h
 LuaInterface.cpp
 LuaInterface.h
 MemoryEditor.cpp

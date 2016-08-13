@@ -4,8 +4,8 @@
 */
 
 #include "Object.h"
-#include "luafuncs.h"
-#include "lattice.h"
+#include "LuaFuncs.h"
+#include "Lattice.h"
 #include "Image.h"
 #include "opengl-api.h"
 

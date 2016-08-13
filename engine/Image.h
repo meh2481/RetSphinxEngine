@@ -4,7 +4,7 @@
 */
 #pragma once
 
-#include "lattice.h"
+#include "Lattice.h"
 #include "SDL_opengl.h"
 
 class Image

@@ -6,7 +6,7 @@ GameEngine_events.cpp
 GameEngine_xmlparse.cpp
 DebugUI.cpp
 DebugUI.h
-luafuncs.cpp
+LuaFuncs.cpp
 main.cpp
 )
 

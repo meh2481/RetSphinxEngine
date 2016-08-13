@@ -1,5 +1,5 @@
-#include "luafuncs.h"
-#include "luainterface.h"
+#include "LuaFuncs.h"
+#include "LuaInterface.h"
 #include "GameEngine.h"
 #include "Image.h"
 #include "ResourceLoader.h"
