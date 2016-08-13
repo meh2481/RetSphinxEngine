@@ -1,6 +1,6 @@
 /*
-	GameEngine header - Parse.h
-	Utility functions for parsing things
+	GameEngine header - StringUtils.h
+	Utility functions for parsing strings
 	Copyright (c) 2014 Mark Hutcheson
 */
 #pragma once
@@ -10,7 +10,7 @@
 //--------------------------------------------------
 // Parsing functions
 //--------------------------------------------------
-namespace Parse
+namespace StringUtils
 {
 	//Trim whitespace from beginning & end of string
 	std::string trim(std::string s);

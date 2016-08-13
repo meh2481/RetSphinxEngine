@@ -336,7 +336,7 @@ void SoftBodyAnim::setEffect()
 				float fac = 1.0f - (distance / totalDist);
 				
 				
-				//TODO Better deformation
+				//TODO Better deformation method
 				vertPos.x += pMoved.x * fac;
 				vertPos.y += pMoved.y * fac;
 			}

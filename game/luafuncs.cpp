@@ -5,7 +5,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "ParticleSystem.h"
-#include "Parse.h"
+#include "StringUtils.h"
 using namespace std;
 
 //Defined by SDL
@@ -152,7 +152,7 @@ public:
 template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 {
 	LuaObjGlue *glue = (LuaObjGlue*)lua_touserdata(L, pos);
-	void *p = T::TYPE == glue->type ? glue->obj : NULL; // TODO ALSO ERROR CHECKS
+	void *p = T::TYPE == glue->type ? glue->obj : NULL; //FG TODO ALSO ERROR CHECKS
 	return (T*)p;
 }
 
@@ -359,7 +359,7 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 			seg = lua_tointeger(L, 3);
 		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg-1);	//Lua remains 1-indexed, C++ side 0-indexed
 	}
-    luaReturnNil(); // FG: FIXME: return success?
+    luaReturnNil();
 }
 
 //-----------------------------------------------------------------------------------------------------------

@@ -57,7 +57,6 @@ void Image::_bind(unsigned char* data, unsigned int width, unsigned int height, 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
-//TODO: This should be split into a resource loader
 void Image::_loadBlob(unsigned char* blob, unsigned int size)
 {
 	if(size < sizeof(TextureHeader))
@@ -225,12 +224,6 @@ void Image::_loadNoise(string sXMLFilename)
 	
 	delete[] bits;
 }*/
-
-/* TODO: Intelligent drawing
-<fgenesis> i recommend using glViewport and related functions so you don't have to scale stuff into [-1 .. 1] anymore
-<fgenesis> let your gfx card do the heavy lifting, not the CPU
-<fgenesis> also have a look at glOrtho() and glMatrixMode(), you'll need those
-*/
 
 void Image::render(Vec2 size, float tilex, float tiley)
 {

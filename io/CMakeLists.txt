@@ -6,8 +6,8 @@ Hash.cpp
 Hash.h
 PakLoader.h
 PakLoader.cpp
-Parse.cpp
-Parse.h
+StringUtils.cpp
+StringUtils.h
 ResourceTypes.h
 stb_image.h
 stb_image_write.h

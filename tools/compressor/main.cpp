@@ -8,7 +8,7 @@
 #include <list>
 #include <vector>
 #include <sstream>
-#include "Parse.h"
+#include "StringUtils.h"
 #include "FileOperations.h"
 #include "tinyxml2.h"
 #include "Hash.h"
@@ -186,7 +186,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 cRect rectFromString(string s)
 {
 	cRect rc;
-	s = Parse::stripCommas(s);
+	s = StringUtils::stripCommas(s);
 
 	//Now, parse
 	istringstream iss(s);
@@ -379,7 +379,7 @@ list<string> readFilenames(string filelistFile)
 	{
 		string s;
 		getline(infile, s);
-		s = Parse::trim(s);
+		s = StringUtils::trim(s);
 		if(!s.length())
 			continue;	//Ignore blank lines
 		if(s.find('#') != string::npos)

@@ -8,7 +8,7 @@
 #include "Object.h"
 #include "ResourceCache.h"
 #include "PakLoader.h"
-#include "Parse.h"
+#include "StringUtils.h"
 #include "Font.h"
 #include "Hash.h"
 #include "Stringbank.h"

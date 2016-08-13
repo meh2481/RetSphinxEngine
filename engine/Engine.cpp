@@ -74,9 +74,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fTimeScale = 1.0f;
 	
 	LOG(INFO) << "Creating resource loader";
-	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");	//TODO: pass in pak folder from somewhere else
+	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");	//TODO: pass in pak folder from somewhere else?
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
-	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere? Hardcoded should be ok for this, right?
+	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere?
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;

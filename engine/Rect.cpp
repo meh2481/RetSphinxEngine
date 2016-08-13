@@ -1,4 +1,4 @@
-#include "Parse.h"
+#include "StringUtils.h"
 #include "Rect.h"
 #include <sstream>
 using namespace std;
@@ -98,7 +98,7 @@ void Rect::centerOn(Vec2 p)
 
 void Rect::fromString(string s)
 {
-	s = Parse::stripCommas(s);
+	s = StringUtils::stripCommas(s);
 
 	//Now, parse
 	istringstream iss(s);
@@ -108,7 +108,7 @@ void Rect::fromString(string s)
 
 Vec2 pointFromString(std::string s)
 {
-	s = Parse::stripCommas(s);
+	s = StringUtils::stripCommas(s);
 
 	//Now, parse
 	std::istringstream iss(s);
@@ -120,7 +120,7 @@ Vec2 pointFromString(std::string s)
 
 Vec3 vec3FromString(std::string s)
 {
-	s = Parse::stripCommas(s);
+	s = StringUtils::stripCommas(s);
 
 	//Now, parse
 	std::istringstream iss(s);

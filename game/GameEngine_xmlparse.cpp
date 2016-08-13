@@ -7,7 +7,7 @@
 #include "ResourceTypes.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
-#include "Parse.h"
+#include "StringUtils.h"
 using namespace std;
 
 //---------------------------------------------------------------------------------------------------------------------------

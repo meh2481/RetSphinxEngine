@@ -8,8 +8,7 @@
 typedef glm::vec2 Vec2;
 typedef glm::vec3 Vec3;
 
-//Can't have these in Parse unfortunately due to cross-inclusion issues
-//TODO: move somewhere sane
+//TODO: move somewhere where it makes sense
 Vec2 pointFromString(std::string s);
 Vec3 vec3FromString(std::string s);
 

@@ -1,7 +1,7 @@
 #include "PakLoader.h"
 #include "wfLZ.h"
 #include "easylogging++.h"
-#include "Parse.h"
+#include "StringUtils.h"
 #include "FileOperations.h"
 #include <sstream>
 using namespace std;
@@ -12,7 +12,7 @@ void PakLoader::loadFromDir(string sDirName)
 
 	for(set<string>::iterator i = pakFiles.begin(); i != pakFiles.end(); i++)
 	{
-		if(Parse::getExtension(*i) == PAK_FILE_TYPE)
+		if(StringUtils::getExtension(*i) == PAK_FILE_TYPE)
 			parseFile(*i);
 	}
 }

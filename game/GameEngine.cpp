@@ -135,8 +135,10 @@ void GameEngine::draw()
 	
 	glColor4f(1,1,1,1);
 	
+	//-------------------------------------------------------------
 	//Set up OpenGL lights
 	//TODO: Remove or move to an actual class
+	//-------------------------------------------------------------
 	float lightPosition[] = {0.0, 0.0, 0.0, 1.0};
 	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -174,6 +176,8 @@ void GameEngine::draw()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
+
+	//-------------------------------------------------------------
 	
 	//Keep camera within camera bounds
 	if(rcSceneBounds.area())	//If it's not unset

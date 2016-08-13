@@ -1,6 +1,6 @@
 #include "Color.h"
 #include <sstream>
-#include "Parse.h"
+#include "StringUtils.h"
 
 Color::Color()
 {
@@ -27,7 +27,7 @@ void Color::from256(int ir, int ig, int ib, int ia)
 
 void Color::fromString(std::string s)
 {
-	s = Parse::stripCommas(s);
+	s = StringUtils::stripCommas(s);
 
 	//Now, parse
 	std::istringstream iss(s);

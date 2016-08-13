@@ -182,7 +182,7 @@ public:
 	
 	//Mouse functions
 	Vec2 getCursorPos()	{return m_ptCursorPos;};
-	void setCursorPos(Vec2 pos);			//TODO Determine if we need mouse cursor warping also
+	void setCursorPos(Vec2 pos);			//TODO Replace with warping once MouseCursor class is kicked out
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};

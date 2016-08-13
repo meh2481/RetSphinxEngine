@@ -77,11 +77,11 @@ void Engine::setup_sdl()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	//TODO: Switch to core instead of compat once all drawing uses VBOs
+	//TODO: Switch to core instead of compat once all drawing uses VBOs/shaders
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 #ifdef _DEBUG
-	//TODO: Add back forward compatibility flag once removal of deprecated stuff is complete
+	//TODO: Add back forward compatibility flag once all drawing uses VBOs/shaders
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);

@@ -1,10 +1,10 @@
 /*
- GameEngine source - Parse.cpp
+ GameEngine source - StringUtils.cpp
  Copyright (c) 2014 Mark Hutcheson
 */
-#include "Parse.h"
+#include "StringUtils.h"
 
-namespace Parse
+namespace StringUtils
 {
 	const std::string delimiters = " \n\r\t";
 	std::string trim(std::string s)
