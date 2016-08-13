@@ -33,6 +33,7 @@ void ResourceLoader::clearCache()
 {
 	m_cache->clear();
 	m_pakLoader->clear();
+	m_pakLoader->loadFromDir(m_sPakDir);	//re-parse
 }
 
 Image* ResourceLoader::getImage(uint64_t hashID)

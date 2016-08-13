@@ -219,11 +219,13 @@ void GameEngine::draw()
 	getEntityManager()->render(mat);
 	drawDebug();
 
-	//Vec2 textPos;
-	//textPos.x = -CameraPos.x - 7.0f;
-	//textPos.y = -CameraPos.y + 0.75f;
+	Vec2 textPos;
+	textPos.x = -CameraPos.x - 7.0f;
+	textPos.y = -CameraPos.y + 0.75f;
 	//getStringbank()->setLanguage("en");
-	//getResourceLoader()->getFont("res/font/test.font")->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
+	Font* fon = getResourceLoader()->getFont("res/font/test.font");
+	if(fon)
+		fon->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 
 	//textPos.y -= 0.25;
 	//getStringbank()->setLanguage("es");
