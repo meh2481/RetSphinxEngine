@@ -147,6 +147,44 @@ void Engine::start()
 	while(!_frame());
 }
 
+bool Engine::_processEvent(SDL_Event& e)
+{
+	//Update internal cursor position if cursor has moved
+	if(e.type == SDL_MOUSEMOTION)
+	{
+		m_ptCursorPos.x = (float)e.motion.x;
+		m_ptCursorPos.y = (float)e.motion.y;
+	}
+	else if(e.type == SDL_WINDOWEVENT)
+	{
+		if(e.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
+		{
+			m_bPaused = true;
+			pause();
+		}
+		else if(e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
+		{
+			m_bPaused = false;
+			resume();
+		}
+		else if(e.window.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			if(m_bResizable)
+				changeScreenResolution(e.window.data1, e.window.data2);
+			else
+				LOG(ERROR) << "Resize event generated, but resizable flag not set.";
+		}
+		else if(e.window.event == SDL_WINDOWEVENT_ENTER)
+			m_bCursorOutOfWindow = false;
+		else if(e.window.event == SDL_WINDOWEVENT_LEAVE)
+			m_bCursorOutOfWindow = true;
+	}
+	else if(e.type == SDL_QUIT)
+		return true;
+
+	return false;
+}
+
 bool Engine::_frame()
 {
 	updateSound();
@@ -157,40 +195,10 @@ bool Engine::_frame()
 	{
 		ImGui_ImplSdl_ProcessEvent(&event);
 
-		//Update internal cursor position if cursor has moved
-		if(event.type == SDL_MOUSEMOTION)
-		{
-			m_ptCursorPos.x = (float) event.motion.x;
-			m_ptCursorPos.y = (float) event.motion.y;
-		}
-		else if(event.type == SDL_WINDOWEVENT)
-		{
-			if(event.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
-			{
-				m_bPaused = true;
-				pause();
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
-			{
-				m_bPaused = false;
-				resume();
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				if (m_bResizable)
-					changeScreenResolution(event.window.data1, event.window.data2);
-				else
-					LOG(ERROR) << "Error! Resize event generated, but resizable flag not set.";
-			}
-			else if(event.window.event == SDL_WINDOWEVENT_ENTER)
-				m_bCursorOutOfWindow = false;
-			else if(event.window.event == SDL_WINDOWEVENT_LEAVE)
-				m_bCursorOutOfWindow = true;
-		}
-		else if(event.type == SDL_QUIT)
+		if(_processEvent(event)) 
 			return true;
 			
-		//Let final game engine handle it, whatever the case
+		//Pass on to derived game engine class
 		if(!m_bPaused)
 			handleEvent(event);
 	}
@@ -418,9 +426,11 @@ void Engine::_loadicon()	//Load icon into SDL window
 	FreeImage_Unload(dib);*/
 }
 
-void Engine::setCursorPos(int32_t x, int32_t y)
+void Engine::setCursorPos(Vec2 pos)
 {
-		SDL_WarpMouseInWindow(m_Window, x, y);
+	if(m_cursor)
+		m_cursor->pos = pos;
+	//	SDL_WarpMouseInWindow(m_Window, pos.x, pos.y);
 	//#ifdef __APPLE__
 	//	hideCursor(); //TODO: Warping the mouse shows it again in Mac, and this doesn't work. Debug.
 	//#endif

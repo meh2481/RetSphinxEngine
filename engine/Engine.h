@@ -92,6 +92,8 @@ private:
 	void setup_opengl();
 	void _loadicon();					//Load icon and set window to have said icon
 
+	bool _processEvent(SDL_Event& e);	//Engine-specific handling of events
+
 	Engine(){}; //Default constructor isn't callable
 
 protected:
@@ -180,7 +182,7 @@ public:
 	
 	//Mouse functions
 	Vec2 getCursorPos()	{return m_ptCursorPos;};
-	void setCursorPos(int32_t x, int32_t y);
+	void setCursorPos(Vec2 pos);			//TODO Determine if we need mouse cursor warping also
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};

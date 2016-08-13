@@ -38,8 +38,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	showCursor();
 	
 	//TODO: Not hardcoded
-	m_Cursor = getResourceLoader()->getCursor("res/cursor/arrow.xml");//new MouseCursor();
-	setCursor(m_Cursor);
+	setCursor(getResourceLoader()->getCursor("res/cursor/arrow.xml"));
 	
 	m_joy = NULL;
 	m_rumble = NULL;
@@ -102,7 +101,6 @@ GameEngine::~GameEngine()
 	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
 	getEntityManager()->cleanup();
-	delete m_Cursor;
 }
 
 void GameEngine::frame(float dt)
@@ -221,11 +219,11 @@ void GameEngine::draw()
 	getEntityManager()->render(mat);
 	drawDebug();
 
-	Vec2 textPos;
-	textPos.x = -CameraPos.x - 7.0f;
-	textPos.y = -CameraPos.y + 0.75f;
+	//Vec2 textPos;
+	//textPos.x = -CameraPos.x - 7.0f;
+	//textPos.y = -CameraPos.y + 0.75f;
 	//getStringbank()->setLanguage("en");
-	m_font->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
+	//getResourceLoader()->getFont("res/font/test.font")->renderString(getStringbank()->getString("TEST_STRING_1"), 0.15f, textPos);
 
 	//textPos.y -= 0.25;
 	//getStringbank()->setLanguage("es");
@@ -234,7 +232,7 @@ void GameEngine::draw()
 	glLoadIdentity();
 	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
 	Vec3 cam(CameraPos.x, CameraPos.y, m_fDefCameraZ);
-	m_Cursor->pos = worldPosFromCursor(getCursorPos(), cam);
+	setCursorPos(worldPosFromCursor(getCursorPos(), cam));
 	
 	glPushMatrix();
 	
@@ -285,8 +283,6 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(KEY_ENTER2);
 	
 	Lua->call("loadStartingMap");
-
-	m_font = getResourceLoader()->getFont("res/font/test.font");
 
 	string sLocale = SystemUtils::getCurLocale();
 	if(sLocale.size())

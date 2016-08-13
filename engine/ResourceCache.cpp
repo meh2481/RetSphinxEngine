@@ -2,6 +2,7 @@
 #include "Image.h"
 #include "Mesh3D.h"
 #include "Font.h"
+#include "MouseCursor.h"
 using namespace std;
 
 ResourceCache::~ResourceCache()
@@ -9,40 +10,9 @@ ResourceCache::~ResourceCache()
 	clear();
 }
 
-Image* ResourceCache::findImage(uint64_t id)
-{
-	map<uint64_t, Image*>::iterator i = imageIDMap.find(id);
-	if(i == imageIDMap.end())	//This image isn't here
-		return NULL;
-	return i->second;
-}
-
 void ResourceCache::addImage(uint64_t id, Image* img)
 {
 	imageIDMap[id] = img;
-}
-
-void ResourceCache::clearImages()
-{
-	for(map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
-		delete (i->second);
-	imageIDMap.clear();
-}
-
-Mesh3D* ResourceCache::findMesh(uint64_t id)
-{
-	map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
-	if(i == meshIDMap.end())	//This mesh isn't here
-		return NULL;
-	return i->second;
-}
-
-Font* ResourceCache::findFont(uint64_t id)
-{
-	map<uint64_t, Font*>::iterator i = fontIDMap.find(id);
-	if(i == fontIDMap.end())	//This font isn't here
-		return NULL;
-	return i->second;
 }
 
 void ResourceCache::addFont(uint64_t id, Font* font)
@@ -55,9 +25,75 @@ void ResourceCache::addMesh(uint64_t id, Mesh3D* mesh)
 	meshIDMap[id] = mesh;
 }
 
+void ResourceCache::addCursor(uint64_t id, MouseCursor* cur)
+{
+	cursorIDMap[id] = cur;
+}
+
+Image* ResourceCache::findImage(uint64_t id)
+{
+	map<uint64_t, Image*>::iterator i = imageIDMap.find(id);
+	if(i == imageIDMap.end())	//This image isn't here
+		return NULL;
+	return i->second;
+}
+
+Font* ResourceCache::findFont(uint64_t id)
+{
+	map<uint64_t, Font*>::iterator i = fontIDMap.find(id);
+	if(i == fontIDMap.end())	//This font isn't here
+		return NULL;
+	return i->second;
+}
+
+Mesh3D* ResourceCache::findMesh(uint64_t id)
+{
+	map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
+	if(i == meshIDMap.end())	//This mesh isn't here
+		return NULL;
+	return i->second;
+}
+
+MouseCursor* ResourceCache::findCursor(uint64_t id)
+{
+	map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.find(id);
+	if(i == cursorIDMap.end())	//This cursor isn't here
+		return NULL;
+	return i->second;
+}
+
+void ResourceCache::clear()
+{
+	clearImages(); 
+	clearMeshes();
+	clearFonts();
+	clearCursors();
+}
+
+void ResourceCache::clearImages()
+{
+	for(map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
+		delete (i->second);
+	imageIDMap.clear();
+}
+
+void ResourceCache::clearFonts()
+{
+	for(map<uint64_t, Font*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
+		delete (i->second);
+	fontIDMap.clear();
+}
+
 void ResourceCache::clearMeshes()
 {
 	for(map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
 		delete (i->second);
 	meshIDMap.clear();
+}
+
+void ResourceCache::clearCursors()
+{
+	for(map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.begin(); i != cursorIDMap.end(); i++)
+		delete (i->second);
+	cursorIDMap.clear();
 }

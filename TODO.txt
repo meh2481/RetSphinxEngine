@@ -5,7 +5,6 @@ Overall TODO list:
 - Implement newer OpenGL shaders and such
 - Use shaders rather than lattice animations where possible
 - IO in separate thread?
-- Replace string w/utf-8 compatible things?
 - Disable exceptions/rtti?
 - Add ImGUI editor stuff
 - rip out displaylists for 3D objects - vertex buffers are better
@@ -28,10 +27,7 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 	-- Don't want to bother with bones/3D animation; math too complicated. Does this make the 3D too limited?
 	-- How much do I care about 3D eye candy and does that just make the 2D stuff look like crap?
 - Simplified resource managment
-	-- Resources compressed into smaller formats w/ WFLZ or similar
-		--- Images/3D models/etc should be readable directly into OpenGL
 	-- Paged in with memory mapping if intelligent enough for performance gains
-	-- Packaged into larger files, but intelligently; don't want huge Steam updates for small changes because EVERYTHING recompressed
 - XML vs. Lua - when to use one over the other? Can XML be removed intelligently?
 - Optimization and data-driven programming/design where applicable
 
@@ -47,7 +43,7 @@ Other misc unordered TODO:
 
 
 
-LOPENG LGILS TUFF
+OPENGL STUFF
 
 - glNamedBufferStorageEXT()
 https://www.opengl.org/wiki/Nomenclature/Direct_State_Access

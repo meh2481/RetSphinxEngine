@@ -313,56 +313,62 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 MouseCursor* ResourceLoader::getCursor(string sID)
 {
-	MouseCursor* cur = new MouseCursor();
-	cur->_init();
-
-	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	//TODO Check cache first
-	unsigned int len = 0;
-	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
-	int iErr;
-	if(!resource || !len)
-	{
-		LOG(TRACE) << "Pak miss";
-		iErr = doc->LoadFile(sID.c_str());
-	}
-	else
-	{
-		LOG(TRACE) << "loading from pak";
-		iErr = doc->Parse((const char*)resource, len);
-		free(resource);
-	}
+	MouseCursor* cur = m_cache->findCursor(hashVal);
 
-	if(iErr != tinyxml2::XML_NO_ERROR)
+	if(!cur)
 	{
-		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
+		cur = new MouseCursor();
+		cur->_init();
+
+		tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+
+		unsigned int len = 0;
+		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+		int iErr;
+		if(!resource || !len)
+		{
+			LOG(TRACE) << "Pak miss";
+			iErr = doc->LoadFile(sID.c_str());
+		}
+		else
+		{
+			LOG(TRACE) << "loading from pak";
+			iErr = doc->Parse((const char*)resource, len);
+			free(resource);
+		}
+
+		if(iErr != tinyxml2::XML_NO_ERROR)
+		{
+			LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
+			delete doc;
+			return cur;
+		}
+
+		tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
+		if(root == NULL)
+		{
+			LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
+			delete doc;
+			return cur;
+		}
+
+		const char* cImgPath = root->Attribute("path");
+		if(cImgPath)
+			cur->img = getImage(cImgPath);
+
+		const char* cSize = root->Attribute("size");
+		if(cSize)
+			cur->size = pointFromString(cSize);
+
+		const char* cHotSpot = root->Attribute("hotspot");
+		if(cHotSpot)
+			cur->hotSpot = pointFromString(cHotSpot);
+
 		delete doc;
-		return cur;
+
+		m_cache->addCursor(hashVal, cur);
 	}
-
-	tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
-	if(root == NULL)
-	{
-		LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
-		delete doc;
-		return cur;
-	}
-
-	const char* cImgPath = root->Attribute("path");
-	if(cImgPath)
-		cur->img = getImage(cImgPath);	//TODO REMOVE
-
-	const char* cSize = root->Attribute("size");
-	if(cSize)
-		cur->size = pointFromString(cSize);
-
-	const char* cHotSpot = root->Attribute("hotspot");
-	if(cHotSpot)
-		cur->hotSpot = pointFromString(cHotSpot);
-
-	delete doc;
 	return cur;
 }
 
