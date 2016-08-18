@@ -14,6 +14,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "Stringbank.h"
+#include "stb_image.h"
 using namespace std;
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
@@ -65,18 +66,20 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_bSteppingPhysics = false;
 	m_bStepFrame = false;
 #endif
-	
+
 	//Initialize engine stuff
 	m_fAccumulatedTime = 0.0;
 	//m_bFirstMusic = true;
 	m_bQuitting = false;
 	Random::seed(SDL_GetTicks());
 	m_fTimeScale = 1.0f;
-	
+
 	LOG(INFO) << "Creating resource loader";
 	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");	//TODO: pass in pak folder from somewhere else?
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
 	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere?
+
+	_loadicon();	//Load our window icon
 
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
@@ -124,7 +127,7 @@ Engine::~Engine()
 		for(map<string, FMOD_SOUND*>::iterator i = m_sounds.begin(); i != m_sounds.end(); i++)
 			FMOD_Sound_Release(i->second);
 	}
-	
+
 	//Clean up FMOD
 	if(!m_bSoundDied)
 	{
@@ -188,16 +191,16 @@ bool Engine::_processEvent(SDL_Event& e)
 bool Engine::_frame()
 {
 	updateSound();
-	
+
 	//Handle input events from SDL
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
 		ImGui_ImplSdl_ProcessEvent(&event);
 
-		if(_processEvent(event)) 
+		if(_processEvent(event))
 			return true;
-			
+
 		//Pass on to derived game engine class
 		if(!m_bPaused)
 			handleEvent(event);
@@ -211,7 +214,7 @@ bool Engine::_frame()
 		return m_bQuitting;	//Break out here
 	}
 
-	float fCurTime = ((float)SDL_GetTicks())/1000.0f;
+	float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
 	if(m_fAccumulatedTime <= fCurTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
@@ -241,7 +244,7 @@ void Engine::_render()
 
 	// Game-specific drawing
 	draw();
-	
+
 	//Draw gamma/brightness overlay on top of everything else
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -253,11 +256,11 @@ void Engine::_render()
 	}
 	else
 	{
-		glBlendFunc( GL_ZERO, GL_SRC_COLOR );
+		glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1.0f);
 	}
 	fillScreen(fillCol);
-	
+
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -265,7 +268,7 @@ void Engine::_render()
 
 	glPopMatrix();
 	drawCursor();
-	
+
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
 }
@@ -278,7 +281,7 @@ void Engine::drawDebug()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_physicsWorld->DrawDebugData();
-		glColor4f(1,1,1,1);
+		glColor4f(1, 1, 1, 1);
 	}
 }
 
@@ -316,13 +319,13 @@ void Engine::fillScreen(Color col)
 bool Engine::keyDown(int32_t keyCode)
 {
 	if(m_iKeystates == NULL) return false;	//On first cycle, this can be NULL and cause segfaults otherwise
-	
+
 	//HACK: See if one of our combined keycodes
-	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL)||keyDown(SDL_SCANCODE_RCTRL));
-	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT)||keyDown(SDL_SCANCODE_RSHIFT));
-	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT)||keyDown(SDL_SCANCODE_RALT));
-	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI)||keyDown(SDL_SCANCODE_RGUI));
-	
+	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
+	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
+	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT) || keyDown(SDL_SCANCODE_RALT));
+	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI) || keyDown(SDL_SCANCODE_RGUI));
+
 	//Otherwise, just use our pre-polled list we got from SDL
 	return(m_iKeystates[keyCode]);
 }
@@ -330,9 +333,9 @@ bool Engine::keyDown(int32_t keyCode)
 void Engine::setFramerate(float fFramerate)
 {
 	if(fFramerate < 30.0)
-	fFramerate = 30.0;	//30fps is bare minimum
+		fFramerate = 30.0;	//30fps is bare minimum
 	if(m_fFramerate == 0.0)
-		m_fAccumulatedTime = (float)SDL_GetTicks()/1000.0f;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
+		m_fAccumulatedTime = (float)SDL_GetTicks() / 1000.0f;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
 	m_fFramerate = fFramerate;
 	m_fTargetTime = 1.0f / m_fFramerate;
 }
@@ -345,7 +348,7 @@ void Engine::setMSAA(int iMSAA)
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, iMSAA);
 		glEnable(GL_MULTISAMPLE);
-		
+
 		// Enable OpenGL antialiasing stuff
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
@@ -357,7 +360,7 @@ void Engine::setMSAA(int iMSAA)
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 		glDisable(GL_MULTISAMPLE);
-		
+
 		// Disable OpenGL antialiasing stuff
 		glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
@@ -366,64 +369,18 @@ void Engine::setMSAA(int iMSAA)
 	}
 }
 
-//TODO: Fix
 void Engine::_loadicon()	//Load icon into SDL window
 {
-	/*LOG(INFO) << "Load icon " << m_sIcon
-	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-	FIBITMAP *dib(0);
-	BYTE* bits(0);
-	unsigned int width(0), height(0);
-	
-	//check the file signature and deduce its format
-	fif = FreeImage_GetFileType(m_sIcon.c_str(), 0);
-	//if still unknown, try to guess the file format from the file extension
-	if(fif == FIF_UNKNOWN) 
-		fif = FreeImage_GetFIFFromFilename(m_sIcon.c_str());
-	//if still unkown, return failure
-	if(fif == FIF_UNKNOWN)
-	{
-		LOG(ERROR) << "Unknown image type for file " << m_sIcon
-		return;
-	}
-	
-	//check that the plugin has reading capabilities and load the file
-	if(FreeImage_FIFSupportsReading(fif))
-		dib = FreeImage_Load(fif, m_sIcon.c_str());
-	else
-		LOG(ERROR) << "File " << m_sIcon << " doesn't support reading."
-	//if the image failed to load, return failure
-	if(!dib)
-	{
-		LOG(ERROR) << "Error loading image " << m_sIcon.c_str()
-		return;
-	}	
-	//retrieve the image data
-	
-	//get the image width and height
-	width = FreeImage_GetWidth(dib);
-	height = FreeImage_GetHeight(dib);
-	
-	FreeImage_FlipVertical(dib);
-	
-	bits = FreeImage_GetBits(dib);	//if this somehow one of these failed (they shouldn't), return failure
-	if((bits == 0) || (width == 0) || (height == 0))
-	{
-		LOG(ERROR) << "Something went terribly horribly wrong with getting image bits; just sit and wait for the singularity"
-		return;
-	}
-	
-	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(bits, width, height, FreeImage_GetBPP(dib), FreeImage_GetPitch(dib), 
-													0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+	LOG(INFO) << "Load icon " << m_sIcon;
+
+	SDL_Surface *surface = getResourceLoader()->getSDLImage(m_sIcon);
 	if(surface == NULL)
-		LOG(ERROR) << "NULL surface for icon " << m_sIcon
+		LOG(ERROR) << "NULL surface for icon " << m_sIcon;
 	else
 	{
 		SDL_SetWindowIcon(m_Window, surface);
 		SDL_FreeSurface(surface);
 	}
-	
-	FreeImage_Unload(dib);*/
 }
 
 void Engine::setCursorPos(Vec2 pos)
@@ -447,9 +404,9 @@ void Engine::commandline(list<string> argv)
 		if(sSwitch.find('-') == 0)
 		{
 			if(sSwitch.find("--") == 0)
-				sSwitch.erase(0,1);
-			sSwitch.erase(0,1);
-			
+				sSwitch.erase(0, 1);
+			sSwitch.erase(0, 1);
+
 			cla.sSwitch = sSwitch;
 			list<string>::iterator sw = i;
 			if(++sw != argv.end())	//Switch with a value
@@ -494,11 +451,11 @@ Vec2 Engine::worldMovement(Vec2 cursormove, Vec3 Camera)
 {
 	cursormove.x /= (float)getWidth();
 	cursormove.y /= (float)getHeight();
-	
+
 	Rect rcCamera = getCameraView(Camera);
 	cursormove.x *= rcCamera.width();
 	cursormove.y *= rcCamera.height();
-	
+
 	return cursormove;
 }
 
@@ -506,28 +463,28 @@ Vec2 Engine::worldPosFromCursor(Vec2 cursorpos, Vec3 Camera)
 {
 	//Rectangle that the camera can see in world space
 	Rect rcCamera = getCameraView(Camera);
-	
+
 	//Our relative position in window rect space (in rage 0-1)
 	cursorpos.x /= (float)getWidth();
 	cursorpos.y /= (float)getHeight();
-	
+
 	//Multiply this by the size of the world rect to get the relative cursor pos
 	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
 	cursorpos.y = cursorpos.y * -rcCamera.height() + rcCamera.bottom;	//Flip on y axis
-	
+
 	return cursorpos;
 }
 
 void Engine::stepPhysics(float dt)
 {
 	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
-	
+
 	//Update collisions
 	set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
 	//Set join the short contacts that fired and also quit this frame
 	for(set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
 		contacts.insert(*i);
-	
+
 	//Iterate over all these
 	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
 	{
@@ -550,7 +507,7 @@ void Engine::stepPhysics(float dt)
 			c.objB->collideWall(Vec2(worldManifold.normal.x, worldManifold.normal.y));
 		}
 		//Don't care about two non-object fixtures colliding
-		
+
 		//Test for objects entering nodes (sensors)
 		if(c.nodeA && c.objB)
 		{
@@ -566,56 +523,56 @@ void Engine::stepPhysics(float dt)
 
 void Engine::setDoubleBuffered(bool bDoubleBuffered)
 {
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);
 }
 
 bool Engine::getDoubleBuffered()
 {
-    int val = 1;
+	int val = 1;
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
-    return val;
+	return val;
 }
 
 void Engine::setVsync(int iVsync)
 {
-    SDL_GL_SetSwapInterval(iVsync);
+	SDL_GL_SetSwapInterval(iVsync);
 }
 
 int Engine::getVsync()
 {
-    return SDL_GL_GetSwapInterval();
+	return SDL_GL_GetSwapInterval();
 }
 
 b2Body* Engine::createBody(b2BodyDef* bdef)
 {
-    return m_physicsWorld->CreateBody(bdef);
+	return m_physicsWorld->CreateBody(bdef);
 }
 
 void Engine::setGravity(Vec2 ptGravity)
 {
-    m_physicsWorld->SetGravity(b2Vec2(ptGravity.x, ptGravity.y));
+	m_physicsWorld->SetGravity(b2Vec2(ptGravity.x, ptGravity.y));
 }
 
 void Engine::setGravity(float x, float y)
 {
-    setGravity(Vec2(x,y));
+	setGravity(Vec2(x, y));
 }
 
 bool Engine::isMouseGrabbed()
 {
-    return SDL_GetWindowGrab(m_Window);
+	return SDL_GetWindowGrab(m_Window);
 }
 
 void Engine::grabMouse(bool bGrab)
 {
-    SDL_SetWindowGrab(m_Window, (SDL_bool)bGrab);
+	SDL_SetWindowGrab(m_Window, (SDL_bool)bGrab);
 }
 
 unsigned Engine::getTicks()
 {
-    return SDL_GetTicks();
+	return SDL_GetTicks();
 }
 float Engine::getSeconds()
 {
-    return (float)SDL_GetTicks()/1000.0f;
+	return (float)SDL_GetTicks() / 1000.0f;
 }

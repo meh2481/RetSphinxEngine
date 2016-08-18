@@ -186,7 +186,7 @@ public:
 	bool getCursorDown(int iButtonCode);
 	void showCursor()	{m_bCursorShow = true;};
 	void hideCursor()	{m_bCursorShow = false;};
-	void setCursor(MouseCursor* cur)	{m_cursor = cur;};
+	void setCursor(SDL_Cursor* cur)	{SDL_SetCursor(cur);};
 	bool isMouseGrabbed();
 	void grabMouse(bool bGrab = true);
 	

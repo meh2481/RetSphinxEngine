@@ -12,6 +12,7 @@
 #include "Font.h"
 #include "Hash.h"
 #include "Stringbank.h"
+#include "stb_image.h"
 using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
@@ -310,64 +311,90 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	return ps;
 }
 
-MouseCursor* ResourceLoader::getCursor(string sID)
+SDL_Surface* ResourceLoader::getSDLImage(std::string sID)
+{
+	LOG(INFO) << "Load image " << sID;
+
+	int comp = 0;
+	int width = 0;
+	int height = 0;
+	unsigned char* cBuf = stbi_load(sID.c_str(), &width, &height, &comp, 0);
+
+	if((cBuf == 0) || (width == 0) || (height == 0))
+	{
+		LOG(ERROR) << "Unable to open image " << sID;
+		return NULL;
+	}
+
+	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(cBuf, width, height, 32, 4 * width, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+	//TODO stbi_image_free(cBuf); but SDL_Surface doesn't deep copy it...
+
+	return surface;
+}
+
+SDL_Cursor* ResourceLoader::getCursor(string sID)
 {
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	MouseCursor* cur = m_cache->findCursor(hashVal);
+	SDL_Cursor* cur = NULL;
 
-	if(!cur)
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	int iErr;
+	if(!resource || !len)
 	{
-		cur = new MouseCursor();
-		cur->_init();
-
-		tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-
-		unsigned int len = 0;
-		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
-		int iErr;
-		if(!resource || !len)
-		{
-			LOG(TRACE) << "Pak miss";
-			iErr = doc->LoadFile(sID.c_str());
-		}
-		else
-		{
-			LOG(TRACE) << "loading from pak";
-			iErr = doc->Parse((const char*)resource, len);
-			free(resource);
-		}
-
-		if(iErr != tinyxml2::XML_NO_ERROR)
-		{
-			LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
-			delete doc;
-			return cur;
-		}
-
-		tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
-		if(root == NULL)
-		{
-			LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
-			delete doc;
-			return cur;
-		}
-
-		const char* cImgPath = root->Attribute("path");
-		if(cImgPath)
-			cur->img = getImage(cImgPath);
-
-		const char* cSize = root->Attribute("size");
-		if(cSize)
-			cur->size = pointFromString(cSize);
-
-		const char* cHotSpot = root->Attribute("hotspot");
-		if(cHotSpot)
-			cur->hotSpot = pointFromString(cHotSpot);
-
-		delete doc;
-
-		m_cache->addCursor(hashVal, cur);
+		LOG(TRACE) << "Pak miss";
+		iErr = doc->LoadFile(sID.c_str());
 	}
+	else
+	{
+		LOG(TRACE) << "loading from pak";
+		iErr = doc->Parse((const char*)resource, len);
+		free(resource);
+	}
+
+	if(iErr != tinyxml2::XML_NO_ERROR)
+	{
+		LOG(ERROR) << "Error parsing XML file " << sID << ": Error " << iErr;
+		delete doc;
+		return NULL;
+	}
+
+	tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
+	if(root == NULL)
+	{
+		LOG(ERROR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
+		delete doc;
+		return NULL;
+	}
+
+	const char* cImgPath = root->Attribute("path");
+	if(!cImgPath)
+	{
+		LOG(ERROR) << "Error: No cursor image path in XML file " << sID;
+		delete doc;
+		return NULL;
+	}
+
+	const char* cHotSpot = root->Attribute("hotspot");
+	if(!cHotSpot)
+	{
+		LOG(ERROR) << "Error: No cursor hotspot in XML file " << sID;
+		delete doc;
+		return NULL;
+	}
+	Vec2 hotSpot = pointFromString(cHotSpot);
+
+	SDL_Surface* img = getSDLImage(cImgPath);
+	assert(img != NULL);
+	cur = SDL_CreateColorCursor(img, hotSpot.x, hotSpot.y);
+
+
+	delete doc;
+
+	//m_cache->addCursor(hashVal, cur);
 	return cur;
 }
 

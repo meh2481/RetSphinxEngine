@@ -5,11 +5,11 @@
 #include "tinyxml2.h"
 #include "Box2D/Box2D.h"
 #include "Rect.h"
+#include "SDL.h"
 
 class Image;
 class Object;
 class ParticleSystem;
-class MouseCursor;
 class ObjSegment;
 class ResourceCache;
 class Mesh3D;
@@ -34,6 +34,7 @@ public:
 	//Images
 	Image* getImage(std::string sID);
 	Image* getImage(uint64_t hashID);
+	SDL_Surface* getSDLImage(std::string sID);
 
 	//Meshes
 	Mesh3D* getMesh(std::string sID);
@@ -42,7 +43,7 @@ public:
 	ParticleSystem* getParticleSystem(std::string sID);
 
 	//Mouse cursors
-	MouseCursor* getCursor(std::string sID);
+	SDL_Cursor* getCursor(std::string sID);
 
 	//Fonts
 	Font* getFont(std::string sID);

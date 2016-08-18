@@ -17,7 +17,7 @@ Overall TODO list:
 - Use SDL's built-in cursor functionality
 - Particle systems, objects, etc should be loaded by template, not from XML each time
 - .pak packager needs better organization - move all resource loading stuff to IO
-- Properly use resource files again
+- Properly use resource files again - game icon, etc
 - Move object self-creation into resource loaders where applicable
 
 
