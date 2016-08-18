@@ -1,6 +1,7 @@
 set(game_src
 GameEngine.cpp
 GameEngine.h
+GameEngine.rc
 GameEngine_color.cpp
 GameEngine_events.cpp
 GameEngine_xmlparse.cpp
