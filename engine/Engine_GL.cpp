@@ -111,10 +111,6 @@ void Engine::setup_sdl()
 		}
 	}
 	
-	
-	//Hide system cursor for SDL, so we can use our own
-	//SDL_ShowCursor(0);
-	
 	OpenGLAPI::LoadSymbols();	//Load our OpenGL symbols to use
 	
 	const char *ver = (const char*)glGetString(GL_VERSION);

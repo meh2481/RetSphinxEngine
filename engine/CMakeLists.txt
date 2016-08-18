@@ -34,8 +34,6 @@ MemoryEditor.cpp
 MemoryEditor.h
 Mesh3D.cpp
 Mesh3D.h
-MouseCursor.cpp
-MouseCursor.h
 mtrand.cpp
 mtrand.h
 Node.cpp

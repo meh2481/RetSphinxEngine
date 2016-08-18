@@ -59,7 +59,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fGamma = 1.0f;
 	m_bPaused = false;
 	m_bPauseOnKeyboardFocus = true;
-	m_cursor = NULL;
 	m_bCursorShow = true;
 	m_bCursorOutOfWindow = false;
 #ifdef _DEBUG
@@ -267,7 +266,6 @@ void Engine::_render()
 	ImGui::Render();
 
 	glPopMatrix();
-	drawCursor();
 
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
@@ -283,14 +281,6 @@ void Engine::drawDebug()
 		m_physicsWorld->DrawDebugData();
 		glColor4f(1, 1, 1, 1);
 	}
-}
-
-void Engine::drawCursor()
-{
-	//Draw cursor over everything
-	glClear(GL_DEPTH_BUFFER_BIT);
-	if(m_cursor && m_bCursorShow && !m_bCursorOutOfWindow)
-		m_cursor->draw();
 }
 
 void Engine::fillScreen(Color col)
@@ -381,12 +371,6 @@ void Engine::_loadicon()	//Load icon into SDL window
 		SDL_SetWindowIcon(m_Window, surface);
 		SDL_FreeSurface(surface);
 	}
-}
-
-void Engine::setCursorPos(Vec2 pos)
-{
-	if(m_cursor)
-		m_cursor->pos = pos;
 }
 
 bool Engine::getCursorDown(int iButtonCode)

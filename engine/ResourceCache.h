@@ -4,7 +4,6 @@
 class Image;
 class Mesh3D;
 class Font;
-class MouseCursor;
 
 class ResourceCache
 {
@@ -16,12 +15,12 @@ class ResourceCache
 
 	std::map<uint64_t, Font*> fontIDMap;
 
-	std::map<uint64_t, MouseCursor*> cursorIDMap;
+	//std::map<uint64_t, MouseCursor*> cursorIDMap;
 
 	void clearImages();
 	void clearFonts();
 	void clearMeshes();
-	void clearCursors();
+	//void clearCursors();
 
 public:
 	~ResourceCache();
@@ -35,8 +34,8 @@ public:
 	Font* findFont(uint64_t id);
 	void addFont(uint64_t id, Font* font);
 
-	MouseCursor* findCursor(uint64_t id);
-	void addCursor(uint64_t id, MouseCursor* cur);
+	//MouseCursor* findCursor(uint64_t id);
+	//void addCursor(uint64_t id, MouseCursor* cur);
 
 	void clear();
 };

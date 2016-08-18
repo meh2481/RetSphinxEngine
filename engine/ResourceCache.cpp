@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "Mesh3D.h"
 #include "Font.h"
-#include "MouseCursor.h"
 using namespace std;
 
 ResourceCache::~ResourceCache()
@@ -25,10 +24,10 @@ void ResourceCache::addMesh(uint64_t id, Mesh3D* mesh)
 	meshIDMap[id] = mesh;
 }
 
-void ResourceCache::addCursor(uint64_t id, MouseCursor* cur)
-{
-	cursorIDMap[id] = cur;
-}
+//void ResourceCache::addCursor(uint64_t id, MouseCursor* cur)
+//{
+//	cursorIDMap[id] = cur;
+//}
 
 Image* ResourceCache::findImage(uint64_t id)
 {
@@ -54,20 +53,20 @@ Mesh3D* ResourceCache::findMesh(uint64_t id)
 	return i->second;
 }
 
-MouseCursor* ResourceCache::findCursor(uint64_t id)
-{
-	map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.find(id);
-	if(i == cursorIDMap.end())	//This cursor isn't here
-		return NULL;
-	return i->second;
-}
+//MouseCursor* ResourceCache::findCursor(uint64_t id)
+//{
+//	map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.find(id);
+//	if(i == cursorIDMap.end())	//This cursor isn't here
+//		return NULL;
+//	return i->second;
+//}
 
 void ResourceCache::clear()
 {
 	clearImages(); 
 	clearMeshes();
 	clearFonts();
-	clearCursors();
+//	clearCursors();
 }
 
 void ResourceCache::clearImages()
@@ -91,9 +90,9 @@ void ResourceCache::clearMeshes()
 	meshIDMap.clear();
 }
 
-void ResourceCache::clearCursors()
-{
-	for(map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.begin(); i != cursorIDMap.end(); i++)
-		delete (i->second);
-	cursorIDMap.clear();
-}
+//void ResourceCache::clearCursors()
+//{
+//	for(map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.begin(); i != cursorIDMap.end(); i++)
+//		delete (i->second);
+//	cursorIDMap.clear();
+//}

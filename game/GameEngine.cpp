@@ -220,15 +220,6 @@ void GameEngine::draw()
 	getEntityManager()->render(mat);
 	drawDebug();
 	
-	glLoadIdentity();
-	glTranslatef(-CameraPos.x, -CameraPos.y, m_fDefCameraZ);		//translate back to put cursor in the right position
-	Vec3 cam(CameraPos.x, CameraPos.y, m_fDefCameraZ);
-	setCursorPos(worldPosFromCursor(getCursorPos(), cam));
-	
-	glPushMatrix();
-	
-	glTranslatef(0, 0, m_fDefCameraZ);
-	
 }
 
 void GameEngine::init(list<commandlineArg> sArgs)

@@ -4,7 +4,6 @@
 #include "easylogging++.h"
 #include "tinyxml2.h"
 #include "Random.h"
-#include "MouseCursor.h"
 #include "Object.h"
 #include "ResourceCache.h"
 #include "PakLoader.h"
