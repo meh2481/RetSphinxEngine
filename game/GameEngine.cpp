@@ -37,14 +37,11 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 #endif
 	showCursor();
 	
-	m_joy = NULL;
+	m_controller = NULL;
 	m_rumble = NULL;
 	player = NULL;
 	
 	//Keybinding stuff!
-	JOY_AXIS_HORIZ = 0;
-	JOY_AXIS_VERT = 1;
-	JOY_AXIS_RT = 5;
 	JOY_AXIS_TRIP = 20000;
 	KEY_UP1 = SDL_SCANCODE_W;
 	KEY_UP2 = SDL_SCANCODE_UP;
@@ -56,38 +53,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	KEY_RIGHT2 = SDL_SCANCODE_RIGHT;
 	KEY_ENTER1 = SDL_SCANCODE_SPACE;
 	KEY_ENTER2 = SDL_SCANCODE_RETURN;
-	
-	//Apparently our Xbox drivers for different OS's can't agree on which buttons are which
-	//TODO This doesn't seem to apply to me now in Win10. Check what was going on there.
-/*#ifdef _WIN32
-	JOY_BUTTON_BACK = 5;
-	JOY_BUTTON_START = 4;
-	JOY_BUTTON_X = 12;
-	JOY_BUTTON_Y = 13;
-	JOY_BUTTON_A = 10;
-	JOY_BUTTON_B = 11;
-	JOY_BUTTON_LB = 8;
-	JOY_BUTTON_RB = 9;
-	JOY_BUTTON_LSTICK = 6;
-	JOY_BUTTON_RSTICK = 7;
-	JOY_AXIS2_HORIZ = 2;
-	JOY_AXIS2_VERT = 3;
-	JOY_AXIS_LT = 4;
-#else*/
-	JOY_BUTTON_BACK = 6;
-	JOY_BUTTON_START = 7;
-	JOY_BUTTON_X = 2;
-	JOY_BUTTON_Y = 3;
-	JOY_BUTTON_A = 0;
-	JOY_BUTTON_B = 1;
-	JOY_BUTTON_LB = 4;
-	JOY_BUTTON_RB = 5;
-	JOY_BUTTON_LSTICK = 9;
-	JOY_BUTTON_RSTICK = 10;
-	JOY_AXIS2_HORIZ = 3;
-	JOY_AXIS2_VERT = 4;
-	JOY_AXIS_LT = 2;
-//#endif
+
 	g_fParticleFac = 1.0f;
 
 	m_debugUI = new DebugUI(this);
@@ -236,6 +202,24 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	//Have to do this manually because non-constants?
 	//TODO: Fix/move from here
 	//TODO: Also update these on user key/joystick config
+	unsigned int JOY_BUTTON_BACK = SDL_CONTROLLER_BUTTON_BACK;
+	unsigned int JOY_BUTTON_START = SDL_CONTROLLER_BUTTON_START;
+	unsigned int JOY_BUTTON_X = SDL_CONTROLLER_BUTTON_X;
+	unsigned int JOY_BUTTON_Y = SDL_CONTROLLER_BUTTON_Y;
+	unsigned int JOY_BUTTON_A = SDL_CONTROLLER_BUTTON_A;
+	unsigned int JOY_BUTTON_B = SDL_CONTROLLER_BUTTON_B;
+	unsigned int JOY_BUTTON_LB = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+	unsigned int JOY_BUTTON_RB = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+	unsigned int JOY_BUTTON_LSTICK = SDL_CONTROLLER_BUTTON_LEFTSTICK;
+	unsigned int JOY_BUTTON_RSTICK = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
+	unsigned int JOY_AXIS_HORIZ = SDL_CONTROLLER_AXIS_LEFTX;
+	unsigned int JOY_AXIS_VERT = SDL_CONTROLLER_AXIS_LEFTY;
+	unsigned int JOY_AXIS2_HORIZ = SDL_CONTROLLER_AXIS_RIGHTX;
+	unsigned int JOY_AXIS2_VERT = SDL_CONTROLLER_AXIS_RIGHTY;
+	unsigned int JOY_AXIS_LT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+	unsigned int JOY_AXIS_RT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
+
+	//Set joystick config
 	luaSetGlobal(JOY_BUTTON_BACK);
 	luaSetGlobal(JOY_BUTTON_START);
 	luaSetGlobal(JOY_BUTTON_X);
@@ -253,6 +237,8 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(JOY_AXIS_LT);
 	luaSetGlobal(JOY_AXIS_RT);
 	luaSetGlobal(JOY_AXIS_TRIP);
+
+	//Set key config
 	luaSetGlobal(KEY_UP1);
 	luaSetGlobal(KEY_UP2);
 	luaSetGlobal(KEY_DOWN1);

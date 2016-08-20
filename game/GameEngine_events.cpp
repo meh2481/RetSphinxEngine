@@ -11,6 +11,8 @@
 #include "ResourceCache.h"
 using namespace std;
 
+#define GUID_STR_SZ	256
+
 typedef struct
 {
 	int w, h;
@@ -128,68 +130,90 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 			
 		//Gamepad stuff!
-		case SDL_JOYDEVICEADDED:
-			LOG(INFO) << "Joystick " << (int)event.jdevice.which << " connected.";
-			//TODO: Create new joystick, don't override old one
-			m_joy = SDL_JoystickOpen(event.jdevice.which);
+		case SDL_CONTROLLERDEVICEADDED:
+			//TODO: Create new controller, don't override old one
+			m_controller = SDL_GameControllerOpen(event.cdevice.which);
 
-			if (m_joy)
+			if (m_controller)
 			{
-				LOG(TRACE) << "Opened Joystick " << event.jdevice.which;
-				LOG(TRACE) << "Name: " << SDL_JoystickNameForIndex(event.jdevice.which);
-				LOG(TRACE) << "Number of Axes: " << SDL_JoystickNumAxes(m_joy);
-				LOG(TRACE) << "Number of Buttons: " << SDL_JoystickNumButtons(m_joy);
-				LOG(TRACE) << "Number of Balls: " << SDL_JoystickNumBalls(m_joy);
-				LOG(TRACE) << "Number of Hats: " << SDL_JoystickNumHats(m_joy);
+				SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
+				if(!joy)
+				{
+					LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
+					break;
+				}
+				char guid[GUID_STR_SZ];
+				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
+
+				LOG(INFO) << "Opened controller " << SDL_GameControllerName(m_controller);
+				LOG(INFO) << "Controller joystick has GUID " << guid;
 
 				//On Linux, "xboxdrv" is the driver I had the most success with when it came to rumble (default driver said it rumbled, but didn't)
 				m_rumble = NULL;
-				if (SDL_JoystickIsHaptic(m_joy))
-					m_rumble = SDL_HapticOpenFromJoystick(m_joy);
+				if (SDL_JoystickIsHaptic(joy))
+					m_rumble = SDL_HapticOpenFromJoystick(joy);
 				if (m_rumble)
 				{
 					if (SDL_HapticRumbleInit(m_rumble) != 0)
 					{
-						LOG(WARNING) << "Unable to initialize joystick " << (int)event.jdevice.which << " as rumble.";
+						LOG(WARNING) << "Unable to initialize controller " << (int)event.cdevice.which << " as rumble.";
 						SDL_HapticClose(m_rumble);
 						m_rumble = NULL;
 					}
 					else
 					{
-						LOG(INFO) << "Initialized joystick " << (int)event.jdevice.which << " as rumble.";
+						LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << " as rumble.";
+						LOG(INFO) << "Haptic query: " << SDL_HapticQuery(m_rumble);
 					}
 				}
 				else
-					LOG(INFO) << "Joystick " << (int)event.jdevice.which << " has no rumble support.";
+					LOG(INFO) << "Controller " << (int)event.cdevice.which << " has no rumble support.";
 			}
 			else
-				LOG(WARNING) << "Couldn't open Joystick " << (int)event.jdevice.which;
+				LOG(WARNING) << "Couldn't open controller " << (int)event.cdevice.which;
+			break;
+
+		case SDL_JOYDEVICEADDED:
+		{
+			SDL_Joystick* joy = SDL_JoystickOpen(event.jdevice.which);
+			if(joy)
+			{
+				char guid[GUID_STR_SZ];
+				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
+
+				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
+				LOG(INFO) << "Joystick has GUID " << guid;
+				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
+				LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
+				LOG(INFO) << "Joystick Number of Balls: " << SDL_JoystickNumBalls(joy);
+				LOG(INFO) << "Joystick Number of Hats: " << SDL_JoystickNumHats(joy);
+				SDL_JoystickClose(joy);
+			}
+			break;
+		}
+
+		case SDL_CONTROLLERDEVICEREMOVED:
+			LOG(INFO) << "Controller " << (int)event.cdevice.which << " disconnected.";
 			break;
 			
-		//TODO: Test if this is working now
-		case SDL_JOYDEVICEREMOVED:
-			LOG(INFO) << "Joystick " << (int)event.jdevice.which << " disconnected.";
-			break;
-			
-		case SDL_JOYBUTTONDOWN:
-			LOG(TRACE) << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button;
-			if(event.jbutton.button == JOY_BUTTON_BACK)
+		case SDL_CONTROLLERBUTTONDOWN:
+			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
+			if(event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)	//TODO Not hardcoded
 				quit();
-				
 			break;
 			
-		case SDL_JOYBUTTONUP:
-			LOG(TRACE) << "Joystick " << (int)event.jbutton.which << " released button " << (int)event.jbutton.button;
+		case SDL_CONTROLLERBUTTONUP:
+			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button;
 			break;
 			
-		case SDL_JOYAXISMOTION:
-			if(abs(event.jaxis.value) > JOY_AXIS_TRIP)
-				LOG(TRACE) << "Joystick " << (int)event.jaxis.which << " moved axis " << (int)event.jaxis.axis << " to " << event.jaxis.value;
+		case SDL_CONTROLLERAXISMOTION:
+			if(abs(event.caxis.value) > JOY_AXIS_TRIP)
+				LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value;
 			break;
 			
-		case SDL_JOYHATMOTION:
-			LOG(TRACE) << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value;
-			break;
+		//case SDL_JOYHATMOTION:
+		//	LOG(TRACE) << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value;
+		//	break;
 	}
 
 

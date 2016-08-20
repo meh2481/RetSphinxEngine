@@ -68,15 +68,15 @@ public:
 	
 	static bool joyDown(int button)
 	{
-		if(g_pGlobalEngine->m_joy)
-			return (SDL_JoystickGetButton(g_pGlobalEngine->m_joy, button) > 0);
+		if(g_pGlobalEngine->m_controller)
+			return (SDL_GameControllerGetButton(g_pGlobalEngine->m_controller, (SDL_GameControllerButton)button) > 0);
 		return false;
 	}
 	
 	static int joyAxis(int axis)
 	{
-		if(g_pGlobalEngine->m_joy)
-			return SDL_JoystickGetAxis(g_pGlobalEngine->m_joy, axis);
+		if(g_pGlobalEngine->m_controller)
+			return SDL_GameControllerGetAxis(g_pGlobalEngine->m_controller, (SDL_GameControllerAxis)axis);
 		return 0;
 	}
 	
@@ -610,6 +610,7 @@ static LuaFunctions s_functab[] =
 	{NULL, NULL}
 };
 
+//TODO: This is messed up; shouldn't be using SDL scancodes in Lua, shouldn't be defining joy axis min/max outside of where we define joy buttons
 static const struct {
 	const char *name;
 	int value;

@@ -10,12 +10,12 @@ Overall TODO list:
 - rip out displaylists for 3D objects - vertex buffers are better
 - class predeclaration - don't have to include headers
 - Ortho HUD
-- Research SDL gamecontroller stuff
 - Use allocator / choose one to use rather than mixing malloc & new
 - Decide if map loading is engine-specific or game-specific
 - Particle systems, objects, etc should be loaded by template, not from XML each time
 - .pak packager needs better organization - move all resource loading stuff to IO
 - Move object self-creation into resource loaders where applicable
+- Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
 
 
 Refactoring thoughts:

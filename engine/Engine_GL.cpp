@@ -3,6 +3,7 @@
 #include "easylogging++.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
+#define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
 
 static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
@@ -130,6 +131,14 @@ void Engine::setup_sdl()
 	else
 		puts("glDebugMessageCallback() not supported");
 #endif
+
+	LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;
+	if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
+		LOG(WARNING) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
+
+	//TODO: Load mouse haptic if available
+	LOG(INFO) << "Mouse haptic: " << SDL_MouseIsHaptic();
+
 }
 
 //Set up OpenGL

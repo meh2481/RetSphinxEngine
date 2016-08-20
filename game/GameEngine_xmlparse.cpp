@@ -89,22 +89,22 @@ bool GameEngine::loadConfig(string sFilename)
 	if(joystick != NULL)
 	{
 		joystick->QueryIntAttribute("axistripthreshold", &JOY_AXIS_TRIP);
-		joystick->QueryUnsignedAttribute("backbutton", &JOY_BUTTON_BACK);
-		joystick->QueryUnsignedAttribute("startbutton", &JOY_BUTTON_START);
-		joystick->QueryUnsignedAttribute("Y", &JOY_BUTTON_Y);
-		joystick->QueryUnsignedAttribute("X", &JOY_BUTTON_X);
-		joystick->QueryUnsignedAttribute("A", &JOY_BUTTON_A);
-		joystick->QueryUnsignedAttribute("B", &JOY_BUTTON_B);
-		joystick->QueryUnsignedAttribute("LB", &JOY_BUTTON_LB);
-		joystick->QueryUnsignedAttribute("RB", &JOY_BUTTON_RB);
-		joystick->QueryUnsignedAttribute("leftstick", &JOY_BUTTON_LSTICK);
-		joystick->QueryUnsignedAttribute("rightstick", &JOY_BUTTON_RSTICK);
-		joystick->QueryUnsignedAttribute("horizontalaxis1", &JOY_AXIS_HORIZ);
-		joystick->QueryUnsignedAttribute("verticalaxis1", &JOY_AXIS_VERT);
-		joystick->QueryUnsignedAttribute("horizontalaxis2", &JOY_AXIS2_HORIZ);
-		joystick->QueryUnsignedAttribute("verticalaxis2", &JOY_AXIS2_VERT);
-		joystick->QueryUnsignedAttribute("ltaxis", &JOY_AXIS_LT);
-		joystick->QueryUnsignedAttribute("rtaxis", &JOY_AXIS_RT);
+		//joystick->QueryUnsignedAttribute("backbutton", &JOY_BUTTON_BACK);
+		//joystick->QueryUnsignedAttribute("startbutton", &JOY_BUTTON_START);
+		//joystick->QueryUnsignedAttribute("Y", &JOY_BUTTON_Y);
+		//joystick->QueryUnsignedAttribute("X", &JOY_BUTTON_X);
+		//joystick->QueryUnsignedAttribute("A", &JOY_BUTTON_A);
+		//joystick->QueryUnsignedAttribute("B", &JOY_BUTTON_B);
+		//joystick->QueryUnsignedAttribute("LB", &JOY_BUTTON_LB);
+		//joystick->QueryUnsignedAttribute("RB", &JOY_BUTTON_RB);
+		//joystick->QueryUnsignedAttribute("leftstick", &JOY_BUTTON_LSTICK);
+		//joystick->QueryUnsignedAttribute("rightstick", &JOY_BUTTON_RSTICK);
+		//joystick->QueryUnsignedAttribute("horizontalaxis1", &JOY_AXIS_HORIZ);
+		//joystick->QueryUnsignedAttribute("verticalaxis1", &JOY_AXIS_VERT);
+		//joystick->QueryUnsignedAttribute("horizontalaxis2", &JOY_AXIS2_HORIZ);
+		//joystick->QueryUnsignedAttribute("verticalaxis2", &JOY_AXIS2_VERT);
+		//joystick->QueryUnsignedAttribute("ltaxis", &JOY_AXIS_LT);
+		//joystick->QueryUnsignedAttribute("rtaxis", &JOY_AXIS_RT);
 	}
 	
 	tinyxml2::XMLElement* keyboard = root->FirstChildElement("keyboard");
@@ -171,24 +171,25 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("pauseminimized", pausesOnFocusLost());
 	root->InsertEndChild(window);
 	
+	//TODO: Unbreak joystick config
 	tinyxml2::XMLElement* joystick = doc->NewElement("joystick");
 	joystick->SetAttribute("axistripthreshold", JOY_AXIS_TRIP);
-	joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);
-	joystick->SetAttribute("startbutton", JOY_BUTTON_START);
-	joystick->SetAttribute("Y", JOY_BUTTON_Y);
-	joystick->SetAttribute("X", JOY_BUTTON_X);
-	joystick->SetAttribute("A", JOY_BUTTON_A);
-	joystick->SetAttribute("B", JOY_BUTTON_B);
-	joystick->SetAttribute("LB", JOY_BUTTON_LB);
-	joystick->SetAttribute("RB", JOY_BUTTON_RB);
-	joystick->SetAttribute("leftstick", JOY_BUTTON_LSTICK);
-	joystick->SetAttribute("rightstick", JOY_BUTTON_RSTICK);
-	joystick->SetAttribute("horizontalaxis1", JOY_AXIS_HORIZ);
-	joystick->SetAttribute("verticalaxis1", JOY_AXIS_VERT);
-	joystick->SetAttribute("horizontalaxis2", JOY_AXIS2_HORIZ);
-	joystick->SetAttribute("verticalaxis2", JOY_AXIS2_VERT);
-	joystick->SetAttribute("ltaxis", JOY_AXIS_LT);
-	joystick->SetAttribute("rtaxis", JOY_AXIS_RT);
+	//joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);
+	//joystick->SetAttribute("startbutton", JOY_BUTTON_START);
+	//joystick->SetAttribute("Y", JOY_BUTTON_Y);
+	//joystick->SetAttribute("X", JOY_BUTTON_X);
+	//joystick->SetAttribute("A", JOY_BUTTON_A);
+	//joystick->SetAttribute("B", JOY_BUTTON_B);
+	//joystick->SetAttribute("LB", JOY_BUTTON_LB);
+	//joystick->SetAttribute("RB", JOY_BUTTON_RB);
+	//joystick->SetAttribute("leftstick", JOY_BUTTON_LSTICK);
+	//joystick->SetAttribute("rightstick", JOY_BUTTON_RSTICK);
+	//joystick->SetAttribute("horizontalaxis1", JOY_AXIS_HORIZ);
+	//joystick->SetAttribute("verticalaxis1", JOY_AXIS_VERT);
+	//joystick->SetAttribute("horizontalaxis2", JOY_AXIS2_HORIZ);
+	//joystick->SetAttribute("verticalaxis2", JOY_AXIS2_VERT);
+	//joystick->SetAttribute("ltaxis", JOY_AXIS_LT);
+	//joystick->SetAttribute("rtaxis", JOY_AXIS_RT);
 	root->InsertEndChild(joystick);
 	
 	tinyxml2::XMLElement* keyboard = doc->NewElement("keyboard");
