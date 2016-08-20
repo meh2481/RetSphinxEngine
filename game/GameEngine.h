@@ -95,6 +95,7 @@ public:
 	
 	//Other stuff in GameEngine.cpp
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
+	void rumbleLR(uint32_t duration, uint16_t large, uint16_t small);	//Rumble L/R
 	void warpObjectToNode(Object* o, Node* n);
 	
 	//GameEngine_color.cpp functions

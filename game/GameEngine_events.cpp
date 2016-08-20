@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 #include <ctime>
+#include <climits>
 #include <iomanip>
 #include "Image.h"
 #include "easylogging++.h"
@@ -10,6 +11,10 @@
 #include "ResourceLoader.h"
 #include "ResourceCache.h"
 using namespace std;
+
+extern int g_largeMotorStrength;
+extern int g_smallMotorStrength;
+extern int g_motorDuration;
 
 #define GUID_STR_SZ	256
 
@@ -148,23 +153,49 @@ void GameEngine::handleEvent(SDL_Event event)
 				LOG(INFO) << "Opened controller " << SDL_GameControllerName(m_controller);
 				LOG(INFO) << "Controller joystick has GUID " << guid;
 
-				//On Linux, "xboxdrv" is the driver I had the most success with when it came to rumble (default driver said it rumbled, but didn't)
 				m_rumble = NULL;
 				if (SDL_JoystickIsHaptic(joy))
 					m_rumble = SDL_HapticOpenFromJoystick(joy);
 				if (m_rumble)
 				{
-					if (SDL_HapticRumbleInit(m_rumble) != 0)
-					{
-						LOG(WARNING) << "Unable to initialize controller " << (int)event.cdevice.which << " as rumble.";
-						SDL_HapticClose(m_rumble);
-						m_rumble = NULL;
-					}
-					else
-					{
-						LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << " as rumble.";
-						LOG(INFO) << "Haptic query: " << SDL_HapticQuery(m_rumble);
-					}
+					LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << "\'s haptic.";
+					LOG(TRACE) << "Haptic effect storage size: " << SDL_HapticNumEffects(m_rumble);
+					LOG(TRACE) << "Haptic effect play channels: " << SDL_HapticNumEffectsPlaying(m_rumble);
+					LOG(TRACE) << "Haptic effect number of axes: " << SDL_HapticNumAxes(m_rumble);
+
+					unsigned int hapticQuery = SDL_HapticQuery(m_rumble);
+					LOG(TRACE) << "Haptic functions available: ";
+					//Haptic effects
+					LOG(TRACE) << "SDL_HAPTIC_CONSTANT: " << ((hapticQuery & SDL_HAPTIC_CONSTANT) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_SINE: " << ((hapticQuery & SDL_HAPTIC_SINE) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_LEFTRIGHT: " << ((hapticQuery & SDL_HAPTIC_LEFTRIGHT) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_TRIANGLE: " << ((hapticQuery & SDL_HAPTIC_TRIANGLE) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHUP: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHUP) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHDOWN: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHDOWN) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_RAMP: " << ((hapticQuery & SDL_HAPTIC_RAMP) != 0);
+					//Complicated stuff that requires super-specific hardware
+					LOG(TRACE) << "SDL_HAPTIC_SPRING: " << ((hapticQuery & SDL_HAPTIC_SPRING) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_DAMPER: " << ((hapticQuery & SDL_HAPTIC_DAMPER) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_INERTIA: " << ((hapticQuery & SDL_HAPTIC_INERTIA) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_FRICTION: " << ((hapticQuery & SDL_HAPTIC_FRICTION) != 0);
+					//Define your own effect shape
+					LOG(TRACE) << "SDL_HAPTIC_CUSTOM: " << ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0);
+					//Features
+					LOG(TRACE) << "SDL_HAPTIC_GAIN: " << ((hapticQuery & SDL_HAPTIC_GAIN) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_AUTOCENTER: " << ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_STATUS: " << ((hapticQuery & SDL_HAPTIC_STATUS) != 0);
+					LOG(TRACE) << "SDL_HAPTIC_PAUSE: " << ((hapticQuery & SDL_HAPTIC_PAUSE) != 0);
+
+					//if (SDL_HapticRumbleInit(m_rumble) != 0)
+					//{
+					//	LOG(WARNING) << "Unable to initialize controller " << (int)event.cdevice.which << " as rumble.";
+					//	SDL_HapticClose(m_rumble);
+					//	m_rumble = NULL;
+					//}
+					//else
+					//{
+					//	LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << " as rumble.";
+					//}
 				}
 				else
 					LOG(INFO) << "Controller " << (int)event.cdevice.which << " has no rumble support.";
@@ -198,8 +229,16 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
-			if(event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK)	//TODO Not hardcoded
-				quit();
+			switch(event.cbutton.button)
+			{
+				case SDL_CONTROLLER_BUTTON_BACK:	//TODO Not hardcoded
+					quit();
+					break;
+
+				case SDL_CONTROLLER_BUTTON_A:
+					rumbleLR(g_motorDuration, g_largeMotorStrength, g_smallMotorStrength);
+					break;
+			}
 			break;
 			
 		case SDL_CONTROLLERBUTTONUP:
@@ -314,17 +353,51 @@ void GameEngine::handleKeys()
 //TODO: Controller haptic shouldn't be game specific
 void GameEngine::rumbleController(float strength, float sec, int priority)
 {
-	static float fLastRumble = 0.0f;
-	static int prevPriority = 0;
-	
-	//Too low priority to rumble here; another higher-priority rumble is currently going on
-	if(getSeconds() < fLastRumble && priority < prevPriority)
+	//static float fLastRumble = 0.0f;
+	//static int prevPriority = 0;
+	//
+	////Too low priority to rumble here; another higher-priority rumble is currently going on
+	//if(getSeconds() < fLastRumble && priority < prevPriority)
+	//	return;
+	//
+	//fLastRumble = getSeconds() + sec;
+	//prevPriority = priority;
+	//strength = max(strength, 0.0f);
+	//strength = min(strength, 1.0f);
+	//if(m_rumble != NULL)
+	//	SDL_HapticRumblePlay(m_rumble, strength, (Uint32)(sec*1000));
+}
+static int curEffect = -1;
+void GameEngine::rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
+{
+	if(curEffect >= 0)
+	{
+		SDL_HapticDestroyEffect(m_rumble, curEffect);
+	}
+
+	SDL_HapticLeftRight lrHaptic;
+	lrHaptic.large_magnitude = large;
+	lrHaptic.small_magnitude = small;
+	lrHaptic.length = duration;
+
+	SDL_HapticEffect effect;
+	effect.type = SDL_HAPTIC_LEFTRIGHT;
+	effect.leftright = lrHaptic;
+
+	curEffect = SDL_HapticNewEffect(m_rumble, &effect);
+	if(curEffect < 0)
+	{
+		LOG(WARNING) << "Unable to create LR effect: " << SDL_GetError();
+
+		//Fall back on standard rumble
+		float strength = large + small;
+		strength /= (float)USHRT_MAX * 2.0f;
+		rumbleController(strength, (float)duration/1000.0);
 		return;
-	
-	fLastRumble = getSeconds() + sec;
-	prevPriority = priority;
-	strength = max(strength, 0.0f);
-	strength = min(strength, 1.0f);
-	if(m_rumble != NULL)
-		SDL_HapticRumblePlay(m_rumble, strength, (Uint32)(sec*1000));
+	}
+
+	if(SDL_HapticRunEffect(m_rumble, curEffect, 1) < 0)
+	{
+		LOG(WARNING) << "Unable to run LR effect: " << SDL_GetError();
+	}
 }

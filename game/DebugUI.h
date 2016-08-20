@@ -21,4 +21,5 @@ private:
 	GameEngine *_ge;
 
 	bool showTestWindow;
+	bool rumbleMenu;
 };

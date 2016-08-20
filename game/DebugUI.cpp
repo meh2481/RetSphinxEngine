@@ -1,9 +1,10 @@
 #include "DebugUI.h"
 #include "imgui/imgui.h"
 #include "GameEngine.h"
+#include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
-: visible(false), hadFocus(false), _ge(ge), showTestWindow(false)
+: visible(false), hadFocus(false), _ge(ge), showTestWindow(false), rumbleMenu(false)
 {
 }
 
@@ -19,7 +20,9 @@ void DebugUI::draw()
 	hadFocus = ImGui::IsMouseHoveringAnyWindow();
 	ImGui::PopStyleColor(2);
 }
-
+int g_largeMotorStrength = USHRT_MAX;
+int g_smallMotorStrength = USHRT_MAX;
+int g_motorDuration = 1000;
 void DebugUI::_draw()
 {
 	if(!visible)
@@ -35,6 +38,8 @@ void DebugUI::_draw()
 #endif
 			ImGui::MenuItem("Memory debugger", NULL, &memEdit.Open);
 
+			ImGui::MenuItem("Gamepad rumble", NULL, &rumbleMenu);
+
 			ImGui::EndMenu();
 		}
 
@@ -48,6 +53,17 @@ void DebugUI::_draw()
 	if(showTestWindow)
 		ImGui::ShowTestWindow(&showTestWindow);
 #endif
+
+	if(rumbleMenu)
+	{
+		if(ImGui::Begin("Gamepad Rumble Test", &rumbleMenu))
+		{
+			ImGui::SliderInt("large motor", &g_largeMotorStrength, 0, USHRT_MAX);
+			ImGui::SliderInt("small motor", &g_smallMotorStrength, 0, USHRT_MAX);
+			ImGui::SliderInt("duration (msec)", &g_motorDuration, 0, 5000);
+		}
+		ImGui::End();
+	}
 }
 
 bool DebugUI::hasFocus()
