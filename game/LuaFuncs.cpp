@@ -141,6 +141,11 @@ public:
 	{
 		g_pGlobalEngine->setCursor(g_pGlobalEngine->getResourceLoader()->getCursor(s));
 	}
+
+	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
+	{
+		g_pGlobalEngine->rumbleLR(duration, large, small);
+	}
 };
 
 
@@ -167,6 +172,18 @@ luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --fo
 	float sec = (float)lua_tonumber(L, 2);
 	int priority = (int)lua_tointeger(L, 3);
 	GameEngineLua::rumble(force, sec, priority);
+	luaReturnNil();
+}
+
+luaFunc(controller_lub)
+{
+	GameEngineLua::rumbleLR(95, USHRT_MAX, 0);
+	luaReturnNil();
+}
+
+luaFunc(controller_dub)
+{
+	GameEngineLua::rumbleLR(32, 0, USHRT_MAX);
 	luaReturnNil();
 }
 
@@ -571,6 +588,8 @@ luaFunc(mouse_setCursor)	//void mouse_setCursor(string cursorFile)
 static LuaFunctions s_functab[] =
 {
 	luaRegister(controller_rumble),
+	luaRegister(controller_lub),
+	luaRegister(controller_dub),
 	luaRegister(getFramerate),
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getVelocity),
