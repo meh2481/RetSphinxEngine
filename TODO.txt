@@ -16,6 +16,8 @@ Overall TODO list:
 - .pak packager needs better organization - move all resource loading stuff to IO
 - Move object self-creation into resource loaders where applicable
 - Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
+- Error checking of parameters in luafuncs.cpp
+
 
 
 Refactoring thoughts:
