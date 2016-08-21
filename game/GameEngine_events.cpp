@@ -164,22 +164,24 @@ void GameEngine::handleEvent(SDL_Event event)
 					LOG(TRACE) << "Haptic effect number of axes: " << SDL_HapticNumAxes(m_rumble);
 
 					unsigned int hapticQuery = SDL_HapticQuery(m_rumble);
-					LOG(TRACE) << "Haptic functions available: ";
 					//Haptic effects
+					LOG(TRACE) << "Haptic functions available: ";
+					//Multi-motor
+					LOG(TRACE) << "SDL_HAPTIC_LEFTRIGHT: " << ((hapticQuery & SDL_HAPTIC_LEFTRIGHT) != 0);
+					//Rumble wave types
 					LOG(TRACE) << "SDL_HAPTIC_CONSTANT: " << ((hapticQuery & SDL_HAPTIC_CONSTANT) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_SINE: " << ((hapticQuery & SDL_HAPTIC_SINE) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_LEFTRIGHT: " << ((hapticQuery & SDL_HAPTIC_LEFTRIGHT) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_TRIANGLE: " << ((hapticQuery & SDL_HAPTIC_TRIANGLE) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHUP: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHUP) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHDOWN: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHDOWN) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_RAMP: " << ((hapticQuery & SDL_HAPTIC_RAMP) != 0);
+					//Define your own wave shape
+					LOG(TRACE) << "SDL_HAPTIC_CUSTOM: " << ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0);
 					//Complicated stuff that requires super-specific hardware
 					LOG(TRACE) << "SDL_HAPTIC_SPRING: " << ((hapticQuery & SDL_HAPTIC_SPRING) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_DAMPER: " << ((hapticQuery & SDL_HAPTIC_DAMPER) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_INERTIA: " << ((hapticQuery & SDL_HAPTIC_INERTIA) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_FRICTION: " << ((hapticQuery & SDL_HAPTIC_FRICTION) != 0);
-					//Define your own effect shape
-					LOG(TRACE) << "SDL_HAPTIC_CUSTOM: " << ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0);
 					//Features
 					LOG(TRACE) << "SDL_HAPTIC_GAIN: " << ((hapticQuery & SDL_HAPTIC_GAIN) != 0);
 					LOG(TRACE) << "SDL_HAPTIC_AUTOCENTER: " << ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0);
