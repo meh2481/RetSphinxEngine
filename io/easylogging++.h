@@ -15,6 +15,8 @@
 //
 #pragma once
 
+//MEH My defines for intelligent usage (like, what kind of idiot would make a logger assert?)
+#define ELPP_THREAD_SAFE
 #define ELPP_NO_DEFAULT_LOG_FILE
 #define ELPP_DISABLE_ASSERT
 #define ELPP_DISABLE_DEFAULT_CRASH_HANDLING

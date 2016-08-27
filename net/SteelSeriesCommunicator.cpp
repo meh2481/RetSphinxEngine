@@ -1,14 +1,36 @@
 #include "SteelSeriesCommunicator.h"
-#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 #include "easylogging++.h"
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 using namespace std;
 
 #define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"
+#define START_HREF_HTTP "http://"
+
+//JSON keys
 #define JSON_KEY_ADDRESS "address"
 #define JSON_KEY_ENCRYPTED_ADDRESS "encrypted_address"	//Use mebbe at some point? Prolly not
-#define START_HREF_HTTP "http://"
+#define JSON_KEY_GAME "game"
+#define JSON_KEY_GAME_DISPLAY_NAME "game_display_name"
+#define JSON_KEY_ICON_COLOR_ID "icon_color_id"
+#define JSON_KEY_TIMEOUT "deinitialize_timer_length_ms"
+
+#define MAX_TIMEOUT_LEN 60000
+const float HEARTBEAT_FREQUENCY = (((float)MAX_TIMEOUT_LEN) / (1000.0) - 0.2);
+#define ICON_COLOR_BLUE 5
+
+SteelSeriesCommunicator::SteelSeriesCommunicator()
+{
+	url = appId = "";
+	heartbeatTimer = 0;
+	valid = false;
+}
+
+SteelSeriesCommunicator::~SteelSeriesCommunicator()
+{
+}
 
 #ifdef _WIN32
 #include <windows.h>
@@ -77,16 +99,6 @@ string SteelSeriesCommunicator::getSSURL()
 #error TODO Support other OSs for SteelSeries stuff...
 #endif	//_WIN32
 
-SteelSeriesCommunicator::SteelSeriesCommunicator()
-{
-	url = "";
-	valid = false;
-}
-
-SteelSeriesCommunicator::~SteelSeriesCommunicator()
-{
-}
-
 bool SteelSeriesCommunicator::init(std::string appName)
 {
 	url = getSSURL();
@@ -95,6 +107,11 @@ bool SteelSeriesCommunicator::init(std::string appName)
 		valid = false;
 		return false;
 	}
+
+	if(!registerApp(normalize(appName), appName)) 
+		return false;
+
+	valid = true;
 	return true;
 }
 
@@ -102,5 +119,60 @@ void SteelSeriesCommunicator::update(float dt)
 {
 	if(!valid) return;
 
+	heartbeatTimer += dt;
+	if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
+	{
+		heartbeatTimer = 0;	//Reset
+
+		//Send a new heartbeat message
+		rapidjson::Document doc;
+		doc.SetObject();
+		doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
+		string heartbeatJSON = stringify(doc);
+
+		LOG(TRACE) << "Sending heartbeat" << endl << heartbeatJSON;
+
+		//TODO Actually send
+	}
 
 }
+
+bool SteelSeriesCommunicator::registerApp(std::string ID, std::string displayName)
+{
+	appId = ID;
+
+	rapidjson::Document doc;
+	doc.SetObject();
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(ID.c_str()), doc.GetAllocator());
+	doc.AddMember(JSON_KEY_GAME_DISPLAY_NAME, rapidjson::StringRef(displayName.c_str()), doc.GetAllocator());
+	doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
+	doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
+
+	LOG(INFO) << "Game init json: " << endl << stringify(doc);
+	//TODO Actually send
+
+
+	//LOG(INFO) << "Registered: " << displayName << ", " << ID;
+	return true;
+}
+
+string SteelSeriesCommunicator::normalize(std::string input)
+{
+	transform(input.begin(), input.end(), input.begin(), ::toupper);
+	input.erase(remove_if(input.begin(), input.end(), [](char c) { return !isalpha(c); }), input.end());
+	return input;
+}
+
+string SteelSeriesCommunicator::stringify(const rapidjson::Document& doc)
+{
+	rapidjson::StringBuffer sb;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+	doc.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
+	return sb.GetString();
+}
+
+void SteelSeriesCommunicator::heartbeat()
+{
+}
+
+
