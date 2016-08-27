@@ -48,6 +48,6 @@ template <class T>
 void ThreadsafeQueue<T>::push(const T& x)
 {
 	assert(!SDL_LockMutex(mutex));
-	q.push(s);
+	q.push(x);
 	assert(!SDL_UnlockMutex(mutex));
 }

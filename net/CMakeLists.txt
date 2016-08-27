@@ -1,6 +1,8 @@
 set(net_src
 minihttp.cpp
 minihttp.h
+NetworkThread.cpp
+NetworkThread.h
 SteelSeriesCommunicator.h
 SteelSeriesCommunicator.cpp
 ThreadsafeQueue.h

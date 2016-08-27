@@ -15,6 +15,7 @@
 #include "Stringbank.h"
 #include "SystemUtils.h"
 #include "SteelSeriesCommunicator.h"
+#include "NetworkThread.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -64,6 +65,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 
 GameEngine::~GameEngine()
 {
+	NetworkThread::stop();
 	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
 	getEntityManager()->cleanup();
@@ -265,11 +267,16 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		getStringbank()->setLanguage(sLocale.c_str());
 	}
 
+	//Start network thread
+	if(!NetworkThread::start())
+		LOG(ERROR) << "Unable to start networking thread";
+
 	//Open communication to SteelSeries drivers
 	if(steelSeriesCommunicator->init(getAppName()))
 		LOG(INFO) << "Initialized with SteelSeries drivers";
 	else
 		LOG(WARNING) << "Unable to communcate with SteelSeries drivers";
+
 }
 
 void GameEngine::pause()
