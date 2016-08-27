@@ -1,13 +1,18 @@
 #include "SteelSeriesCommunicator.h"
 #include "rapidjson/prettywriter.h"
 #include "easylogging++.h"
+#include "NetworkThread.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>
 using namespace std;
 
-#define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"
+#define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"	//Location SteelSeries ini file is
 #define START_HREF_HTTP "http://"
+
+//URLs for POSTing to SteelSeries methods
+#define URL_REGISTER_APP "/game_metadata"
+#define URL_HEARTBEAT "/game_heartbeat"
 
 //JSON keys
 #define JSON_KEY_ADDRESS "address"
@@ -18,7 +23,7 @@ using namespace std;
 #define JSON_KEY_TIMEOUT "deinitialize_timer_length_ms"
 
 #define MAX_TIMEOUT_LEN 60000
-const float HEARTBEAT_FREQUENCY = (((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
+const float HEARTBEAT_FREQUENCY = 2.0;//(((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
 #define ICON_COLOR_BLUE 5
 
 SteelSeriesCommunicator::SteelSeriesCommunicator()
@@ -125,16 +130,8 @@ void SteelSeriesCommunicator::update(float dt)
 		heartbeatTimer = 0;	//Reset
 
 		//Send a new heartbeat message
-		rapidjson::Document doc;
-		doc.SetObject();
-		doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
-		string heartbeatJSON = stringify(doc);
-
-		LOG(TRACE) << "Sending heartbeat" << endl << heartbeatJSON;
-
-		//TODO Actually send
+		heartbeat();
 	}
-
 }
 
 bool SteelSeriesCommunicator::registerApp(std::string ID, std::string displayName)
@@ -148,11 +145,17 @@ bool SteelSeriesCommunicator::registerApp(std::string ID, std::string displayNam
 	doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
 	doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
 
-	LOG(INFO) << "Game init json: " << endl << stringify(doc);
-	//TODO Actually send
+	std::string stringifiedJSON = stringify(doc);
 
+	LOG(INFO) << "Game init json: " << endl << stringifiedJSON;
 
-	//LOG(INFO) << "Registered: " << displayName << ", " << ID;
+	NetworkThread::NetworkMessage msg;
+	msg.data = stringifiedJSON;
+	ostringstream ssURL;
+	ssURL << url << URL_REGISTER_APP;
+	msg.url = ssURL.str();
+	NetworkThread::send(msg);
+
 	return true;
 }
 
@@ -173,6 +176,19 @@ string SteelSeriesCommunicator::stringify(const rapidjson::Document& doc)
 
 void SteelSeriesCommunicator::heartbeat()
 {
+	rapidjson::Document doc;
+	doc.SetObject();
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
+	string heartbeatJSON = stringify(doc);
+
+	LOG(TRACE) << "Sending heartbeat" << endl << heartbeatJSON;
+
+	NetworkThread::NetworkMessage msg;
+	msg.data = heartbeatJSON;
+	ostringstream ssURL;
+	ssURL << url << URL_HEARTBEAT;
+	msg.url = ssURL.str();
+	NetworkThread::send(msg);
 }
 
 

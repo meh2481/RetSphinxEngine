@@ -12,4 +12,11 @@ main.cpp
 )
 
 add_executable(game ${game_src})
-target_link_libraries(game engine net)
+
+set(EXTRA_LIBS "")
+
+if(WIN32)
+    set(EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
+endif()
+
+target_link_libraries(game engine net ${EXTRA_LIBS})

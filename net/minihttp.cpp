@@ -289,7 +289,8 @@ bool SplitURI(const std::string& uri, std::string& protocol, std::string& host, 
     size_t colon = host.find(':');
     if(colon != std::string::npos)
     {
-        port = atoi(host.c_str() + colon);
+		const char* pos = host.c_str() + colon + 1;
+        port = atoi(pos);
         host.erase(colon);
     }
     useSSL = ssl;
@@ -790,12 +791,21 @@ static void strToLower(std::string& s)
 
 POST& POST::add(const char *key, const char *value)
 {
+	if(json)
+		data.clear();
     if(!empty())
         data += '&';
     URLEncode(key, data);
     data += '=';
     URLEncode(value, data);
     return *this;
+}
+
+POST & POST::setJsonData(const char * value)
+{
+	data = value;
+	json = true;
+	return *this;
 }
 
 
@@ -926,7 +936,10 @@ bool HttpSocket::SendRequest(Request& req, bool enqueue)
     if(post)
     {
         r << "Content-Length: " << req.post.length() << crlf;
-        r << "Content-Type: application/x-www-form-urlencoded" << crlf;
+		if(req.post.isJson())
+			r << "Content-Type: application/json" << crlf;
+		else
+			r << "Content-Type: application/x-www-form-urlencoded" << crlf;
     }
 
     if(req.extraGetHeaders.length())
@@ -938,7 +951,7 @@ bool HttpSocket::SendRequest(Request& req, bool enqueue)
 
     r << crlf; // header terminator
 
-    // FIXME: appending this to the 'header' field is probably not a good idea
+	//Add data to POST
     if(post)
         r << req.post.str();
 

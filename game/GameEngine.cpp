@@ -65,12 +65,12 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 
 GameEngine::~GameEngine()
 {
-	NetworkThread::stop();
 	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
 	getEntityManager()->cleanup();
 	delete m_debugUI;
 	delete steelSeriesCommunicator;
+	NetworkThread::stop();
 }
 
 void GameEngine::frame(float dt)
