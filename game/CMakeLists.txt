@@ -12,4 +12,4 @@ main.cpp
 )
 
 add_executable(game ${game_src})
-target_link_libraries(game engine)
+target_link_libraries(game engine net)

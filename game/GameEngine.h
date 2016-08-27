@@ -15,6 +15,7 @@
 #include "tinyxml2.h"
 
 class DebugUI;
+class SteelSeriesCommunicator;
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -65,6 +66,7 @@ private:
 	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
 	std::string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 	std::string m_sLastScene;
+	SteelSeriesCommunicator* steelSeriesCommunicator;
 
 	DebugUI *m_debugUI;
 

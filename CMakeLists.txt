@@ -32,9 +32,10 @@ include_directories("${SDL2_INCLUDE_DIR}")
 include_directories(dep/lua)
 include_directories(dep/imgui)
 
+add_subdirectory(net)
 add_subdirectory(engine)
 
-
+include_directories(net)
 include_directories(engine)
 include_directories(engine/events)
 include_directories(engine/managers)

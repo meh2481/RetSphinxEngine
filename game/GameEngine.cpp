@@ -14,6 +14,7 @@
 #include "EntityManager.h"
 #include "Stringbank.h"
 #include "SystemUtils.h"
+#include "SteelSeriesCommunicator.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -57,6 +58,8 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	g_fParticleFac = 1.0f;
 
 	m_debugUI = new DebugUI(this);
+
+	steelSeriesCommunicator = new SteelSeriesCommunicator();
 }
 
 GameEngine::~GameEngine()
@@ -64,6 +67,8 @@ GameEngine::~GameEngine()
 	LOG(INFO) << "~GameEngine()";
 	saveConfig(getSaveLocation() + "config.xml");
 	getEntityManager()->cleanup();
+	delete m_debugUI;
+	delete steelSeriesCommunicator;
 }
 
 void GameEngine::frame(float dt)
@@ -72,6 +77,7 @@ void GameEngine::frame(float dt)
 
 	stepPhysics(dt);
 	getEntityManager()->update(dt);
+	steelSeriesCommunicator->update(dt);
 	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
@@ -258,6 +264,12 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		LOG(INFO) << "Current system locale: " << sLocale;
 		getStringbank()->setLanguage(sLocale.c_str());
 	}
+
+	//Open communication to SteelSeries drivers
+	if(steelSeriesCommunicator->init(getAppName()))
+		LOG(INFO) << "Initialized with SteelSeries drivers";
+	else
+		LOG(WARNING) << "Unable to communcate with SteelSeries drivers";
 }
 
 void GameEngine::pause()

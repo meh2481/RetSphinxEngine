@@ -117,6 +117,7 @@ public:
 	Rect getCameraView(Vec3 Camera);		//Return the rectangle, in world position z=0, that the camera can see
 	Vec2 worldPosFromCursor(Vec2 cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
 	Vec2 worldMovement(Vec2 cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
+	std::string getAppName() { return m_sAppName; };		//Get the application name this engine was created with
 
 	//Drawing functions
 	Rect getScreenRect() { Rect rc(0, 0, getWidth(), getHeight()); return rc; };
