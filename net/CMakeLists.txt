@@ -3,6 +3,7 @@ minihttp.cpp
 minihttp.h
 SteelSeriesCommunicator.h
 SteelSeriesCommunicator.cpp
+ThreadsafeQueue.h
 )
 
 include_directories (.)
