@@ -1,12 +1,13 @@
-#include "NetworkThread.h"
-#include "ThreadsafeQueue.h"
-#include "SDL_thread.h"
-#include "SDL_timer.h"
-#include "easylogging++.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <cassert>
+#include "NetworkThread.h"
+#include "ThreadsafeQueue.h"
+#include "MutexLock.h"
+#include "SDL_thread.h"
+#include "SDL_timer.h"
+#include "easylogging++.h"
 #include "minihttp.h"
 
 // Overloaded socket class that handles incoming data.
@@ -77,10 +78,11 @@ namespace NetworkThread
 		while(!shouldStop)
 		{
 			//See if we should stop first
-			assert(!SDL_LockMutex(stopMutex));
-			if(stopFlag)
-				shouldStop = true;
-			assert(!SDL_UnlockMutex(stopMutex));
+			{
+				MutexLock lock(stopMutex);
+				if(stopFlag)
+					shouldStop = true;
+			}
 
 			//Poll for network messages
 			NetworkMessage msg;
@@ -107,9 +109,10 @@ namespace NetworkThread
 	bool stop()
 	{
 		//Stop mutex
-		assert(!SDL_LockMutex(stopMutex));
-		stopFlag = true;
-		assert(!SDL_UnlockMutex(stopMutex));
+		{
+			MutexLock lock(stopMutex);
+			stopFlag = true;
+		}
 		
 		//Wait for thread to finish
 		int threadReturnValue;

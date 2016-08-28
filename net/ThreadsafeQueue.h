@@ -1,6 +1,7 @@
 #pragma once
 #include <queue>
 #include <cassert>
+#include "MutexLock.h"
 #include "SDL_mutex.h"
 
 template <class T>
@@ -35,22 +36,17 @@ ThreadsafeQueue<T>::~ThreadsafeQueue()
 template <class T>
 bool ThreadsafeQueue<T>::pop(T& s)
 {
-	assert(!SDL_LockMutex(mutex));
+	MutexLock lock(mutex);
 	if(q.empty())
-	{
-		assert(!SDL_UnlockMutex(mutex));
 		return false;
-	}
 	s = q.front();
 	q.pop();
-	assert(!SDL_UnlockMutex(mutex));
 	return true;
 }
 
 template <class T>
 void ThreadsafeQueue<T>::push(const T& x)
 {
-	assert(!SDL_LockMutex(mutex));
+	MutexLock lock(mutex);
 	q.push(x);
-	assert(!SDL_UnlockMutex(mutex));
 }
