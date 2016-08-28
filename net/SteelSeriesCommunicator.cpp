@@ -5,9 +5,17 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+
+#ifdef _WIN32
+	#include <windows.h>
+	#include <shlobj.h>		//for knownFolder
+	#include <winerror.h>	//for HRESULT
+	#include <atlstr.h>		//for CW2A
+#endif //_WIN32
+
 using namespace std;
 
-#define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"	//Location SteelSeries ini file is
+#define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"	//Location SteelSeries ini file is relative to %PROGRAMDATA%
 #define START_HREF_HTTP "http://"
 
 //URLs for POSTing to SteelSeries methods
@@ -37,15 +45,10 @@ SteelSeriesCommunicator::~SteelSeriesCommunicator()
 {
 }
 
-#ifdef _WIN32
-#include <windows.h>
-#include <shlobj.h>//for knownFolder
-#include <winerror.h> //for HRESULT
-#include <atlstr.h>	//for CW2A
-
-//Defined by SteelSeries API to be %PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json
 string SteelSeriesCommunicator::getSSURL()
 {
+#ifdef _WIN32
+	//Path on Windows is defined by SteelSeries API to be %PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json
 	LPWSTR wszPath = NULL;
 	HRESULT hr;
 
@@ -98,11 +101,12 @@ string SteelSeriesCommunicator::getSSURL()
 		LOG(ERROR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
 	}
 	return string();
-}
-
 #else
-#error TODO Support other OSs for SteelSeries stuff...
+	#error TODO Support other OSs for SteelSeries stuff...
+	//On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
+	//SS has no Linux support yet
 #endif	//_WIN32
+}
 
 bool SteelSeriesCommunicator::init(std::string appName)
 {

@@ -17,33 +17,16 @@ public:
 	virtual ~HttpDumpSocket() {}
 
 protected:
-	virtual void _OnClose()
-	{
-		puts("_OnClose()");
-		minihttp::HttpSocket::_OnClose();
-	}
-	virtual void _OnOpen()
-	{
-		puts("_OnOpen()");
-		char buf[1024] = { 0 };
-		minihttp::SSLResult sr = verifySSL(buf, sizeof(buf));
-		printf("SSL status flags (0 is good): 0x%x. Info: %s\n", sr, buf);
-		minihttp::HttpSocket::_OnOpen();
-	}
-
-	virtual void _OnRequestDone()
-	{
-		printf("_OnRequestDone(): %s\n", GetCurrentRequest().resource.c_str());
-		// Do *NOT* call close() in here!
-	}
-
 	virtual void _OnRecv(void *buf, unsigned int size)
 	{
-		if(!size)
-			return;
-		printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
-		fwrite(buf, 1, size, stdout);
-		puts("\n===END====================");
+#ifdef _DEBUG
+		if(size)
+		{
+			printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
+			fwrite(buf, 1, size, stdout);
+			puts("\n===END====================");
+		}
+#endif
 	}
 };
 
@@ -68,13 +51,13 @@ namespace NetworkThread
 		ht->SetAlwaysHandle(true);
 		ht->SetUserAgent("minihttp");
 
-		//Test thing I guess?
+		//Init a POST message with our JSON data
 		minihttp::POST post;
 		post.setJsonData(msg.data.c_str());
 		ht->Download(msg.url, NULL, NULL, &post);
 
 		minihttp::SocketSet ss;
-		ss.add(ht, true);
+		ss.add(ht, true);		//Set ss to delete ht when done (so no memory leak here)
 
 		uint32_t startTicks = SDL_GetTicks();
 		while(ss.size() && SDL_GetTicks() < startTicks + 1000)	//Just spin here (for a maximum of 1 second)
@@ -97,10 +80,9 @@ namespace NetworkThread
 			assert(!SDL_LockMutex(stopMutex));
 			if(stopFlag)
 				shouldStop = true;
-
 			assert(!SDL_UnlockMutex(stopMutex));
 
-			//Poll for network changes
+			//Poll for network messages
 			NetworkMessage msg;
 			if(outgoing.pop(msg))
 				sendPost(msg);
