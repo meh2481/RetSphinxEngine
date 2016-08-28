@@ -20,7 +20,6 @@ class SteelSeriesCommunicator
 	//TESTING
 	int lub;
 	void bindTestEvent();								//Create lub-dub effect
-	void sendTestEvent();								//Send lub-dub update
 
 public:
 	SteelSeriesCommunicator();
@@ -29,4 +28,6 @@ public:
 	bool init(std::string appName);
 
 	void update(float dt);
+
+	void sendTestEvent();								//Send lub-dub update
 };

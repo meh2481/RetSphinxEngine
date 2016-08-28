@@ -149,7 +149,7 @@ bool SteelSeriesCommunicator::init(std::string appName)
 
 	//TEST
 	bindTestEvent();
-	sendTestEvent();
+	//sendTestEvent();
 
 
 	return true;
@@ -238,10 +238,10 @@ void SteelSeriesCommunicator::bindTestEvent()
 	handler.AddMember(JSON_KEY_ZONE, ZONE_ONE, allocator);
 	handler.AddMember(JSON_KEY_MODE, MODE_VIBRATE, allocator);
 	
-	rapidjson::Value rate(rapidjson::kObjectType);
-	rate.AddMember(JSON_KEY_FREQUENCY, 0.65, allocator);
-	rate.AddMember(JSON_KEY_REPEAT_LIMIT, 10, allocator);
-	handler.AddMember(JSON_KEY_RATE, rate, allocator);
+	//rapidjson::Value rate(rapidjson::kObjectType);
+	//rate.AddMember(JSON_KEY_FREQUENCY, 0.65, allocator);
+	//rate.AddMember(JSON_KEY_REPEAT_LIMIT, 10, allocator);
+	//handler.AddMember(JSON_KEY_RATE, rate, allocator);
 
 	rapidjson::Value patterns(rapidjson::kArrayType);
 	rapidjson::Value patternLub(rapidjson::kObjectType);
