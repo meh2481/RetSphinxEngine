@@ -17,7 +17,7 @@ Overall TODO list:
 - Move object self-creation into resource loaders where applicable
 - Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
 - Error checking of parameters in luafuncs.cpp
-
+- "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 
 
 Refactoring thoughts:
