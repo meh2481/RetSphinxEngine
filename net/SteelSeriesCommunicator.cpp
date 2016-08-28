@@ -179,18 +179,7 @@ bool SteelSeriesCommunicator::registerApp(std::string ID, std::string displayNam
 	doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
 	doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
 
-	std::string stringifiedJSON = stringify(doc);
-
-	LOG(INFO) << "Game init json: " << endl << stringifiedJSON;
-
-	NetworkThread::NetworkMessage msg;
-	msg.data = stringifiedJSON;
-	ostringstream ssURL;
-	ssURL << url << URL_REGISTER_APP;
-	msg.url = ssURL.str();
-	NetworkThread::send(msg);
-
-	return true;
+	return sendJSON(doc, URL_REGISTER_APP);
 }
 
 string SteelSeriesCommunicator::normalize(std::string input)
@@ -198,6 +187,22 @@ string SteelSeriesCommunicator::normalize(std::string input)
 	transform(input.begin(), input.end(), input.begin(), ::toupper);
 	input.erase(remove_if(input.begin(), input.end(), [](char c) { return (!isalnum(c) && c != '_'); }), input.end());
 	return input;
+}
+
+bool SteelSeriesCommunicator::sendJSON(const rapidjson::Document & doc, const char * endpoint)
+{
+	std::string stringifiedJSON = stringify(doc);
+
+	//Send message to SS
+	NetworkThread::NetworkMessage msg;
+	msg.data = stringifiedJSON;
+	ostringstream ssURL;
+	ssURL << url << endpoint;
+	msg.url = ssURL.str();
+
+	LOG(INFO) << "Sending json to " << ssURL.str() << " : " << endl << stringifiedJSON;
+
+	return NetworkThread::send(msg);
 }
 
 string SteelSeriesCommunicator::stringify(const rapidjson::Document& doc)
@@ -214,14 +219,7 @@ void SteelSeriesCommunicator::heartbeat()
 	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
 	string heartbeatJSON = stringify(doc);
 
-	LOG(TRACE) << "Sending heartbeat" << endl << heartbeatJSON;
-
-	NetworkThread::NetworkMessage msg;
-	msg.data = heartbeatJSON;
-	ostringstream ssURL;
-	ssURL << url << URL_HEARTBEAT;
-	msg.url = ssURL.str();
-	NetworkThread::send(msg);
+	sendJSON(doc, URL_HEARTBEAT);
 }
 
 void SteelSeriesCommunicator::bindTestEvent()
@@ -259,17 +257,7 @@ void SteelSeriesCommunicator::bindTestEvent()
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
 
-	std::string stringifiedJSON = stringify(doc);
-
-	LOG(INFO) << "Test event json: " << endl << stringifiedJSON;
-
-	//Send message to SS
-	NetworkThread::NetworkMessage msg;
-	msg.data = stringifiedJSON;
-	ostringstream ssURL;
-	ssURL << url << URL_BIND_EVENT;
-	msg.url = ssURL.str();
-	NetworkThread::send(msg);
+	sendJSON(doc, URL_BIND_EVENT);
 }
 
 void SteelSeriesCommunicator::sendTestEvent()
@@ -284,17 +272,7 @@ void SteelSeriesCommunicator::sendTestEvent()
 	data.AddMember(JSON_KEY_VALUE, lub++, allocator);
 	doc.AddMember(JSON_KEY_DATA, data, allocator);
 
-	std::string stringifiedJSON = stringify(doc);
-
-	LOG(INFO) << "Sending lubdub json: " << endl << stringifiedJSON;
-
-	//Send message to SS
-	NetworkThread::NetworkMessage msg;
-	msg.data = stringifiedJSON;
-	ostringstream ssURL;
-	ssURL << url << URL_GAME_EVENT;
-	msg.url = ssURL.str();
-	NetworkThread::send(msg);
+	sendJSON(doc, URL_GAME_EVENT);
 }
 
 
