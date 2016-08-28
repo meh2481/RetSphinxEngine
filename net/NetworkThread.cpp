@@ -61,7 +61,6 @@ namespace NetworkThread
 
 	void sendPost(const NetworkMessage& msg)
 	{
-		LOG(TRACE) << "Sending " << msg.data << " to " << msg.url;
 		//Init socket
 		HttpDumpSocket *ht = new HttpDumpSocket;
 		ht->SetKeepAlive(3);
@@ -75,13 +74,11 @@ namespace NetworkThread
 		ht->Download(msg.url, NULL, NULL, &post);
 
 		minihttp::SocketSet ss;
-		ss.add(ht, false);
+		ss.add(ht, true);
 
-		//TODO: Figure out why this hangs here for so long...
 		uint32_t startTicks = SDL_GetTicks();
-		while(ss.size() && SDL_GetTicks() < startTicks + 1000 * 10)	//Just spin here (for a maximum of 10 seconds)
+		while(ss.size() && SDL_GetTicks() < startTicks + 1000)	//Just spin here (for a maximum of 1 second)
 			ss.update();
-		LOG(TRACE) << "\nDone sending to " << msg.url << "\n";
 	}
 
 	static int NetworkingThread(void *ptr)
@@ -100,12 +97,16 @@ namespace NetworkThread
 			assert(!SDL_LockMutex(stopMutex));
 			if(stopFlag)
 				shouldStop = true;
+
 			assert(!SDL_UnlockMutex(stopMutex));
 
 			//Poll for network changes
 			NetworkMessage msg;
 			if(outgoing.pop(msg))
 				sendPost(msg);
+
+			//Wait 10 ms so we don't hog all this CPU, since net is low-priority
+			SDL_Delay(10);
 		}
 
 		LOG(INFO) << "Networking thread finished";

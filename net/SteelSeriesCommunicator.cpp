@@ -23,7 +23,7 @@ using namespace std;
 #define JSON_KEY_TIMEOUT "deinitialize_timer_length_ms"
 
 #define MAX_TIMEOUT_LEN 60000
-const float HEARTBEAT_FREQUENCY = 2.0;//(((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
+const float HEARTBEAT_FREQUENCY = (((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
 #define ICON_COLOR_BLUE 5
 
 SteelSeriesCommunicator::SteelSeriesCommunicator()

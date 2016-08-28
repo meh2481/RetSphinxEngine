@@ -37,7 +37,10 @@ bool ThreadsafeQueue<T>::pop(T& s)
 {
 	assert(!SDL_LockMutex(mutex));
 	if(q.empty())
+	{
+		assert(!SDL_UnlockMutex(mutex));
 		return false;
+	}
 	s = q.front();
 	q.pop();
 	assert(!SDL_UnlockMutex(mutex));
