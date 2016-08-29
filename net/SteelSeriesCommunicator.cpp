@@ -49,8 +49,8 @@ using namespace std;
 #define TYPE_TACTILE "tactile"
 #define ZONE_ONE "one"
 #define MODE_VIBRATE "vibrate"
-#define TYPE_STRONGBUZZ_100 "ti_predefined_strongbuzz_100"
-#define TYPE_SOFTBUMP_60 "ti_predefined_softbump_60"
+#define TYPE_SOFTBUMP_100 "ti_predefined_softbump_100"
+#define TYPE_SOFTBUMP_30 "ti_predefined_softbump_30"
 
 #define TEST_EVENT_NAME "TEST_EVENT"
 
@@ -155,9 +155,22 @@ bool SteelSeriesCommunicator::init(std::string appName)
 	return true;
 }
 
+extern bool g_fireSSTest;
+extern std::string g_eventType;
+
 void SteelSeriesCommunicator::update(float dt)
 {
 	if(!valid) return;
+
+	//TEST
+	if(g_fireSSTest)
+	{
+		static int tmp = 0;
+		const char* TEST_EVNT = "TEST_EVNT";
+		g_fireSSTest = false;
+		bindEvent(g_eventType, TEST_EVNT);
+		sendEvent(TEST_EVNT, ++tmp);
+	}
 
 	heartbeatTimer += dt;
 	if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
@@ -245,12 +258,12 @@ void SteelSeriesCommunicator::bindTestEvent()
 
 	rapidjson::Value patterns(rapidjson::kArrayType);
 	rapidjson::Value patternLub(rapidjson::kObjectType);
-	patternLub.AddMember(JSON_KEY_TYPE, TYPE_STRONGBUZZ_100, allocator);
+	patternLub.AddMember(JSON_KEY_TYPE, TYPE_SOFTBUMP_100, allocator);
 	patternLub.AddMember(JSON_KEY_DELAY_MS, 250, allocator);
 	patterns.PushBack(patternLub, allocator);
 
 	rapidjson::Value patternDub(rapidjson::kObjectType);
-	patternDub.AddMember(JSON_KEY_TYPE, TYPE_SOFTBUMP_60, allocator);
+	patternDub.AddMember(JSON_KEY_TYPE, TYPE_SOFTBUMP_30, allocator);
 	patterns.PushBack(patternDub, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
 
@@ -270,6 +283,52 @@ void SteelSeriesCommunicator::sendTestEvent()
 
 	rapidjson::Value data(rapidjson::kObjectType);
 	data.AddMember(JSON_KEY_VALUE, lub++, allocator);
+	doc.AddMember(JSON_KEY_DATA, data, allocator);
+
+	sendJSON(doc, URL_GAME_EVENT);
+}
+
+void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId)
+{
+	rapidjson::Document doc(rapidjson::kObjectType);
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+
+	rapidjson::Value handlers(rapidjson::kArrayType);
+	rapidjson::Value handler(rapidjson::kObjectType);
+	handler.AddMember(JSON_KEY_DEVICE_TYPE, TYPE_TACTILE, allocator);
+	handler.AddMember(JSON_KEY_ZONE, ZONE_ONE, allocator);
+	handler.AddMember(JSON_KEY_MODE, MODE_VIBRATE, allocator);
+
+	rapidjson::Value rate(rapidjson::kObjectType);
+	rate.AddMember(JSON_KEY_FREQUENCY, 0.65, allocator);
+	rate.AddMember(JSON_KEY_REPEAT_LIMIT, 5, allocator);
+	handler.AddMember(JSON_KEY_RATE, rate, allocator);
+
+	rapidjson::Value patterns(rapidjson::kArrayType);
+	rapidjson::Value patternLub(rapidjson::kObjectType);
+	patternLub.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
+	patterns.PushBack(patternLub, allocator);
+	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
+
+	handlers.PushBack(handler, allocator);
+	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
+
+	sendJSON(doc, URL_BIND_EVENT);
+}
+
+void SteelSeriesCommunicator::sendEvent(std::string eventId, int value)
+{
+	rapidjson::Document doc(rapidjson::kObjectType);
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+
+	rapidjson::Value data(rapidjson::kObjectType);
+	data.AddMember(JSON_KEY_VALUE, value, allocator);
 	doc.AddMember(JSON_KEY_DATA, data, allocator);
 
 	sendJSON(doc, URL_GAME_EVENT);
