@@ -36,6 +36,7 @@ using namespace std;
 #define JSON_KEY_GAME_DISPLAY_NAME "game_display_name"
 #define JSON_KEY_HANDLERS "handlers"
 #define JSON_KEY_ICON_COLOR_ID "icon_color_id"
+#define JSON_KEY_LENGTH_MS "length-ms"
 #define JSON_KEY_MODE "mode"
 #define JSON_KEY_PATTERN "pattern"
 #define JSON_KEY_RATE "rate"
@@ -288,6 +289,10 @@ void SteelSeriesCommunicator::sendTestEvent()
 	sendJSON(doc, URL_GAME_EVENT);
 }
 
+extern int g_rumbleCount;
+extern float g_rumbleFreq;
+extern int g_rumbleLen;
+
 void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
@@ -303,13 +308,15 @@ void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string event
 	handler.AddMember(JSON_KEY_MODE, MODE_VIBRATE, allocator);
 
 	rapidjson::Value rate(rapidjson::kObjectType);
-	rate.AddMember(JSON_KEY_FREQUENCY, 0.65, allocator);
-	rate.AddMember(JSON_KEY_REPEAT_LIMIT, 5, allocator);
+	rate.AddMember(JSON_KEY_FREQUENCY, g_rumbleFreq, allocator);
+	rate.AddMember(JSON_KEY_REPEAT_LIMIT, g_rumbleCount, allocator);
 	handler.AddMember(JSON_KEY_RATE, rate, allocator);
 
 	rapidjson::Value patterns(rapidjson::kArrayType);
 	rapidjson::Value patternLub(rapidjson::kObjectType);
 	patternLub.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
+	if(eventType == "custom")
+		patternLub.AddMember(JSON_KEY_LENGTH_MS, g_rumbleLen, allocator);
 	patterns.PushBack(patternLub, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
 

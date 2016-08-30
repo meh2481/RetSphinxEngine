@@ -4,6 +4,7 @@
 #include <climits>
 
 const char* event_types[] = {
+	"custom",
 	"ti_predefined_strongclick_100",
 	"ti_predefined_strongclick_60",
 	"ti_predefined_strongclick_30",
@@ -154,7 +155,10 @@ int g_motorDuration = 1000;
 bool g_fireSSTest = false;
 std::string g_eventType = "ti_predefined_strongclick_100";
 
-int selectedSSMouseRumble = 0;
+int selectedSSMouseRumble = 1;
+int g_rumbleCount = 5;
+float g_rumbleFreq = 0.65;
+int g_rumbleLen = 100;
 
 void DebugUI::_draw()
 {
@@ -201,9 +205,12 @@ void DebugUI::_draw()
 			ImGui::LabelText("", "SteelSeries mouse rumble");
 			if(ImGui::Button("TEST"))
 				g_fireSSTest = true;
-			ImGui::SameLine();
-			if(ImGui::Combo("rumble type", &selectedSSMouseRumble, event_types, 123))
+			ImGui::SliderInt("repeat", &g_rumbleCount, 1, 10);
+			ImGui::SliderFloat("frequency (Hz)", &g_rumbleFreq, 0.25, 5.0);
+			if(ImGui::Combo("rumble type", &selectedSSMouseRumble, event_types, 124))
 				g_eventType = event_types[selectedSSMouseRumble];
+			if(g_eventType == "custom")
+				ImGui::SliderInt("length (msec)", &g_rumbleLen, 1, 2559);
 		}
 		ImGui::End();
 	}
