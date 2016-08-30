@@ -7,6 +7,7 @@ NetworkThread.cpp
 NetworkThread.h
 SteelSeriesCommunicator.h
 SteelSeriesCommunicator.cpp
+SteelSeriesEvents.h
 ThreadsafeQueue.h
 )
 

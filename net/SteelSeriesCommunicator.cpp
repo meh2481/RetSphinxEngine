@@ -6,6 +6,13 @@
 #include <fstream>
 #include <algorithm>
 
+//TODO don't have these as global variables; pass them around as needed
+extern bool g_fireSSTest;
+extern std::string g_eventType;
+extern int g_rumbleCount;
+extern float g_rumbleFreq;
+extern int g_rumbleLen;
+
 #ifdef _WIN32
 	#include <windows.h>
 	#include <shlobj.h>		//for knownFolder
@@ -156,9 +163,6 @@ bool SteelSeriesCommunicator::init(std::string appName)
 	return true;
 }
 
-extern bool g_fireSSTest;
-extern std::string g_eventType;
-
 void SteelSeriesCommunicator::update(float dt)
 {
 	if(!valid) return;
@@ -288,10 +292,6 @@ void SteelSeriesCommunicator::sendTestEvent()
 
 	sendJSON(doc, URL_GAME_EVENT);
 }
-
-extern int g_rumbleCount;
-extern float g_rumbleFreq;
-extern int g_rumbleLen;
 
 void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId)
 {
