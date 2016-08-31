@@ -126,3 +126,24 @@ const char* steelSeriesTactileEvents[] = {
 	"ti_predefined_smoothhum4nokickorbrakepulse_20",
 	"ti_predefined_smoothhum5nokickorbrakepulse_10"
 };
+
+const char* steelSeriesEventIcons[] = {
+	"None",
+	"Health",
+	"Armor",
+	"Ammo",
+	"Money",
+	"Explosion",
+	"Skull",
+	"Headshot",
+	"Helmet",
+	"Mighty Number 9",	//TODO: Figure out why this isn't here in the API doc
+	"Drumstick",
+	"Bubbles",
+	"Compass",
+	"Pickaxe",
+	"Potion",
+	"Clock",
+	"Lightning",
+	"Backpack"
+};

@@ -33,4 +33,11 @@ private:
 	int rumbleCount;
 	float rumbleFreq;
 	int rumbleLen;
+
+	//Mouse color testing helper vars
+	float mouseWheelColor[3];
+	float mouseLogoColor[3];
+
+	//Mouse screen testing helper vars
+	int selectedEventIcon;
 };

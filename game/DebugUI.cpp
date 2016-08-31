@@ -18,9 +18,12 @@ DebugUI::DebugUI(GameEngine *ge)
 	motorDuration = 100;
 	eventType = "ti_predefined_strongclick_100";
 	selectedSSMouseRumble = 1;
+	selectedEventIcon = 0;
 	rumbleCount = 5;
 	rumbleFreq = 0.65;
 	rumbleLen = 100;
+	mouseWheelColor[0] = mouseWheelColor[1] = mouseWheelColor[2] = 1.0;
+	mouseLogoColor[0] = mouseLogoColor[1] = mouseLogoColor[2] = 1.0;
 }
 
 DebugUI::~DebugUI()
@@ -99,6 +102,22 @@ void DebugUI::_draw()
 					eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
 				if(eventType == "custom")
 					ImGui::SliderInt("length (msec)", &rumbleLen, 1, 2559);
+			}
+
+			//Mouse color testing
+			if(ImGui::CollapsingHeader("SteelSeries mouse color"))
+			{
+				if(ImGui::ColorEdit3("Wheel Color", mouseWheelColor))
+					;
+				if(ImGui::ColorEdit3("Logo Color", mouseLogoColor))
+					;
+			}
+
+			//Mouse screen testing
+			if(ImGui::CollapsingHeader("SteelSeries mouse screen"))
+			{
+				if(ImGui::Combo("Icon", &selectedEventIcon, steelSeriesEventIcons, 18))
+					;
 			}
 		}
 		ImGui::End();
