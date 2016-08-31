@@ -95,10 +95,11 @@ public:
 	void saveConfig(std::string sFilename);
 	void loadScene(std::string sXMLFilename);	//Load scene from file
 	
-	//Other stuff in GameEngine.cpp
+	//Other stuff
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
 	void rumbleLR(uint32_t duration, uint16_t large, uint16_t small);	//Rumble L/R
 	void warpObjectToNode(Object* o, Node* n);
+	SteelSeriesCommunicator* getSSCommunicator() { return steelSeriesCommunicator; };
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float dt);

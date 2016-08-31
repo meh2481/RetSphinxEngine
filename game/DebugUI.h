@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class GameEngine;
 
@@ -22,4 +23,14 @@ private:
 
 	bool showTestWindow;
 	bool rumbleMenu;
+
+	//Rumble testing helper vars
+	int largeMotorStrength;
+	int smallMotorStrength;
+	int motorDuration;
+	std::string eventType;
+	int selectedSSMouseRumble;
+	int rumbleCount;
+	float rumbleFreq;
+	int rumbleLen;
 };

@@ -12,10 +12,6 @@
 #include "ResourceCache.h"
 using namespace std;
 
-extern int g_largeMotorStrength;
-extern int g_smallMotorStrength;
-extern int g_motorDuration;
-
 #define GUID_STR_SZ	256
 
 typedef struct
@@ -235,10 +231,6 @@ void GameEngine::handleEvent(SDL_Event event)
 			{
 				case SDL_CONTROLLER_BUTTON_BACK:	//TODO Not hardcoded
 					quit();
-					break;
-
-				case SDL_CONTROLLER_BUTTON_A:
-					rumbleLR(g_motorDuration, g_largeMotorStrength, g_smallMotorStrength);
 					break;
 			}
 			break;

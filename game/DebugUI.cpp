@@ -2,22 +2,20 @@
 #include "imgui/imgui.h"
 #include "GameEngine.h"
 #include "SteelSeriesEvents.h"
+#include "SteelSeriesCommunicator.h"
 #include <climits>
-
-//TODO don't have these as global variables; pass them around as needed
-int g_largeMotorStrength = USHRT_MAX;
-int g_smallMotorStrength = USHRT_MAX;
-int g_motorDuration = 1000;
-bool g_fireSSTest = false;
-std::string g_eventType = "ti_predefined_strongclick_100";
-int selectedSSMouseRumble = 1;
-int g_rumbleCount = 5;
-float g_rumbleFreq = 0.65;
-int g_rumbleLen = 100;
 
 DebugUI::DebugUI(GameEngine *ge)
 : visible(false), hadFocus(false), _ge(ge), showTestWindow(false), rumbleMenu(true)
 {
+	largeMotorStrength = USHRT_MAX;
+	smallMotorStrength = USHRT_MAX;
+	motorDuration = 1000;
+	eventType = "ti_predefined_strongclick_100";
+	selectedSSMouseRumble = 1;
+	rumbleCount = 5;
+	rumbleFreq = 0.65;
+	rumbleLen = 100;
 }
 
 DebugUI::~DebugUI()
@@ -68,21 +66,27 @@ void DebugUI::_draw()
 	{
 		if(ImGui::Begin("Rumble Test", &rumbleMenu))
 		{
-			ImGui::LabelText("", "Game controller rumble (Press A to test)");
-			ImGui::SliderInt("large motor", &g_largeMotorStrength, 0, USHRT_MAX);
-			ImGui::SliderInt("small motor", &g_smallMotorStrength, 0, USHRT_MAX);
-			ImGui::SliderInt("duration (msec)", &g_motorDuration, 0, 5000);
+			ImGui::LabelText("", "Game controller rumble");
+			if(ImGui::Button("Test Controller Rumble"))
+				_ge->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength);
+			ImGui::SliderInt("large motor", &largeMotorStrength, 0, USHRT_MAX);
+			ImGui::SliderInt("small motor", &smallMotorStrength, 0, USHRT_MAX);
+			ImGui::SliderInt("duration (msec)", &motorDuration, 0, 5000);
 
-			//TEST
 			ImGui::LabelText("", "SteelSeries mouse rumble");
-			if(ImGui::Button("TEST"))
-				g_fireSSTest = true;
-			ImGui::SliderInt("repeat", &g_rumbleCount, 1, 10);
-			ImGui::SliderFloat("frequency (Hz)", &g_rumbleFreq, 0.25, 5.0);
+			if(ImGui::Button("Test Mouse Rumble"))
+			{
+					static int eventVal = 0;
+					const char* TEST_EVNT = "TEST_EVNT2";
+					_ge->getSSCommunicator()->bindEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
+					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, ++eventVal);
+			}
+			ImGui::SliderInt("repeat", &rumbleCount, 1, 10);
+			ImGui::SliderFloat("frequency (Hz)", &rumbleFreq, 0.25, 5.0);
 			if(ImGui::Combo("rumble type", &selectedSSMouseRumble, steelSeriesTactileEvents, 124))
-				g_eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
-			if(g_eventType == "custom")
-				ImGui::SliderInt("length (msec)", &g_rumbleLen, 1, 2559);
+				eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
+			if(eventType == "custom")
+				ImGui::SliderInt("length (msec)", &rumbleLen, 1, 2559);
 		}
 		ImGui::End();
 	}

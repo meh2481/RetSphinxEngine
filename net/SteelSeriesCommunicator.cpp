@@ -6,13 +6,6 @@
 #include <fstream>
 #include <algorithm>
 
-//TODO don't have these as global variables; pass them around as needed
-extern bool g_fireSSTest;
-extern std::string g_eventType;
-extern int g_rumbleCount;
-extern float g_rumbleFreq;
-extern int g_rumbleLen;
-
 #ifdef _WIN32
 	#include <windows.h>
 	#include <shlobj.h>		//for knownFolder
@@ -167,16 +160,6 @@ void SteelSeriesCommunicator::update(float dt)
 {
 	if(!valid) return;
 
-	//TEST
-	if(g_fireSSTest)
-	{
-		static int tmp = 0;
-		const char* TEST_EVNT = "TEST_EVNT";
-		g_fireSSTest = false;
-		bindEvent(g_eventType, TEST_EVNT);
-		sendEvent(TEST_EVNT, ++tmp);
-	}
-
 	heartbeatTimer += dt;
 	if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
 	{
@@ -293,7 +276,7 @@ void SteelSeriesCommunicator::sendTestEvent()
 	sendJSON(doc, URL_GAME_EVENT);
 }
 
-void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId)
+void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
@@ -308,15 +291,15 @@ void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string event
 	handler.AddMember(JSON_KEY_MODE, MODE_VIBRATE, allocator);
 
 	rapidjson::Value rate(rapidjson::kObjectType);
-	rate.AddMember(JSON_KEY_FREQUENCY, g_rumbleFreq, allocator);
-	rate.AddMember(JSON_KEY_REPEAT_LIMIT, g_rumbleCount, allocator);
+	rate.AddMember(JSON_KEY_FREQUENCY, rumbleFreq, allocator);
+	rate.AddMember(JSON_KEY_REPEAT_LIMIT, rumbleCount, allocator);
 	handler.AddMember(JSON_KEY_RATE, rate, allocator);
 
 	rapidjson::Value patterns(rapidjson::kArrayType);
 	rapidjson::Value patternLub(rapidjson::kObjectType);
 	patternLub.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
 	if(eventType == "custom")
-		patternLub.AddMember(JSON_KEY_LENGTH_MS, g_rumbleLen, allocator);
+		patternLub.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
 	patterns.PushBack(patternLub, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
 

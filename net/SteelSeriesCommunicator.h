@@ -32,6 +32,6 @@ public:
 	//TEST
 	void sendTestEvent();								//Send lub-dub update
 
-	void bindEvent(std::string eventType, std::string eventId);
+	void bindEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen = 100);
 	void sendEvent(std::string eventId, int value);
 };
