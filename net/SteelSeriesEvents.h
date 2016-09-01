@@ -137,9 +137,9 @@ const char* steelSeriesEventIcons[] = {
 	"Skull",
 	"Headshot",
 	"Helmet",
-	"Mighty Number 9",	//TODO: Figure out why this isn't here in the API doc
-	"Drumstick",
-	"Bubbles",
+	"UNDEFINED",	//Blank space there but no icon for id=9
+	"Hunger",
+	"Air",
 	"Compass",
 	"Pickaxe",
 	"Potion",

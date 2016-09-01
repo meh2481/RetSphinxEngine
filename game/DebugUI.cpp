@@ -22,8 +22,11 @@ DebugUI::DebugUI(GameEngine *ge)
 	rumbleCount = 5;
 	rumbleFreq = 0.65;
 	rumbleLen = 100;
+	percentHealth = 100;
 	mouseWheelColor[0] = mouseWheelColor[1] = mouseWheelColor[2] = 1.0;
 	mouseLogoColor[0] = mouseLogoColor[1] = mouseLogoColor[2] = 1.0;
+	prefixBuf[0] = suffixBuf[0] = '\0';
+	screenMs = 0;
 }
 
 DebugUI::~DebugUI()
@@ -92,8 +95,8 @@ void DebugUI::_draw()
 				if(ImGui::Button("Test Mouse Rumble"))
 				{
 					static int eventVal = 0;
-					const char* TEST_EVNT = "TEST_EVNT2";
-					_ge->getSSCommunicator()->bindEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
+					const char* TEST_EVNT = "TEST_EVNT_RUMBLE";
+					_ge->getSSCommunicator()->bindTactileEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
 					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, ++eventVal);
 				}
 				ImGui::SliderInt("repeat", &rumbleCount, 1, 10);
@@ -116,8 +119,18 @@ void DebugUI::_draw()
 			//Mouse screen testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse screen"))
 			{
-				if(ImGui::Combo("Icon", &selectedEventIcon, steelSeriesEventIcons, 18))
-					;
+				if(ImGui::Button("Test Mouse Screen"))
+				{
+					const char* TEST_EVNT = "TESTVNTS";
+					_ge->getSSCommunicator()->bindScreenEvent(TEST_EVNT, selectedEventIcon, screenMs, prefixBuf, suffixBuf);
+					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, percentHealth);
+				}
+
+				ImGui::Combo("Icon", &selectedEventIcon, steelSeriesEventIcons, 18);
+				ImGui::SliderInt("Percent value", &percentHealth, 1, 100);
+				ImGui::InputText("Prefix text", prefixBuf, SS_BUF_SZ);
+				ImGui::InputText("Suffix text", suffixBuf, SS_BUF_SZ);
+				ImGui::SliderInt("length (ms)", &screenMs, 0, 2559);
 			}
 		}
 		ImGui::End();

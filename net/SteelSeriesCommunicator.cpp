@@ -27,6 +27,7 @@ using namespace std;
 //JSON keys
 #define JSON_KEY_ADDRESS "address"
 #define JSON_KEY_DATA "data"
+#define JSON_KEY_DATAS "datas"
 #define JSON_KEY_DELAY_MS "delay-ms"
 #define JSON_KEY_DEVICE_TYPE "device-type"
 #define JSON_KEY_ENCRYPTED_ADDRESS "encrypted_address"	//Use mebbe at some point? Prolly not
@@ -35,20 +36,28 @@ using namespace std;
 #define JSON_KEY_GAME "game"
 #define JSON_KEY_GAME_DISPLAY_NAME "game_display_name"
 #define JSON_KEY_HANDLERS "handlers"
+#define JSON_KEY_HAS_TEXT "has-text"
 #define JSON_KEY_ICON_COLOR_ID "icon_color_id"
+#define JSON_KEY_ICON_ID "icon-id"
+#define JSON_KEY_LENGTH_MILLIS "length-millis"
 #define JSON_KEY_LENGTH_MS "length-ms"
 #define JSON_KEY_MODE "mode"
 #define JSON_KEY_PATTERN "pattern"
+#define JSON_KEY_PREFIX	"prefix"
 #define JSON_KEY_RATE "rate"
 #define JSON_KEY_REPEAT_LIMIT "repeat_limit"
+#define JSON_KEY_REPEATS "repeats"
+#define JSON_KEY_SUFFIX	"suffix"
 #define JSON_KEY_TIMEOUT "deinitialize_timer_length_ms"
 #define JSON_KEY_TYPE "type"
 #define JSON_KEY_VALUE "value"
 #define JSON_KEY_ZONE "zone"
 
 //String constants for JSON values
+#define TYPE_SCREENED "screened"
 #define TYPE_TACTILE "tactile"
 #define ZONE_ONE "one"
+#define MODE_SCREEN "screen"
 #define MODE_VIBRATE "vibrate"
 #define TYPE_SOFTBUMP_100 "ti_predefined_softbump_100"
 #define TYPE_SOFTBUMP_30 "ti_predefined_softbump_30"
@@ -201,7 +210,7 @@ bool SteelSeriesCommunicator::sendJSON(const rapidjson::Document & doc, const ch
 	ssURL << url << endpoint;
 	msg.url = ssURL.str();
 
-	LOG(INFO) << "Sending json to " << ssURL.str() << " : " << endl << stringifiedJSON;
+	std::cout << "Sending json to " << ssURL.str() << " : " << endl << stringifiedJSON;
 
 	return NetworkThread::send(msg);
 }
@@ -276,7 +285,7 @@ void SteelSeriesCommunicator::sendTestEvent()
 	sendJSON(doc, URL_GAME_EVENT);
 }
 
-void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen)
+void SteelSeriesCommunicator::bindTactileEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
@@ -302,6 +311,38 @@ void SteelSeriesCommunicator::bindEvent(std::string eventType, std::string event
 		patternLub.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
 	patterns.PushBack(patternLub, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
+
+	handlers.PushBack(handler, allocator);
+	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
+
+	sendJSON(doc, URL_BIND_EVENT);
+}
+
+void SteelSeriesCommunicator::bindScreenEvent(std::string eventId, int iconId, int ms, std::string prefixText, std::string suffixText)
+{
+	rapidjson::Document doc(rapidjson::kObjectType);
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_ICON_ID, iconId, allocator);
+
+	rapidjson::Value handlers(rapidjson::kArrayType);
+	rapidjson::Value handler(rapidjson::kObjectType);
+	handler.AddMember(JSON_KEY_DEVICE_TYPE, TYPE_SCREENED, allocator);
+	handler.AddMember(JSON_KEY_ZONE, ZONE_ONE, allocator);
+	handler.AddMember(JSON_KEY_MODE, MODE_SCREEN, allocator);
+
+	rapidjson::Value datas(rapidjson::kArrayType);
+	rapidjson::Value data1(rapidjson::kObjectType);
+	data1.AddMember(JSON_KEY_HAS_TEXT, true, allocator);
+	data1.AddMember(JSON_KEY_PREFIX, rapidjson::StringRef(prefixText.c_str()), allocator);
+	data1.AddMember(JSON_KEY_SUFFIX, rapidjson::StringRef(suffixText.c_str()), allocator);
+	data1.AddMember(JSON_KEY_ICON_ID, iconId, allocator);
+	data1.AddMember(JSON_KEY_LENGTH_MILLIS, ms, allocator);
+
+	datas.PushBack(data1, allocator);
+	handler.AddMember(JSON_KEY_DATAS, datas, allocator);
 
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);

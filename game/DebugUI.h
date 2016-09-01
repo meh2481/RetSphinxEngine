@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
+#include "MemoryEditor.h"
+
+#define SS_BUF_SZ 33
 
 class GameEngine;
 
-#include "MemoryEditor.h"
 
 class DebugUI
 {
@@ -40,4 +42,8 @@ private:
 
 	//Mouse screen testing helper vars
 	int selectedEventIcon;
+	int percentHealth;
+	int screenMs;
+	char prefixBuf[SS_BUF_SZ];
+	char suffixBuf[SS_BUF_SZ];
 };
