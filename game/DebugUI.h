@@ -37,8 +37,12 @@ private:
 	int rumbleLen;
 
 	//Mouse color testing helper vars
-	float mouseWheelColor[3];
-	float mouseLogoColor[3];
+	std::string colorZone;
+	int selectedSSMouseColorZone;
+	int colorValue;
+	float mouse0Color[3];
+	float mouse100Color[3];
+	bool colorFlash;
 
 	//Mouse screen testing helper vars
 	int selectedEventIcon;

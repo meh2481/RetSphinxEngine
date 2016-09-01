@@ -16,17 +16,23 @@ DebugUI::DebugUI(GameEngine *ge)
 	largeMotorStrength = USHRT_MAX;
 	smallMotorStrength = USHRT_MAX;
 	motorDuration = 100;
-	eventType = "ti_predefined_strongclick_100";
 	selectedSSMouseRumble = 1;
+	eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
 	selectedEventIcon = 0;
 	rumbleCount = 5;
 	rumbleFreq = 0.65;
 	rumbleLen = 100;
 	percentHealth = 100;
-	mouseWheelColor[0] = mouseWheelColor[1] = mouseWheelColor[2] = 1.0;
-	mouseLogoColor[0] = mouseLogoColor[1] = mouseLogoColor[2] = 1.0;
+	mouse0Color[0] = mouse0Color[1] = mouse0Color[2] = 1.0;
+	mouse100Color[0] = mouse100Color[1] = mouse100Color[2] = 1.0;
 	prefixBuf[0] = suffixBuf[0] = '\0';
 	screenMs = 0;
+	colorValue = 0;
+	selectedSSMouseColorZone = 0;
+	colorZone = steelSeriesColorZones[selectedSSMouseColorZone];
+	colorFlash = false;
+	colorFlashFreq = 5.0f;
+	colorFlashCount = 0;
 }
 
 DebugUI::~DebugUI()
@@ -95,7 +101,7 @@ void DebugUI::_draw()
 				if(ImGui::Button("Test Mouse Rumble"))
 				{
 					static int eventVal = 0;
-					const char* TEST_EVNT = "TEST_EVNT_RUMBLE";
+					const char* TEST_EVNT = "TEST_EVENT_RUMBLE";
 					_ge->getSSCommunicator()->bindTactileEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
 					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, ++eventVal);
 				}
@@ -110,10 +116,22 @@ void DebugUI::_draw()
 			//Mouse color testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse color"))
 			{
-				if(ImGui::ColorEdit3("Wheel Color", mouseWheelColor))
-					;
-				if(ImGui::ColorEdit3("Logo Color", mouseLogoColor))
-					;
+				if(ImGui::Button("Test Mouse Color"))
+				{
+					const char* TEST_EVNT = "TEST_EVENT_COLOR";
+					_ge->getSSCommunicator()->bindColorEvent(TEST_EVNT, colorZone, mouse0Color, mouse100Color);//, colorFlash, colorFlashFreq, colorFlashCount);
+					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, colorValue);
+				}
+				if(ImGui::Combo("Color zone", &selectedSSMouseColorZone, steelSeriesColorZones, 3))
+					colorZone = steelSeriesColorZones[selectedSSMouseColorZone];
+				ImGui::ColorEdit3("0 Color", mouse0Color);
+				ImGui::ColorEdit3("100 Color", mouse100Color);
+				ImGui::SliderInt("Value", &colorValue, 0, 100);
+				if(ImGui::Checkbox("Flash", &colorFlash))
+				{
+					ImGui::SliderFloat("Frequency", &colorFlashFreq, 0.0f, 100.0f);
+					ImGui::SliderInt("Repeat (0 = forever)", &colorFlashCount, 0, 50);
+				}
 			}
 
 			//Mouse screen testing
@@ -121,7 +139,7 @@ void DebugUI::_draw()
 			{
 				if(ImGui::Button("Test Mouse Screen"))
 				{
-					const char* TEST_EVNT = "TESTVNTS";
+					const char* TEST_EVNT = "TEST_EVENT_SCREEN";
 					_ge->getSSCommunicator()->bindScreenEvent(TEST_EVNT, selectedEventIcon, screenMs, prefixBuf, suffixBuf);
 					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, percentHealth);
 				}

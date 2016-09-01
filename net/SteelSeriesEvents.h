@@ -147,3 +147,11 @@ const char* steelSeriesEventIcons[] = {
 	"Lightning",
 	"Backpack"
 };
+
+const char* steelSeriesColorZones[] = {
+	"wheel",
+	"logo",
+	"base"
+};
+
+

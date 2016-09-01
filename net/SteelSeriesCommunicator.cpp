@@ -26,6 +26,8 @@ using namespace std;
 
 //JSON keys
 #define JSON_KEY_ADDRESS "address"
+#define JSON_KEY_BLUE "blue"
+#define JSON_KEY_COLOR "color"
 #define JSON_KEY_DATA "data"
 #define JSON_KEY_DATAS "datas"
 #define JSON_KEY_DELAY_MS "delay-ms"
@@ -35,28 +37,38 @@ using namespace std;
 #define JSON_KEY_FREQUENCY "frequency"
 #define JSON_KEY_GAME "game"
 #define JSON_KEY_GAME_DISPLAY_NAME "game_display_name"
+#define JSON_KEY_GRADIENT "gradient"
+#define JSON_KEY_GREEN "green"
 #define JSON_KEY_HANDLERS "handlers"
 #define JSON_KEY_HAS_TEXT "has-text"
+#define JSON_KEY_HUNDRED "hundred"
 #define JSON_KEY_ICON_COLOR_ID "icon_color_id"
 #define JSON_KEY_ICON_ID "icon-id"
 #define JSON_KEY_LENGTH_MILLIS "length-millis"
 #define JSON_KEY_LENGTH_MS "length-ms"
+#define JSON_KEY_MAX_VALUE "max_value"
+#define JSON_KEY_MIN_VALUE "min_value"
 #define JSON_KEY_MODE "mode"
 #define JSON_KEY_PATTERN "pattern"
 #define JSON_KEY_PREFIX	"prefix"
 #define JSON_KEY_RATE "rate"
+#define JSON_KEY_RED "red"
 #define JSON_KEY_REPEAT_LIMIT "repeat_limit"
 #define JSON_KEY_REPEATS "repeats"
 #define JSON_KEY_SUFFIX	"suffix"
 #define JSON_KEY_TIMEOUT "deinitialize_timer_length_ms"
 #define JSON_KEY_TYPE "type"
 #define JSON_KEY_VALUE "value"
+#define JSON_KEY_ZERO "zero"
 #define JSON_KEY_ZONE "zone"
 
 //String constants for JSON values
+#define TYPE_MOUSE "mouse"
 #define TYPE_SCREENED "screened"
 #define TYPE_TACTILE "tactile"
 #define ZONE_ONE "one"
+#define MODE_COLOR "color"
+#define MODE_PERCENT "percent"
 #define MODE_SCREEN "screen"
 #define MODE_VIBRATE "vibrate"
 #define TYPE_SOFTBUMP_100 "ti_predefined_softbump_100"
@@ -343,6 +355,47 @@ void SteelSeriesCommunicator::bindScreenEvent(std::string eventId, int iconId, i
 
 	datas.PushBack(data1, allocator);
 	handler.AddMember(JSON_KEY_DATAS, datas, allocator);
+
+	handlers.PushBack(handler, allocator);
+	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
+
+	sendJSON(doc, URL_BIND_EVENT);
+}
+
+void SteelSeriesCommunicator::bindColorEvent(std::string eventId, std::string zone, float zeroColor[3], float hundredColor[3])
+{
+	rapidjson::Document doc(rapidjson::kObjectType);
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_MIN_VALUE, 0, allocator);
+	doc.AddMember(JSON_KEY_MAX_VALUE, 100, allocator);
+	doc.AddMember(JSON_KEY_ICON_ID, 1, allocator);
+
+	rapidjson::Value handlers(rapidjson::kArrayType);
+	rapidjson::Value handler(rapidjson::kObjectType);
+	handler.AddMember(JSON_KEY_DEVICE_TYPE, TYPE_MOUSE, allocator);
+	handler.AddMember(JSON_KEY_ZONE, rapidjson::StringRef(zone.c_str()), allocator);
+	handler.AddMember(JSON_KEY_MODE, MODE_COLOR, allocator);
+
+	rapidjson::Value color(rapidjson::kObjectType);
+	rapidjson::Value gradient(rapidjson::kObjectType);
+
+	rapidjson::Value zero(rapidjson::kObjectType);
+	zero.AddMember(JSON_KEY_RED, int(zeroColor[0] * 255), allocator);
+	zero.AddMember(JSON_KEY_GREEN, int(zeroColor[1] * 255), allocator);
+	zero.AddMember(JSON_KEY_BLUE, int(zeroColor[2] * 255), allocator);
+	gradient.AddMember(JSON_KEY_ZERO, zero, allocator);
+
+	rapidjson::Value hundred(rapidjson::kObjectType);
+	hundred.AddMember(JSON_KEY_RED, int(hundredColor[0] * 255), allocator);
+	hundred.AddMember(JSON_KEY_GREEN, int(hundredColor[1] * 255), allocator);
+	hundred.AddMember(JSON_KEY_BLUE, int(hundredColor[2] * 255), allocator);
+	gradient.AddMember(JSON_KEY_HUNDRED, hundred, allocator);
+
+	color.AddMember(JSON_KEY_GRADIENT, gradient, allocator);
+	handler.AddMember(JSON_KEY_COLOR, color, allocator);
 
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
