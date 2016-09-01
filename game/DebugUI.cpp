@@ -91,36 +91,36 @@ void DebugUI::_draw()
 			if(ImGui::CollapsingHeader("Game controller rumble"))
 			{
 				//ImGui::LabelText("", "Game controller rumble");
-				if(ImGui::Button("Test Controller Rumble"))
+				if(ImGui::Button("Test controller rumble"))
 					_ge->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength);
-				ImGui::SliderInt("large motor", &largeMotorStrength, 0, USHRT_MAX);
-				ImGui::SliderInt("small motor", &smallMotorStrength, 0, USHRT_MAX);
-				ImGui::SliderInt("duration (msec)", &motorDuration, 10, 5000);
+				ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
+				ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
+				ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
 			}
 
 			//Mouse rumble testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse rumble"))
 			{
 				//ImGui::LabelText("", "SteelSeries mouse rumble");
-				if(ImGui::Button("Test Mouse Rumble"))
+				if(ImGui::Button("Test mouse rumble"))
 				{
 					static int eventVal = 0;
 					const char* TEST_EVNT = "TEST_EVENT_RUMBLE";
 					_ge->getSSCommunicator()->bindTactileEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
 					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, ++eventVal);
 				}
-				ImGui::SliderInt("repeat", &rumbleCount, 1, 10);
-				ImGui::SliderFloat("frequency (Hz)", &rumbleFreq, 0.25, 5.0);
-				if(ImGui::Combo("rumble type", &selectedSSMouseRumble, steelSeriesTactileEvents, 124))
+				ImGui::SliderInt("Rumble repeat", &rumbleCount, 1, 10);
+				ImGui::SliderFloat("Rumble repeat frequency (Hz)", &rumbleFreq, 0.25, 5.0);
+				if(ImGui::Combo("Rumble type", &selectedSSMouseRumble, steelSeriesTactileEvents, 124))
 					eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
 				if(eventType == "custom")
-					ImGui::SliderInt("length (msec)", &rumbleLen, 1, 2559);
+					ImGui::SliderInt("Rumble length (ms)", &rumbleLen, 1, 2559);
 			}
 
 			//Mouse color testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse color"))
 			{
-				if(ImGui::Button("Test Mouse Color"))
+				if(ImGui::Button("Test mouse color"))
 				{
 					const char* TEST_EVNT = "TEST_EVENT_COLOR";
 					_ge->getSSCommunicator()->bindColorEvent(TEST_EVNT, colorZone, mouse0Color, mouse100Color, colorFlash, colorFlashFreq, colorFlashCount);
@@ -128,21 +128,21 @@ void DebugUI::_draw()
 				}
 				if(ImGui::Combo("Color zone", &selectedSSMouseColorZone, steelSeriesColorZones, 3))
 					colorZone = steelSeriesColorZones[selectedSSMouseColorZone];
-				ImGui::ColorEdit3("0 Color", mouse0Color);
-				ImGui::ColorEdit3("100 Color", mouse100Color);
-				ImGui::SliderInt("Value", &colorValue, 0, 100);
-				ImGui::Checkbox("Flash", &colorFlash);
+				ImGui::ColorEdit3("0 color", mouse0Color);
+				ImGui::ColorEdit3("100 color", mouse100Color);
+				ImGui::SliderInt("Color value", &colorValue, 0, 100);
+				ImGui::Checkbox("Color flash", &colorFlash);
 				if(colorFlash)
 				{
-					ImGui::SliderFloat("Frequency", &colorFlashFreq, 0.0f, 30.0f);
-					ImGui::SliderInt("Repeat (0 = forever)", &colorFlashCount, 0, 100);
+					ImGui::SliderFloat("Color flash frequency (Hz)", &colorFlashFreq, 0.0f, 30.0f);
+					ImGui::SliderInt("Color flash repeat (0 = forever)", &colorFlashCount, 0, 100);
 				}
 			}
 
 			//Mouse screen testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse screen"))
 			{
-				if(ImGui::Button("Test Mouse Screen"))
+				if(ImGui::Button("Test mouse screen"))
 				{
 					const char* TEST_EVNT = "TEST_EVENT_SCREEN";
 					_ge->getSSCommunicator()->bindScreenEvent(TEST_EVNT, selectedEventIcon, screenMs, prefixBuf, suffixBuf);
@@ -150,10 +150,10 @@ void DebugUI::_draw()
 				}
 
 				ImGui::Combo("Icon", &selectedEventIcon, steelSeriesEventIcons, 18);
-				ImGui::SliderInt("Percent value", &percentHealth, 1, 100);
+				ImGui::SliderInt("Mouse event value", &percentHealth, 1, 100);
 				ImGui::InputText("Prefix text", prefixBuf, SS_BUF_SZ);
 				ImGui::InputText("Suffix text", suffixBuf, SS_BUF_SZ);
-				ImGui::SliderInt("length (ms)", &screenMs, 0, 2559);
+				ImGui::SliderInt("Display duration (ms)", &screenMs, 0, 2559);
 			}
 		}
 		ImGui::End();
