@@ -362,7 +362,7 @@ void SteelSeriesCommunicator::bindScreenEvent(std::string eventId, int iconId, i
 	sendJSON(doc, URL_BIND_EVENT);
 }
 
-void SteelSeriesCommunicator::bindColorEvent(std::string eventId, std::string zone, float zeroColor[3], float hundredColor[3])
+void SteelSeriesCommunicator::bindColorEvent(std::string eventId, std::string zone, float zeroColor[3], float hundredColor[3], bool flashCol, float colorFlashFreq, int colorFlashCount)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
@@ -396,6 +396,16 @@ void SteelSeriesCommunicator::bindColorEvent(std::string eventId, std::string zo
 
 	color.AddMember(JSON_KEY_GRADIENT, gradient, allocator);
 	handler.AddMember(JSON_KEY_COLOR, color, allocator);
+
+	if(flashCol)
+	{
+		rapidjson::Value rate(rapidjson::kObjectType);
+		rate.AddMember(JSON_KEY_FREQUENCY, colorFlashFreq, allocator);
+		if(colorFlashCount)
+			rate.AddMember(JSON_KEY_REPEAT_LIMIT, colorFlashCount, allocator);
+
+		handler.AddMember(JSON_KEY_RATE, rate, allocator);
+	}
 
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);

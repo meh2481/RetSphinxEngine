@@ -23,8 +23,12 @@ DebugUI::DebugUI(GameEngine *ge)
 	rumbleFreq = 0.65;
 	rumbleLen = 100;
 	percentHealth = 100;
-	mouse0Color[0] = mouse0Color[1] = mouse0Color[2] = 1.0;
-	mouse100Color[0] = mouse100Color[1] = mouse100Color[2] = 1.0;
+	mouse0Color[0] = 1.0f;
+	mouse0Color[1] = 0.0f;
+	mouse0Color[2] = 0.0f;
+	mouse100Color[0] = 0.0f;
+	mouse100Color[1] = 1.0f;
+	mouse100Color[2] = 0.0f;
 	prefixBuf[0] = suffixBuf[0] = '\0';
 	screenMs = 0;
 	colorValue = 0;
@@ -119,7 +123,7 @@ void DebugUI::_draw()
 				if(ImGui::Button("Test Mouse Color"))
 				{
 					const char* TEST_EVNT = "TEST_EVENT_COLOR";
-					_ge->getSSCommunicator()->bindColorEvent(TEST_EVNT, colorZone, mouse0Color, mouse100Color);//, colorFlash, colorFlashFreq, colorFlashCount);
+					_ge->getSSCommunicator()->bindColorEvent(TEST_EVNT, colorZone, mouse0Color, mouse100Color, colorFlash, colorFlashFreq, colorFlashCount);
 					_ge->getSSCommunicator()->sendEvent(TEST_EVNT, colorValue);
 				}
 				if(ImGui::Combo("Color zone", &selectedSSMouseColorZone, steelSeriesColorZones, 3))
@@ -127,10 +131,11 @@ void DebugUI::_draw()
 				ImGui::ColorEdit3("0 Color", mouse0Color);
 				ImGui::ColorEdit3("100 Color", mouse100Color);
 				ImGui::SliderInt("Value", &colorValue, 0, 100);
-				if(ImGui::Checkbox("Flash", &colorFlash))
+				ImGui::Checkbox("Flash", &colorFlash);
+				if(colorFlash)
 				{
-					ImGui::SliderFloat("Frequency", &colorFlashFreq, 0.0f, 100.0f);
-					ImGui::SliderInt("Repeat (0 = forever)", &colorFlashCount, 0, 50);
+					ImGui::SliderFloat("Frequency", &colorFlashFreq, 0.0f, 30.0f);
+					ImGui::SliderInt("Repeat (0 = forever)", &colorFlashCount, 0, 100);
 				}
 			}
 

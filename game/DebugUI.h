@@ -43,6 +43,8 @@ private:
 	float mouse0Color[3];
 	float mouse100Color[3];
 	bool colorFlash;
+	float colorFlashFreq;
+	int colorFlashCount;
 
 	//Mouse screen testing helper vars
 	int selectedEventIcon;
