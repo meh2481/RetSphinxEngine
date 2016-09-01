@@ -45,11 +45,11 @@ DebugUI::~DebugUI()
 
 void DebugUI::draw()
 {
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.2f, 0.2f, 0.9f));
-	//ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.2f, 0.2f, 0.2f, 0.9f));
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
+	style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
 	_draw();
 	hadFocus = ImGui::IsMouseHoveringAnyWindow();
-	ImGui::PopStyleColor(1);
 }
 
 void DebugUI::_draw()
