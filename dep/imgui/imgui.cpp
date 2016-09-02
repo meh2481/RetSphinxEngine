@@ -3916,7 +3916,9 @@ bool ImGui::Begin(const char* name, bool* p_open, const ImVec2& size_on_first_us
         if (!(flags & ImGuiWindowFlags_NoTitleBar) && !(flags & ImGuiWindowFlags_NoCollapse))
         {
             ImRect title_bar_rect = window->TitleBarRect();
-            if (g.HoveredWindow == window && IsMouseHoveringRect(title_bar_rect.Min, title_bar_rect.Max) && g.IO.MouseDoubleClicked[0])
+			ImVec2 arrowR(title_bar_rect.Min.x + window->TitleBarHeight(), title_bar_rect.Max.y);
+            if ((g.HoveredWindow == window && IsMouseHoveringRect(title_bar_rect.Min, title_bar_rect.Max) && g.IO.MouseDoubleClicked[0]) ||
+				(g.HoveredWindow == window && IsMouseHoveringRect(title_bar_rect.Min, arrowR) && g.IO.MouseClicked[0]))	//Collapse window by single-clicking on triangle in upper left
             {
                 window->Collapsed = !window->Collapsed;
                 if (!(flags & ImGuiWindowFlags_NoSavedSettings))
