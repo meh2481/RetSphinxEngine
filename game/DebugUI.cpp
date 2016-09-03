@@ -12,6 +12,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	_ge = ge;
 	showTestWindow = false;
 	rumbleMenu = true;
+	windowFlags = ImGuiWindowFlags_ShowBorders;
 
 	largeMotorStrength = USHRT_MAX;
 	smallMotorStrength = USHRT_MAX;
@@ -37,6 +38,10 @@ DebugUI::DebugUI(GameEngine *ge)
 	colorFlash = false;
 	colorFlashFreq = 5.0f;
 	colorFlashCount = 0;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
+	style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
 }
 
 DebugUI::~DebugUI()
@@ -45,9 +50,6 @@ DebugUI::~DebugUI()
 
 void DebugUI::draw()
 {
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
-	style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
 	_draw();
 	hadFocus = ImGui::IsMouseHoveringAnyWindow();
 }
@@ -76,7 +78,7 @@ void DebugUI::_draw()
 	}
 
 	if(memEdit.Open)
-		memEdit.Draw("Memory Editor", (unsigned char*)_ge, sizeof(*_ge));
+		memEdit.Draw("Memory Editor", (unsigned char*)_ge, sizeof(*_ge), 0, windowFlags);
 
 #ifdef _DEBUG
 	if(showTestWindow)
@@ -85,7 +87,7 @@ void DebugUI::_draw()
 
 	if(rumbleMenu)
 	{
-		if(ImGui::Begin("SteelSeries & Rumble", &rumbleMenu))
+		if(ImGui::Begin("SteelSeries & Rumble", &rumbleMenu, windowFlags))
 		{
 			//Controller rumble testing
 			if(ImGui::CollapsingHeader("Game controller rumble"))

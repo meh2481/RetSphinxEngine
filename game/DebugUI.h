@@ -25,6 +25,7 @@ private:
 
 	bool showTestWindow;
 	bool rumbleMenu;
+	int windowFlags;
 
 	//Rumble testing helper vars
 	int largeMotorStrength;

@@ -33,9 +33,9 @@ MemoryEditor::MemoryEditor()
     AllowEdits = true;
 }
 
-void MemoryEditor::Draw(const char* title, unsigned char* mem_data, int mem_size, size_t base_display_addr /* = 0 */)
+void MemoryEditor::Draw(const char* title, unsigned char* mem_data, int mem_size, size_t base_display_addr /* = 0 */, int flags /* = 0 */)
 {
-    if (ImGui::Begin(title, &Open))
+    if (ImGui::Begin(title, &Open, flags))
     {
         ImGui::BeginChild("##scrolling", ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()));
 

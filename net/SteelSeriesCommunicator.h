@@ -11,7 +11,6 @@ class SteelSeriesCommunicator
 
 	std::string getSSURL();	//Get the URL for communicating with SteelSeries devices
 	bool registerApp(std::string ID, std::string displayName);		//Registers the application
-	std::string normalize(std::string input);						//Normalizes this string to all uppercase, no punctuation
 	bool sendJSON(const rapidjson::Document& doc, const char* endpoint);	//Sends this JSON to the specified endpoint
 
 	std::string stringify(const rapidjson::Document& doc);			//Stringifies the passed-in JSON doc

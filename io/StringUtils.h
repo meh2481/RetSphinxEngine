@@ -27,5 +27,7 @@ namespace StringUtils
 	//Get the file extension (not including the dot) from a filename, or empty string if there is none
 	// For example: if filename is "image.png", then getExtension(filename) will be "png"
 	std::string getExtension(std::string filename);
+
+	std::string normalize(std::string input); //Normalizes this string to all uppercase, no punctuation
 }
 

@@ -2,9 +2,9 @@
 #include "rapidjson/prettywriter.h"
 #include "easylogging++.h"
 #include "NetworkThread.h"
+#include "StringUtils.h"
 #include <sstream>
 #include <fstream>
-#include <algorithm>
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -84,7 +84,7 @@ SteelSeriesCommunicator::SteelSeriesCommunicator()
 {
 	url = appId = "";
 	heartbeatTimer = 0;
-	valid = false;
+	valid = true;
 }
 
 SteelSeriesCommunicator::~SteelSeriesCommunicator()
@@ -163,16 +163,15 @@ bool SteelSeriesCommunicator::init(std::string appName)
 		return false;
 	}
 
-	if(!registerApp(normalize(appName), appName)) 
+	if(!registerApp(StringUtils::normalize(appName), appName))
+	{
+		valid = false;
 		return false;
-
-	valid = true;
+	}
 
 
 	//TEST
 	bindTestEvent();
-	//sendTestEvent();
-
 
 	return true;
 }
@@ -204,15 +203,10 @@ bool SteelSeriesCommunicator::registerApp(std::string ID, std::string displayNam
 	return sendJSON(doc, URL_REGISTER_APP);
 }
 
-string SteelSeriesCommunicator::normalize(std::string input)
-{
-	transform(input.begin(), input.end(), input.begin(), ::toupper);
-	input.erase(remove_if(input.begin(), input.end(), [](char c) { return (!isalnum(c) && c != '_'); }), input.end());
-	return input;
-}
-
 bool SteelSeriesCommunicator::sendJSON(const rapidjson::Document & doc, const char * endpoint)
 {
+	if(!valid) return false;
+
 	std::string stringifiedJSON = stringify(doc);
 
 	//Send message to SS

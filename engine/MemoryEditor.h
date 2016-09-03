@@ -14,5 +14,5 @@ public:
 
     MemoryEditor();
 
-    void Draw(const char* title, unsigned char* mem_data, int mem_size, size_t base_display_addr = 0);
+    void Draw(const char* title, unsigned char* mem_data, int mem_size, size_t base_display_addr = 0, int flags = 0);
 };
