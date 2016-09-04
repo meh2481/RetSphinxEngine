@@ -6,7 +6,7 @@
 #include "EntityManager.h"
 #include "ParticleSystem.h"
 #include "StringUtils.h"
-#include "SteelSeriesCommunicator.h"
+#include "SteelSeriesClient.h"
 using namespace std;
 
 //Defined by SDL
@@ -146,11 +146,6 @@ public:
 	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 	{
 		g_pGlobalEngine->rumbleLR(duration, large, small);
-	}
-
-	static void rumbleMouse()
-	{
-		g_pGlobalEngine->steelSeriesCommunicator->sendTestEvent();
 	}
 };
 
@@ -586,12 +581,6 @@ luaFunc(mouse_setCursor)	//void mouse_setCursor(string cursorFile)
 	luaReturnNil();
 }
 
-luaFunc(mouse_rumble)
-{
-	GameEngineLua::rumbleMouse();
-	luaReturnNil();
-}
-
 //-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
@@ -635,7 +624,6 @@ static LuaFunctions s_functab[] =
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),
 	luaRegister(mouse_setCursor),
-	luaRegister(mouse_rumble),
 	{NULL, NULL}
 };
 

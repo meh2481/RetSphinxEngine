@@ -1,5 +1,43 @@
 #pragma once
 
+//JSON keys for SteelSeries testing
+#define JSON_KEY_BLUE "blue"
+#define JSON_KEY_COLOR "color"
+#define JSON_KEY_DATAS "datas"
+#define JSON_KEY_DEVICE_TYPE "device-type"
+#define JSON_KEY_EVENT "event"
+#define JSON_KEY_FREQUENCY "frequency"
+#define JSON_KEY_GAME "game"
+#define JSON_KEY_GRADIENT "gradient"
+#define JSON_KEY_GREEN "green"
+#define JSON_KEY_HANDLERS "handlers"
+#define JSON_KEY_HAS_TEXT "has-text"
+#define JSON_KEY_HUNDRED "hundred"
+#define JSON_KEY_ICON_ID "icon-id"
+#define JSON_KEY_LENGTH_MILLIS "length-millis"
+#define JSON_KEY_LENGTH_MS "length-ms"
+#define JSON_KEY_MAX_VALUE "max_value"
+#define JSON_KEY_MIN_VALUE "min_value"
+#define JSON_KEY_MODE "mode"
+#define JSON_KEY_PATTERN "pattern"
+#define JSON_KEY_PREFIX	"prefix"
+#define JSON_KEY_RATE "rate"
+#define JSON_KEY_RED "red"
+#define JSON_KEY_REPEAT_LIMIT "repeat_limit"
+#define JSON_KEY_SUFFIX	"suffix"
+#define JSON_KEY_TYPE "type"
+#define JSON_KEY_ZERO "zero"
+#define JSON_KEY_ZONE "zone"
+
+//Other keys for SteelSeries testing
+#define TYPE_MOUSE "mouse"
+#define TYPE_SCREENED "screened"
+#define TYPE_TACTILE "tactile"
+#define ZONE_ONE "one"
+#define MODE_COLOR "color"
+#define MODE_SCREEN "screen"
+#define MODE_VIBRATE "vibrate"
+
 const char* steelSeriesTactileEvents[] = {
 	"custom",
 	"ti_predefined_strongclick_100",

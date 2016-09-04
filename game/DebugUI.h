@@ -53,4 +53,9 @@ private:
 	int screenMs;
 	char prefixBuf[SS_BUF_SZ];
 	char suffixBuf[SS_BUF_SZ];
+
+	//Helper functions for dealing with SteelSeries mouse testing
+	void bindTactileEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen = 100);
+	void bindScreenEvent(std::string eventId, int iconId, int ms = 0, std::string prefixText = "", std::string suffixText = "");
+	void bindColorEvent(std::string eventId, std::string zone, float zeroColor[3], float hundredColor[3], bool flashCol = false, float colorFlashFreq = 1.0f, int colorFlashCount = 0);
 };

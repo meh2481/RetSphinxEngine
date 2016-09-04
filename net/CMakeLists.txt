@@ -5,8 +5,8 @@ MutexLock.cpp
 MutexLock.h
 NetworkThread.cpp
 NetworkThread.h
-SteelSeriesCommunicator.h
-SteelSeriesCommunicator.cpp
+SteelSeriesClient.h
+SteelSeriesClient.cpp
 SteelSeriesEvents.h
 ThreadsafeQueue.h
 )

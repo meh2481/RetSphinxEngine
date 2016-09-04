@@ -15,7 +15,7 @@
 #include "tinyxml2.h"
 
 class DebugUI;
-class SteelSeriesCommunicator;
+class SteelSeriesClient;
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -66,7 +66,7 @@ private:
 	std::string m_sLoadScene;	//If this is ever set, on the next frame we'll load this map
 	std::string m_sLoadNode;		//If the above is set and this is also set, warp to this named node when loading the map
 	std::string m_sLastScene;
-	SteelSeriesCommunicator* steelSeriesCommunicator;
+	SteelSeriesClient* steelSeriesClient;
 
 	DebugUI *m_debugUI;
 
@@ -99,7 +99,7 @@ public:
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
 	void rumbleLR(uint32_t duration, uint16_t large, uint16_t small);	//Rumble L/R
 	void warpObjectToNode(Object* o, Node* n);
-	SteelSeriesCommunicator* getSSCommunicator() { return steelSeriesCommunicator; };
+	SteelSeriesClient* getSteelSeriesClient() { return steelSeriesClient; };
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float dt);

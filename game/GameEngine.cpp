@@ -14,7 +14,7 @@
 #include "EntityManager.h"
 #include "Stringbank.h"
 #include "SystemUtils.h"
-#include "SteelSeriesCommunicator.h"
+#include "SteelSeriesClient.h"
 #include "NetworkThread.h"
 using namespace std;
 
@@ -60,7 +60,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 
 	m_debugUI = new DebugUI(this);
 
-	steelSeriesCommunicator = new SteelSeriesCommunicator();
+	steelSeriesClient = new SteelSeriesClient();
 }
 
 GameEngine::~GameEngine()
@@ -69,7 +69,7 @@ GameEngine::~GameEngine()
 	saveConfig(getSaveLocation() + "config.xml");
 	getEntityManager()->cleanup();
 	delete m_debugUI;
-	delete steelSeriesCommunicator;
+	delete steelSeriesClient;
 	NetworkThread::stop();
 }
 
@@ -79,7 +79,7 @@ void GameEngine::frame(float dt)
 
 	stepPhysics(dt);
 	getEntityManager()->update(dt);
-	steelSeriesCommunicator->update(dt);
+	steelSeriesClient->update(dt);
 	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())
@@ -272,7 +272,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		LOG(ERROR) << "Unable to start networking thread";
 
 	//Open communication to SteelSeries drivers
-	if(steelSeriesCommunicator->init(getAppName()))
+	if(steelSeriesClient->init(getAppName()))
 		LOG(INFO) << "Initialized with SteelSeries drivers";
 	else
 		LOG(WARNING) << "Unable to communcate with SteelSeries drivers";
