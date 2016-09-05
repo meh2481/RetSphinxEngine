@@ -267,15 +267,19 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		getStringbank()->setLanguage(sLocale.c_str());
 	}
 
-	//Start network thread
-	if(!NetworkThread::start())
-		LOG(ERROR) << "Unable to start networking thread";
+	//Start network thread, if SS engine is here
+	if(steelSeriesClient->isValid())
+	{
+		//TODO: If we have other networking stuff, this shouldn't depend on SS engine
+		if(!NetworkThread::start())
+			LOG(ERROR) << "Unable to start networking thread";
 
-	//Open communication to SteelSeries drivers
-	if(steelSeriesClient->init(getAppName()))
-		LOG(INFO) << "Initialized with SteelSeries drivers";
-	else
-		LOG(WARNING) << "Unable to communcate with SteelSeries drivers";
+		//Open communication to SteelSeries drivers
+		if(steelSeriesClient->init(getAppName()))
+			LOG(INFO) << "Initialized with SteelSeries drivers";
+		else
+			LOG(WARNING) << "Unable to communicate with SteelSeries drivers";
+	}
 
 }
 

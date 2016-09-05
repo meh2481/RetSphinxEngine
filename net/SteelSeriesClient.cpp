@@ -40,9 +40,11 @@ const float HEARTBEAT_FREQUENCY = (((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
 
 SteelSeriesClient::SteelSeriesClient()
 {
-	url = appId = "";
-	heartbeatTimer = 0;
 	valid = true;
+	url = getSSURL();
+	if(url.empty())
+		valid = false;
+	heartbeatTimer = 0;
 }
 
 SteelSeriesClient::~SteelSeriesClient()
@@ -114,25 +116,18 @@ string SteelSeriesClient::getSSURL()
 
 bool SteelSeriesClient::init(std::string appName)
 {
-	url = getSSURL();
-	if(url.empty())
-	{
-		valid = false;
-		return false;
-	}
-
 	if(!registerApp(StringUtils::normalize(appName), appName))
 	{
 		valid = false;
 		return false;
 	}
-
 	return true;
 }
 
 void SteelSeriesClient::update(float dt)
 {
-	if(!valid) return;
+	if(!valid) 
+		return;
 
 	heartbeatTimer += dt;
 	if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
@@ -159,7 +154,8 @@ bool SteelSeriesClient::registerApp(std::string ID, std::string displayName)
 
 bool SteelSeriesClient::sendJSON(std::string stringifiedJSON, const char * endpoint)
 {
-	if(!valid) return false;
+	if(!valid) 
+		return false;
 
 	//Send message to SS
 	NetworkThread::NetworkMessage msg;
@@ -185,11 +181,6 @@ void SteelSeriesClient::heartbeat()
 void SteelSeriesClient::bindEvent(std::string eventJSON)
 {
 	sendJSON(eventJSON, URL_BIND_EVENT);
-}
-
-void SteelSeriesClient::bindEvent(const rapidjson::Document & eventJSON)
-{
-	bindEvent(StringUtils::stringify(eventJSON));
 }
 
 void SteelSeriesClient::sendEvent(std::string eventId, int value)

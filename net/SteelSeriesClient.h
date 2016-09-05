@@ -18,10 +18,11 @@ public:
 	SteelSeriesClient();
 	~SteelSeriesClient();
 
+	bool isValid() { return valid; };	//Call after constructor to determine if the SS engine exists or not
+
 	bool init(std::string appName);	//Register ourselves with SteelSeries with the given app name
 	void update(float dt);			//Update (Call every frame)
 
 	void bindEvent(std::string eventJSON);					//Create an event with this (stringified) JSON
-	void bindEvent(const rapidjson::Document& eventJSON);	//Create an event with this JSON
 	void sendEvent(std::string eventId, int value);			//Send an update to this event
 };

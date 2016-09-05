@@ -37,11 +37,11 @@ namespace NetworkThread
 	ThreadsafeQueue<NetworkMessage> outgoing;
 
 	//Thread to spin off
-	SDL_Thread *thread;
+	SDL_Thread *thread = NULL;
 
 	//These two go together
-	SDL_mutex *stopMutex;	//Lock if you want to get/set stopFlag
-	bool stopFlag;			//true if networking thread should quit
+	SDL_mutex *stopMutex = NULL;	//Lock if you want to get/set stopFlag
+	bool stopFlag;					//true if networking thread should quit
 
 	void sendPost(const NetworkMessage& msg)
 	{
@@ -108,6 +108,9 @@ namespace NetworkThread
 
 	bool stop()
 	{
+		if(thread == NULL)
+			return false;
+
 		//Stop mutex
 		{
 			MutexLock lock(stopMutex);
@@ -127,6 +130,7 @@ namespace NetworkThread
 
 	bool send(NetworkMessage message)
 	{
+		assert(thread != NULL);
 		outgoing.push(message);
 		return true;
 	}

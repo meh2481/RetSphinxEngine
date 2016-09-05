@@ -197,7 +197,7 @@ void DebugUI::bindTactileEvent(std::string eventId)
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
 
-	_ge->getSteelSeriesClient()->bindEvent(doc);
+	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
 
 void DebugUI::bindScreenEvent(std::string eventId)
@@ -229,7 +229,7 @@ void DebugUI::bindScreenEvent(std::string eventId)
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
 
-	_ge->getSteelSeriesClient()->bindEvent(doc);
+	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
 
 void DebugUI::bindColorEvent(std::string eventId)
@@ -280,5 +280,5 @@ void DebugUI::bindColorEvent(std::string eventId)
 	handlers.PushBack(handler, allocator);
 	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
 
-	_ge->getSteelSeriesClient()->bindEvent(doc);
+	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
