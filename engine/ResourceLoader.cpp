@@ -458,7 +458,39 @@ Stringbank * ResourceLoader::getStringbank(std::string sID)
 	return sb;
 }
 
-ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
+std::string ResourceLoader::readTextFile(std::string filename)
+{
+	std::string contents;
+	FILE *fp = fopen(filename.c_str(), "rb");
+	if(fp)
+	{
+		fseek(fp, 0, SEEK_END);
+		contents.resize(ftell(fp));
+		rewind(fp);
+		fread(&contents[0], 1, contents.size(), fp);
+		fclose(fp);
+	}
+	return contents;
+}
+
+std::string ResourceLoader::getTextFile(std::string sID)
+{
+	LOG(TRACE) << "Loading text file " << sID;
+	uint64_t hashVal = Hash::hash(sID.c_str());
+	unsigned int len = 0;
+	unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
+	if(!resource || !len)
+	{
+		LOG(TRACE) << "Unable to load " << sID << " from pak";
+		return readTextFile(sID);
+	}
+	std::string s;
+	s.resize(len);
+	memcpy(&s[0], resource, len);
+	return s;
+}
+
+ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 {
 	ObjSegment* seg = new ObjSegment();
 
@@ -492,7 +524,7 @@ ObjSegment* ResourceLoader::getObjSegment(tinyxml2::XMLElement* layer)
 	return seg;
 }
 
-Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
+Object* ResourceLoader::getObject(string sType, Vec2 ptOffset, Vec2 ptVel)
 {
 	ostringstream oss;
 	oss << "res/obj/" << sType << ".xml";
@@ -549,7 +581,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 		ObjSegment* seg;
 		tinyxml2::XMLElement* layer = segment->FirstChildElement("layer");
 		if(layer != NULL)
-			seg = getObjSegment(layer);
+			seg = getObjectSegment(layer);
 		else
 			seg = new ObjSegment;
 		seg->parent = o;
@@ -600,7 +632,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 
 			//Create body fixtures
 			for(tinyxml2::XMLElement* fixture = body->FirstChildElement("fixture"); fixture != NULL; fixture = fixture->NextSiblingElement("fixture"))
-				readFixture(fixture, bod);
+				getObjectFixture(fixture, bod);
 		}
 		o->addSegment(seg);
 	}
@@ -742,7 +774,7 @@ Object* ResourceLoader::objFromXML(string sType, Vec2 ptOffset, Vec2 ptVel)
 	return o;
 }
 
-b2Fixture* ResourceLoader::readFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
+b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
 	b2FixtureDef fixtureDef;
 	b2PolygonShape dynamicBox;

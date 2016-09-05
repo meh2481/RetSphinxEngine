@@ -35,7 +35,7 @@ public:
 
 	static Object* xmlParseObj(string sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
 	{
-		Object* o = g_pGlobalEngine->getResourceLoader()->objFromXML(sClassName, ptOffset, ptVel);
+		Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel);
 		if(o)
 			o->lua = g_pGlobalEngine->Lua;	//TODO Better way to load lua
 		return o;
@@ -146,6 +146,16 @@ public:
 	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 	{
 		g_pGlobalEngine->rumbleLR(duration, large, small);
+	}
+
+	static void sendSSEvent(string eventId, int value)
+	{
+		g_pGlobalEngine->getSteelSeriesClient()->sendEvent(eventId, value);
+	}
+
+	static void bindSSEvent(string filename)
+	{
+		g_pGlobalEngine->getSteelSeriesClient()->bindEvent(g_pGlobalEngine->getResourceLoader()->getTextFile(filename));
 	}
 };
 
@@ -582,6 +592,27 @@ luaFunc(mouse_setCursor)	//void mouse_setCursor(string cursorFile)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// SteelSeries events
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(ss_bindEvent)	//void ss_bindEvent(string eventFilename)
+{
+	if(lua_isstring(L, 1))
+	{
+		GameEngineLua::bindSSEvent(lua_tostring(L, 1));
+	}
+	luaReturnNil();
+}
+
+luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
+{
+	if(lua_isstring(L, 1) && lua_isinteger(L, 2))
+	{
+		GameEngineLua::sendSSEvent(lua_tostring(L, 1), lua_tointeger(L, 2));
+	}
+	luaReturnNil();
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
@@ -624,6 +655,8 @@ static LuaFunctions s_functab[] =
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),
 	luaRegister(mouse_setCursor),
+	luaRegister(ss_bindEvent),
+	luaRegister(ss_sendEvent),
 	{NULL, NULL}
 };
 

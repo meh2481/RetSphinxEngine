@@ -274,7 +274,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load layers for the scene
 	for(tinyxml2::XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
 	{
-		ObjSegment* seg = getResourceLoader()->getObjSegment(layer);
+		ObjSegment* seg = getResourceLoader()->getObjectSegment(layer);
 		getEntityManager()->add(seg);
 	}
 	
@@ -296,7 +296,7 @@ void GameEngine::loadScene(string sXMLFilename)
 			if(cVel != NULL)
 				vel = pointFromString(cVel);
 			
-			Object* o = getResourceLoader()->objFromXML(cObjType, pos, vel);
+			Object* o = getResourceLoader()->getObject(cObjType, pos, vel);
 			
 			if(o != NULL)
 			{
@@ -345,7 +345,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load level geometry
 	for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
 	{
-		b2Fixture* fixture = getResourceLoader()->readFixture(geom, groundBody);
+		b2Fixture* fixture = getResourceLoader()->getObjectFixture(geom, groundBody);
 		if(fixture)
 		{
 			Vec2 pos;

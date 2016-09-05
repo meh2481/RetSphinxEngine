@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <string>
 
 class Image;
 class Mesh3D;
@@ -15,11 +16,14 @@ class ResourceCache
 
 	std::map<uint64_t, Font*> fontIDMap;
 
+	std::map<uint64_t, std::string> textIDMap;
+
 	//std::map<uint64_t, MouseCursor*> cursorIDMap;
 
 	void clearImages();
 	void clearFonts();
 	void clearMeshes();
+	void clearTextFiles();
 	//void clearCursors();
 
 public:
@@ -36,6 +40,9 @@ public:
 
 	//MouseCursor* findCursor(uint64_t id);
 	//void addCursor(uint64_t id, MouseCursor* cur);
+
+	std::string findTextFile(uint64_t id);
+	void addTextFile(uint64_t id, const std::string& str);
 
 	void clear();
 };

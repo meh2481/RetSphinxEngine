@@ -61,11 +61,25 @@ Mesh3D* ResourceCache::findMesh(uint64_t id)
 //	return i->second;
 //}
 
+std::string ResourceCache::findTextFile(uint64_t id)
+{
+	map<uint64_t, std::string>::iterator i = textIDMap.find(id);
+	if(i == textIDMap.end())	//This mesh isn't here
+		return std::string();
+	return i->second;
+}
+
+void ResourceCache::addTextFile(uint64_t id, const std::string & str)
+{
+	textIDMap[id] = str;
+}
+
 void ResourceCache::clear()
 {
 	clearImages(); 
 	clearMeshes();
 	clearFonts();
+	clearTextFiles();
 //	clearCursors();
 }
 
@@ -88,6 +102,11 @@ void ResourceCache::clearMeshes()
 	for(map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
 		delete (i->second);
 	meshIDMap.clear();
+}
+
+void ResourceCache::clearTextFiles()
+{
+	textIDMap.clear();
 }
 
 //void ResourceCache::clearCursors()

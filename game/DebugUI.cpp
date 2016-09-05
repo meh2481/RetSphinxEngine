@@ -187,11 +187,11 @@ void DebugUI::bindTactileEvent(std::string eventId)
 	handler.AddMember(JSON_KEY_RATE, rate, allocator);
 
 	rapidjson::Value patterns(rapidjson::kArrayType);
-	rapidjson::Value patternLub(rapidjson::kObjectType);
-	patternLub.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
-	if(eventType == "custom")
-		patternLub.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
-	patterns.PushBack(patternLub, allocator);
+	rapidjson::Value pattern(rapidjson::kObjectType);
+	pattern.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
+	if(eventType == steelSeriesTactileEvents[0])
+		pattern.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
+	patterns.PushBack(pattern, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
 
 	handlers.PushBack(handler, allocator);
