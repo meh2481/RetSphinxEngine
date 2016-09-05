@@ -5,6 +5,7 @@
 */
 #pragma once
 
+#include "rapidjson/document.h"
 #include <string>
 
 //--------------------------------------------------
@@ -29,5 +30,7 @@ namespace StringUtils
 	std::string getExtension(std::string filename);
 
 	std::string normalize(std::string input); //Normalizes this string to all uppercase, no punctuation
+
+	std::string stringify(const rapidjson::Document& doc);	//Stringifies the passed-in JSON doc
 }
 

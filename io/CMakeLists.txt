@@ -18,4 +18,7 @@ wfLZ.c
 wfLZ.h
 )
 
+include_directories (.)
+include_directories (rapidjson)
+
 add_library(io ${io_src})

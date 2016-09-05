@@ -1,5 +1,4 @@
 #include "SteelSeriesClient.h"
-#include "rapidjson/prettywriter.h"
 #include "easylogging++.h"
 #include "NetworkThread.h"
 #include "StringUtils.h"
@@ -155,7 +154,7 @@ bool SteelSeriesClient::registerApp(std::string ID, std::string displayName)
 	doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
 	doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
 
-	return sendJSON(stringify(doc), URL_REGISTER_APP);
+	return sendJSON(StringUtils::stringify(doc), URL_REGISTER_APP);
 }
 
 bool SteelSeriesClient::sendJSON(std::string stringifiedJSON, const char * endpoint)
@@ -174,21 +173,13 @@ bool SteelSeriesClient::sendJSON(std::string stringifiedJSON, const char * endpo
 	return NetworkThread::send(msg);
 }
 
-string SteelSeriesClient::stringify(const rapidjson::Document& doc)
-{
-	rapidjson::StringBuffer sb;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
-	doc.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
-	return sb.GetString();
-}
-
 void SteelSeriesClient::heartbeat()
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
-	string heartbeatJSON = stringify(doc);
+	string heartbeatJSON = StringUtils::stringify(doc);
 
-	sendJSON(stringify(doc), URL_HEARTBEAT);
+	sendJSON(StringUtils::stringify(doc), URL_HEARTBEAT);
 }
 
 void SteelSeriesClient::bindEvent(std::string eventJSON)
@@ -198,7 +189,7 @@ void SteelSeriesClient::bindEvent(std::string eventJSON)
 
 void SteelSeriesClient::bindEvent(const rapidjson::Document & eventJSON)
 {
-	bindEvent(stringify(eventJSON));
+	bindEvent(StringUtils::stringify(eventJSON));
 }
 
 void SteelSeriesClient::sendEvent(std::string eventId, int value)
@@ -213,7 +204,7 @@ void SteelSeriesClient::sendEvent(std::string eventId, int value)
 	data.AddMember(JSON_KEY_VALUE, value, allocator);
 	doc.AddMember(JSON_KEY_DATA, data, allocator);
 
-	sendJSON(stringify(doc), URL_GAME_EVENT);
+	sendJSON(StringUtils::stringify(doc), URL_GAME_EVENT);
 }
 
 

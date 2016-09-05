@@ -3,6 +3,7 @@
 #include "GameEngine.h"
 #include "SteelSeriesEvents.h"
 #include "SteelSeriesClient.h"
+#include "StringUtils.h"
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
@@ -13,6 +14,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	showTestWindow = false;
 	rumbleMenu = true;
 	windowFlags = ImGuiWindowFlags_ShowBorders;
+	appName = StringUtils::normalize(_ge->getAppName());
 
 	largeMotorStrength = USHRT_MAX;
 	smallMotorStrength = USHRT_MAX;
@@ -92,7 +94,6 @@ void DebugUI::_draw()
 			//Controller rumble testing
 			if(ImGui::CollapsingHeader("Game controller rumble"))
 			{
-				//ImGui::LabelText("", "Game controller rumble");
 				if(ImGui::Button("Test controller rumble"))
 					_ge->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength);
 				ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
@@ -103,12 +104,11 @@ void DebugUI::_draw()
 			//Mouse rumble testing
 			if(ImGui::CollapsingHeader("SteelSeries mouse rumble"))
 			{
-				//ImGui::LabelText("", "SteelSeries mouse rumble");
 				if(ImGui::Button("Test mouse rumble"))
 				{
 					static int eventVal = 0;
 					const char* TEST_EVNT = "TEST_EVENT_RUMBLE";
-					bindTactileEvent(eventType, TEST_EVNT, rumbleFreq, rumbleCount, rumbleLen);
+					bindTactileEvent(TEST_EVNT);
 					_ge->getSteelSeriesClient()->sendEvent(TEST_EVNT, ++eventVal);
 				}
 				ImGui::SliderInt("Rumble repeat", &rumbleCount, 1, 10);
@@ -125,7 +125,7 @@ void DebugUI::_draw()
 				if(ImGui::Button("Test mouse color"))
 				{
 					const char* TEST_EVNT = "TEST_EVENT_COLOR";
-					bindColorEvent(TEST_EVNT, colorZone, mouse0Color, mouse100Color, colorFlash, colorFlashFreq, colorFlashCount);
+					bindColorEvent(TEST_EVNT);
 					_ge->getSteelSeriesClient()->sendEvent(TEST_EVNT, colorValue);
 				}
 				if(ImGui::Combo("Color zone", &selectedSSMouseColorZone, steelSeriesColorZones, 3))
@@ -147,7 +147,7 @@ void DebugUI::_draw()
 				if(ImGui::Button("Test mouse screen"))
 				{
 					const char* TEST_EVNT = "TEST_EVENT_SCREEN";
-					bindScreenEvent(TEST_EVNT, selectedEventIcon, screenMs, prefixBuf, suffixBuf);
+					bindScreenEvent(TEST_EVNT);
 					_ge->getSteelSeriesClient()->sendEvent(TEST_EVNT, percentHealth);
 				}
 
@@ -167,12 +167,12 @@ bool DebugUI::hasFocus()
 	return visible && (hadFocus || ImGui::IsMouseHoveringAnyWindow());
 }
 
-void DebugUI::bindTactileEvent(std::string eventType, std::string eventId, float rumbleFreq, int rumbleCount, int rumbleLen)
+void DebugUI::bindTactileEvent(std::string eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(_ge->getAppName().c_str()), allocator);
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appName.c_str()), allocator);
 	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
 
 	rapidjson::Value handlers(rapidjson::kArrayType);
@@ -200,14 +200,14 @@ void DebugUI::bindTactileEvent(std::string eventType, std::string eventId, float
 	_ge->getSteelSeriesClient()->bindEvent(doc);
 }
 
-void DebugUI::bindScreenEvent(std::string eventId, int iconId, int ms, std::string prefixText, std::string suffixText)
+void DebugUI::bindScreenEvent(std::string eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(_ge->getAppName().c_str()), allocator);
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appName.c_str()), allocator);
 	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
-	doc.AddMember(JSON_KEY_ICON_ID, iconId, allocator);
+	doc.AddMember(JSON_KEY_ICON_ID, selectedEventIcon, allocator);
 
 	rapidjson::Value handlers(rapidjson::kArrayType);
 	rapidjson::Value handler(rapidjson::kObjectType);
@@ -218,10 +218,10 @@ void DebugUI::bindScreenEvent(std::string eventId, int iconId, int ms, std::stri
 	rapidjson::Value datas(rapidjson::kArrayType);
 	rapidjson::Value data1(rapidjson::kObjectType);
 	data1.AddMember(JSON_KEY_HAS_TEXT, true, allocator);
-	data1.AddMember(JSON_KEY_PREFIX, rapidjson::StringRef(prefixText.c_str()), allocator);
-	data1.AddMember(JSON_KEY_SUFFIX, rapidjson::StringRef(suffixText.c_str()), allocator);
-	data1.AddMember(JSON_KEY_ICON_ID, iconId, allocator);
-	data1.AddMember(JSON_KEY_LENGTH_MILLIS, ms, allocator);
+	data1.AddMember(JSON_KEY_PREFIX, rapidjson::StringRef(prefixBuf), allocator);
+	data1.AddMember(JSON_KEY_SUFFIX, rapidjson::StringRef(suffixBuf), allocator);
+	data1.AddMember(JSON_KEY_ICON_ID, selectedEventIcon, allocator);
+	data1.AddMember(JSON_KEY_LENGTH_MILLIS, screenMs, allocator);
 
 	datas.PushBack(data1, allocator);
 	handler.AddMember(JSON_KEY_DATAS, datas, allocator);
@@ -232,12 +232,12 @@ void DebugUI::bindScreenEvent(std::string eventId, int iconId, int ms, std::stri
 	_ge->getSteelSeriesClient()->bindEvent(doc);
 }
 
-void DebugUI::bindColorEvent(std::string eventId, std::string zone, float zeroColor[3], float hundredColor[3], bool flashCol, float colorFlashFreq, int colorFlashCount)
+void DebugUI::bindColorEvent(std::string eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(_ge->getAppName().c_str()), allocator);
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appName.c_str()), allocator);
 	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
 	doc.AddMember(JSON_KEY_MIN_VALUE, 0, allocator);
 	doc.AddMember(JSON_KEY_MAX_VALUE, 100, allocator);
@@ -246,28 +246,28 @@ void DebugUI::bindColorEvent(std::string eventId, std::string zone, float zeroCo
 	rapidjson::Value handlers(rapidjson::kArrayType);
 	rapidjson::Value handler(rapidjson::kObjectType);
 	handler.AddMember(JSON_KEY_DEVICE_TYPE, TYPE_MOUSE, allocator);
-	handler.AddMember(JSON_KEY_ZONE, rapidjson::StringRef(zone.c_str()), allocator);
+	handler.AddMember(JSON_KEY_ZONE, rapidjson::StringRef(colorZone.c_str()), allocator);
 	handler.AddMember(JSON_KEY_MODE, MODE_COLOR, allocator);
 
 	rapidjson::Value color(rapidjson::kObjectType);
 	rapidjson::Value gradient(rapidjson::kObjectType);
 
 	rapidjson::Value zero(rapidjson::kObjectType);
-	zero.AddMember(JSON_KEY_RED, int(zeroColor[0] * 255), allocator);
-	zero.AddMember(JSON_KEY_GREEN, int(zeroColor[1] * 255), allocator);
-	zero.AddMember(JSON_KEY_BLUE, int(zeroColor[2] * 255), allocator);
+	zero.AddMember(JSON_KEY_RED, int(mouse0Color[0] * 255), allocator);
+	zero.AddMember(JSON_KEY_GREEN, int(mouse0Color[1] * 255), allocator);
+	zero.AddMember(JSON_KEY_BLUE, int(mouse0Color[2] * 255), allocator);
 	gradient.AddMember(JSON_KEY_ZERO, zero, allocator);
 
 	rapidjson::Value hundred(rapidjson::kObjectType);
-	hundred.AddMember(JSON_KEY_RED, int(hundredColor[0] * 255), allocator);
-	hundred.AddMember(JSON_KEY_GREEN, int(hundredColor[1] * 255), allocator);
-	hundred.AddMember(JSON_KEY_BLUE, int(hundredColor[2] * 255), allocator);
+	hundred.AddMember(JSON_KEY_RED, int(mouse100Color[0] * 255), allocator);
+	hundred.AddMember(JSON_KEY_GREEN, int(mouse100Color[1] * 255), allocator);
+	hundred.AddMember(JSON_KEY_BLUE, int(mouse100Color[2] * 255), allocator);
 	gradient.AddMember(JSON_KEY_HUNDRED, hundred, allocator);
 
 	color.AddMember(JSON_KEY_GRADIENT, gradient, allocator);
 	handler.AddMember(JSON_KEY_COLOR, color, allocator);
 
-	if(flashCol)
+	if(colorFlash)
 	{
 		rapidjson::Value rate(rapidjson::kObjectType);
 		rate.AddMember(JSON_KEY_FREQUENCY, colorFlashFreq, allocator);

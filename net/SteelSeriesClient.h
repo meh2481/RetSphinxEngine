@@ -12,7 +12,6 @@ class SteelSeriesClient
 	std::string getSSURL();	//Get the URL for communicating with SteelSeries devices
 	bool registerApp(std::string ID, std::string displayName);		//Registers the application
 	bool sendJSON(std::string stringifiedJSON, const char* endpoint);	//Sends this JSON to the specified endpoint
-	std::string stringify(const rapidjson::Document& doc);			//Stringifies the passed-in JSON doc
 	void heartbeat();												//Call this every so often so that SteelSeries drivers don't drop us
 
 public:

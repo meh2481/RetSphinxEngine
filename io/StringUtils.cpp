@@ -3,6 +3,7 @@
  Copyright (c) 2014 Mark Hutcheson
 */
 #include "StringUtils.h"
+#include "rapidjson/prettywriter.h"
 #include <algorithm>
 
 namespace StringUtils
@@ -72,6 +73,14 @@ namespace StringUtils
 		transform(input.begin(), input.end(), input.begin(), ::toupper);	//Convert to uppercase
 		input.erase(remove_if(input.begin(), input.end(), [](char c) { return (!isalnum(c) && c != '_'); }), input.end()); //Remove non alphanumeric chars
 		return input;
+	}
+
+	std::string stringify(const rapidjson::Document& doc)
+	{
+		rapidjson::StringBuffer sb;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+		doc.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
+		return sb.GetString();
 	}
 
 }
