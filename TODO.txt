@@ -1,20 +1,20 @@
 Overall TODO list:
-- Fix noise loading so it's not crazy slow
+- Remove noise loading; replace with pre-generated noise textures
 - Fix math for softbody lattice anim so it actually works properly
 - Use GLM for math stuff instead of glPushMatrix() and friends
-- Implement newer OpenGL shaders and such
+- Implement newer OpenGL shaders
 - Use shaders rather than lattice animations where possible
 - IO in separate thread?
 - Disable exceptions/rtti?
-- Add ImGUI editor stuff
-- rip out displaylists for 3D objects - vertex buffers are better
-- class predeclaration - don't have to include headers
-- Ortho HUD
-- Use allocator / choose one to use rather than mixing malloc & new
+- rip out displaylists for 3D objects and use vertex buffers instead
+- class predeclaration where possible
+- Ortho for HUD
+- Create allocator / choose one to use rather than mixing malloc & new
 - Decide if map loading is engine-specific or game-specific
 - Particle systems, objects, etc should be loaded by template, not from XML each time
-- .pak packager needs better organization - move all resource loading stuff to IO
+- Move all resource loading stuff to IO?
 - Move object self-creation into resource loaders where applicable
+- Revisit joystick support - support multiple controllers, switching input modes, etc
 - Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
 - Error checking of parameters in luafuncs.cpp
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
@@ -40,7 +40,7 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 
 Other misc unordered TODO:
 - Scene editor / XML exporter
-- Intelligently split things into subclasses, rather than having giant Engine and GameEngine classes that do everything
+- Intelligently split things into subclasses
 
 
 

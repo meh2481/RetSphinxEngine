@@ -16,15 +16,10 @@ private:
 	std::string     	m_sFilename;
 	int 		m_iWidth, m_iHeight;			// width and height of original image
 	
-#ifdef BIG_ENDIAN
-	uint32_t m_iRealWidth, m_iRealHeight;
-#endif
-
 	void _load(std::string sFilename);
 	void _loadPNG(std::string sFilename);
 	void _loadBlob(unsigned char* blob, unsigned int size);
 	void _bind(unsigned char* data, unsigned int width, unsigned int height, int mode);
-	//void _loadNoise(string sXMLFilename);
 
 public:
 	GLuint  _getTex() {return m_hTex;};
@@ -32,7 +27,6 @@ public:
 	//Constructor/destructor
 	Image(std::string sFilename);
 	Image(unsigned char* blob, unsigned int size);
-	//Image(uint32_t width, uint32_t height, float sizex = 1.0f, float sizey = 1.0f, float xoffset = 0.0f, float yoffset = 0.0f);	//Create image from random noise
 	~Image();
 
 	//Accessor methods

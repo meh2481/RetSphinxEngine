@@ -25,7 +25,6 @@ Image::Image(unsigned char* blob, unsigned int size)
 
 Image::Image(string sFilename)
 {
-	//m_bReloadEachTime = false;
 	m_hTex = 0;
 	m_iWidth = m_iHeight = 0;
 	m_sFilename = sFilename;
@@ -106,125 +105,6 @@ void Image::_loadPNG(string sFilename)
 	stbi_image_free(cBuf);
 }
 
-/*/TODO: This is CRAZY slow. Rip out, preload, or otherwise fix.
-
-SimplexNoise1234 noiseGen;
-
-//Code modified from https://cmaher.github.io/posts/working-with-simplex-noise/
-float sumOcatave(int num_iterations, float x, float y, float persistence, float scalex, float scaley, float low, float high, float freqinc)
-{
-float maxAmp = 0;
-float amp = 1;
-float freqx = scalex;
-float freqy = scaley;
-float noise = 0;
-
-//add successively smaller, higher-frequency terms
-for(int i = 0; i < num_iterations; ++i)
-{
-noise += noiseGen.noise(x * freqx, y * freqy) * amp;
-maxAmp += amp;
-amp *= persistence;
-freqx *= freqinc;
-freqy *= freqinc;
-}
-
-//take the average value of the iterations
-noise /= maxAmp;
-
-//normalize the result
-noise = noise * (high - low) / 2 + (high + low) / 2;
-
-return noise;
-}
-
-void Image::_loadNoise(string sXMLFilename)
-{
-	m_bReloadEachTime = true;
-	XMLDocument* doc = new XMLDocument;
-	int iErr = doc->LoadFile(sXMLFilename.c_str());
-	if(iErr != XML_NO_ERROR)
-	{
-		LOG(ERROR) << "Error opening image noise XML file: " << sXMLFilename << "- Error " << iErr
-		delete doc;
-		return;
-	}
-	
-	XMLElement* root = doc->RootElement();
-	if(root == NULL)
-	{
-		LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring..."
-		delete doc;
-		return;
-	}
-	
-	uint32_t width = 512;
-	uint32_t height = 512;
-	float sizex = 10.0f;
-	float sizey = 10.0f;
-	float xoffset = Random::randomFloat(0, 5000);	//By default, use random position in noise function
-	float yoffset = Random::randomFloat(0, 5000);
-	uint32_t iterations = 5;
-	float persistence = 0.5f;
-	float minval = -1.0f;
-	float maxval = 1.0f;
-	float freqinc = 2.0f;
-	
-	root->QueryUnsignedAttribute("width", &width);
-	root->QueryUnsignedAttribute("height", &height);
-	root->QueryFloatAttribute("sizex", &sizex);
-	root->QueryFloatAttribute("sizey", &sizey);
-	root->QueryFloatAttribute("xoffset", &xoffset);
-	root->QueryFloatAttribute("yoffset", &yoffset);
-	root->QueryUnsignedAttribute("iterations", &iterations);
-	root->QueryFloatAttribute("persistence", &persistence);
-	root->QueryFloatAttribute("min", &minval);
-	root->QueryFloatAttribute("max", &maxval);
-	root->QueryFloatAttribute("freqinc", &freqinc);
-	
-	Gradient g;
-	const char* cGradFile = root->Attribute("gradient");
-	if(cGradFile != NULL)
-		g.load(cGradFile);
-	else
-	{
-		g.insert(-1.0f, 255, 255, 255, 0);
-		g.insert(1.0f, 255, 255, 255, 255);	//Gradient from transparent white to opaque white
-	}
-	
-	//Done loading XML
-	delete doc;
-	
-	m_iWidth = width;
-	m_iHeight = height;
-	
-	//Generate noise
-	unsigned char* bits = new unsigned char[width*height*4];
-	unsigned char* ptr = bits;
-	for(uint32_t h = 0; h < height; h++)
-	{
-		for(uint32_t w = 0; w < width; w++)
-		{
-			//Grab noise value for this pixel from our noise summation function
-			float val = sumOcatave(iterations, (float(w+1)/float(width)) + xoffset,(float(h+1)/float(height)) + yoffset, persistence, sizex, sizey, minval, maxval, freqinc);
-			Color c = g.getVal(val);
-			
-			*ptr++ = (unsigned char)(c.r * 255.0f);
-			*ptr++ = (unsigned char)(c.g * 255.0f);
-			*ptr++ = (unsigned char)(c.b * 255.0f);
-			*ptr++ = (unsigned char)(c.a * 255.0f);
-		}
-	}
-	
-	glGenTextures(1, &m_hTex);
-	glBindTexture(GL_TEXTURE_2D, m_hTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	
-	delete[] bits;
-}*/
-
 void Image::render(Vec2 size, float tilex, float tiley)
 {
 	// tell opengl to use the generated texture
@@ -294,13 +174,6 @@ void Image::bindTexture()
 
 void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
 {
-	float maxx, maxy;
-#ifdef __BIG_ENDIAN__
-	maxx = (float)m_iWidth/(float)m_iRealWidth;
-	maxy = (float)m_iHeight/(float)m_iRealHeight;
-#else
-	maxx = maxy = 1.0;
-#endif
 	// tell opengl to use the generated texture
 	glBindTexture(GL_TEXTURE_2D, m_hTex);
 	
@@ -313,10 +186,10 @@ void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
     };
     const float texCoords[] =
     {
-        0.0, maxy, // upper left
-        maxx, maxy, // upper right
-        0.0, 0.0, // lower left
-        maxx, 0.0, // lower right
+        0.0f, 1.0f, // upper left
+        1.0f, 1.0f, // upper right
+        0.0f, 0.0f, // lower left
+        1.0f, 0.0f, // lower right
     };
     glVertexPointer(2, GL_FLOAT, 0, &vertexData);
     glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
