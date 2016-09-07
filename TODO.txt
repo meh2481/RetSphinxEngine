@@ -1,5 +1,4 @@
 Overall TODO list:
-- Remove noise loading; replace with pre-generated noise textures
 - Fix math for softbody lattice anim so it actually works properly
 - Use GLM for math stuff instead of glPushMatrix() and friends
 - Implement newer OpenGL shaders
@@ -16,7 +15,6 @@ Overall TODO list:
 - Move object self-creation into resource loaders where applicable
 - Revisit joystick support - support multiple controllers, switching input modes, etc
 - Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
-- Error checking of parameters in luafuncs.cpp
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 
 
