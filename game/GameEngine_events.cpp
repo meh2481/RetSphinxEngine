@@ -292,13 +292,16 @@ void GameEngine::handleEvent(SDL_Event event)
 		break;
 			
 		case SDL_MOUSEWHEEL:
-			if(event.wheel.y > 0)
+			if(!m_debugUI->visible)
 			{
-				CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
-			}
-			else
-			{
-				CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
+				if(event.wheel.y > 0)
+				{
+					CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
+				}
+				else
+				{
+					CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
+				}
 			}
 			break;
 

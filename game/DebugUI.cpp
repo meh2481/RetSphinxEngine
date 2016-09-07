@@ -218,14 +218,14 @@ void DebugUI::_draw()
 				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -180.0f, 180.0f);
 				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, -180.0f, 180.0f);
 				static float rotAxis[3] = { 0.0f, 0.0f, 1.0f };
-				if(ImGui::SliderFloat3("Rotation Axis", rotAxis, -1.0f, 1.0f))
+				if(ImGui::SliderFloat3("Rotation Axis (x, y, z)", rotAxis, -1.0f, 1.0f))
 				{
 					particles->rotAxis.x = rotAxis[0];
 					particles->rotAxis.y = rotAxis[1];
 					particles->rotAxis.z = rotAxis[2];
 				}
 				static float rotAxisVar[3] = { 0.0f, 0.0f, 0.0f };
-				if(ImGui::SliderFloat3("Rotation Axis var", rotAxisVar, -1.0f, 1.0f))
+				if(ImGui::SliderFloat3("Rotation Axis var (x, y, z)", rotAxisVar, -1.0f, 1.0f))
 				{
 					particles->rotAxisVar.x = rotAxisVar[0];
 					particles->rotAxisVar.y = rotAxisVar[1];
