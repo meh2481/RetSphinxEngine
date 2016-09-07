@@ -5,7 +5,7 @@
 #define SS_BUF_SZ 33
 
 class GameEngine;
-
+class ParticleSystem;
 
 class DebugUI
 {
@@ -59,4 +59,8 @@ private:
 	void bindTactileEvent(std::string eventId);
 	void bindScreenEvent(std::string eventId);
 	void bindColorEvent(std::string eventId);
+
+	//Variables for particle system editing
+	bool particleSystemEdit;
+	ParticleSystem* particles;
 };

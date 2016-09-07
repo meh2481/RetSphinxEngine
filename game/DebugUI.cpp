@@ -4,6 +4,7 @@
 #include "SteelSeriesEvents.h"
 #include "SteelSeriesClient.h"
 #include "StringUtils.h"
+#include "ParticleSystem.h"
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
@@ -44,6 +45,9 @@ DebugUI::DebugUI(GameEngine *ge)
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
 	style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
+
+	particleSystemEdit = true;
+	particles = new ParticleSystem();
 }
 
 DebugUI::~DebugUI()
@@ -72,6 +76,8 @@ void DebugUI::_draw()
 			ImGui::MenuItem("Memory Editor", NULL, &memEdit.Open);
 
 			ImGui::MenuItem("SteelSeries & Rumble", NULL, &rumbleMenu);
+
+			ImGui::MenuItem("Particle System Editor", NULL, &particleSystemEdit);
 
 			ImGui::EndMenu();
 		}
@@ -156,6 +162,101 @@ void DebugUI::_draw()
 				ImGui::InputText("Prefix text", prefixBuf, SS_BUF_SZ);
 				ImGui::InputText("Suffix text", suffixBuf, SS_BUF_SZ);
 				ImGui::SliderInt("Display duration (ms)", &screenMs, 0, 2559);
+			}
+		}
+		ImGui::End();
+	}
+
+	if(particleSystemEdit)
+	{
+		if(ImGui::Begin("Particle System Editor", &particleSystemEdit, windowFlags))
+		{
+			if(ImGui::CollapsingHeader("Size"))
+			{
+				static float startSz[2] = { 1.0f, 1.0f };
+				if(ImGui::SliderFloat2("Starting Size (x, y)", startSz, 0.0f, 5.0f))
+				{
+					particles->sizeStart.x = startSz[0];
+					particles->sizeStart.y = startSz[1];
+				}
+				static float endSz[2] = { 1.0f, 1.0f };
+				if(ImGui::SliderFloat2("Ending Size (x, y)", endSz, 0.0f, 5.0f))
+				{
+					particles->sizeEnd.x = endSz[0];
+					particles->sizeEnd.y = endSz[1];
+				}
+				ImGui::SliderFloat("Size var", &particles->sizeVar, 0.0f, 10.0f);
+			}
+			if(ImGui::CollapsingHeader("Speed"))
+			{
+				ImGui::SliderFloat("Speed", &particles->speed, 0.0f, 50.0f);
+				ImGui::SliderFloat("Speed var", &particles->speedVar, 0.0f, 50.0f);
+				static float accel[2] = { 0.0f, 0.0f };
+				if(ImGui::SliderFloat2("Acceleration (x, y)", accel, 0.0f, 5.0f))
+				{
+					particles->accel.x = accel[0];
+					particles->accel.y = accel[1];
+				}
+				static float accelVar[2] = { 0.0f, 0.0f };
+				if(ImGui::SliderFloat2("Acceleration var (x, y)", accelVar, 0.0f, 5.0f))
+				{
+					particles->accelVar.x = accelVar[0];
+					particles->accelVar.y = accelVar[1];
+				}
+				ImGui::SliderFloat("Tangential Accel", &particles->tangentialAccel, -100.0f, 100.0f);
+				ImGui::SliderFloat("Tangential Accel var", &particles->tangentialAccelVar, -100.0f, 100.0f);
+				ImGui::SliderFloat("Normal Accel", &particles->normalAccel, -100.0f, 100.0f);
+				ImGui::SliderFloat("Normal Accel var", &particles->normalAccelVar, -100.0f, 100.0f);
+			}
+			//TODO: Check if these are radians or degrees
+			if(ImGui::CollapsingHeader("Rotation"))
+			{
+				ImGui::SliderFloat("Starting Rotation", &particles->rotStart, -180.0f, 180.0f);
+				ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, -180.0f, 180.0f);
+				ImGui::SliderFloat("Rotational velocity", &particles->rotVel, -180.0f, 180.0f);
+				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, -180.0f, 180.0f);
+				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -180.0f, 180.0f);
+				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, -180.0f, 180.0f);
+				static float rotAxis[3] = { 0.0f, 0.0f, 1.0f };
+				if(ImGui::SliderFloat3("Rotation Axis", rotAxis, -1.0f, 1.0f))
+				{
+					particles->rotAxis.x = rotAxis[0];
+					particles->rotAxis.y = rotAxis[1];
+					particles->rotAxis.z = rotAxis[2];
+				}
+				static float rotAxisVar[3] = { 0.0f, 0.0f, 0.0f };
+				if(ImGui::SliderFloat3("Rotation Axis var", rotAxisVar, -1.0f, 1.0f))
+				{
+					particles->rotAxisVar.x = rotAxisVar[0];
+					particles->rotAxisVar.y = rotAxisVar[1];
+					particles->rotAxisVar.z = rotAxisVar[2];
+				}
+			}
+			if(ImGui::CollapsingHeader("Color"))
+			{
+				static float startCol[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+				if(ImGui::ColorEdit4("Start col", startCol))
+					particles->colStart.set(startCol[0], startCol[1], startCol[2], startCol[3]);
+				static float endCol[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				if(ImGui::ColorEdit4("End col", endCol))
+					particles->colEnd.set(endCol[0], endCol[1], endCol[2], endCol[3]);
+				static float colVar[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+				if(ImGui::ColorEdit4("Color var", colVar))
+					particles->colVar.set(colVar[0], colVar[1], colVar[2], colVar[3]);
+			}
+			if(ImGui::CollapsingHeader("Life"))
+			{
+				ImGui::SliderFloat("Lifetime (sec)", &particles->lifetime, 0.0f, 20.0f);
+				ImGui::SliderFloat("Lifetime var", &particles->lifetimeVar, -10.0f, 10.0f);
+				ImGui::SliderFloat("Lifetime Pre-Fade", &particles->lifetimePreFade, 0.0f, 20.0f);
+				ImGui::SliderFloat("Lifetime Pre-Fade var", &particles->lifetimePreFadeVar, -10.0f, 10.0f);
+				static bool psysDecay = false;
+				if(ImGui::Checkbox("Particle System Decay", &psysDecay))
+					particles->decay = 5.0f;	//On first tick, set to 5 secs (because it'll be FLT_MAX, which isn't pretty to look at)
+				if(psysDecay)
+					ImGui::SliderFloat("decay", &particles->decay, 0.0f, 120.0f);
+				else
+					particles->decay = FLT_MAX;
 			}
 		}
 		ImGui::End();
