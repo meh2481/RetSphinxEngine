@@ -61,6 +61,8 @@ DebugUI::DebugUI(GameEngine *ge)
 	particles->imgRect.push_back(rc);
 	particles->init();
 	particles->firing = false;
+
+	particleBgColor = Color(0, 0, 0, 1);
 }
 
 DebugUI::~DebugUI()
@@ -285,6 +287,9 @@ void DebugUI::_draw()
 				if(ImGui::ColorEdit4("Color var", colVar))
 					particles->colVar.set(colVar[0], colVar[1], colVar[2], colVar[3]);
 				ImGui::Combo("Blend Type", (int*)&particles->blend, particleBlendTypes, 3);
+				static float bgCol[3] = { 0.0f, 0.0f, 0.0f };
+				if(ImGui::ColorEdit3("Background Color", bgCol))
+					particleBgColor.set(bgCol[0], bgCol[1], bgCol[2]);
 			}
 			if(ImGui::CollapsingHeader("Life"))
 			{

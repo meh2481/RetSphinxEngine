@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "MemoryEditor.h"
+#include "Color.h"
 
 #define SS_BUF_SZ 33
 
@@ -22,6 +23,7 @@ public:
 	//Variables for particle system editing
 	bool particleSystemEdit;
 	ParticleSystem* particles;
+	Color particleBgColor;
 
 private:
 	void _draw();

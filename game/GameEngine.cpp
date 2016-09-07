@@ -95,8 +95,10 @@ void GameEngine::frame(float dt)
 		}
 	}
 
+#ifdef _DEBUG
 	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
 		m_debugUI->particles->update(dt);
+#endif
 }
 
 void GameEngine::draw()
@@ -198,15 +200,17 @@ void GameEngine::draw()
 	getEntityManager()->render(mat);
 	drawDebug();
 
+#ifdef _DEBUG
 	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
 	{
 		glLoadIdentity();
 		glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		fillScreen(Color(0, 0, 0, 1));
+		fillScreen(m_debugUI->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		m_debugUI->particles->draw();
 	}
+#endif
 	
 }
 
