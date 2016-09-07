@@ -7,6 +7,12 @@
 #include "ParticleSystem.h"
 #include <climits>
 
+const char* particleBlendTypes[] = {
+	"Additive",
+	"Normal",
+	"Subtractive"
+};
+
 DebugUI::DebugUI(GameEngine *ge)
 {
 	visible = false;
@@ -171,6 +177,29 @@ void DebugUI::_draw()
 	{
 		if(ImGui::Begin("Particle System Editor", &particleSystemEdit, windowFlags))
 		{
+			if(ImGui::Button("Fire Particles"))
+				;	//TODO
+			if(ImGui::CollapsingHeader("Images"))
+			{
+				ImGui::LabelText("", "TODO");
+			}
+			if(ImGui::CollapsingHeader("Emission"))
+			{
+				ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000.0f);
+				ImGui::SliderFloat("Rate", &particles->rate, 0.0f, 1000.0f);
+				ImGui::SliderFloat("Rate Scale", &particles->curRate, 0.0f, 10.0f);
+				ImGui::SliderFloat("Emission Angle", &particles->emissionAngle, -180.0f, 180.0f);
+				ImGui::SliderFloat("Emission Angle var", &particles->emissionAngleVar, -180.0f, 180.0f);
+				static float emitRect[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+				if(ImGui::SliderFloat4("Emission Rect (l, t, r, b)", emitRect, -10.0f, 10.0f))
+					particles->emitFrom.set(emitRect[0], emitRect[1], emitRect[2], emitRect[3]);
+				static float emitVel[2] = { 0.0f, 0.0f };
+				if(ImGui::SliderFloat2("Emission vel", emitVel, -10.0f, 10.0f))
+				{
+					particles->emissionVel.x = emitVel[0];
+					particles->emissionVel.y = emitVel[1];
+				}
+			}
 			if(ImGui::CollapsingHeader("Size"))
 			{
 				static float startSz[2] = { 1.0f, 1.0f };
@@ -243,6 +272,7 @@ void DebugUI::_draw()
 				static float colVar[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 				if(ImGui::ColorEdit4("Color var", colVar))
 					particles->colVar.set(colVar[0], colVar[1], colVar[2], colVar[3]);
+				ImGui::Combo("Blend Type", (int*)&particles->blend, particleBlendTypes, 3);
 			}
 			if(ImGui::CollapsingHeader("Life"))
 			{

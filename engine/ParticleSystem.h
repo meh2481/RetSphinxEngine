@@ -18,7 +18,7 @@ class Image;
 
 typedef enum 
 {
-	ADDITIVE,
+	ADDITIVE = 0,
 	NORMAL,
 	SUBTRACTIVE,
 } particleBlendType;

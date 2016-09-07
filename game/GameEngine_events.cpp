@@ -295,13 +295,9 @@ void GameEngine::handleEvent(SDL_Event event)
 			if(!m_debugUI->visible)
 			{
 				if(event.wheel.y > 0)
-				{
 					CameraPos.z += 1.5;// min(CameraPos.z + 1.5, -5.0);
-				}
 				else
-				{
 					CameraPos.z -= 1.5;// max(CameraPos.z - 1.5, -3000.0);
-				}
 			}
 			break;
 
