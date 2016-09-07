@@ -16,6 +16,7 @@
 #include "SystemUtils.h"
 #include "SteelSeriesClient.h"
 #include "NetworkThread.h"
+#include "ParticleSystem.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -93,6 +94,9 @@ void GameEngine::frame(float dt)
 			m_sLoadNode.clear();
 		}
 	}
+
+	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
+		m_debugUI->particles->update(dt);
 }
 
 void GameEngine::draw()
@@ -193,6 +197,16 @@ void GameEngine::draw()
 	glm::mat4 mat;	//TODO Use real mat
 	getEntityManager()->render(mat);
 	drawDebug();
+
+	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
+	{
+		glLoadIdentity();
+		glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		fillScreen(Color(0, 0, 0, 1));
+		glClear(GL_DEPTH_BUFFER_BIT);
+		m_debugUI->particles->draw();
+	}
 	
 }
 

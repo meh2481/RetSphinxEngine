@@ -34,6 +34,7 @@ ParticleSystem::ParticleSystem()
 	m_num = 0;
 	glue = NULL;
 	lua = NULL;
+	m_subject = NULL;
 
 	m_vertexPtr = NULL;
 	m_colorPtr = NULL;
@@ -306,7 +307,7 @@ void ParticleSystem::update(float dt)
 		{
 			firing = false;
 			startedFiring = 0.0f;
-			if(spawnOnDeath.size())
+			if(spawnOnDeath.size() && m_subject != NULL)
 				m_subject->notify(spawnOnDeath[Random::random(spawnOnDeath.size()-1)], emitFrom.center());
 		}
 	}

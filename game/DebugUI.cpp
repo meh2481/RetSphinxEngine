@@ -5,6 +5,7 @@
 #include "SteelSeriesClient.h"
 #include "StringUtils.h"
 #include "ParticleSystem.h"
+#include "ResourceLoader.h"
 #include <climits>
 
 const char* particleBlendTypes[] = {
@@ -54,10 +55,17 @@ DebugUI::DebugUI(GameEngine *ge)
 
 	particleSystemEdit = true;
 	particles = new ParticleSystem();
+	//TODO No hardcodey
+	particles->img = _ge->getResourceLoader()->getImage("res/particles/particlesheet1.png");
+	Rect rc(0, 0, 128, 128);
+	particles->imgRect.push_back(rc);
+	particles->init();
+	particles->firing = false;
 }
 
 DebugUI::~DebugUI()
 {
+	delete particles;
 }
 
 void DebugUI::draw()
@@ -177,24 +185,28 @@ void DebugUI::_draw()
 	{
 		if(ImGui::Begin("Particle System Editor", &particleSystemEdit, windowFlags))
 		{
+			static float emitRect[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			if(ImGui::Button("Fire Particles"))
-				;	//TODO
+			{
+				particles->emitFrom.set(emitRect[0], emitRect[1], emitRect[2], emitRect[3]);	//Reset emit rect (cause of emitVel)
+				particles->firing = true;
+			}
 			if(ImGui::CollapsingHeader("Images"))
 			{
-				ImGui::LabelText("", "TODO");
+				//TODO
 			}
 			if(ImGui::CollapsingHeader("Emission"))
 			{
-				ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000.0f);
+				if(ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000.0f))
+					particles->init();	//Gotta reset this...
 				ImGui::SliderFloat("Rate", &particles->rate, 0.0f, 1000.0f);
 				ImGui::SliderFloat("Rate Scale", &particles->curRate, 0.0f, 10.0f);
 				ImGui::SliderFloat("Emission Angle", &particles->emissionAngle, -180.0f, 180.0f);
 				ImGui::SliderFloat("Emission Angle var", &particles->emissionAngleVar, -180.0f, 180.0f);
-				static float emitRect[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 				if(ImGui::SliderFloat4("Emission Rect (l, t, r, b)", emitRect, -10.0f, 10.0f))
 					particles->emitFrom.set(emitRect[0], emitRect[1], emitRect[2], emitRect[3]);
 				static float emitVel[2] = { 0.0f, 0.0f };
-				if(ImGui::SliderFloat2("Emission vel", emitVel, -10.0f, 10.0f))
+				if(ImGui::SliderFloat2("Emitter vel", emitVel, -10.0f, 10.0f))
 				{
 					particles->emissionVel.x = emitVel[0];
 					particles->emissionVel.y = emitVel[1];
@@ -218,8 +230,8 @@ void DebugUI::_draw()
 			}
 			if(ImGui::CollapsingHeader("Speed"))
 			{
-				ImGui::SliderFloat("Speed", &particles->speed, 0.0f, 50.0f);
-				ImGui::SliderFloat("Speed var", &particles->speedVar, 0.0f, 50.0f);
+				ImGui::SliderFloat("Starting Speed", &particles->speed, 0.0f, 50.0f);
+				ImGui::SliderFloat("Starting Speed var", &particles->speedVar, 0.0f, 50.0f);
 				static float accel[2] = { 0.0f, 0.0f };
 				if(ImGui::SliderFloat2("Acceleration (x, y)", accel, 0.0f, 5.0f))
 				{
@@ -284,7 +296,7 @@ void DebugUI::_draw()
 				if(ImGui::Checkbox("Particle System Decay", &psysDecay))
 					particles->decay = 5.0f;	//On first tick, set to 5 secs (because it'll be FLT_MAX, which isn't pretty to look at)
 				if(psysDecay)
-					ImGui::SliderFloat("decay", &particles->decay, 0.0f, 120.0f);
+					ImGui::SliderFloat("System Decay (sec)", &particles->decay, 0.0f, 10.0f);
 				else
 					particles->decay = FLT_MAX;
 			}

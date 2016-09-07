@@ -18,6 +18,11 @@ public:
 	bool visible;
 	bool hadFocus;
 
+
+	//Variables for particle system editing
+	bool particleSystemEdit;
+	ParticleSystem* particles;
+
 private:
 	void _draw();
 	MemoryEditor memEdit;
@@ -59,8 +64,4 @@ private:
 	void bindTactileEvent(std::string eventId);
 	void bindScreenEvent(std::string eventId);
 	void bindColorEvent(std::string eventId);
-
-	//Variables for particle system editing
-	bool particleSystemEdit;
-	ParticleSystem* particles;
 };
