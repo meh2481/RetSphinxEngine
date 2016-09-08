@@ -289,7 +289,7 @@ void GameEngine::handleEvent(SDL_Event event)
 		case SDL_MOUSEBUTTONDOWN:
 #ifdef _DEBUG
 			if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleSystemEdit && m_debugUI->visible)
-				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(getCursorPos(), CameraPos));
+				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.button.x, event.button.y), CameraPos));
 #endif
 			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
 			break;
@@ -323,7 +323,7 @@ void GameEngine::handleEvent(SDL_Event event)
 		case SDL_MOUSEMOTION:
 #ifdef _DEBUG
 			if(getCursorDown(SDL_BUTTON_RIGHT) && m_debugUI->particleSystemEdit && m_debugUI->visible)
-				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(getCursorPos(), CameraPos));
+				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.motion.x, event.motion.y), CameraPos));
 #endif
 			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
 			break;
