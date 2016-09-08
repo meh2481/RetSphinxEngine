@@ -19,8 +19,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	visible = false;
 	hadFocus = false;
 	_ge = ge;
-	showTestWindow = false;
-	rumbleMenu = true;
+	rumbleMenu = false;
 	windowFlags = ImGuiWindowFlags_ShowBorders;
 	appName = StringUtils::normalize(_ge->getAppName());
 
@@ -63,6 +62,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	particles->firing = false;
 
 	particleBgColor = Color(0, 0, 0, 1);
+	psysDecay = false;
 }
 
 DebugUI::~DebugUI()
@@ -86,9 +86,6 @@ void DebugUI::_draw()
 	{
 		if(ImGui::BeginMenu("Windows"))
 		{
-#ifdef _DEBUG
-			ImGui::MenuItem("ImGui Demo", NULL, &showTestWindow);
-#endif
 			ImGui::MenuItem("Memory Editor", NULL, &memEdit.Open);
 
 			ImGui::MenuItem("SteelSeries & Rumble", NULL, &rumbleMenu);
@@ -103,11 +100,6 @@ void DebugUI::_draw()
 
 	if(memEdit.Open)
 		memEdit.Draw("Memory Editor", (unsigned char*)_ge, sizeof(*_ge), 0, windowFlags);
-
-#ifdef _DEBUG
-	if(showTestWindow)
-		ImGui::ShowTestWindow(&showTestWindow);
-#endif
 
 	if(rumbleMenu)
 	{
@@ -185,14 +177,35 @@ void DebugUI::_draw()
 
 	if(particleSystemEdit)
 	{
+		updateHelperVars();
 		if(ImGui::Begin("Particle System Editor", &particleSystemEdit, windowFlags))
 		{
-			static float emitRect[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			if(ImGui::BeginMainMenuBar())
+			{
+				if(ImGui::BeginMenu("Particles"))
+				{
+					if(ImGui::MenuItem("Load"))
+					{
+						//TODO More than just load this particular particle system
+						delete particles;
+						particles = _ge->getResourceLoader()->getParticleSystem("res/particles/shiptrail.xml");
+						particles->firing = true;
+					}
+					if(ImGui::MenuItem("Save"))
+						;	//TODO
+
+					ImGui::EndMenu();
+				}
+				ImGui::EndMainMenuBar();
+			}
 			if(ImGui::Button("Fire Particles"))
 			{
-				particles->emitFrom.set(emitRect[0], emitRect[1], emitRect[2], emitRect[3]);	//Reset emit rect (cause of emitVel)
+				particles->emitFrom.centerOn(Vec2(0.0f, 0.0f));	//Reset emit rect (cause of emitVel)
 				particles->firing = true;
 			}
+			ImGui::SameLine();
+			if(ImGui::Button("Stop Firing"))
+				particles->firing = false;
 			if(ImGui::CollapsingHeader("Images"))
 			{
 				//TODO
@@ -204,10 +217,9 @@ void DebugUI::_draw()
 				ImGui::SliderFloat("Rate", &particles->rate, 0.0f, 1000.0f);
 				ImGui::SliderFloat("Rate Scale", &particles->curRate, 0.0f, 10.0f);
 				ImGui::SliderFloat("Emission Angle", &particles->emissionAngle, -180.0f, 180.0f);
-				ImGui::SliderFloat("Emission Angle var", &particles->emissionAngleVar, -180.0f, 180.0f);
+				ImGui::SliderFloat("Emission Angle var", &particles->emissionAngleVar, 0.0f, 180.0f);
 				if(ImGui::SliderFloat4("Emission Rect (l, t, r, b)", emitRect, -10.0f, 10.0f))
 					particles->emitFrom.set(emitRect[0], emitRect[1], emitRect[2], emitRect[3]);
-				static float emitVel[2] = { 0.0f, 0.0f };
 				if(ImGui::SliderFloat2("Emitter vel", emitVel, -10.0f, 10.0f))
 				{
 					particles->emissionVel.x = emitVel[0];
@@ -216,59 +228,53 @@ void DebugUI::_draw()
 			}
 			if(ImGui::CollapsingHeader("Size"))
 			{
-				static float startSz[2] = { 1.0f, 1.0f };
 				if(ImGui::SliderFloat2("Starting Size (x, y)", startSz, 0.0f, 5.0f))
 				{
 					particles->sizeStart.x = startSz[0];
 					particles->sizeStart.y = startSz[1];
 				}
-				static float endSz[2] = { 1.0f, 1.0f };
 				if(ImGui::SliderFloat2("Ending Size (x, y)", endSz, 0.0f, 5.0f))
 				{
 					particles->sizeEnd.x = endSz[0];
 					particles->sizeEnd.y = endSz[1];
 				}
-				ImGui::SliderFloat("Size var", &particles->sizeVar, 0.0f, 10.0f);
+				ImGui::SliderFloat("Size var", &particles->sizeVar, 0.0f, 5.0f);
 			}
 			if(ImGui::CollapsingHeader("Speed"))
 			{
-				ImGui::SliderFloat("Starting Speed", &particles->speed, 0.0f, 50.0f);
+				ImGui::SliderFloat("Starting Speed", &particles->speed, -50.0f, 50.0f);
 				ImGui::SliderFloat("Starting Speed var", &particles->speedVar, 0.0f, 50.0f);
-				static float accel[2] = { 0.0f, 0.0f };
-				if(ImGui::SliderFloat2("Acceleration (x, y)", accel, 0.0f, 5.0f))
+				if(ImGui::SliderFloat2("Acceleration (x, y)", accel, -10.0f, 10.0f))
 				{
 					particles->accel.x = accel[0];
 					particles->accel.y = accel[1];
 				}
-				static float accelVar[2] = { 0.0f, 0.0f };
-				if(ImGui::SliderFloat2("Acceleration var (x, y)", accelVar, 0.0f, 5.0f))
+				if(ImGui::SliderFloat2("Acceleration var (x, y)", accelVar, 0.0f, 10.0f))
 				{
 					particles->accelVar.x = accelVar[0];
 					particles->accelVar.y = accelVar[1];
 				}
 				ImGui::SliderFloat("Tangential Accel", &particles->tangentialAccel, -100.0f, 100.0f);
-				ImGui::SliderFloat("Tangential Accel var", &particles->tangentialAccelVar, -100.0f, 100.0f);
+				ImGui::SliderFloat("Tangential Accel var", &particles->tangentialAccelVar, 0.0f, 100.0f);
 				ImGui::SliderFloat("Normal Accel", &particles->normalAccel, -100.0f, 100.0f);
-				ImGui::SliderFloat("Normal Accel var", &particles->normalAccelVar, -100.0f, 100.0f);
+				ImGui::SliderFloat("Normal Accel var", &particles->normalAccelVar, 0.0f, 100.0f);
 			}
 			//TODO: Check if these are radians or degrees
 			if(ImGui::CollapsingHeader("Rotation"))
 			{
 				ImGui::SliderFloat("Starting Rotation", &particles->rotStart, -180.0f, 180.0f);
-				ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, -180.0f, 180.0f);
+				ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, 0.0f, 180.0f);
 				ImGui::SliderFloat("Rotational velocity", &particles->rotVel, -180.0f, 180.0f);
-				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, -180.0f, 180.0f);
+				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, 0.0f, 180.0f);
 				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -180.0f, 180.0f);
-				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, -180.0f, 180.0f);
-				static float rotAxis[3] = { 0.0f, 0.0f, 1.0f };
+				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, 0.0f, 180.0f);
 				if(ImGui::SliderFloat3("Rotation Axis (x, y, z)", rotAxis, -1.0f, 1.0f))
 				{
 					particles->rotAxis.x = rotAxis[0];
 					particles->rotAxis.y = rotAxis[1];
 					particles->rotAxis.z = rotAxis[2];
 				}
-				static float rotAxisVar[3] = { 0.0f, 0.0f, 0.0f };
-				if(ImGui::SliderFloat3("Rotation Axis var (x, y, z)", rotAxisVar, -1.0f, 1.0f))
+				if(ImGui::SliderFloat3("Rotation Axis var (x, y, z)", rotAxisVar, 0.0f, 1.0f))
 				{
 					particles->rotAxisVar.x = rotAxisVar[0];
 					particles->rotAxisVar.y = rotAxisVar[1];
@@ -277,27 +283,22 @@ void DebugUI::_draw()
 			}
 			if(ImGui::CollapsingHeader("Color"))
 			{
-				static float startCol[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 				if(ImGui::ColorEdit4("Start col", startCol))
 					particles->colStart.set(startCol[0], startCol[1], startCol[2], startCol[3]);
-				static float endCol[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 				if(ImGui::ColorEdit4("End col", endCol))
 					particles->colEnd.set(endCol[0], endCol[1], endCol[2], endCol[3]);
-				static float colVar[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 				if(ImGui::ColorEdit4("Color var", colVar))
 					particles->colVar.set(colVar[0], colVar[1], colVar[2], colVar[3]);
 				ImGui::Combo("Blend Type", (int*)&particles->blend, particleBlendTypes, 3);
-				static float bgCol[3] = { 0.0f, 0.0f, 0.0f };
 				if(ImGui::ColorEdit3("Background Color", bgCol))
 					particleBgColor.set(bgCol[0], bgCol[1], bgCol[2]);
 			}
 			if(ImGui::CollapsingHeader("Life"))
 			{
 				ImGui::SliderFloat("Lifetime (sec)", &particles->lifetime, 0.0f, 20.0f);
-				ImGui::SliderFloat("Lifetime var", &particles->lifetimeVar, -10.0f, 10.0f);
+				ImGui::SliderFloat("Lifetime var", &particles->lifetimeVar, 0.0f, 10.0f);
 				ImGui::SliderFloat("Lifetime Pre-Fade", &particles->lifetimePreFade, 0.0f, 20.0f);
-				ImGui::SliderFloat("Lifetime Pre-Fade var", &particles->lifetimePreFadeVar, -10.0f, 10.0f);
-				static bool psysDecay = false;
+				ImGui::SliderFloat("Lifetime Pre-Fade var", &particles->lifetimePreFadeVar, 0.0f, 10.0f);
 				if(ImGui::Checkbox("Particle System Decay", &psysDecay))
 					particles->decay = 5.0f;	//On first tick, set to 5 secs (because it'll be FLT_MAX, which isn't pretty to look at)
 				if(psysDecay)
@@ -430,3 +431,54 @@ void DebugUI::bindColorEvent(std::string eventId)
 
 	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
+
+void DebugUI::updateHelperVars()
+{
+	emitRect[0] = particles->emitFrom.left;
+	emitRect[1] = particles->emitFrom.top;
+	emitRect[2] = particles->emitFrom.right;
+	emitRect[3] = particles->emitFrom.bottom;
+
+	emitVel[0] = particles->emissionVel.x;
+	emitVel[1] = particles->emissionVel.y;
+
+	startSz[0] = particles->sizeStart.x;
+	startSz[1] = particles->sizeStart.y;
+
+	endSz[0] = particles->sizeEnd.x;
+	endSz[1] = particles->sizeEnd.y;
+
+	accel[0] = particles->accel.x;
+	accel[1] = particles->accel.y;
+
+	accelVar[0] = particles->accelVar.x;
+	accelVar[1] = particles->accelVar.y;
+
+	rotAxis[0] = particles->rotAxis.x;
+	rotAxis[1] = particles->rotAxis.y;
+	rotAxis[2] = particles->rotAxis.z;
+
+	rotAxisVar[0] = particles->rotAxisVar.x;
+	rotAxisVar[1] = particles->rotAxisVar.y;
+	rotAxisVar[2] = particles->rotAxisVar.z;
+
+	startCol[0] = particles->colStart.r;
+	startCol[1] = particles->colStart.g;
+	startCol[2] = particles->colStart.b;
+	startCol[3] = particles->colStart.a;
+
+	endCol[0] = particles->colEnd.r;
+	endCol[1] = particles->colEnd.g;
+	endCol[2] = particles->colEnd.b;
+	endCol[3] = particles->colEnd.a;
+
+	colVar[0] = particles->colVar.r;
+	colVar[1] = particles->colVar.g;
+	colVar[2] = particles->colVar.b;
+	colVar[3] = particles->colVar.a;
+
+	bgCol[0] = particleBgColor.r;
+	bgCol[1] = particleBgColor.g;
+	bgCol[2] = particleBgColor.b;
+}
+

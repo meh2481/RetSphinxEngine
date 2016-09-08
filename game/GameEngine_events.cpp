@@ -10,6 +10,7 @@
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "ResourceCache.h"
+#include "ParticleSystem.h"
 using namespace std;
 
 #define GUID_STR_SZ	256
@@ -286,10 +287,12 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 		
 		case SDL_MOUSEBUTTONDOWN:
-		{
+#ifdef _DEBUG
+			if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleSystemEdit && m_debugUI->visible)
+				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(getCursorPos(), CameraPos));
+#endif
 			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
-		}
-		break;
+			break;
 			
 		case SDL_MOUSEWHEEL:
 			if(!m_debugUI->visible)
@@ -318,6 +321,10 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 
 		case SDL_MOUSEMOTION:
+#ifdef _DEBUG
+			if(getCursorDown(SDL_BUTTON_RIGHT) && m_debugUI->particleSystemEdit && m_debugUI->visible)
+				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(getCursorPos(), CameraPos));
+#endif
 			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
 			break;
 	}

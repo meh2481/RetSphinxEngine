@@ -30,7 +30,6 @@ private:
 	MemoryEditor memEdit;
 	GameEngine *_ge;
 
-	bool showTestWindow;
 	bool rumbleMenu;
 	int windowFlags;
 	std::string appName;
@@ -66,4 +65,21 @@ private:
 	void bindTactileEvent(std::string eventId);
 	void bindScreenEvent(std::string eventId);
 	void bindColorEvent(std::string eventId);
+
+	//Helper variables for particle-system editing
+	float emitRect[4];
+	float emitVel[2];
+	float startSz[2];
+	float endSz[2];
+	float accel[2];
+	float accelVar[2];
+	float rotAxis[3];
+	float rotAxisVar[3];
+	float startCol[4];
+	float endCol[4];
+	float colVar[4];
+	float bgCol[3];
+	bool psysDecay;
+
+	void updateHelperVars();	//Keep the above up-to-date with the particle system
 };

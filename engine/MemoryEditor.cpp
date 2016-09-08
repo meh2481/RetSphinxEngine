@@ -24,7 +24,7 @@
 
 MemoryEditor::MemoryEditor()
 {
-    Open = true;
+    Open = false;
     Rows = 16;
     DataEditingAddr = -1;
     DataEditingTakeFocus = false;
