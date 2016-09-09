@@ -70,6 +70,7 @@ Image* ResourceLoader::getImage(string sID)
 		img = new Image(sID);				//Create this image
 		m_cache->addImage(hashVal, img);	//Add to the cache
 	}
+	img->_setReloadFilename(sID);
 	return img;
 }
 

@@ -10,7 +10,9 @@ typedef glm::vec3 Vec3;
 
 //TODO: move somewhere where it makes sense
 Vec2 pointFromString(std::string s);
+std::string pointToString(Vec2 pt);
 Vec3 vec3FromString(std::string s);
+std::string vec3ToString(Vec3 vec);
 
 //------------------------------------------------------
 // Rect class
@@ -42,5 +44,6 @@ public:
 
 	//Setter methods
 	void fromString(std::string s);	  //Get a rectangle from comma-separated values in a string
+	std::string toString();
 	void set(float fleft, float ftop, float fright, float fbottom);
 };

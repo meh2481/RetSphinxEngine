@@ -7,6 +7,8 @@
 #include "ParticleSystem.h"
 #include "ResourceLoader.h"
 #include "FileOperations.h"
+#include "tinyxml2.h"
+#include "easylogging++.h"
 #include <climits>
 #include <vector>
 using namespace std;
@@ -14,9 +16,9 @@ using namespace std;
 #define PARTICLE_SYSTEM_PATH "res/particles/"
 
 const char* particleBlendTypes[] = {
-	"Additive",
-	"Normal",
-	"Subtractive"
+	"additive",
+	"normal",
+	"subtractive"
 };
 
 //Particle systems in folder to load
@@ -400,11 +402,11 @@ void DebugUI::_draw()
 			}
 		}
 		ImGui::InputText("Filename", saveFilenameBuf, SAVE_BUF_SZ);
-		if(ImGui::Button("OK"))
+		if(ImGui::Button("OK") && strlen(saveFilenameBuf))
 		{
 			ImGui::CloseCurrentPopup();
 			saveParticles = false;
-			//TODO
+			saveParticleSystemXML(saveFilenameBuf);
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Cancel"))
@@ -586,5 +588,41 @@ void DebugUI::updateHelperVars()
 	bgCol[0] = particleBgColor.r;
 	bgCol[1] = particleBgColor.g;
 	bgCol[2] = particleBgColor.b;
+}
+
+void DebugUI::saveParticleSystemXML(std::string filename)
+{
+	filename = PARTICLE_SYSTEM_PATH + filename;
+
+	LOG(INFO) << "Saving " << filename;
+
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+	tinyxml2::XMLElement* root = doc->NewElement("particlesystem");
+
+	root->SetAttribute("emitfrom", particles->emitFrom.toString().c_str());
+	root->SetAttribute("emitfromvel", pointToString(particles->emissionVel).c_str());
+	root->SetAttribute("fireonstart", particles->firing);	//TODO I dunno; should prolly add this
+	root->SetAttribute("blend", particleBlendTypes[(int)particles->blend]);
+	root->SetAttribute("max", particles->max);
+	root->SetAttribute("rate", particles->rate);
+	if(psysDecay)
+		root->SetAttribute("decay", particles->decay);
+	//root->SetAttribute("decayvar")	//TODO Figure out/add
+	
+	tinyxml2::XMLElement* img = doc->NewElement("img");
+	img->SetAttribute("path", particles->img->getFilename().c_str());
+	for(vector<Rect>::iterator i = particles->imgRect.begin(); i != particles->imgRect.end(); i++)
+	{
+		tinyxml2::XMLElement* rc = doc->NewElement("rect");
+		rc->SetAttribute("val", i->toString().c_str());
+		img->InsertEndChild(rc);
+	}
+	root->InsertFirstChild(img);
+
+
+
+	doc->InsertFirstChild(root);
+	doc->SaveFile(filename.c_str());//, true);
+	delete doc;
 }
 

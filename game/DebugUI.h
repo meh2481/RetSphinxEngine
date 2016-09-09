@@ -81,12 +81,12 @@ private:
 	float colVar[4];
 	float bgCol[3];
 	bool psysDecay;
-
-	void updateHelperVars();	//Keep the above up-to-date with the particle system
-
-	//Load particle system
 	bool loadParticles;
 	bool saveParticles;
 	int curSelectedLoadSaveItem;
 	char saveFilenameBuf[SAVE_BUF_SZ];
+
+	//Helper functions
+	void updateHelperVars();	//Keep the above up-to-date with the particle system
+	void saveParticleSystemXML(std::string filename);	//Save the current particle system to XML
 };

@@ -106,6 +106,13 @@ void Rect::fromString(string s)
 		set(0, 0, 0, 0);
 }
 
+std::string Rect::toString()
+{
+	ostringstream oss;
+	oss << left << ", " << top << ", " << right << ", " << bottom;
+	return oss.str();
+}
+
 Vec2 pointFromString(std::string s)
 {
 	s = StringUtils::stripCommas(s);
@@ -125,7 +132,21 @@ Vec3 vec3FromString(std::string s)
 	//Now, parse
 	std::istringstream iss(s);
 	Vec3 pt;
-	if(!(iss >> pt.x >> pt.y))
+	if(!(iss >> pt.x >> pt.y >> pt.z))
 		pt = Vec3(0, 0, 0);
 	return pt;
+}
+
+std::string pointToString(Vec2 pt)
+{
+	ostringstream oss;
+	oss << pt.x << ", " << pt.y;
+	return oss.str();
+}
+
+std::string vec3ToString(Vec3 vec)
+{
+	ostringstream oss;
+	oss << vec.x << ", " << vec.y << ", " << vec.z;
+	return oss.str();
 }

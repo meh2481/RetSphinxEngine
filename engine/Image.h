@@ -13,7 +13,7 @@ private:
 	Image(){};  //Default constructor is uncallable
 
 	GLuint    	m_hTex;
-	std::string     	m_sFilename;
+	std::string m_sFilename;
 	int 		m_iWidth, m_iHeight;			// width and height of original image
 	
 	void _load(std::string sFilename);
@@ -41,5 +41,7 @@ public:
 	void render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br);
 
 	void bindTexture();	//Bind texture to OpenGL (so we don't have to bind each draw call)
+
+	void _setReloadFilename(std::string sFilename) { m_sFilename = sFilename; };
 };
 
