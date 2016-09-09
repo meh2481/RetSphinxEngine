@@ -6,13 +6,42 @@
 #include "StringUtils.h"
 #include "ParticleSystem.h"
 #include "ResourceLoader.h"
+#include "FileOperations.h"
 #include <climits>
+#include <vector>
+using namespace std;
+
+#define PARTICLE_SYSTEM_PATH "res/particles/"
 
 const char* particleBlendTypes[] = {
 	"Additive",
 	"Normal",
 	"Subtractive"
 };
+
+//Particle systems in folder to load
+vector<string> availableParticleSystems;
+bool getParticleSystem(void* data, int cur, const char** toSet)
+{
+	if(cur < availableParticleSystems.size())
+	{
+		*toSet = availableParticleSystems.at(cur).c_str();
+		return true;
+	}
+	return false;
+}
+
+void readAvailableParticleSystems(string filePath)
+{
+	//std::set<std::string> readFilesFromDir(std::string sDirPath, bool fullPath = true);
+	set<string> allFiles = FileOperations::readFilesFromDir(filePath, false);
+	availableParticleSystems.clear();
+	for(set<string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
+	{
+		if(i->find(".xml") != string::npos)
+			availableParticleSystems.push_back(*i);
+	}
+}
 
 DebugUI::DebugUI(GameEngine *ge)
 {
@@ -63,6 +92,10 @@ DebugUI::DebugUI(GameEngine *ge)
 
 	particleBgColor = Color(0, 0, 0, 1);
 	psysDecay = false;
+	loadParticles = false;
+	saveParticles = false;
+	curSelectedLoadSaveItem = -1;
+	memset(saveFilenameBuf, '\0', SAVE_BUF_SZ);
 }
 
 DebugUI::~DebugUI()
@@ -184,16 +217,24 @@ void DebugUI::_draw()
 			{
 				if(ImGui::BeginMenu("Particles"))
 				{
-					if(ImGui::MenuItem("Load"))
+					if(ImGui::MenuItem("Load..."))
 					{
-						//TODO More than just load this particular particle system
-						delete particles;
-						particles = _ge->getResourceLoader()->getParticleSystem("res/particles/shiptrail.xml");
-						particles->firing = true;
+						loadParticles = true;
+						//Reload available particle systems
+						readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
 					}
-					if(ImGui::MenuItem("Save"))
-						;	//TODO
-
+					if(ImGui::MenuItem("Save.."))
+					{
+						saveParticles = true;
+						//Reload available particle systems
+						readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
+						if(!strlen(saveFilenameBuf) && availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+						{
+							string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
+							if(sFilename.size() < SAVE_BUF_SZ)
+								strcpy(saveFilenameBuf, sFilename.c_str());
+						}
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMainMenuBar();
@@ -308,6 +349,71 @@ void DebugUI::_draw()
 			}
 		}
 		ImGui::End();
+	}
+
+	if(loadParticles)
+		ImGui::OpenPopup("Load Particle System");
+
+	if(saveParticles)
+		ImGui::OpenPopup("Save Particle System");
+
+	if(ImGui::BeginPopupModal("Load Particle System"))
+	{
+		ImGui::Text("Select a Particle System to load:");
+		ImGui::ListBox("", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
+		if(ImGui::Button("OK"))
+		{
+			ImGui::CloseCurrentPopup();
+			loadParticles = false;
+			//Error check before loading file
+			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+			{
+				string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
+				if(sFileToLoad.size())
+				{
+					delete particles;
+					particles = _ge->getResourceLoader()->getParticleSystem(PARTICLE_SYSTEM_PATH + sFileToLoad);
+					particles->firing = true;
+				}
+			}
+		}
+		ImGui::SameLine(); 
+		if(ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+			loadParticles = false;
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if(ImGui::BeginPopupModal("Save Particle System"))
+	{
+		ImGui::Text("Select a Particle System to save:");
+		if(ImGui::ListBox("", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5))
+		{
+			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+			{
+				string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
+				if(sFilename.size() < SAVE_BUF_SZ)
+					strcpy(saveFilenameBuf, sFilename.c_str());
+			}
+		}
+		ImGui::InputText("Filename", saveFilenameBuf, SAVE_BUF_SZ);
+		if(ImGui::Button("OK"))
+		{
+			ImGui::CloseCurrentPopup();
+			saveParticles = false;
+			//TODO
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+			saveParticles = false;
+		}
+
+		ImGui::EndPopup();
 	}
 }
 

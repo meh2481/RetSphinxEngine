@@ -4,6 +4,7 @@
 #include "Color.h"
 
 #define SS_BUF_SZ 33
+#define SAVE_BUF_SZ 256
 
 class GameEngine;
 class ParticleSystem;
@@ -82,4 +83,10 @@ private:
 	bool psysDecay;
 
 	void updateHelperVars();	//Keep the above up-to-date with the particle system
+
+	//Load particle system
+	bool loadParticles;
+	bool saveParticles;
+	int curSelectedLoadSaveItem;
+	char saveFilenameBuf[SAVE_BUF_SZ];
 };

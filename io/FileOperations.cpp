@@ -27,7 +27,7 @@ namespace FileOperations
 		return buf;
 	}
 
-	set<string> readFilesFromDir(string sDirPath)
+	set<string> readFilesFromDir(string sDirPath, bool fullPath)
 	{
 		set<string> returnedFiles;
 
@@ -41,9 +41,14 @@ namespace FileOperations
 
 			if(!file.is_dir)
 			{
-				ostringstream oss;
-				oss << sDirPath << "/" << file.name;
-				returnedFiles.insert(oss.str());
+				if(fullPath)
+				{
+					ostringstream oss;
+					oss << sDirPath << "/" << file.name;
+					returnedFiles.insert(oss.str());
+				}
+				else
+					returnedFiles.insert(file.name);
 			}
 
 			tinydir_next(&dir);

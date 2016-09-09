@@ -8,5 +8,5 @@ namespace FileOperations
 	//The pointer returned from this function must be free()d.
 	unsigned char* readFile(std::string filename, unsigned int* fileSize);
 
-	std::set<std::string> readFilesFromDir(std::string sDirPath);
+	std::set<std::string> readFilesFromDir(std::string sDirPath, bool fullPath = true);
 }
