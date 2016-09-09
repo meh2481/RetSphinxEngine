@@ -619,7 +619,72 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 	}
 	root->InsertFirstChild(img);
 
+	tinyxml2::XMLElement* emit = doc->NewElement("emit");
+	emit->SetAttribute("angle", particles->emissionAngle);
+	emit->SetAttribute("var", particles->emissionAngleVar);
+	root->InsertEndChild(emit);
 
+	tinyxml2::XMLElement* size = doc->NewElement("size");
+	size->SetAttribute("start", pointToString(particles->sizeStart).c_str());
+	size->SetAttribute("end", pointToString(particles->sizeEnd).c_str());
+	size->SetAttribute("var", particles->sizeVar);
+	root->InsertEndChild(size);
+
+	tinyxml2::XMLElement* speed = doc->NewElement("speed");
+	speed->SetAttribute("value", particles->speed);
+	speed->SetAttribute("var", particles->speedVar);
+	root->InsertEndChild(speed);
+
+	tinyxml2::XMLElement* accel = doc->NewElement("accel");
+	accel->SetAttribute("value", pointToString(particles->accel).c_str());
+	accel->SetAttribute("var", pointToString(particles->accelVar).c_str());
+	root->InsertEndChild(accel);
+
+	tinyxml2::XMLElement* rotstart = doc->NewElement("rotstart");
+	rotstart->SetAttribute("value", particles->rotStart);
+	rotstart->SetAttribute("var", particles->rotStartVar);
+	root->InsertEndChild(rotstart);
+
+	tinyxml2::XMLElement* rotvel = doc->NewElement("rotvel");
+	rotvel->SetAttribute("value", particles->rotVel);
+	rotvel->SetAttribute("var", particles->rotVelVar);
+	root->InsertEndChild(rotvel);
+
+	tinyxml2::XMLElement* rotaccel = doc->NewElement("rotaccel");
+	rotaccel->SetAttribute("value", particles->rotAccel);
+	rotaccel->SetAttribute("var", particles->rotAccelVar);
+	root->InsertEndChild(rotaccel);
+
+	tinyxml2::XMLElement* rotaxis = doc->NewElement("rotaxis");
+	rotaxis->SetAttribute("value", vec3ToString(particles->rotAxis).c_str());
+	rotaxis->SetAttribute("var", vec3ToString(particles->rotAxisVar).c_str());
+	root->InsertEndChild(rotaxis);
+
+	tinyxml2::XMLElement* col = doc->NewElement("col");
+	col->SetAttribute("start", particles->colStart.toString().c_str());
+	col->SetAttribute("end", particles->colEnd.toString().c_str());
+	col->SetAttribute("var", particles->colVar.toString().c_str());
+	root->InsertEndChild(col);
+
+	tinyxml2::XMLElement* tanaccel = doc->NewElement("tanaccel");
+	tanaccel->SetAttribute("value", particles->tangentialAccel);
+	tanaccel->SetAttribute("var", particles->tangentialAccelVar);
+	root->InsertEndChild(tanaccel);
+
+	tinyxml2::XMLElement* normaccel = doc->NewElement("normaccel");
+	normaccel->SetAttribute("value", particles->normalAccel);
+	normaccel->SetAttribute("var", particles->normalAccelVar);
+	root->InsertEndChild(normaccel);
+
+	tinyxml2::XMLElement* life = doc->NewElement("life");
+	life->SetAttribute("value", particles->lifetime);
+	life->SetAttribute("var", particles->lifetimeVar);
+	life->SetAttribute("prefade", particles->lifetimePreFade);
+	life->SetAttribute("prefadevar", particles->lifetimePreFadeVar);
+	root->InsertEndChild(life);
+
+	//TODO
+	//tinyxml2::XMLElement* spawnondeath = doc->NewElement("spawnondeath");
 
 	doc->InsertFirstChild(root);
 	doc->SaveFile(filename.c_str());//, true);

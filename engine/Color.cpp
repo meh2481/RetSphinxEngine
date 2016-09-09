@@ -41,6 +41,17 @@ void Color::fromString(std::string s)
 	}
 }
 
+std::string Color::toString()
+{
+	std::ostringstream oss;
+	int ir = r * 255;
+	int ig = g * 255;
+	int ib = b * 255;
+	int ia = a * 255;
+	oss << ir << ", " << ig << ", " << ib << ", " << ia;
+	return oss.str();
+}
+
 void Color::set(float fr, float fg, float fb, float fa)
 { 
 	r = fr; 

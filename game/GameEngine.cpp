@@ -79,7 +79,14 @@ void GameEngine::frame(float dt)
 	handleKeys();
 
 	stepPhysics(dt);
-	getEntityManager()->update(dt);
+#ifdef _DEBUG
+	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
+		m_debugUI->particles->update(dt);
+	else
+#endif
+	{
+		getEntityManager()->update(dt);
+	}
 	steelSeriesClient->update(dt);
 	
 	//Load a new scene after updating if we've been told to
@@ -94,11 +101,6 @@ void GameEngine::frame(float dt)
 			m_sLoadNode.clear();
 		}
 	}
-
-#ifdef _DEBUG
-	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
-		m_debugUI->particles->update(dt);
-#endif
 }
 
 void GameEngine::draw()
@@ -204,7 +206,7 @@ void GameEngine::draw()
 	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
 	{
 		glLoadIdentity();
-		glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		fillScreen(m_debugUI->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);

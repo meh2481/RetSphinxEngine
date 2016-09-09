@@ -14,4 +14,5 @@ public:
 	void clear() { r = g = b = a = 1.0f; };
 
 	void fromString(std::string s);	//Set values from comma-separated values in a string
+	std::string toString();
 };
