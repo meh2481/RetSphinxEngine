@@ -157,7 +157,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		ps->emissionVel = pointFromString(emfromvel);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
-	//TODO This was a nice thing to have
+	//TODO What even was this?
 	//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
 
 	const char* blendmode = root->Attribute("blend");
@@ -174,7 +174,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	root->QueryUnsignedAttribute("max", &ps->max);
 	root->QueryFloatAttribute("rate", &ps->rate);
-	//	root->QueryBoolAttribute("velrotate", &ps->velRotate);
+	root->QueryBoolAttribute("velrotate", &ps->velRotate);
 	root->QueryFloatAttribute("decay", &ps->decay);
 	float fDecayVar = 0.0f;
 	root->QueryFloatAttribute("decayvar", &fDecayVar);

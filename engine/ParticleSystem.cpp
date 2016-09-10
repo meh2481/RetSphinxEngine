@@ -149,8 +149,8 @@ void ParticleSystem::_newParticle()
 	float* particleTexCoord = &m_texCoordPtr[m_num * 8];
 	float left = m_imgRect[m_num].left / (float)img->getWidth();
 	float right = m_imgRect[m_num].right / (float)img->getWidth();
-	float top = 1.0f - m_imgRect[m_num].top / (float)img->getHeight();
-	float bottom = 1.0f - m_imgRect[m_num].bottom / (float)img->getHeight();
+	float top = m_imgRect[m_num].top / (float)img->getHeight();
+	float bottom = m_imgRect[m_num].bottom / (float)img->getHeight();
 
 	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
 	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
@@ -171,42 +171,46 @@ void ParticleSystem::_newParticle()
 	m_rot[m_num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
 	m_rotVel[m_num] = rotVel + Random::randomFloat(-rotVelVar,rotVelVar);
 	m_rotAccel[m_num] = rotAccel + Random::randomFloat(-rotAccelVar,rotAccelVar);
-	m_colStart[m_num].r = colStart.r + Random::randomFloat(-colVar.r,colVar.r);
+	float colVarr = Random::randomFloat(-colVar.r, colVar.r);
+	float colVarg = Random::randomFloat(-colVar.g, colVar.g);
+	float colVarb = Random::randomFloat(-colVar.b, colVar.b);
+	float colVara = Random::randomFloat(-colVar.a, colVar.a);
+	m_colStart[m_num].r = colStart.r + colVarr;
 	if(m_colStart[m_num].r > 1)
 		m_colStart[m_num].r = 1;
 	if(m_colStart[m_num].r < 0)
 		m_colStart[m_num].r = 0;
-	m_colStart[m_num].g = colStart.g + Random::randomFloat(-colVar.g,colVar.g);
+	m_colStart[m_num].g = colStart.g + colVarg;
 	if(m_colStart[m_num].g > 1)
 		m_colStart[m_num].g = 1;
 	if(m_colStart[m_num].g < 0)
 		m_colStart[m_num].g = 0;
-	m_colStart[m_num].b = colStart.b + Random::randomFloat(-colVar.b,colVar.b);
+	m_colStart[m_num].b = colStart.b + colVarb;
 	if(m_colStart[m_num].b > 1)
 		m_colStart[m_num].b = 1;
 	if(m_colStart[m_num].b < 0)
 		m_colStart[m_num].b = 0;
-	m_colStart[m_num].a = colStart.a + Random::randomFloat(-colVar.a,colVar.a);
+	m_colStart[m_num].a = colStart.a + colVara;
 	if(m_colStart[m_num].a > 1)
 		m_colStart[m_num].a = 1;
 	if(m_colStart[m_num].a < 0)
 		m_colStart[m_num].a = 0;
-	m_colEnd[m_num].r = colEnd.r + Random::randomFloat(-colVar.r,colVar.r);
+	m_colEnd[m_num].r = colEnd.r + colVarr;
 	if(m_colEnd[m_num].r > 1)
 		m_colEnd[m_num].r = 1;
 	if(m_colEnd[m_num].r < 0)
 		m_colEnd[m_num].r = 0;
-	m_colEnd[m_num].g = colEnd.g + Random::randomFloat(-colVar.g,colVar.g);
+	m_colEnd[m_num].g = colEnd.g + colVarg;
 	if(m_colEnd[m_num].g > 1)
 		m_colEnd[m_num].g = 1;
 	if(m_colEnd[m_num].g < 0)
 		m_colEnd[m_num].g = 0;
-	m_colEnd[m_num].b = colEnd.b + Random::randomFloat(-colVar.b,colVar.b);
+	m_colEnd[m_num].b = colEnd.b + colVarb;
 	if(m_colEnd[m_num].b > 1)
 		m_colEnd[m_num].b = 1;
 	if(m_colEnd[m_num].b < 0)
 		m_colEnd[m_num].b = 0;
-	m_colEnd[m_num].a = colEnd.a + Random::randomFloat(-colVar.a,colVar.a);
+	m_colEnd[m_num].a = colEnd.a + colVara;
 	if(m_colEnd[m_num].a > 1)
 		m_colEnd[m_num].a = 1;
 	if(m_colEnd[m_num].a < 0)
@@ -228,8 +232,8 @@ void ParticleSystem::_rmParticle(const unsigned idx)
 	float* particleTexCoord = &m_texCoordPtr[idx * 8];
 	float left = m_imgRect[m_num - 1].left / (float)img->getWidth();
 	float right = m_imgRect[m_num - 1].right / (float)img->getWidth();
-	float top = 1.0f - m_imgRect[m_num - 1].top / (float)img->getHeight();
-	float bottom = 1.0f - m_imgRect[m_num - 1].bottom / (float)img->getHeight();
+	float top = m_imgRect[m_num - 1].top / (float)img->getHeight();
+	float bottom = m_imgRect[m_num - 1].bottom / (float)img->getHeight();
 
 	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
 	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
@@ -296,6 +300,7 @@ void ParticleSystem::_initValues()
 	firing = true;
 	lifetimePreFade = 0.0f;
 	lifetimePreFadeVar = 0.0f;
+	velRotate = false;
 }
 
 void ParticleSystem::update(float dt)
@@ -387,7 +392,6 @@ void ParticleSystem::draw()
 {
 	if(img == NULL) return;
 	
-	//TODO: Test and make sure blend types still work after shaders
 	switch(blend)
 	{
 		case ADDITIVE:
@@ -399,6 +403,7 @@ void ParticleSystem::draw()
 			break;
 			
 		case SUBTRACTIVE:
+			//TODO This is incorrect
 			glBlendFunc(GL_DST_COLOR, GL_ONE); 
 			break;
 	}
@@ -413,9 +418,9 @@ void ParticleSystem::draw()
 	Vec2* sizeEnd = m_sizeEnd;
 	Vec2* pos = m_pos;
 	float* rot = m_rot;
-	Vec3* rotAxis = m_rotAxis;
+	//Vec3* rotAxis = m_rotAxis;	//TODO use
 	Vec2* vel = m_vel;
-	Rect* imgRect = m_imgRect;
+	//Rect* imgRect = m_imgRect;
 	
 	float* vertexPos = m_vertexPtr;
 	float* colorPtr = m_colorPtr;
@@ -437,7 +442,12 @@ void ParticleSystem::draw()
 		drawsz.x = (sizeEnd->x - sizeStart->x) * fLifeFac + sizeStart->x;
 		drawsz.y = (sizeEnd->y - sizeStart->y) * fLifeFac + sizeStart->y;
 
-		float rad = glm::radians(*rot);
+		float rad;
+		if(velRotate)	//Rotate each particle according to its velocity
+			rad = glm::pi<float>() - atan2(vel->x, vel->y);	//Rotate 180 degrees - angle. I think our coordinate system is wonky
+		else
+			rad = glm::radians(*rot);	//Rotate based on each particle's rotation
+
 		float s = sin(rad);
 		float c = cos(rad);
 
@@ -481,9 +491,9 @@ void ParticleSystem::draw()
 		sizeEnd++;
 		pos++;
 		rot++;
-		rotAxis++;
+		//rotAxis++;
 		vel++;
-		imgRect++;
+		//imgRect++;
 	}
 
 	//Use this OpenGL program

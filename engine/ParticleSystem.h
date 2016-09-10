@@ -118,6 +118,7 @@ public:
 	float 				emissionAngle;		//Angle particles are emitted at (degrees)
 	float 				emissionAngleVar;	//Variation in emission angle
 	bool				firing;				//If we're creating new particles or not
+	bool				velRotate;			//If each particle should face the direction it's moving instead of rotating normally
 	std::vector<std::string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
 	Vec2				emissionVel;		//Move the emission point every frame
 	

@@ -307,23 +307,27 @@ void DebugUI::_draw()
 			//TODO: Check if these are radians or degrees
 			if(ImGui::CollapsingHeader("Rotation"))
 			{
-				ImGui::SliderFloat("Starting Rotation (degrees)", &particles->rotStart, -180.0f, 180.0f);
-				ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, 0.0f, 180.0f);
-				ImGui::SliderFloat("Rotational velocity (degrees/sec)", &particles->rotVel, -360.0f, 360.0f);
-				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, 0.0f, 360.0f);
-				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -360.0f, 360.0f);
-				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, 0.0f, 360.0f);
-				if(ImGui::SliderFloat3("Rotation Axis (x, y, z)", rotAxis, -1.0f, 1.0f))
+				ImGui::Checkbox("Rotate based on velocity", &particles->velRotate);
+				if(!particles->velRotate)
 				{
-					particles->rotAxis.x = rotAxis[0];
-					particles->rotAxis.y = rotAxis[1];
-					particles->rotAxis.z = rotAxis[2];
-				}
-				if(ImGui::SliderFloat3("Rotation Axis var (x, y, z)", rotAxisVar, 0.0f, 1.0f))
-				{
-					particles->rotAxisVar.x = rotAxisVar[0];
-					particles->rotAxisVar.y = rotAxisVar[1];
-					particles->rotAxisVar.z = rotAxisVar[2];
+					ImGui::SliderFloat("Starting Rotation (degrees)", &particles->rotStart, -180.0f, 180.0f);
+					ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, 0.0f, 180.0f);
+					ImGui::SliderFloat("Rotational velocity (degrees/sec)", &particles->rotVel, -360.0f, 360.0f);
+					ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, 0.0f, 360.0f);
+					ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -360.0f, 360.0f);
+					ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, 0.0f, 360.0f);
+					if(ImGui::SliderFloat3("Rotation Axis (x, y, z)", rotAxis, -1.0f, 1.0f))
+					{
+						particles->rotAxis.x = rotAxis[0];
+						particles->rotAxis.y = rotAxis[1];
+						particles->rotAxis.z = rotAxis[2];
+					}
+					if(ImGui::SliderFloat3("Rotation Axis var (x, y, z)", rotAxisVar, 0.0f, 1.0f))
+					{
+						particles->rotAxisVar.x = rotAxisVar[0];
+						particles->rotAxisVar.y = rotAxisVar[1];
+						particles->rotAxisVar.z = rotAxisVar[2];
+					}
 				}
 			}
 			if(ImGui::CollapsingHeader("Color"))
@@ -612,6 +616,7 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 	root->SetAttribute("blend", particleBlendTypes[(int)particles->blend]);
 	root->SetAttribute("max", particles->max);
 	root->SetAttribute("rate", particles->rate);
+	root->SetAttribute("velrotate", particles->velRotate);
 	if(psysDecay)
 		root->SetAttribute("decay", particles->decay);
 	//root->SetAttribute("decayvar")	//TODO Figure out/add
