@@ -6,17 +6,27 @@ Overall TODO list:
 - IO in separate thread?
 - Disable exceptions/rtti?
 - rip out displaylists for 3D objects and use vertex buffers instead
-- class predeclaration where possible
-- Ortho for HUD
+- Revisit class predeclaration and add more where possible
+- Ortho for HUD and text drawing
 - Create allocator / choose one to use rather than mixing malloc & new
 - Decide if map loading is engine-specific or game-specific
 - Particle systems, objects, etc should be loaded by template, not from XML each time
 - Move all resource loading stuff to IO?
 - Move object self-creation into resource loaders where applicable
-- Revisit joystick support - support multiple controllers, switching input modes, etc
+- Revisit gamepad support - support multiple controllers, switching input modes, etc
 - Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
+
+Particle System Editing:
+- Add support for selecting images / image rects
+- Move particle system saving to new ResourceSaver class
+- Move SS and Particle editing to their own UI classes
+- UI should save/load window booleans as config
+- Add particle death spawn to UI
+- Re - add death spawn types (tho prolly on a per-system basis?)
+- Add particle support for emitter acceleration
+- Fix other TODO items in particle UI and saving
 
 
 Refactoring thoughts:

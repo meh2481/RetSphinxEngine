@@ -619,7 +619,7 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 	root->SetAttribute("velrotate", particles->velRotate);
 	if(psysDecay)
 		root->SetAttribute("decay", particles->decay);
-	//root->SetAttribute("decayvar")	//TODO Figure out/add
+	//root->SetAttribute("decayvar")	//TODO Figure out how to add this without desyncing
 	
 	tinyxml2::XMLElement* img = doc->NewElement("img");
 	img->SetAttribute("path", particles->img->getFilename().c_str());
@@ -705,7 +705,7 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 	root->InsertEndChild(spawnondeath);
 
 	doc->InsertFirstChild(root);
-	doc->SaveFile(filename.c_str());//, true);
+	doc->SaveFile(filename.c_str());//, true);	//TODO Minify XML
 	delete doc;
 }
 
