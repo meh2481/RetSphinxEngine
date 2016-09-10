@@ -437,11 +437,30 @@ void ParticleSystem::draw()
 		drawsz.x = (sizeEnd->x - sizeStart->x) * fLifeFac + sizeStart->x;
 		drawsz.y = (sizeEnd->y - sizeStart->y) * fLifeFac + sizeStart->y;
 
+		float rad = glm::radians(*rot);
+		float s = sin(rad);
+		float c = cos(rad);
+
 		//Set coordinates
-		*vertexPos++ = pos->x + -drawsz.x / 2.0f; *vertexPos++ = pos->y + drawsz.y / 2.0f; // upper left
-		*vertexPos++ = pos->x + drawsz.x / 2.0f; *vertexPos++ = pos->y + drawsz.y / 2.0f; // upper right
-		*vertexPos++ = pos->x + drawsz.x / 2.0f; *vertexPos++ = pos->y + -drawsz.y / 2.0f; // lower right
-		*vertexPos++ = pos->x + -drawsz.x / 2.0f; *vertexPos++ = pos->y + -drawsz.y / 2.0f; // lower left
+		//Rotate manually
+		//TODO VBOs and stuff
+		float px = -drawsz.x / 2.0f;
+		float py = drawsz.y / 2.0f;
+		float xnew = px * c - py * s;
+		float ynew = px * s + py * c;
+		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper left
+		px = -px;
+		xnew = px * c - py * s;
+		ynew = px * s + py * c;
+		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper right
+		py = -py;
+		xnew = px * c - py * s;
+		ynew = px * s + py * c;
+		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower right
+		px = -px;
+		xnew = px * c - py * s;
+		ynew = px * s + py * c;
+		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower left
 
 		//Set color
 		for(int j = 0; j < 4; j++)
@@ -451,9 +470,7 @@ void ParticleSystem::draw()
 			*colorPtr++ = drawcol.b; 
 			*colorPtr++ = drawcol.a;
 		}
-
-		//glRotatef(*rot, rotAxis->x, rotAxis->y, rotAxis->z);	//TODO: Handle rotating somehow else
-
+		
 		//Increment pointers
 		created++;
 		preFade++;

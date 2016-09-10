@@ -243,6 +243,7 @@ void DebugUI::_draw()
 			}
 			if(ImGui::Button("Fire Particles"))
 			{
+				//TODO Better way of handling this
 				particles->emitFrom.centerOn(Vec2(0.0f, 0.0f));	//Reset emit rect (cause of emitVel)
 				particles->firing = true;
 			}
@@ -306,12 +307,12 @@ void DebugUI::_draw()
 			//TODO: Check if these are radians or degrees
 			if(ImGui::CollapsingHeader("Rotation"))
 			{
-				ImGui::SliderFloat("Starting Rotation", &particles->rotStart, -180.0f, 180.0f);
+				ImGui::SliderFloat("Starting Rotation (degrees)", &particles->rotStart, -180.0f, 180.0f);
 				ImGui::SliderFloat("Starting Rotation var", &particles->rotStartVar, 0.0f, 180.0f);
-				ImGui::SliderFloat("Rotational velocity", &particles->rotVel, -180.0f, 180.0f);
-				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, 0.0f, 180.0f);
-				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -180.0f, 180.0f);
-				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, 0.0f, 180.0f);
+				ImGui::SliderFloat("Rotational velocity (degrees/sec)", &particles->rotVel, -360.0f, 360.0f);
+				ImGui::SliderFloat("Rotational velocity var", &particles->rotVelVar, 0.0f, 360.0f);
+				ImGui::SliderFloat("Rotational Acceleration", &particles->rotAccel, -360.0f, 360.0f);
+				ImGui::SliderFloat("Rotational Acceleration var", &particles->rotAccelVar, 0.0f, 360.0f);
 				if(ImGui::SliderFloat3("Rotation Axis (x, y, z)", rotAxis, -1.0f, 1.0f))
 				{
 					particles->rotAxis.x = rotAxis[0];
