@@ -22,7 +22,7 @@ const char* particleBlendTypes[] = {
 };
 
 //Particle systems in folder to load
-vector<string> availableParticleSystems;
+static vector<string> availableParticleSystems;
 bool getParticleSystem(void* data, int cur, const char** toSet)
 {
 	if(cur < availableParticleSystems.size())
@@ -35,7 +35,6 @@ bool getParticleSystem(void* data, int cur, const char** toSet)
 
 void readAvailableParticleSystems(string filePath)
 {
-	//std::set<std::string> readFilesFromDir(std::string sDirPath, bool fullPath = true);
 	set<string> allFiles = FileOperations::readFilesFromDir(filePath, false);
 	availableParticleSystems.clear();
 	for(set<string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
@@ -96,6 +95,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	psysDecay = false;
 	loadParticles = false;
 	saveParticles = false;
+	fireOnStart = true;
 	curSelectedLoadSaveItem = -1;
 	memset(saveFilenameBuf, '\0', SAVE_BUF_SZ);
 }
@@ -268,6 +268,7 @@ void DebugUI::_draw()
 					particles->emissionVel.x = emitVel[0];
 					particles->emissionVel.y = emitVel[1];
 				}
+				ImGui::Checkbox("Fire on start", &fireOnStart);
 			}
 			if(ImGui::CollapsingHeader("Size"))
 			{
@@ -349,6 +350,8 @@ void DebugUI::_draw()
 				else
 					particles->decay = FLT_MAX;
 			}
+			if(ImGui::CollapsingHeader("Spawn"))
+				; //TODO Spawn on death stuff
 		}
 		ImGui::End();
 	}
@@ -375,7 +378,10 @@ void DebugUI::_draw()
 				{
 					delete particles;
 					particles = _ge->getResourceLoader()->getParticleSystem(PARTICLE_SYSTEM_PATH + sFileToLoad);
-					particles->firing = true;
+					if(particles->firing)
+						fireOnStart = true;
+					else
+						particles->firing = true;
 				}
 			}
 		}
@@ -601,7 +607,7 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 
 	root->SetAttribute("emitfrom", particles->emitFrom.toString().c_str());
 	root->SetAttribute("emitfromvel", pointToString(particles->emissionVel).c_str());
-	root->SetAttribute("fireonstart", particles->firing);	//TODO I dunno; should prolly add this
+	root->SetAttribute("fireonstart", fireOnStart);
 	root->SetAttribute("blend", particleBlendTypes[(int)particles->blend]);
 	root->SetAttribute("max", particles->max);
 	root->SetAttribute("rate", particles->rate);
@@ -683,8 +689,14 @@ void DebugUI::saveParticleSystemXML(std::string filename)
 	life->SetAttribute("prefadevar", particles->lifetimePreFadeVar);
 	root->InsertEndChild(life);
 
-	//TODO
-	//tinyxml2::XMLElement* spawnondeath = doc->NewElement("spawnondeath");
+	tinyxml2::XMLElement* spawnondeath = doc->NewElement("spawnondeath");
+	for(vector<string>::iterator i = particles->spawnOnDeath.begin(); i != particles->spawnOnDeath.end(); i++)
+	{
+		tinyxml2::XMLElement* particle = doc->NewElement("particle");
+		particle->SetAttribute("path", i->c_str());
+		spawnondeath->InsertEndChild(particle);
+	}
+	root->InsertEndChild(spawnondeath);
 
 	doc->InsertFirstChild(root);
 	doc->SaveFile(filename.c_str());//, true);

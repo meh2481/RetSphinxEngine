@@ -157,6 +157,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		ps->emissionVel = pointFromString(emfromvel);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
+	//TODO This was a nice thing to have
 	//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
 
 	const char* blendmode = root->Attribute("blend");
@@ -284,6 +285,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 		}
 		else if(sName == "spawnondeath")
 		{
+			//TODO This was a nice thing to have
 			//			const char* cDeathSpawnType = elem->Attribute("deathspawntype");
 			//			if(cDeathSpawnType && strlen(cDeathSpawnType))
 			//			{

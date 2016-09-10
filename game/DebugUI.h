@@ -85,6 +85,7 @@ private:
 	bool saveParticles;
 	int curSelectedLoadSaveItem;
 	char saveFilenameBuf[SAVE_BUF_SZ];
+	bool fireOnStart;
 
 	//Helper functions
 	void updateHelperVars();	//Keep the above up-to-date with the particle system

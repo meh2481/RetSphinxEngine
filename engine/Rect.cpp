@@ -47,9 +47,9 @@ void Rect::offset(Vec2 pt)
 Vec2 Rect::center()
 { 
 	Vec2 pt;
-	pt.x = (right - left)*0.5f + right;
+	pt.x = (right - left)*0.5f + left;
 	pt.y = (bottom - top)*0.5f + top; 
-	return pt; 
+	return pt;
 }
 
 void Rect::center(float* x, float* y) 
