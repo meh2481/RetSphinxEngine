@@ -371,6 +371,7 @@ void GameEngine::rumbleController(float strength, float sec, int priority)
 static int curEffect = -1;
 void GameEngine::rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 {
+	LOG(INFO) << "Running LR effect: " << duration << ", " << large << ", " << small;
 	if(curEffect >= 0)
 	{
 		SDL_HapticDestroyEffect(m_rumble, curEffect);

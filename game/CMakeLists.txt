@@ -1,14 +1,20 @@
 set(game_src
+DebugUI.cpp
+DebugUI.h
 GameEngine.cpp
 GameEngine.h
 GameEngine.rc
 GameEngine_color.cpp
 GameEngine_events.cpp
 GameEngine_xmlparse.cpp
-DebugUI.cpp
-DebugUI.h
 LuaFuncs.cpp
 main.cpp
+MemoryEditor.cpp
+MemoryEditor.h
+ParticleEditor.cpp
+ParticleEditor.h
+SteelSeriesEditor.h
+SteelSeriesEditor.cpp
 )
 
 add_executable(game ${game_src})

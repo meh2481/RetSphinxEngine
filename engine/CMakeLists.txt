@@ -30,8 +30,6 @@ LuaDefines.h
 LuaFuncs.h
 LuaInterface.cpp
 LuaInterface.h
-MemoryEditor.cpp
-MemoryEditor.h
 Mesh3D.cpp
 Mesh3D.h
 mtrand.cpp

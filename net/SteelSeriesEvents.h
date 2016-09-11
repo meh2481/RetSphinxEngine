@@ -38,7 +38,7 @@
 #define MODE_SCREEN "screen"
 #define MODE_VIBRATE "vibrate"
 
-const char* steelSeriesTactileEvents[] = {
+static const char* steelSeriesTactileEvents[] = {
 	"custom",
 	"ti_predefined_strongclick_100",
 	"ti_predefined_strongclick_60",
@@ -165,7 +165,7 @@ const char* steelSeriesTactileEvents[] = {
 	"ti_predefined_smoothhum5nokickorbrakepulse_10"
 };
 
-const char* steelSeriesEventIcons[] = {
+static const char* steelSeriesEventIcons[] = {
 	"None",
 	"Health",
 	"Armor",
@@ -186,7 +186,7 @@ const char* steelSeriesEventIcons[] = {
 	"Backpack"
 };
 
-const char* steelSeriesColorZones[] = {
+static const char* steelSeriesColorZones[] = {
 	"wheel",
 	"logo",
 	"base"
