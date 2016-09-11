@@ -11,6 +11,7 @@
 #include "ResourceLoader.h"
 #include "ResourceCache.h"
 #include "ParticleSystem.h"
+#include "ParticleEditor.h"
 using namespace std;
 
 #define GUID_STR_SZ	256
@@ -289,8 +290,8 @@ void GameEngine::handleEvent(SDL_Event event)
 		
 		case SDL_MOUSEBUTTONDOWN:
 #ifdef _DEBUG
-			if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleSystemEdit && m_debugUI->visible)
-				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.button.x, event.button.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
+			if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleEditor->open && m_debugUI->visible)
+				m_debugUI->particleEditor->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.button.x, event.button.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
 #endif
 			LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
 			break;
@@ -323,8 +324,8 @@ void GameEngine::handleEvent(SDL_Event event)
 
 		case SDL_MOUSEMOTION:
 #ifdef _DEBUG
-			if(getCursorDown(SDL_BUTTON_RIGHT) && m_debugUI->particleSystemEdit && m_debugUI->visible)
-				m_debugUI->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.motion.x, event.motion.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
+			if(getCursorDown(SDL_BUTTON_RIGHT) && m_debugUI->particleEditor->open && m_debugUI->visible)
+				m_debugUI->particleEditor->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.motion.x, event.motion.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
 #endif
 			//LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
 			break;

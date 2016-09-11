@@ -97,7 +97,7 @@ public:
 	
 	//Other stuff
 	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
-	void rumbleLR(uint32_t duration, uint16_t large, uint16_t small);	//Rumble L/R
+	void rumbleLR(uint32_t, uint16_t, uint16_t);	//Rumble L/R
 	void warpObjectToNode(Object* o, Node* n);
 	SteelSeriesClient* getSteelSeriesClient() { return steelSeriesClient; };
 	

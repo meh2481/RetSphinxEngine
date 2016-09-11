@@ -17,6 +17,7 @@
 #include "SteelSeriesClient.h"
 #include "NetworkThread.h"
 #include "ParticleSystem.h"
+#include "ParticleEditor.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -80,8 +81,8 @@ void GameEngine::frame(float dt)
 
 	stepPhysics(dt);
 #ifdef _DEBUG
-	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
-		m_debugUI->particles->update(dt);
+	if(m_debugUI->particleEditor->open && m_debugUI->visible)
+		m_debugUI->particleEditor->particles->update(dt);
 	else
 #endif
 	{
@@ -203,14 +204,14 @@ void GameEngine::draw()
 	drawDebug();
 
 #ifdef _DEBUG
-	if(m_debugUI->particleSystemEdit && m_debugUI->visible)
+	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
 		glLoadIdentity();
 		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		fillScreen(m_debugUI->particleBgColor);
+		fillScreen(m_debugUI->particleEditor->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		m_debugUI->particles->draw();
+		m_debugUI->particleEditor->particles->draw();
 	}
 #endif
 	

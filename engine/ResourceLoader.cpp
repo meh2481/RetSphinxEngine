@@ -174,6 +174,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 
 	root->QueryUnsignedAttribute("max", &ps->max);
 	root->QueryFloatAttribute("rate", &ps->rate);
+	root->QueryFloatAttribute("ratescale", &ps->curRate);
 	root->QueryBoolAttribute("velrotate", &ps->velRotate);
 	root->QueryFloatAttribute("decay", &ps->decay);
 	float fDecayVar = 0.0f;
