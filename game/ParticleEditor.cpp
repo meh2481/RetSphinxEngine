@@ -41,6 +41,17 @@ void readAvailableParticleSystems(string filePath)
 	}
 }
 
+bool spawnParticleList(void* data, int cur, const char** toSet)
+{
+	ParticleSystem* particles = (ParticleSystem*)data;
+	if(cur >= 0 && cur < particles->spawnOnDeath.size())
+	{
+		*toSet = particles->spawnOnDeath.at(cur).c_str();
+		return true;
+	}
+	return false;
+}
+
 ParticleEditor::ParticleEditor(GameEngine * ge)
 {
 	_ge = ge;
@@ -51,7 +62,9 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
 	fireOnStart = true;
 	curSelectedLoadSaveItem = -1;
 	memset(saveFilenameBuf, '\0', SAVE_BUF_SZ);
-
+	curSelectedSpawn = -1;
+	spawnParticleSelect = false;
+	curSelectedSpawnSystem = -1;
 
 	particles = new ParticleSystem();
 	//TODO No hardcodey
@@ -119,7 +132,7 @@ void ParticleEditor::draw(int windowFlags)
 		if(ImGui::CollapsingHeader("Emission"))
 		{
 			if(ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000.0f))
-				particles->init();	//Gotta reset this...
+				particles->init();	//Gotta reset when we change this
 			ImGui::SliderFloat("Rate", &particles->rate, 0.0f, 1000.0f);
 			ImGui::SliderFloat("Rate Scale", &particles->curRate, 0.0f, 10.0f);
 			ImGui::SliderFloat("Emission Angle", &particles->emissionAngle, -180.0f, 180.0f);
@@ -223,7 +236,23 @@ void ParticleEditor::draw(int windowFlags)
 		}
 
 		if(ImGui::CollapsingHeader("Spawn"))
-			; //TODO Spawn on death stuff
+		{
+			ImGui::ListBox("", &curSelectedSpawn, spawnParticleList, particles, particles->spawnOnDeath.size(), 5);
+			if(ImGui::Button("Add"))
+			{
+				readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
+				spawnParticleSelect = true;
+			}
+			ImGui::SameLine();
+			if(ImGui::Button("Remove"))
+			{
+				if(curSelectedSpawn >= 0 && curSelectedSpawn < particles->spawnOnDeath.size())
+				{
+					particles->spawnOnDeath.erase(particles->spawnOnDeath.begin() + curSelectedSpawn);
+					curSelectedSpawn = -1;
+				}
+			}
+		}
 	}
 	ImGui::End();
 
@@ -232,6 +261,9 @@ void ParticleEditor::draw(int windowFlags)
 
 	if(saveParticles)
 		ImGui::OpenPopup("Save Particle System");
+
+	if(spawnParticleSelect)
+		ImGui::OpenPopup("Add Spawned Particle System");
 
 	if(ImGui::BeginPopupModal("Load Particle System"))
 	{
@@ -247,6 +279,7 @@ void ParticleEditor::draw(int windowFlags)
 				string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFileToLoad.size())
 				{
+					curSelectedSpawn = -1;
 					delete particles;
 					particles = _ge->getResourceLoader()->getParticleSystem(PARTICLE_SYSTEM_PATH + sFileToLoad);
 					if(particles->firing)
@@ -296,6 +329,29 @@ void ParticleEditor::draw(int windowFlags)
 			saveParticles = false;
 		}
 
+		ImGui::EndPopup();
+	}
+
+	if(ImGui::BeginPopupModal("Add Spawned Particle System"))
+	{
+		ImGui::Text("Select a Particle System to add:");
+		ImGui::ListBox("", &curSelectedSpawnSystem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
+		if(ImGui::Button("OK") && curSelectedSpawnSystem >= 0)
+		{
+			ImGui::CloseCurrentPopup();
+			spawnParticleSelect = false;
+			if(curSelectedSpawnSystem < availableParticleSystems.size())
+			{
+				particles->spawnOnDeath.push_back(availableParticleSystems.at(curSelectedSpawnSystem));
+				curSelectedSpawnSystem = -1;
+			}
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+			spawnParticleSelect = false;
+		}
 		ImGui::EndPopup();
 	}
 }
@@ -348,6 +404,11 @@ void ParticleEditor::updateHelperVars()
 	bgCol[0] = particleBgColor.r;
 	bgCol[1] = particleBgColor.g;
 	bgCol[2] = particleBgColor.b;
+
+	if(particles->decay == FLT_MAX)
+		psysDecay = false;
+	else
+		psysDecay = true;
 }
 
 void ParticleEditor::saveParticleSystemXML(std::string filename)

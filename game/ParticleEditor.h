@@ -42,6 +42,9 @@ private:
 	int curSelectedLoadSaveItem;
 	char saveFilenameBuf[SAVE_BUF_SZ];
 	bool fireOnStart;
+	int curSelectedSpawn;
+	bool spawnParticleSelect;
+	int curSelectedSpawnSystem;
 
 	//Helper functions
 	void updateHelperVars();	//Keep the above up-to-date with the particle system
