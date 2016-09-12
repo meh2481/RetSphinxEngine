@@ -104,12 +104,16 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
 	loadParticleImage = false;
 
 	particles = new ParticleSystem();
-	//TODO No hardcodey
+	//Set some reasonable defaults
 	particles->img = _ge->getResourceLoader()->getImage("res/particles/particlesheet1.png");
 	Rect rc(0, 0, 128, 128);
 	particles->imgRect.push_back(rc);
+	particles->emissionAngleVar = 180.0f;
+	particles->lifetime = 1.0f;
+	particles->speed = 1.0f;
 	particles->init();
-	particles->firing = false;
+	particles->firing = true;
+
 
 	particleBgColor = Color(0, 0, 0, 1);
 }
