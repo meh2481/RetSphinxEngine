@@ -41,6 +41,28 @@ void readAvailableParticleSystems(string filePath)
 	}
 }
 
+static vector<string> availableParticleSystemImages;
+void readAvailableParticleSystemImages(string filePath)
+{
+	set<string> allFiles = FileOperations::readFilesFromDir(filePath, false);
+	availableParticleSystemImages.clear();
+	for(set<string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
+	{
+		if(i->find(".png") != string::npos)
+			availableParticleSystemImages.push_back(*i);
+	}
+}
+
+bool getParticleSystemImage(void* data, int cur, const char** toSet)
+{
+	if(cur < availableParticleSystemImages.size())
+	{
+		*toSet = availableParticleSystemImages.at(cur).c_str();
+		return true;
+	}
+	return false;
+}
+
 bool spawnParticleList(void* data, int cur, const char** toSet)
 {
 	ParticleSystem* particles = (ParticleSystem*)data;
@@ -79,6 +101,7 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
 	spawnParticleSelect = false;
 	curSelectedSpawnSystem = -1;
 	curSelectedImgRect = -1;
+	loadParticleImage = false;
 
 	particles = new ParticleSystem();
 	//TODO No hardcodey
@@ -144,17 +167,24 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::SameLine();
 			if(ImGui::Button("Load"))
 			{
-				//TODO
+				readAvailableParticleSystemImages(PARTICLE_SYSTEM_PATH);
+				loadParticleImage = true;
 			}
 			ImGui::ListBox("Image Rects", &curSelectedImgRect, imgRectList, particles, particles->imgRect.size(), 5);
 			if(ImGui::Button("Add Rect"))
 			{
-				//TODO
+				particles->imgRect.push_back(Rect(0, 0, 128, 128));
+				curSelectedImgRect = particles->imgRect.size() - 1;
 			}
 			ImGui::SameLine();
-			if(ImGui::Button("Remove Rect") && particles->imgRect.size() > 1)
+			if(ImGui::Button("Remove Rect"))
 			{
-				//TODO
+				if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size() && particles->imgRect.size() > 1)
+				{
+					particles->imgRect.erase(particles->imgRect.begin() + curSelectedImgRect);
+					if(curSelectedImgRect >= particles->imgRect.size())
+						curSelectedImgRect = particles->imgRect.size() - 1;
+				}
 			}
 			if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size())
 			{
@@ -163,9 +193,9 @@ void ParticleEditor::draw(int windowFlags)
 				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0, particles->img->getHeight() - 1, "%.0f");
 				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->getWidth() - 1, "%.0f");
 				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->getHeight() - 1, "%.0f");
-				ImGui::Text("Image Preview:");
-				//TODO
-				//ImGui::Image()
+				ImGui::Text("Preview:");
+				//TODO Crop image
+				ImGui::Image((ImTextureID)particles->img->_getTex(), ImVec2(particles->imgRect.at(curSelectedImgRect).width(), particles->imgRect.at(curSelectedImgRect).height()));
 			}
 		}
 
@@ -305,6 +335,9 @@ void ParticleEditor::draw(int windowFlags)
 	if(spawnParticleSelect)
 		ImGui::OpenPopup("Add Spawned Particle System");
 
+	if(loadParticleImage)
+		ImGui::OpenPopup("Load Particle System Image");
+
 	if(ImGui::BeginPopupModal("Load Particle System"))
 	{
 		ImGui::Text("Select a Particle System to load:");
@@ -393,6 +426,29 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::CloseCurrentPopup();
 			spawnParticleSelect = false;
 		}
+		ImGui::EndPopup();
+	}
+
+	if(ImGui::BeginPopupModal("Load Particle System Image"))
+	{
+		ImGui::Text("Select an image to load:");
+		ImGui::ListBox("Available", &curSelectedLoadImage, getParticleSystemImage, NULL, availableParticleSystemImages.size(), 5);
+		if(ImGui::Button("OK") && curSelectedLoadImage >= 0)
+		{
+			ImGui::CloseCurrentPopup();
+			loadParticleImage = false;
+			//Error check before loading file
+			if(availableParticleSystemImages.size() > curSelectedLoadImage)
+				particles->img = _ge->getResourceLoader()->getImage(PARTICLE_SYSTEM_PATH + availableParticleSystemImages.at(curSelectedLoadImage));
+			curSelectedLoadImage = -1;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+			loadParticleImage = false;
+		}
+
 		ImGui::EndPopup();
 	}
 }
