@@ -45,6 +45,7 @@ private:
 	int curSelectedSpawn;
 	bool spawnParticleSelect;
 	int curSelectedSpawnSystem;
+	int curSelectedImgRect;
 
 	//Helper functions
 	void updateHelperVars();	//Keep the above up-to-date with the particle system

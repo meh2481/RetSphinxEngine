@@ -52,6 +52,19 @@ bool spawnParticleList(void* data, int cur, const char** toSet)
 	return false;
 }
 
+static string imgRectBuffer;	//So we don't run into scoping issues with these
+bool imgRectList(void* data, int cur, const char** toSet)
+{
+	ParticleSystem* particles = (ParticleSystem*)data;
+	if(cur >= 0 && cur < particles->imgRect.size())
+	{
+		imgRectBuffer = particles->imgRect.at(cur).toString();
+		*toSet = imgRectBuffer.c_str();
+		return true;
+	}
+	return false;
+}
+
 ParticleEditor::ParticleEditor(GameEngine * ge)
 {
 	_ge = ge;
@@ -65,6 +78,7 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
 	curSelectedSpawn = -1;
 	spawnParticleSelect = false;
 	curSelectedSpawnSystem = -1;
+	curSelectedImgRect = -1;
 
 	particles = new ParticleSystem();
 	//TODO No hardcodey
@@ -126,7 +140,33 @@ void ParticleEditor::draw(int windowFlags)
 
 		if(ImGui::CollapsingHeader("Images"))
 		{
-			//TODO
+			ImGui::TextDisabled(particles->img->getFilename().c_str());
+			ImGui::SameLine();
+			if(ImGui::Button("Load"))
+			{
+				//TODO
+			}
+			ImGui::ListBox("Image Rects", &curSelectedImgRect, imgRectList, particles, particles->imgRect.size(), 5);
+			if(ImGui::Button("Add Rect"))
+			{
+				//TODO
+			}
+			ImGui::SameLine();
+			if(ImGui::Button("Remove Rect") && particles->imgRect.size() > 1)
+			{
+				//TODO
+			}
+			if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size())
+			{
+				ImGui::Text("Current Rect:");
+				ImGui::SliderFloat("Left", &particles->imgRect.at(curSelectedImgRect).left, 0, particles->img->getWidth() - 1, "%.0f");
+				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0, particles->img->getHeight() - 1, "%.0f");
+				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->getWidth() - 1, "%.0f");
+				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->getHeight() - 1, "%.0f");
+				ImGui::Text("Image Preview:");
+				//TODO
+				//ImGui::Image()
+			}
 		}
 
 		if(ImGui::CollapsingHeader("Emission"))
@@ -237,7 +277,7 @@ void ParticleEditor::draw(int windowFlags)
 
 		if(ImGui::CollapsingHeader("Spawn"))
 		{
-			ImGui::ListBox("", &curSelectedSpawn, spawnParticleList, particles, particles->spawnOnDeath.size(), 5);
+			ImGui::ListBox("Particle Systems", &curSelectedSpawn, spawnParticleList, particles, particles->spawnOnDeath.size(), 5);
 			if(ImGui::Button("Add"))
 			{
 				readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
@@ -268,18 +308,19 @@ void ParticleEditor::draw(int windowFlags)
 	if(ImGui::BeginPopupModal("Load Particle System"))
 	{
 		ImGui::Text("Select a Particle System to load:");
-		ImGui::ListBox("", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
-		if(ImGui::Button("OK"))
+		ImGui::ListBox("Existing", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
+		if(ImGui::Button("OK") && curSelectedLoadSaveItem >= 0)
 		{
 			ImGui::CloseCurrentPopup();
 			loadParticles = false;
 			//Error check before loading file
-			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+			if(availableParticleSystems.size() > curSelectedLoadSaveItem)
 			{
 				string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFileToLoad.size())
 				{
 					curSelectedSpawn = -1;
+					curSelectedImgRect = -1;
 					delete particles;
 					particles = _ge->getResourceLoader()->getParticleSystem(PARTICLE_SYSTEM_PATH + sFileToLoad);
 					if(particles->firing)
@@ -306,7 +347,7 @@ void ParticleEditor::draw(int windowFlags)
 	if(ImGui::BeginPopupModal("Save Particle System"))
 	{
 		ImGui::Text("Select a Particle System to save:");
-		if(ImGui::ListBox("", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5))
+		if(ImGui::ListBox("Current", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5))
 		{
 			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
 			{
@@ -335,7 +376,7 @@ void ParticleEditor::draw(int windowFlags)
 	if(ImGui::BeginPopupModal("Add Spawned Particle System"))
 	{
 		ImGui::Text("Select a Particle System to add:");
-		ImGui::ListBox("", &curSelectedSpawnSystem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
+		ImGui::ListBox("Available", &curSelectedSpawnSystem, getParticleSystem, NULL, availableParticleSystems.size(), 5);
 		if(ImGui::Button("OK") && curSelectedSpawnSystem >= 0)
 		{
 			ImGui::CloseCurrentPopup();
@@ -415,7 +456,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 {
 	filename = PARTICLE_SYSTEM_PATH + filename;
 
-	LOG(INFO) << "Saving " << filename;
+	LOG(INFO) << "Saving particle system " << filename;
 
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 	tinyxml2::XMLElement* root = doc->NewElement("particlesystem");

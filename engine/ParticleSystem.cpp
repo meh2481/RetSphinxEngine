@@ -152,10 +152,10 @@ void ParticleSystem::_newParticle()
 	float top = m_imgRect[m_num].top / (float)img->getHeight();
 	float bottom = m_imgRect[m_num].bottom / (float)img->getHeight();
 
-	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
-	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
-	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
+	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
+	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
 
 	float sizediff = Random::randomFloat(-sizeVar,sizeVar);
 	m_sizeStart[m_num].x = sizeStart.x + sizediff;
@@ -235,10 +235,10 @@ void ParticleSystem::_rmParticle(const unsigned idx)
 	float top = m_imgRect[m_num - 1].top / (float)img->getHeight();
 	float bottom = m_imgRect[m_num - 1].bottom / (float)img->getHeight();
 
-	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
-	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
-	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
+	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+	*particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
+	*particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
 
 	m_imgRect[idx] = m_imgRect[m_num-1];
 	m_pos[idx] = m_pos[m_num-1];
@@ -444,7 +444,7 @@ void ParticleSystem::draw()
 
 		float rad;
 		if(velRotate)	//Rotate each particle according to its velocity
-			rad = glm::pi<float>() - atan2(vel->x, vel->y);	//Rotate 180 degrees - angle. I think our coordinate system is wonky
+			rad = -atan2(vel->x, vel->y);	//Rotate -angle. I think our coordinate system is wonky
 		else
 			rad = glm::radians(*rot);	//Rotate based on each particle's rotation
 
