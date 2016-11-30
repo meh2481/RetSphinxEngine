@@ -165,7 +165,11 @@ void ParticleSystem::_newParticle()
 	float angle = emissionAngle + Random::randomFloat(-emissionAngleVar,emissionAngleVar);
 	float amt = speed + Random::randomFloat(-speedVar,speedVar);
 	m_vel[m_num].x = amt*cos(glm::radians(angle));
+	if(velAdd)
+		m_vel[m_num].x += emissionVel.x;
 	m_vel[m_num].y = amt*sin(glm::radians(angle));
+	if(velAdd)
+		m_vel[m_num].y += emissionVel.y;
 	m_accel[m_num].x = accel.x + Random::randomFloat(-accelVar.x,accelVar.x);
 	m_accel[m_num].y = accel.y + Random::randomFloat(-accelVar.y,accelVar.y);
 	m_rot[m_num] = rotStart + Random::randomFloat(-rotStartVar,rotStartVar);
@@ -301,6 +305,7 @@ void ParticleSystem::_initValues()
 	lifetimePreFade = 0.0f;
 	lifetimePreFadeVar = 0.0f;
 	velRotate = false;
+	velAdd = false;
 }
 
 void ParticleSystem::update(float dt)

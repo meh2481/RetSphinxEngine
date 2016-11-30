@@ -247,6 +247,10 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	unsigned int JOY_AXIS2_VERT = SDL_CONTROLLER_AXIS_RIGHTY;
 	unsigned int JOY_AXIS_LT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
 	unsigned int JOY_AXIS_RT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
+	unsigned int JOY_DPAD_UP = SDL_CONTROLLER_BUTTON_DPAD_UP;
+	unsigned int JOY_DPAD_DOWN = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+	unsigned int JOY_DPAD_LEFT = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+	unsigned int JOY_DPAD_RIGHT = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
 
 	//Set joystick config
 	luaSetGlobal(JOY_BUTTON_BACK);
@@ -266,6 +270,10 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	luaSetGlobal(JOY_AXIS_LT);
 	luaSetGlobal(JOY_AXIS_RT);
 	luaSetGlobal(JOY_AXIS_TRIP);
+	luaSetGlobal(JOY_DPAD_UP);
+	luaSetGlobal(JOY_DPAD_DOWN);
+	luaSetGlobal(JOY_DPAD_LEFT);
+	luaSetGlobal(JOY_DPAD_RIGHT);
 
 	//Set key config
 	luaSetGlobal(KEY_UP1);

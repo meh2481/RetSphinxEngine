@@ -121,6 +121,7 @@ public:
 	bool				velRotate;			//If each particle should face the direction it's moving instead of rotating normally
 	std::vector<std::string>		spawnOnDeath;		//Spawn a new particle system whenever one of these dies
 	Vec2				emissionVel;		//Move the emission point every frame
+	bool				velAdd;				//True to add emitter vel to new particles
 	
 	void update(float dt);
 	void draw();

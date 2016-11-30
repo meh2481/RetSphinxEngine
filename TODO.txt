@@ -1,3 +1,6 @@
+-Particles follow ship with acceleration applied
+-Particle editor breaks after F5
+
 Overall TODO list:
 - Fix math for softbody lattice anim so it actually works properly
 - Use GLM for math stuff instead of glPushMatrix() and friends
@@ -19,14 +22,13 @@ Overall TODO list:
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 
 Particle System Editing:
-- Add support for selecting images / image rects
-- Move particle system saving to new ResourceSaver class
-- Move SS and Particle editing to their own UI classes
+- Fix image rect preview
 - UI should save/load window booleans as config
-- Add particle death spawn to UI
 - Re - add death spawn types (tho prolly on a per-system basis?)
 - Add particle support for emitter acceleration
 - Fix other TODO items in particle UI and saving
+- Add support for seeing particle death spawns
+- Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
 
 
 Refactoring thoughts:

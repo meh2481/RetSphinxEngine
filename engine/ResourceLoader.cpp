@@ -155,6 +155,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	const char* emfromvel = root->Attribute("emitfromvel");
 	if(emfromvel != NULL)
 		ps->emissionVel = pointFromString(emfromvel);
+	root->QueryBoolAttribute("emitadd", &ps->velAdd);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
 	//TODO What even was this?

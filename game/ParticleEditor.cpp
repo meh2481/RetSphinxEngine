@@ -198,8 +198,12 @@ void ParticleEditor::draw(int windowFlags)
 				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->getWidth() - 1, "%.0f");
 				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->getHeight() - 1, "%.0f");
 				ImGui::Text("Preview:");
-				//TODO Crop image
-				ImGui::Image((ImTextureID)particles->img->_getTex(), ImVec2(particles->imgRect.at(curSelectedImgRect).width(), particles->imgRect.at(curSelectedImgRect).height()));
+				//Crop image
+				ImGui::Image(
+					(ImTextureID)particles->img->_getTex(),
+					ImVec2(particles->imgRect.at(curSelectedImgRect).width(), particles->imgRect.at(curSelectedImgRect).height()),
+					ImVec2(particles->imgRect.at(curSelectedImgRect).left / (float)particles->img->getWidth(), particles->imgRect.at(curSelectedImgRect).top / (float)particles->img->getHeight()),
+					ImVec2(particles->imgRect.at(curSelectedImgRect).right / (float)particles->img->getWidth(), particles->imgRect.at(curSelectedImgRect).bottom / (float)particles->img->getHeight()));
 			}
 		}
 
@@ -219,6 +223,7 @@ void ParticleEditor::draw(int windowFlags)
 				particles->emissionVel.y = emitVel[1];
 			}
 			ImGui::Checkbox("Fire on start", &fireOnStart);
+			ImGui::Checkbox("Add emitter vel to particles", &particles->velAdd);
 		}
 
 		if(ImGui::CollapsingHeader("Size"))
@@ -523,6 +528,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 
 	root->SetAttribute("emitfrom", particles->emitFrom.toString().c_str());
 	root->SetAttribute("emitfromvel", pointToString(particles->emissionVel).c_str());
+	root->SetAttribute("emitadd", particles->velAdd);
 	root->SetAttribute("fireonstart", fireOnStart);
 	root->SetAttribute("blend", particleBlendTypes[(int)particles->blend]);
 	root->SetAttribute("max", particles->max);

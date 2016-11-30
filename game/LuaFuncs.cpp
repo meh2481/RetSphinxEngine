@@ -33,6 +33,20 @@ public:
 		g_pGlobalEngine->CameraPos.y = -pt.y;
 	}
 
+	static void camera_getPos(float* x, float* y, float* z)
+	{
+		*x = g_pGlobalEngine->CameraPos.x;
+		*y = g_pGlobalEngine->CameraPos.y;
+		*z = g_pGlobalEngine->CameraPos.z;
+	}
+
+	static void camera_setPos(float x, float y, float z)
+	{
+		g_pGlobalEngine->CameraPos.x = x;
+		g_pGlobalEngine->CameraPos.y = y;
+		g_pGlobalEngine->CameraPos.z = z;
+	}
+
 	static Object* xmlParseObj(string sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
 	{
 		Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel);
@@ -398,6 +412,25 @@ luaFunc(camera_centerOnXY)	//camera_centerOnXY(float x, float y)
 	luaReturnNil();
 }
 
+luaFunc(camera_getPos)	//x,y,z camera_getPos()
+{
+	float x, y, z;
+	GameEngineLua::camera_getPos(&x, &y, &z);
+	luaReturnVec3(x, y, z);
+}
+
+luaFunc(camera_setPos)	//void camera_setPos(x,y,z)
+{
+	if(lua_isnumber(L, 1) && lua_isnumber(L, 2) && lua_isnumber(L, 3))
+	{
+		float x = lua_tonumber(L, 1);
+		float y = lua_tonumber(L, 2);
+		float z = lua_tonumber(L, 3);
+		GameEngineLua::camera_setPos(x, y, z);
+	}
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Node functions
 //-----------------------------------------------------------------------------------------------------------
@@ -543,6 +576,14 @@ luaFunc(particles_setEmitVel)	//void particles_setEmitVel(ParticleSystem* p, flo
 	luaReturnNil();
 }
 
+luaFunc(particles_setEmitAngle)	//void particles_setEmitAngle(ParticleSystem* p, float a)
+{
+	ParticleSystem* ps = getObj<ParticleSystem>(L);
+	if(ps)
+		ps->emissionAngle = (float)lua_tonumber(L, 2);
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
@@ -635,6 +676,8 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
 	luaRegister(camera_centerOnXY),
+	luaRegister(camera_getPos),
+	luaRegister(camera_setPos),
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
 	luaRegister(node_getPos),
@@ -648,6 +691,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(particles_setFireRate),
 	luaRegister(particles_setEmitPos),
 	luaRegister(particles_setEmitVel),
+	luaRegister(particles_setEmitAngle),
 	luaRegister(key_isDown),
 	luaRegister(joy_isDown),
 	luaRegister(joy_getAxis),
