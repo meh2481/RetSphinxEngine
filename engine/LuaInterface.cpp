@@ -195,20 +195,40 @@ bool LuaInterface::callMethod(void *o, const char *func)
 
 bool LuaInterface::callMethod(void *o, const char *func, void* other)
 {
-    lookupMethod(o, func);
+	lookupMethod(o, func);
 	int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, other);
 #ifdef _DEBUG
 	assert(lty == LUA_TUSERDATA);
 #endif
-    return doCall(1+1); // first parameter is self (aka o)
+	return doCall(1 + 1); // first parameter is self (aka o)
+}
+
+bool LuaInterface::callMethod(void *o, const char *func, void* other, float a)
+{
+	lookupMethod(o, func);
+	int lty = lua_rawgetp(_lua, LUA_REGISTRYINDEX, other);
+#ifdef _DEBUG
+	assert(lty == LUA_TUSERDATA);
+#endif
+	lua_pushnumber(_lua, a);
+	return doCall(2 + 1); // first parameter is self (aka o)
 }
 
 bool LuaInterface::callMethod(void *o, const char *func, float a, float b)
 {
-    lookupMethod(o, func);
+	lookupMethod(o, func);
 	lua_pushnumber(_lua, a);
 	lua_pushnumber(_lua, b);
-    return doCall(2+1); // first parameter is self (aka o)
+	return doCall(2 + 1); // first parameter is self (aka o)
+}
+
+bool LuaInterface::callMethod(void *o, const char *func, float a, float b, float c)
+{
+	lookupMethod(o, func);
+	lua_pushnumber(_lua, a);
+	lua_pushnumber(_lua, b);
+	lua_pushnumber(_lua, c);
+	return doCall(3 + 1); // first parameter is self (aka o)
 }
 
 bool LuaInterface::callMethod(void *o, const char *func, float a)

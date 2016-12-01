@@ -478,17 +478,17 @@ void Engine::stepPhysics(float dt)
 		if(c.objA && c.objB)
 		{
 			//Let both scripts handle colliding, for more generic collision in both
-			c.objA->collide(c.objB);
-			c.objB->collide(c.objA);
+			c.objA->collide(c.objB, c.impulse);
+			c.objB->collide(c.objA, c.impulse);
 		}
 		else if(c.objA && !c.nodeB)
 		{
 			b2Vec2 pt = -worldManifold.normal;	//Flip this, since a Box2D normal is defined from A->B, and we want a wall->obj normal
-			c.objA->collideWall(Vec2(pt.x, pt.y));
+			c.objA->collideWall(Vec2(pt.x, pt.y), c.impulse);
 		}
 		else if(c.objB && !c.nodeA)
 		{
-			c.objB->collideWall(Vec2(worldManifold.normal.x, worldManifold.normal.y));
+			c.objB->collideWall(Vec2(worldManifold.normal.x, worldManifold.normal.y), c.impulse);
 		}
 		//Don't care about two non-object fixtures colliding
 

@@ -47,7 +47,7 @@ Object* EngineContactListener::getObj(b2Fixture* fix)
 
 Collision EngineContactListener::getCollision(b2Contact* c)
 {
-	Collision cResult = {NULL, NULL, NULL, NULL};
+	Collision cResult = {NULL, NULL, NULL, NULL, c->GetManifold()->points[0].normalImpulse};
 	if(!c->IsTouching()) return cResult;
 	
 	b2Fixture* fixA = c->GetFixtureA();

@@ -10,6 +10,7 @@ typedef struct {
 	Object* objB;
 	Node* nodeA;
 	Node* nodeB;
+	float impulse;
 } Collision;
 	
 class EngineContactListener : public b2ContactListener

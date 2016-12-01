@@ -372,7 +372,17 @@ void GameEngine::rumbleController(float strength, float sec, int priority)
 static int curEffect = -1;
 void GameEngine::rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 {
-	LOG(INFO) << "Running LR effect: " << duration << ", " << large << ", " << small;
+	static float fLastRumble = 0.0f;
+	static int prevPriority = 0;
+	float sec = (float)duration / 1000.0;
+	
+	//Last rumble is still going
+	if(getSeconds() < fLastRumble || duration < 1)	//Don't run 0-msec duration events either
+		return;
+	
+	fLastRumble = getSeconds() + sec;
+
+	LOG(TRACE) << "Running LR effect: " << duration << ", " << sec << ", " << large << ", " << small;
 	if(curEffect >= 0)
 	{
 		SDL_HapticDestroyEffect(m_rumble, curEffect);
@@ -395,7 +405,7 @@ void GameEngine::rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 		//Fall back on standard rumble
 		float strength = large + small;
 		strength /= (float)USHRT_MAX * 2.0f;
-		rumbleController(strength, (float)duration/1000.0);
+		rumbleController(strength, sec);
 		return;
 	}
 

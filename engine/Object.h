@@ -68,8 +68,8 @@ public:
 	void update(float dt);
 	b2Body* getBody();
 	Vec2 getPos();
-	void collide(Object* other);
-	void collideWall(Vec2 ptNormal);	//ptNormal will be a normal vector from the wall to this object
+	void collide(Object* other, float impulse);
+	void collideWall(Vec2 ptNormal, float impulse);	//ptNormal will be a normal vector from the wall to this object
 	void initLua();	
 	void setPosition(Vec2 p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
 	

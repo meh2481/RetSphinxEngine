@@ -122,16 +122,16 @@ Vec2 Object::getPos()
 	return Vec2(p.x, p.y);
 }
 
-void Object::collide(Object* other)
+void Object::collide(Object* other, float impulse)
 {
 	if(lua)
-		lua->callMethod(this, "collide", other);
+		lua->callMethod(this, "collide", other, impulse);
 }
 
-void Object::collideWall(Vec2 ptNormal)
+void Object::collideWall(Vec2 ptNormal, float impulse)
 {
 	if(lua)
-		lua->callMethod(this, "collidewall", ptNormal.x, ptNormal.y);
+		lua->callMethod(this, "collidewall", ptNormal.x, ptNormal.y, impulse);
 }
 
 void Object::initLua()

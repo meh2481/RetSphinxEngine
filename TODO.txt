@@ -1,5 +1,6 @@
 -Particles follow ship with acceleration applied
 -Particle editor breaks after F5
+-Rumble controller when hitting something
 
 Overall TODO list:
 - Fix math for softbody lattice anim so it actually works properly
