@@ -7,6 +7,8 @@ GameEngine.rc
 GameEngine_color.cpp
 GameEngine_events.cpp
 GameEngine_xmlparse.cpp
+LevelEditor.h
+LevelEditor.cpp
 LuaFuncs.cpp
 main.cpp
 MemoryEditor.cpp
@@ -15,8 +17,6 @@ ParticleEditor.cpp
 ParticleEditor.h
 SteelSeriesEditor.h
 SteelSeriesEditor.cpp
-Editor.h
-Editor.cpp
 )
 
 add_executable(game ${game_src})

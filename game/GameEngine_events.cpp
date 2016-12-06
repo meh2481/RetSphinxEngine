@@ -71,13 +71,7 @@ void GameEngine::handleEvent(SDL_Event event)
 #endif //_DEBUG
 
 				case SDL_SCANCODE_ESCAPE:
-					if(m_debugUI->visible)
-					{
-						m_debugUI->visible = false;
-						playPhysics();
-					}
-					else
-						quit();
+					quit();
 					break;
 
 				case SDL_SCANCODE_PRINTSCREEN:

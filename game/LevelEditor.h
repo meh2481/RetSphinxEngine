@@ -2,14 +2,14 @@
 
 class GameEngine;
 
-class Editor
+class LevelEditor
 {
 	GameEngine* ge;
 	const char* WINDOW_TITLE = "Level Editor";
 
 public:
-	Editor(GameEngine* _g);
+	LevelEditor(GameEngine* _g);
 
 	bool open;
-	void draw(int windowFlags);
+	void draw(int windowFlags, bool focus);
 };

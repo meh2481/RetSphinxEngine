@@ -4,7 +4,7 @@
 #include "easylogging++.h"
 #include "SteelSeriesEditor.h"
 #include "ParticleEditor.h"
-#include "Editor.h"
+#include "LevelEditor.h"
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
@@ -25,7 +25,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	
 	steelSeriesEditor = new SteelSeriesEditor(ge);
 	particleEditor = new ParticleEditor(ge);
-	levelEditor = new Editor(ge);
+	levelEditor = new LevelEditor(ge);
 }
 
 DebugUI::~DebugUI()
@@ -78,7 +78,7 @@ void DebugUI::_draw()
 	if(levelEditor->open)
 	{
 		_ge->pausePhysics();
-		levelEditor->draw(windowFlags);
+		levelEditor->draw(windowFlags, hasFocus());
 	}
 	else
 		_ge->playPhysics();
