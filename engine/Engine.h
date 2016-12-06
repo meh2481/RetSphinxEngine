@@ -175,6 +175,7 @@ public:
 #ifdef _DEBUG
 	void playPausePhysics() { m_bSteppingPhysics = !m_bSteppingPhysics; };
 	void pausePhysics() { m_bSteppingPhysics = true; };
+	void playPhysics() { m_bSteppingPhysics = false; };
 	void stepPhysics() { m_bStepFrame = true; };
 #endif
 

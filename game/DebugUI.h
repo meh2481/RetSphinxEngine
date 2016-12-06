@@ -7,6 +7,7 @@ class GameEngine;
 class ParticleSystem;
 class SteelSeriesEditor;
 class ParticleEditor;
+class Editor;
 
 class DebugUI
 {
@@ -27,7 +28,9 @@ public:
 
 private:
 	void _draw();
+
 	MemoryEditor memEdit;
+	Editor* levelEditor;
 	GameEngine *_ge;
 
 	bool rumbleMenu;

@@ -4,6 +4,7 @@
 #include "easylogging++.h"
 #include "SteelSeriesEditor.h"
 #include "ParticleEditor.h"
+#include "Editor.h"
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
@@ -24,12 +25,14 @@ DebugUI::DebugUI(GameEngine *ge)
 	
 	steelSeriesEditor = new SteelSeriesEditor(ge);
 	particleEditor = new ParticleEditor(ge);
+	levelEditor = new Editor(ge);
 }
 
 DebugUI::~DebugUI()
 {
 	delete steelSeriesEditor;
 	delete particleEditor;
+	delete levelEditor;
 }
 
 void DebugUI::draw()
@@ -55,6 +58,8 @@ void DebugUI::_draw()
 
 			ImGui::MenuItem("Particle System Editor", NULL, &particleEditor->open);
 
+			ImGui::MenuItem("Level Editor", NULL, &levelEditor->open);
+
 			ImGui::EndMenu();
 		}
 
@@ -69,6 +74,14 @@ void DebugUI::_draw()
 
 	if(particleEditor->open)
 		particleEditor->draw(windowFlags);
+
+	if(levelEditor->open)
+	{
+		_ge->pausePhysics();
+		levelEditor->draw(windowFlags);
+	}
+	else
+		_ge->playPhysics();
 
 	if(rumbleMenu)
 	{

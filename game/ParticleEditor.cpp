@@ -90,7 +90,7 @@ bool imgRectList(void* data, int cur, const char** toSet)
 ParticleEditor::ParticleEditor(GameEngine * ge)
 {
 	_ge = ge;
-	open = true;
+	open = false;
 	psysDecay = false;
 	loadParticles = false;
 	saveParticles = false;

@@ -15,6 +15,8 @@ ParticleEditor.cpp
 ParticleEditor.h
 SteelSeriesEditor.h
 SteelSeriesEditor.cpp
+Editor.h
+Editor.cpp
 )
 
 add_executable(game ${game_src})

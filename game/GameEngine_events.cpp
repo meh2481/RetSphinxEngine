@@ -72,7 +72,10 @@ void GameEngine::handleEvent(SDL_Event event)
 
 				case SDL_SCANCODE_ESCAPE:
 					if(m_debugUI->visible)
+					{
 						m_debugUI->visible = false;
+						playPhysics();
+					}
 					else
 						quit();
 					break;
@@ -115,7 +118,10 @@ void GameEngine::handleEvent(SDL_Event event)
 					break;
 
 				case SDL_SCANCODE_GRAVE: // Use the traditional quake key for debug console stuff
+					if(m_debugUI->visible)
+						playPhysics();
 					m_debugUI->visible = !m_debugUI->visible;
+					break;
 			}
 
 		case SDL_WINDOWEVENT:
