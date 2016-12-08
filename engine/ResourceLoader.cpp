@@ -786,7 +786,13 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 	b2CircleShape dynamicCircle;
 	b2ChainShape dynamicChain;
 
-	Vec2 pos;
+
+
+	//Get position (center of box)
+	Vec2 pos(0, 0);
+	const char* cPos = fixture->Attribute("pos");
+	if(cPos)
+		pos = pointFromString(cPos);
 
 	const char* cFixType = fixture->Attribute("type");
 	if(!cFixType)
@@ -802,15 +808,6 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 		{
 			LOG(ERROR) << "readFixture ERR: No box size";
 			return NULL;
-		}
-
-		//Get position (center of box)
-		Vec2 p(0, 0);
-		const char* cPos = fixture->Attribute("pos");
-		if(cPos)
-		{
-			p = pointFromString(cPos);
-			pos = p;
 		}
 
 		//Get rotation (angle) of box
@@ -835,20 +832,13 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 		else
 		{
 			//Create box
-			dynamicBox.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(p.x, p.y), fRot);
+			dynamicBox.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(pos.x, pos.y), fRot);
 			fixtureDef.shape = &dynamicBox;
 		}
 	}
 	else if(sFixType == "circle")
 	{
-		dynamicCircle.m_p.SetZero();
-		const char* cCircPos = fixture->Attribute("pos");
-		if(cCircPos)
-		{
-			pos = pointFromString(cCircPos);
-			dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
-		}
-
+		dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
 		dynamicCircle.m_radius = 1.0f;
 		fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
 		fixtureDef.shape = &dynamicCircle;

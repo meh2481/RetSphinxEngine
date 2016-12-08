@@ -35,7 +35,8 @@ public:
 
 	//Node functions
 	void add(Node* n);
-	Node* getNode(Vec2 pos);
+	Node* getNode(Vec2 pos);	//Get closest node to a location TODO rename
+	Node* getNodeUnder(Vec2 pos);	//Get Node under a location, or NULL
 	Node* getNode(std::string sNodeName);
 
 	//Object funtions

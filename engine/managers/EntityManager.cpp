@@ -10,7 +10,7 @@ using namespace std;
 EntityManager::EntityManager(ResourceLoader* resourceLoader, b2World* world)
 {
 	particleSystemManager = new ParticleSystemManager(resourceLoader);
-	nodeManager = new NodeManager();
+	nodeManager = new NodeManager(world);
 	objectManager = new ObjectManager(world);
 	sceneryManager = new SceneryManager();
 }
@@ -63,6 +63,11 @@ void EntityManager::add(Node * n)
 Node* EntityManager::getNode(Vec2 pos)
 {
 	return nodeManager->getNode(pos);
+}
+
+Node* EntityManager::getNodeUnder(Vec2 pos)
+{
+	return nodeManager->getNodeUnder(pos);
 }
 
 Node* EntityManager::getNode(string sNodeName)

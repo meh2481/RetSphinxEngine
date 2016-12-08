@@ -7,10 +7,11 @@ class Node {
 	std::map<std::string, std::string> propertyValues;	//This can be populated by XML and called from Lua! For userdata and such
 public:
 	enum { TYPE = OT_NODE };
-	std::string 			luaClass;
+	std::string 	luaClass;
 	LuaInterface* 	lua;
 	Vec2 			pos;
-	std::string 			name;
+	std::string 	name;
+	b2Body*         body;
 	
 	Node();
 	~Node();

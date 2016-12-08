@@ -1,6 +1,14 @@
 #include "NodeManager.h"
 #include "Node.h"
+#include "Box2D/Box2D.h"
+#include "PointQueryCallback.h"
+#include <list>
 using namespace std;
+
+NodeManager::NodeManager(b2World * world)
+{
+	physicsWorld = world;
+}
 
 NodeManager::~NodeManager()
 {
@@ -38,30 +46,30 @@ Node* NodeManager::getNode(string sNodeName)
 }
 
 
-//Node* Engine::getNode(Point p)
-//{
-//	PointQueryCallback pqc;
-//	b2AABB aabb;
-//	aabb.lowerBound.Set(p.x, p.y);
-//	aabb.upperBound.Set(p.x, p.y);
-//	m_physicsWorld->QueryAABB(&pqc, aabb);
-//	
-//	//This returns a list of possible bodies; loop through and check for actual containment
-//	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
-//	{
-//		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
-//		{
-//			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
-//			{
-//				void* data = fix->GetUserData();
-//				if(data)
-//					return (Node*)(data);
-//			}
-//		}
-//	}
-//	
-//	return NULL;
-//}
+Node* NodeManager::getNodeUnder(Vec2 p)
+{
+	PointQueryCallback pqc;
+	b2AABB aabb;
+	aabb.lowerBound.Set(p.x, p.y);
+	aabb.upperBound.Set(p.x, p.y);
+	physicsWorld->QueryAABB(&pqc, aabb);
+	
+	//This returns a list of possible bodies; loop through and check for actual containment
+	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+	{
+		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
+		{
+			if(fix->TestPoint(b2Vec2(p.x, p.y)))	//we have a hit
+			{
+				void* data = fix->GetUserData();
+				if(data)
+					return (Node*)(data);
+			}
+		}
+	}
+	
+	return NULL;
+}
 
 Node* NodeManager::getNode(Vec2 p)
 {

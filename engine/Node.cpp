@@ -3,7 +3,8 @@
 
 Node::Node()
 {
-	 lua = NULL;
+	body = NULL;
+	lua = NULL;
 }
 
 Node::~Node()

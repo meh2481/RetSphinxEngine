@@ -345,23 +345,29 @@ void GameEngine::loadScene(string sXMLFilename)
 	//Load level geometry
 	for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
 	{
-		b2Fixture* fixture = getResourceLoader()->getObjectFixture(geom, groundBody);
+		Vec2 pos;
+
+		const char* cPos = geom->Attribute("pos");
+		if(cPos)
+			pos = pointFromString(cPos);
+		geom->SetAttribute("pos", "0,0");	//HACK: Set to 0,0 for fixture so we don't offset twice
+
+		b2BodyDef bodyDef;
+		bodyDef.type = b2_staticBody;
+		bodyDef.position.Set(pos.x, pos.y);
+
+		b2Body* body = getWorld()->CreateBody(&bodyDef);
+		b2Fixture* fixture = getResourceLoader()->getObjectFixture(geom, body);
 		if(fixture)
 		{
-			Vec2 pos;
-
-			//Create node if this is one
 			const char* cLua = geom->Attribute("luaclass");
-			const char* cPos = geom->Attribute("pos");
-			if(cPos)
-				pos = pointFromString(cPos);
-
 			if(cLua)
 			{
 				Node* n = new Node();
 				n->luaClass = cLua;
 				n->lua = Lua;			//TODO: Better handling of node/object LuaInterfaces
 				n->pos = pos;
+				n->body = body;
 
 				const char* cName = geom->Attribute("name");
 				if(cName)

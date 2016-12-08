@@ -1,22 +1,8 @@
 #include "ObjectManager.h"
 #include "Object.h"
 #include "Box2D/Box2D.h"
+#include "PointQueryCallback.h"
 using namespace std;
-
-//-----------------------------------------------------
-// Callback helper class for finding objects
-//-----------------------------------------------------
-class PointQueryCallback : public b2QueryCallback
-{
-public:
-	list<b2Body*> foundBodies;
-
-	bool ReportFixture(b2Fixture* fixture)
-	{
-		foundBodies.push_back(fixture->GetBody());
-		return true;
-	}
-};
 
 //-----------------------------------------------------
 // ObjectManager class functions

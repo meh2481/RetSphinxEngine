@@ -45,6 +45,7 @@ OpenGLShader.cpp
 OpenGLShader.h
 ParticleSystem.cpp
 ParticleSystem.h
+PointQueryCallback.h
 Random.cpp
 Random.h
 Rect.cpp
