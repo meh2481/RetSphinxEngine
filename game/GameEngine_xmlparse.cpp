@@ -218,7 +218,7 @@ void GameEngine::loadScene(string sXMLFilename)
 	getEntityManager()->cleanup();
 	player = NULL;
 	LOG(INFO) << "Loading scene " << sXMLFilename;
-	CameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
+	cameraPos = Vec3(0,0,m_fDefCameraZ);	//Reset camera
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	int iErr = doc->LoadFile(sXMLFilename.c_str());
 	if(iErr != tinyxml2::XML_NO_ERROR)

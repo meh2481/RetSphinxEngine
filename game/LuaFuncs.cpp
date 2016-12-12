@@ -29,22 +29,22 @@ public:
 
 	static void camera_centerOnXY(Vec2 pt)
 	{
-		g_pGlobalEngine->CameraPos.x = -pt.x;
-		g_pGlobalEngine->CameraPos.y = -pt.y;
+		g_pGlobalEngine->cameraPos.x = -pt.x;
+		g_pGlobalEngine->cameraPos.y = -pt.y;
 	}
 
 	static void camera_getPos(float* x, float* y, float* z)
 	{
-		*x = g_pGlobalEngine->CameraPos.x;
-		*y = g_pGlobalEngine->CameraPos.y;
-		*z = g_pGlobalEngine->CameraPos.z;
+		*x = g_pGlobalEngine->cameraPos.x;
+		*y = g_pGlobalEngine->cameraPos.y;
+		*z = g_pGlobalEngine->cameraPos.z;
 	}
 
 	static void camera_setPos(float x, float y, float z)
 	{
-		g_pGlobalEngine->CameraPos.x = x;
-		g_pGlobalEngine->CameraPos.y = y;
-		g_pGlobalEngine->CameraPos.z = z;
+		g_pGlobalEngine->cameraPos.x = x;
+		g_pGlobalEngine->cameraPos.y = y;
+		g_pGlobalEngine->cameraPos.z = z;
 	}
 
 	static Object* xmlParseObj(string sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
@@ -107,7 +107,7 @@ public:
 
 	static Vec2 getWorldMousePos(Vec2 p)
 	{
-		return g_pGlobalEngine->worldPosFromCursor(p, g_pGlobalEngine->CameraPos);
+		return g_pGlobalEngine->worldPosFromCursor(p, g_pGlobalEngine->cameraPos);
 	}
 
 	static ParticleSystem* createParticles(string sName)

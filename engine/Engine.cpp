@@ -423,11 +423,11 @@ Rect Engine::getCameraView(Vec3 Camera)
 	Rect rcCamera;
 	const float tan45_2 = 0.4142135623f;// tan(glm::radians(45.0f / 2.0f));
 	const float fAspect = (float)getWidth() / (float)getHeight();
-	rcCamera.top = (tan45_2 * Camera.z);
-	rcCamera.bottom = -(tan45_2 * Camera.z);
-	rcCamera.left = rcCamera.top * fAspect;
-	rcCamera.right = rcCamera.bottom * fAspect;
-	rcCamera.offset(Camera.x, Camera.y);
+	rcCamera.bottom = (tan45_2 * Camera.z);
+	rcCamera.top = -(tan45_2 * Camera.z);
+	rcCamera.left = rcCamera.bottom * fAspect;
+	rcCamera.right = rcCamera.top * fAspect;
+	rcCamera.offset(-Camera.x, -Camera.y);
 	return rcCamera;
 }
 
@@ -450,11 +450,11 @@ Vec2 Engine::worldPosFromCursor(Vec2 cursorpos, Vec3 Camera)
 
 	//Our relative position in window rect space (in rage 0-1)
 	cursorpos.x /= (float)getWidth();
-	cursorpos.y /= (float)getHeight();
+	cursorpos.y /= -(float)getHeight();	//Flip on y
 
 	//Multiply this by the size of the world rect to get the relative cursor pos
 	cursorpos.x = cursorpos.x * rcCamera.width() + rcCamera.left;
-	cursorpos.y = cursorpos.y * -rcCamera.height() + rcCamera.bottom;	//Flip on y axis
+	cursorpos.y = cursorpos.y * rcCamera.height() + rcCamera.top;
 
 	return cursorpos;
 }

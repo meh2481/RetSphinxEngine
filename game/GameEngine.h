@@ -51,7 +51,7 @@ private:
 	SDL_Scancode KEY_ENTER2;
 
 	//Important general-purpose game variables!
-	Vec3 CameraPos;
+	Vec3 cameraPos;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	std::list<ColorPhase> m_ColorsChanging;

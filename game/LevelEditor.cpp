@@ -15,16 +15,16 @@ void LevelEditor::draw(int windowFlags, bool focus)
 	if(ImGui::Begin(WINDOW_TITLE, &open, windowFlags))
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		ge->CameraPos.z += io.MouseWheel * 4.0f; //+ = zoom in, - = zoom out
+		ge->cameraPos.z += io.MouseWheel * 4.0f; //+ = zoom in, - = zoom out
 
-		Vec2 cursorPos = ge->worldPosFromCursor(Vec2(io.MousePos.x, io.MousePos.y), ge->CameraPos);
-		Vec2 cursorMove = ge->worldMovement(Vec2(io.MouseDelta.x, -io.MouseDelta.y), ge->CameraPos);
+		Vec2 cursorPos = ge->worldPosFromCursor(Vec2(io.MousePos.x, io.MousePos.y), ge->cameraPos);
+		Vec2 cursorMove = ge->worldMovement(Vec2(io.MouseDelta.x, -io.MouseDelta.y), ge->cameraPos);
 		static Node* draggingNode = NULL;
 		//Pan view with rmb+drag
 		if(!focus && io.MouseDown[1])
 		{
-			ge->CameraPos.x += cursorMove.x;
-			ge->CameraPos.y += cursorMove.y;
+			ge->cameraPos.x += cursorMove.x;
+			ge->cameraPos.y += cursorMove.y;
 		}
 		else if(!focus && io.MouseDown[0])	//Move objects with LMB
 		{

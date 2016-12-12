@@ -33,7 +33,7 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 	
 	//Set camera position for this game
 	m_fDefCameraZ = -16;
-	CameraPos = Vec3(0,0,m_fDefCameraZ);
+	cameraPos = Vec3(0,0,m_fDefCameraZ);
 #ifdef _DEBUG
 	m_bMouseGrabOnWindowRegain = false;
 #else
@@ -112,7 +112,7 @@ void GameEngine::draw()
 	fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 
 	m_debugUI->draw();
 	
@@ -165,34 +165,44 @@ void GameEngine::draw()
 	//Keep camera within camera bounds
 	if(rcSceneBounds.area())	//If it's not unset
 	{
-		Rect rcCam = getCameraView(CameraPos);
+		//Check for within bounds
+		Rect rcCam = getCameraView(cameraPos);
 		if(rcCam.left < rcSceneBounds.left)
 		{
-			CameraPos.x += rcSceneBounds.left - rcCam.left;
-			rcCam = getCameraView(CameraPos);
+			cameraPos.x -= rcSceneBounds.left - rcCam.left;
+			rcCam = getCameraView(cameraPos);
 		}
 		if(rcCam.right > rcSceneBounds.right)
 		{
-			CameraPos.x -= rcCam.right - rcSceneBounds.right;
-			rcCam = getCameraView(CameraPos);
+			cameraPos.x += rcCam.right - rcSceneBounds.right;
+			rcCam = getCameraView(cameraPos);
 		}
-		if(rcCam.top < rcSceneBounds.top)
+		if(rcCam.top > rcSceneBounds.top)
 		{
-			CameraPos.y += rcSceneBounds.top - rcCam.top;
-			rcCam = getCameraView(CameraPos);
+			cameraPos.y -= rcSceneBounds.top - rcCam.top;
+			rcCam = getCameraView(cameraPos);
 		}
-		if(rcCam.bottom > rcSceneBounds.bottom)
+		if(rcCam.bottom < rcSceneBounds.bottom)
 		{
-			CameraPos.y -= rcCam.bottom - rcSceneBounds.bottom;
-			rcCam = getCameraView(CameraPos);
+			cameraPos.y += rcCam.bottom - rcSceneBounds.bottom;
+			rcCam = getCameraView(cameraPos);
+		}
+		//Secondary check to see if we're over both
+		if(rcCam.left < rcSceneBounds.left)
+		{
+			cameraPos.x -= (rcSceneBounds.left - rcCam.left) / 2.0f;
+		}
+		if(rcCam.top > rcSceneBounds.top)
+		{
+			cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
 		}
 	}
 	glLoadIdentity();
-	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 	//glLoadIdentity();
-	//gluLookAt(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, -CameraPos.x, -CameraPos.y, 0.0f, 0, 0, 1);
-    //Vec3 eye(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z);
-    //Vec3 center(-CameraPos.x, -CameraPos.y, 0.0f);
+	//gluLookAt(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z, -cameraPos.x, -cameraPos.y, 0.0f, 0, 0, 1);
+    //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
+    //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
     //Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
     //glm::mat4 look = glm::lookAt(eye, center, up);
     //glLoadMatrixf(glm::value_ptr(look));
@@ -201,9 +211,10 @@ void GameEngine::draw()
 	glDisable(GL_LIGHTING);
 	glm::mat4 mat;	//TODO Use real mat
 	getEntityManager()->render(mat);
-	drawDebug();
 
 #ifdef _DEBUG
+
+	drawDebug();
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
 		glLoadIdentity();
