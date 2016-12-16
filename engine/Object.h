@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Mesh3D.h"
-#include "Drawable.h"
+#include "DrawableItem.h"
 #include "LuaInterface.h"
 #include "LuaFuncs.h"
 #include "Rect.h"
@@ -24,7 +24,7 @@ class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO Make SceneryLayer class that this can contain
-class ObjSegment : public Drawable
+class ObjSegment : public DrawableItem
 {
 public:
     b2Body*         body;		//Physics body associated with this segment
@@ -46,7 +46,7 @@ public:
 };
 
 //Collections of the above all stuffed into one object for ease of use.
-class Object : public Drawable
+class Object : public DrawableItem
 {
 	LuaObjGlue* glueObj;
 	std::map<std::string, std::string> propertyValues;

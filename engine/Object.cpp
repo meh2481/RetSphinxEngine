@@ -17,7 +17,7 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------
 // obj class
 //----------------------------------------------------------------------------------------------------
-Object::Object() : Drawable()
+Object::Object() : DrawableItem()
 {
   meshLattice = NULL;
   meshAnim = NULL;
@@ -170,7 +170,7 @@ void Object::setPosition(Vec2 p)
 //----------------------------------------------------------------------------------------------------
 // physSegment class
 //----------------------------------------------------------------------------------------------------
-ObjSegment::ObjSegment() : Drawable()
+ObjSegment::ObjSegment() : DrawableItem()
 {
     body = NULL;
 	parent = NULL;

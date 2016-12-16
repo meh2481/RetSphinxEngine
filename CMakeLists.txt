@@ -5,6 +5,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(PROJ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
+# HACK: Apparently not set automatically either
+set(BOX2D_INCLUDE_DIRS CACHE PATH "")
 find_package(Box2D REQUIRED)
 find_package(glm REQUIRED)
 find_package(SDL2 REQUIRED)
@@ -14,7 +16,7 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-# HACK: apparently not set automatically?
+# HACK: Apparently not set automatically?
 set(glm_INCLUDE_DIRS "${glm_DIR}/../" CACHE STRING "Path to glm includes")
 
 

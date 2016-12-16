@@ -4,14 +4,14 @@
 
 class Image;
 
-class Font
+class ImgFont
 {
 	unsigned int num;
 	Image* img;
 	uint32_t* codepoints;
 	float* rects;
 
-	Font() {};
+	ImgFont() {};
 
 	void renderChar(Vec2 drawSz, Vec2 offset, float* rect);
 	uint32_t getIndex(uint32_t codepoint);
@@ -19,8 +19,8 @@ class Font
 	float* getNextRect(const char** str);			//Get the next image rect for the given string position & increment the pointer
 
 public:
-	Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
-	~Font();
+	ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
+	~ImgFont();
 
 	void renderString(const char* str, float drawPt, Vec2 drawOffset);
 	float stringWidth(const char* str, float drawPt);

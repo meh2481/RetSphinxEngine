@@ -1,7 +1,7 @@
 #include "ResourceCache.h"
 #include "Image.h"
 #include "Mesh3D.h"
-#include "Font.h"
+#include "ImgFont.h"
 using namespace std;
 
 ResourceCache::~ResourceCache()
@@ -14,7 +14,7 @@ void ResourceCache::addImage(uint64_t id, Image* img)
 	imageIDMap[id] = img;
 }
 
-void ResourceCache::addFont(uint64_t id, Font* font)
+void ResourceCache::addFont(uint64_t id, ImgFont* font)
 {
 	fontIDMap[id] = font;
 }
@@ -37,9 +37,9 @@ Image* ResourceCache::findImage(uint64_t id)
 	return i->second;
 }
 
-Font* ResourceCache::findFont(uint64_t id)
+ImgFont* ResourceCache::findFont(uint64_t id)
 {
-	map<uint64_t, Font*>::iterator i = fontIDMap.find(id);
+	map<uint64_t, ImgFont*>::iterator i = fontIDMap.find(id);
 	if(i == fontIDMap.end())	//This font isn't here
 		return NULL;
 	return i->second;
@@ -92,7 +92,7 @@ void ResourceCache::clearImages()
 
 void ResourceCache::clearFonts()
 {
-	for(map<uint64_t, Font*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
+	for(map<uint64_t, ImgFont*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
 		delete (i->second);
 	fontIDMap.clear();
 }

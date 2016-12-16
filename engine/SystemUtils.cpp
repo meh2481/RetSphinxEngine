@@ -3,7 +3,7 @@
 #include <Windows.h>
 #define BUFFER_SIZE 100
 #else
-#error TODO Get locale in UNIX/POSIX using those functions
+#warning TODO Get locale in UNIX/POSIX using those functions
 #endif
 
 //See OSFunctions.cpp in Aquaria for inspiration
