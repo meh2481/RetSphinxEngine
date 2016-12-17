@@ -5,11 +5,11 @@
 #pragma once
 
 #include "Image.h"
-#include "Drawable.h"
 #include "LuaFuncs.h"
 #include "LuaInterface.h"
 #include "Subject.h"
 #include "Rect.h"
+#include "Color.h"
 #include <vector>
 
 extern float g_fParticleFac;

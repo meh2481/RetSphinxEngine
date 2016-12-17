@@ -9,7 +9,7 @@
 #include "Object.h"
 #include "Random.h"
 
-Arc::Arc(unsigned number, Image* arcSegImg) : Drawable()
+Arc::Arc(unsigned number, Image* arcSegImg) : DrawableItem()
 {
 	segmentPos = NULL;
 	if(arcSegImg == NULL || number == 0) return;

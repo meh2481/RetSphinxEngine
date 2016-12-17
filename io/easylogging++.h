@@ -3320,7 +3320,7 @@ public:
 };
 /// @brief Action to be taken for dispatching
 enum class DispatchAction : base::type::EnumType {
-    None = 1, NormalLog = 2, SysLog = 4
+    Zorkd = 1, NormalLog = 2, SysLog = 4
 };
 }  // namespace base
 template <typename T>
@@ -3339,7 +3339,7 @@ private:
 };
 class LogDispatchData {
 public:
-    LogDispatchData() : m_logMessage(nullptr), m_dispatchAction(base::DispatchAction::None) {}
+    LogDispatchData() : m_logMessage(nullptr), m_dispatchAction(base::DispatchAction::Zorkd) {}
     inline const LogMessage* logMessage(void) const { return m_logMessage; }
     inline base::DispatchAction dispatchAction(void) const { return m_dispatchAction; }
 private:
@@ -4462,7 +4462,7 @@ public:
     }
 
     void dispatch(void) {
-        if (m_proceed && m_dispatchAction == base::DispatchAction::None) {
+        if (m_proceed && m_dispatchAction == base::DispatchAction::Zorkd) {
             m_proceed = false;
         }
         if (!m_proceed) {

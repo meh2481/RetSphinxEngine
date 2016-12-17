@@ -11,7 +11,6 @@
 #include "LuaInterface.h"
 
 #include "Mesh3D.h"
-#include "Font.h"
 #include "tinyxml2.h"
 
 class DebugUI;

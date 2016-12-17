@@ -3,11 +3,11 @@
 class Image;
 
 //TODO Remove
-class Drawable
+class DrawableItem
 {
 public:
-	Drawable() { depth = 0; img = NULL; active = true; };
-	~Drawable() {};
+	DrawableItem() { depth = 0; img = NULL; active = true; };
+	~DrawableItem() {};
 	
 	float depth;
 	Image* img;

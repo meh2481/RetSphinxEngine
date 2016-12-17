@@ -4,7 +4,7 @@
 
 class Image;
 class Mesh3D;
-class Font;
+class ImgFont;
 
 class ResourceCache
 {
@@ -14,7 +14,7 @@ class ResourceCache
 	//std::map<Mesh3D*, uint32_t> meshUses;
 	std::map<uint64_t, Mesh3D*> meshIDMap;
 
-	std::map<uint64_t, Font*> fontIDMap;
+	std::map<uint64_t, ImgFont*> fontIDMap;
 
 	std::map<uint64_t, std::string> textIDMap;
 
@@ -35,8 +35,8 @@ public:
 	Mesh3D* findMesh(uint64_t id);
 	void addMesh(uint64_t id, Mesh3D* mesh);
 
-	Font* findFont(uint64_t id);
-	void addFont(uint64_t id, Font* font);
+	ImgFont* findFont(uint64_t id);
+	void addFont(uint64_t id, ImgFont* font);
 
 	//MouseCursor* findCursor(uint64_t id);
 	//void addCursor(uint64_t id, MouseCursor* cur);

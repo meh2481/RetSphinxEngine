@@ -5,8 +5,11 @@
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
-
+#ifdef _WIN32
 static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+#else
+static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+#endif
 {
 
 	switch(severity)

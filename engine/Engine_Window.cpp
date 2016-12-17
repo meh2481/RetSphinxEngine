@@ -78,7 +78,7 @@ void Engine::changeScreenResolution(int w, int h)
 	}
 #else
 	//TODO See what can be done on Linux/Mac about this
-	#error need to research OpenGL context sharing for Linux/Mac
+	#warning need to research OpenGL context sharing for Linux/Mac
 #endif
 }
 

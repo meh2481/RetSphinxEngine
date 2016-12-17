@@ -14,7 +14,7 @@ class ObjSegment;
 class ResourceCache;
 class Mesh3D;
 class PakLoader;
-class Font;
+class ImgFont;
 class Stringbank;
 
 class ResourceLoader
@@ -48,7 +48,7 @@ public:
 	SDL_Cursor* getCursor(std::string sID);
 
 	//Fonts
-	Font* getFont(std::string sID);
+	ImgFont* getFont(std::string sID);
 
 	//Text
 	Stringbank* getStringbank(std::string sID);

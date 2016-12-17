@@ -5,13 +5,13 @@
 */
 #pragma once
 
-#include "Drawable.h"
+#include "DrawableItem.h"
 #include "Rect.h"
 #include <string>
 
 class Image;
 
-class Arc : public Drawable
+class Arc : public DrawableItem
 {
 protected:
 	float* segmentPos;

@@ -8,7 +8,7 @@
 #include "ResourceCache.h"
 #include "PakLoader.h"
 #include "StringUtils.h"
-#include "Font.h"
+#include "ImgFont.h"
 #include "Hash.h"
 #include "Stringbank.h"
 #include "stb_image.h"
@@ -402,12 +402,12 @@ SDL_Cursor* ResourceLoader::getCursor(string sID)
 	return cur;
 }
 
-Font* ResourceLoader::getFont(std::string sID)
+ImgFont* ResourceLoader::getFont(std::string sID)
 {
 	LOG(TRACE) << "Loading Font " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Font has ID " << hashVal;
-	Font* font = m_cache->findFont(hashVal);
+	ImgFont* font = m_cache->findFont(hashVal);
 	if(!font)	//This font isn't here; load it
 	{
 		unsigned int len = 0;
@@ -438,7 +438,7 @@ Font* ResourceLoader::getFont(std::string sID)
 			float* imgRects = (float*)malloc(imgRectSz);
 			memcpy(imgRects, &resource[offset], imgRectSz);
 
-			font = new Font(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
+			font = new ImgFont(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
 			m_cache->addFont(hashVal, font);
 			free(resource);						//Free memory
 		}

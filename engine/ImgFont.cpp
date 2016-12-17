@@ -1,9 +1,9 @@
-#include "Font.h"
+#include "ImgFont.h"
 #include "Image.h"
 #include "easylogging++.h"
 #include <cstring>
 
-Font::Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
+ImgFont::ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
 	//Make sure data is valid
 	assert(count > 1);
@@ -17,13 +17,13 @@ Font::Font(Image* image, unsigned int count, uint32_t* codePoints, float* imgRec
 	rects = imgRects;
 }
 
-Font::~Font()
+ImgFont::~ImgFont()
 {
 	free(codepoints);
 	free(rects);
 }
 
-uint32_t Font::getIndex(uint32_t codepoint)
+uint32_t ImgFont::getIndex(uint32_t codepoint)
 {
 	//Binary search
 	uint32_t first = 0;
@@ -45,7 +45,7 @@ uint32_t Font::getIndex(uint32_t codepoint)
 	return 0;
 }
 
-void Font::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
+void ImgFont::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 {
 	//TODO Store vertex data & don't re-send this to the gfx card every frame
 	Rect rc(
@@ -68,13 +68,13 @@ void Font::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 
 }
 
-float* Font::getNextRect(const char** str)
+float* ImgFont::getNextRect(const char** str)
 {
 	uint32_t idx = getIndex(getNextCodepoint(str));
 	return &rects[idx * 8];
 }
 
-uint32_t Font::getNextCodepoint(const char** strpos)
+uint32_t ImgFont::getNextCodepoint(const char** strpos)
 {
 	//Determine UTF-8 codepoint
 	int seqlen = 0;
@@ -96,7 +96,7 @@ uint32_t Font::getNextCodepoint(const char** strpos)
 	return codepoint;
 }
 
-void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
+void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
 	float fac = (float)img->getWidth() / (float)img->getHeight();
 	img->bindTexture();
@@ -123,7 +123,7 @@ void Font::renderString(const char* str, float drawPt, Vec2 drawOffset)
 	}
 }
 
-float Font::stringWidth(const char* str, float drawPt)
+float ImgFont::stringWidth(const char* str, float drawPt)
 {
 	float fac = (float)img->getWidth() / (float)img->getHeight();
 	float width = 0.0f;

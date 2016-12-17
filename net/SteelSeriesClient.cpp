@@ -108,7 +108,8 @@ string SteelSeriesClient::getSSURL()
 	}
 	return string();
 #else
-	#error TODO Support other OSs for SteelSeries stuff...
+	#warning TODO Support other OSs for SteelSeries stuff...
+        return string();
 	//On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
 	//SS has no Linux support yet
 #endif	//_WIN32
