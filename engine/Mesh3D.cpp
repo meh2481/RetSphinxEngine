@@ -275,7 +275,6 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 
 void Mesh3D::render(Image* img)
 {
-    return;
 	assert(m_obj);
 	assert(img);
 
