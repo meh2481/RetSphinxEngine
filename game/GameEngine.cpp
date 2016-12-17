@@ -187,15 +187,11 @@ void GameEngine::draw()
 			cameraPos.y += rcCam.bottom - rcSceneBounds.bottom;
 			rcCam = getCameraView(cameraPos);
 		}
-		//Secondary check to see if we're over both
+		//Secondary check to see if we're over both, in which case center
 		if(rcCam.left < rcSceneBounds.left)
-		{
 			cameraPos.x -= (rcSceneBounds.left - rcCam.left) / 2.0f;
-		}
 		if(rcCam.top > rcSceneBounds.top)
-		{
 			cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
-		}
 	}
 	glLoadIdentity();
 	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);

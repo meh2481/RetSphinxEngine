@@ -41,7 +41,8 @@ void LevelEditor::draw(int windowFlags, bool focus)
 
 		if(draggingNode != NULL)
 		{
-			draggingNode->pos = cursorPos;
+			draggingNode->pos += cursorMove;
+			draggingNode->lua->callMethod(draggingNode, "init");	//Re-init lua to recalc position
 			draggingNode->body->SetTransform(b2Vec2(draggingNode->pos.x, draggingNode->pos.y), draggingNode->body->GetAngle());
 		}
 	}
