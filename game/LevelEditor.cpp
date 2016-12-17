@@ -6,7 +6,7 @@
 
 LevelEditor::LevelEditor(GameEngine * _g)
 {
-	open = true;// false;
+	open = true;
 	ge = _g;
 }
 
@@ -30,19 +30,20 @@ void LevelEditor::draw(int windowFlags, bool focus)
 		{
 			Node* curOverNode = ge->getEntityManager()->getNodeUnder(cursorPos);
 			if(draggingNode == NULL && curOverNode != NULL)
-			{
 				draggingNode = curOverNode;
-			}
 		}
 		else if(!io.MouseDown[0])
 		{
-			draggingNode = NULL;
+			if(draggingNode)
+			{
+				draggingNode->lua->callMethod(draggingNode, "init");	//Re-init lua to recalc position
+				draggingNode = NULL;
+			}
 		}
 
 		if(draggingNode != NULL)
 		{
 			draggingNode->pos += cursorMove;
-			draggingNode->lua->callMethod(draggingNode, "init");	//Re-init lua to recalc position
 			draggingNode->body->SetTransform(b2Vec2(draggingNode->pos.x, draggingNode->pos.y), draggingNode->body->GetAngle());
 		}
 	}
