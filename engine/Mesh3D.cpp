@@ -285,7 +285,7 @@ void Mesh3D::render(Image* img)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glBindTexture(GL_TEXTURE_2D, img->_getTex());
-    glCallList(m_obj);
+        glCallList(m_obj);
 
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
