@@ -25,6 +25,7 @@ gmon.out
 Planet.cpp
 Planet.h
 res/*
+res
 dev/*
 workspace.np
 gamecontrollerdb.txt
