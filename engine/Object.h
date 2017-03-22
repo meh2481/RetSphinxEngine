@@ -54,11 +54,11 @@ class Object : public DrawableItem
 
 public:
 	enum { TYPE = OT_OBJECT };
-	Lattice*				meshLattice;
+	Lattice*			meshLattice;
 	LatticeAnim*			meshAnim;
-	Vec2					meshSize;
+	Vec2				meshSize;
 	LuaInterface* 			lua;
-	std::string 					luaClass;
+	std::string 			luaClass;
     
     Object();
     ~Object();

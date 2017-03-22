@@ -11,9 +11,11 @@ static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenu
 static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
 #endif
 {
-
 	switch(severity)
 	{
+            case GL_DEBUG_SEVERITY_NOTIFICATION:
+                LOG(INFO) << "GL[" << severity << "]: " << message;
+                break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
 	case GL_DEBUG_SEVERITY_LOW:
 		printf("GL[%u]: %s\n", severity, message);
@@ -77,22 +79,26 @@ void Engine::setup_sdl()
 		LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);	//TODO: Figure out vsync and add way to enable/disable
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	assert(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == 0);	//TODO: Figure out vsync and add way to enable/disable
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3) == 0);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0) == 0);
 
 	//TODO: Switch to core instead of compat once all drawing uses VBOs/shaders
 	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY) == 0);
 #ifdef _DEBUG
 	//TODO: Add back forward compatibility flag once all drawing uses VBOs/shaders
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG) == 0);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 #endif
 
-	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1); //Share objects between OpenGL contexts
-	SDL_GL_CreateContext(m_Window);
+	assert(SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1) == 0); //Share objects between OpenGL contexts
+        if(SDL_GL_CreateContext(m_Window) == NULL) 
+        {
+            LOG(ERROR) << "Error creating OpenGL context: " << SDL_GetError();
+            exit(1);
+        }
 	if(SDL_GL_SetSwapInterval(-1) == -1) //Apparently Vsync or something
 		SDL_GL_SetSwapInterval(1);
 
@@ -118,9 +124,11 @@ void Engine::setup_sdl()
 	OpenGLAPI::LoadSymbols();	//Load our OpenGL symbols to use
 	
 	const char *ver = (const char*)glGetString(GL_VERSION);
-	LOG(INFO) << "GL version: " << ver;
-    const char *ven = (const char*)glGetString(GL_VENDOR);
-	LOG(INFO) << "GL vendor: " << ven;
+        if(ver)
+            LOG(INFO) << "GL version: " << ver;
+        const char *ven = (const char*)glGetString(GL_VENDOR);
+        if(ven)
+            LOG(INFO) << "GL vendor: " << ven;
 
 	glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
 
