@@ -1,6 +1,10 @@
+-Look into ETC1 compression for images
 -Particles follow ship with acceleration applied
 -Particle editor breaks after F5
 -Figure out why up key doesn't work with ship flying
+-Use JSON objects for SS event sending - SS editor should output JSON, so you can edit
+-Use level editor to create geometry/scenery
+-Fix tamerisk board
 
 Overall TODO list:
 - Fix math for softbody lattice anim so it actually works properly

@@ -61,12 +61,13 @@ void GameEngine::handleEvent(SDL_Event event)
 				case SDL_SCANCODE_F5:
 					Lua->call("clearClasses"); //Reload Lua classes
 					getResourceLoader()->clearCache();
-					Lua->call("loadLua");	//Restart Lua
-					//loadScene(m_sLastScene);	//Reload current scene
+					Lua->call("loadLua", m_sLastScene.c_str());	//Restart Lua with our last map
 					break;
 					
 				case SDL_SCANCODE_F6:
-					Lua->call("loadStartingMap");	//Start from initial map
+					Lua->call("clearClasses"); //Reload Lua classes
+					getResourceLoader()->clearCache();
+					Lua->call("loadLua");	//Restart Lua
 					break;
 #endif //_DEBUG
 
