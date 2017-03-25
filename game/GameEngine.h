@@ -15,6 +15,7 @@
 
 class DebugUI;
 class SteelSeriesClient;
+class InputDevice;
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -54,8 +55,6 @@ private:
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	std::list<ColorPhase> m_ColorsChanging;
-	SDL_GameController *m_controller;	//TODO: Handle more than one gamepad at a time, also manage with Engine
-	SDL_Haptic* m_rumble;
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
@@ -96,8 +95,6 @@ public:
 	void loadScene(std::string sXMLFilename);	//Load scene from file
 	
 	//Other stuff
-	void rumbleController(float strength, float sec, int priority = 0);	//Rumble the controller
-	void rumbleLR(uint32_t, uint16_t, uint16_t);	//Rumble L/R
 	void warpObjectToNode(Object* o, Node* n);
 	SteelSeriesClient* getSteelSeriesClient() { return steelSeriesClient; };
 	

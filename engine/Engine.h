@@ -10,12 +10,14 @@
 #include "Node.h"
 #include "DebugDraw.h"
 #include "SDL.h"
+#include <vector>
 
 class b2World;
 class Image;
 class ResourceLoader;
 class EntityManager;
 class Stringbank;
+class InputDevice;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -54,6 +56,9 @@ private:
 	float m_fFramerate;
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
+
+	std::vector<InputDevice*> m_controllers;
+	int m_curActiveController;
 
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
@@ -157,9 +162,6 @@ public:
 	bool hasMic();										//If we have some form of mic-like input
 	void updateSound();
 
-	//Keyboard functions
-	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed
-
 	//Physics functions
 	b2Body* createBody(b2BodyDef* bdef);
 	void setGravity(Vec2 ptGravity);
@@ -188,6 +190,15 @@ public:
 	void setCursor(SDL_Cursor* cur) { SDL_SetCursor(cur); };
 	bool isMouseGrabbed();
 	void grabMouse(bool bGrab = true);
+
+	//Keyboard functions
+	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed
+
+	//Controller functions
+	InputDevice* getCurController();	//Return current controller, or NULL if none
+	void addController(int deviceIndex);	//Register the controller from the given SDL device 
+	void removeController(int deviceIndex);	//Deregister the controller from the given SDL device
+	void activateController(int deviceIndex);	//Set the given controller as active (player 1)
 
 	//Time functions
 	float getTimeScale() { return m_fTimeScale; };

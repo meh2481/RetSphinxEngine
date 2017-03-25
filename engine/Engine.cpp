@@ -15,6 +15,7 @@
 #include "EntityManager.h"
 #include "Stringbank.h"
 #include "stb_image.h"
+#include "InputDevice.h"
 using namespace std;
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
@@ -53,6 +54,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fFramerate = 60.0f;
 	setFramerate(60);	 //60 fps default
 	m_bFullscreen = true;
+	m_curActiveController = -1;
 
 	setup_sdl();
 	setup_opengl();
@@ -115,6 +117,9 @@ Engine::~Engine()
 {
 	delete m_entityManager;
 	delete m_resourceLoader;
+
+	for(vector<InputDevice*>::iterator i = m_controllers.begin(); i != m_controllers.end(); i++)
+		delete *i;
 
 	ImGui_Impl_GL2_Shutdown();
 
@@ -318,6 +323,50 @@ bool Engine::keyDown(int32_t keyCode)
 
 	//Otherwise, just use our pre-polled list we got from SDL
 	return(m_iKeystates[keyCode]);
+}
+
+InputDevice* Engine::getCurController()
+{
+	if(m_curActiveController < 0 || m_curActiveController > m_controllers.size() - 1)
+		return NULL;
+	return m_controllers[m_curActiveController];
+}
+
+void Engine::addController(int deviceIndex)
+{
+	InputDevice* device = new InputDevice(deviceIndex);
+	m_controllers.push_back(device);
+	m_curActiveController = m_controllers.size() - 1;	//Set this as new active controller
+}
+
+void Engine::removeController(int deviceIndex)
+{
+	for(int i = 0; i < m_controllers.size(); i++)
+	{
+		if(deviceIndex == m_controllers[i]->getDeviceIndex())
+		{
+			//Remove this controller from the list
+			delete m_controllers[i];
+			m_controllers.erase(m_controllers.begin() + i);
+			if(i <= m_curActiveController)
+			{
+				//TODO: Pause game if this is the active controller
+				m_curActiveController--;
+				if(m_curActiveController < 0)	//Was first in the list
+					m_curActiveController = m_controllers.size() - 1;
+			}
+			break;
+		}
+	}
+}
+
+void Engine::activateController(int deviceIndex)
+{
+	for(int i = 0; i < m_controllers.size(); i++)
+	{
+		if(deviceIndex == m_controllers[i]->getDeviceIndex())
+			m_curActiveController = i;
+	}
 }
 
 void Engine::setFramerate(float fFramerate)

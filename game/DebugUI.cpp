@@ -5,6 +5,7 @@
 #include "SteelSeriesEditor.h"
 #include "ParticleEditor.h"
 #include "LevelEditor.h"
+#include "InputDevice.h"
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
@@ -89,7 +90,11 @@ void DebugUI::_draw()
 		{
 			//Controller rumble testing
 			if(ImGui::Button("Test controller rumble"))
-				_ge->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength);
+			{
+				InputDevice* controller = _ge->getCurController();
+				if(controller != NULL)
+					controller->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength, _ge->getSeconds());
+			}
 			ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);

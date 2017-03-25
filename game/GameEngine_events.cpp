@@ -135,75 +135,12 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		//Gamepad stuff!
 		case SDL_CONTROLLERDEVICEADDED:
-			//TODO: Create new controller, don't override old one
-			m_controller = SDL_GameControllerOpen(event.cdevice.which);
-
-			if (m_controller)
-			{
-				SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
-				if(!joy)
-				{
-					LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
-					break;
-				}
-				char guid[GUID_STR_SZ];
-				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
-
-				LOG(INFO) << "Opened controller " << SDL_GameControllerName(m_controller);
-				LOG(INFO) << "Controller joystick has GUID " << guid;
-
-				m_rumble = NULL;
-				if (SDL_JoystickIsHaptic(joy))
-					m_rumble = SDL_HapticOpenFromJoystick(joy);
-				if (m_rumble)
-				{
-					LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << "\'s haptic.";
-					LOG(TRACE) << "Haptic effect storage size: " << SDL_HapticNumEffects(m_rumble);
-					LOG(TRACE) << "Haptic effect play channels: " << SDL_HapticNumEffectsPlaying(m_rumble);
-					LOG(TRACE) << "Haptic effect number of axes: " << SDL_HapticNumAxes(m_rumble);
-
-					unsigned int hapticQuery = SDL_HapticQuery(m_rumble);
-					//Haptic effects
-					LOG(TRACE) << "Haptic functions available: ";
-					//Multi-motor
-					LOG(TRACE) << "SDL_HAPTIC_LEFTRIGHT: " << ((hapticQuery & SDL_HAPTIC_LEFTRIGHT) != 0);
-					//Rumble wave types
-					LOG(TRACE) << "SDL_HAPTIC_CONSTANT: " << ((hapticQuery & SDL_HAPTIC_CONSTANT) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_SINE: " << ((hapticQuery & SDL_HAPTIC_SINE) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_TRIANGLE: " << ((hapticQuery & SDL_HAPTIC_TRIANGLE) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHUP: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHUP) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHDOWN: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHDOWN) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_RAMP: " << ((hapticQuery & SDL_HAPTIC_RAMP) != 0);
-					//Define your own wave shape
-					LOG(TRACE) << "SDL_HAPTIC_CUSTOM: " << ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0);
-					//Complicated stuff that requires super-specific hardware
-					LOG(TRACE) << "SDL_HAPTIC_SPRING: " << ((hapticQuery & SDL_HAPTIC_SPRING) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_DAMPER: " << ((hapticQuery & SDL_HAPTIC_DAMPER) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_INERTIA: " << ((hapticQuery & SDL_HAPTIC_INERTIA) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_FRICTION: " << ((hapticQuery & SDL_HAPTIC_FRICTION) != 0);
-					//Features
-					LOG(TRACE) << "SDL_HAPTIC_GAIN: " << ((hapticQuery & SDL_HAPTIC_GAIN) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_AUTOCENTER: " << ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_STATUS: " << ((hapticQuery & SDL_HAPTIC_STATUS) != 0);
-					LOG(TRACE) << "SDL_HAPTIC_PAUSE: " << ((hapticQuery & SDL_HAPTIC_PAUSE) != 0);
-
-					//if (SDL_HapticRumbleInit(m_rumble) != 0)
-					//{
-					//	LOG(WARNING) << "Unable to initialize controller " << (int)event.cdevice.which << " as rumble.";
-					//	SDL_HapticClose(m_rumble);
-					//	m_rumble = NULL;
-					//}
-					//else
-					//{
-					//	LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << " as rumble.";
-					//}
-				}
-				else
-					LOG(INFO) << "Controller " << (int)event.cdevice.which << " has no rumble support.";
-			}
-			else
-				LOG(WARNING) << "Couldn't open controller " << (int)event.cdevice.which;
+		{
+			cout << "Controller " << (int)event.cdevice.which << " connected." << endl;
+			//Create new controller, don't override old one
+			addController(event.cdevice.which);
 			break;
+		}
 
 		case SDL_JOYDEVICEADDED:
 		{
@@ -213,6 +150,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				char guid[GUID_STR_SZ];
 				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 
+				cout << "Joystick " << SDL_JoystickName(joy) << " attached." << endl;
 				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
 				LOG(INFO) << "Joystick has GUID " << guid;
 				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
@@ -226,10 +164,13 @@ void GameEngine::handleEvent(SDL_Event event)
 
 		case SDL_CONTROLLERDEVICEREMOVED:
 			LOG(INFO) << "Controller " << (int)event.cdevice.which << " disconnected.";
+			cout << "Controller " << (int)event.cdevice.which << " disconnected." << endl;
+			removeController(event.cdevice.which);
 			break;
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
+			activateController(event.cbutton.which);
 			switch(event.cbutton.button)
 			{
 				case SDL_CONTROLLER_BUTTON_BACK:	//TODO Not hardcoded
@@ -353,65 +294,4 @@ void GameEngine::handleKeys()
 #endif
 }
 
-//TODO: Controller haptic shouldn't be game specific
-void GameEngine::rumbleController(float strength, float sec, int priority)
-{
-	//static float fLastRumble = 0.0f;
-	//static int prevPriority = 0;
-	//
-	////Too low priority to rumble here; another higher-priority rumble is currently going on
-	//if(getSeconds() < fLastRumble && priority < prevPriority)
-	//	return;
-	//
-	//fLastRumble = getSeconds() + sec;
-	//prevPriority = priority;
-	//strength = max(strength, 0.0f);
-	//strength = min(strength, 1.0f);
-	//if(m_rumble != NULL)
-	//	SDL_HapticRumblePlay(m_rumble, strength, (Uint32)(sec*1000));
-}
-static int curEffect = -1;
-void GameEngine::rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
-{
-	static float fLastRumble = 0.0f;
-	static int prevPriority = 0;
-	float sec = (float)duration / 1000.0;
-	
-	//Last rumble is still going
-	if(getSeconds() < fLastRumble || duration < 1)	//Don't run 0-msec duration events either
-		return;
-	
-	fLastRumble = getSeconds() + sec;
 
-	LOG(TRACE) << "Running LR effect: " << duration << ", " << sec << ", " << large << ", " << small;
-	if(curEffect >= 0)
-	{
-		SDL_HapticDestroyEffect(m_rumble, curEffect);
-	}
-
-	SDL_HapticLeftRight lrHaptic;
-	lrHaptic.large_magnitude = large;
-	lrHaptic.small_magnitude = small;
-	lrHaptic.length = duration;
-
-	SDL_HapticEffect effect;
-	effect.type = SDL_HAPTIC_LEFTRIGHT;
-	effect.leftright = lrHaptic;
-
-	curEffect = SDL_HapticNewEffect(m_rumble, &effect);
-	if(curEffect < 0)
-	{
-		LOG(WARNING) << "Unable to create LR effect: " << SDL_GetError();
-
-		//Fall back on standard rumble
-		float strength = large + small;
-		strength /= (float)USHRT_MAX * 2.0f;
-		rumbleController(strength, sec);
-		return;
-	}
-
-	if(SDL_HapticRunEffect(m_rumble, curEffect, 1) < 0)
-	{
-		LOG(WARNING) << "Unable to run LR effect: " << SDL_GetError();
-	}
-}

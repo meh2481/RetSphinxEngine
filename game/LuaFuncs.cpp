@@ -7,6 +7,7 @@
 #include "ParticleSystem.h"
 #include "StringUtils.h"
 #include "SteelSeriesClient.h"
+#include "InputDevice.h"
 using namespace std;
 
 //Defined by SDL
@@ -22,10 +23,6 @@ extern GameEngine* g_pGlobalEngine;
 class GameEngineLua
 {
 public:
-	static void rumble(float fAmt, float len, int priority = 0)
-	{
-		g_pGlobalEngine->rumbleController(fAmt, len, priority);
-	}
 
 	static void camera_centerOnXY(Vec2 pt)
 	{
@@ -83,15 +80,17 @@ public:
 
 	static bool joyDown(int button)
 	{
-		if(g_pGlobalEngine->m_controller)
-			return (SDL_GameControllerGetButton(g_pGlobalEngine->m_controller, (SDL_GameControllerButton)button) > 0);
+		InputDevice* controller = g_pGlobalEngine->getCurController();
+		if(controller != NULL)
+			return controller->getButton(button);
 		return false;
 	}
 
 	static int joyAxis(int axis)
 	{
-		if(g_pGlobalEngine->m_controller)
-			return SDL_GameControllerGetAxis(g_pGlobalEngine->m_controller, (SDL_GameControllerAxis)axis);
+		InputDevice* controller = g_pGlobalEngine->getCurController();
+		if(controller != NULL)
+			return controller->getAxis(axis);
 		return 0;
 	}
 
@@ -159,7 +158,9 @@ public:
 
 	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 	{
-		g_pGlobalEngine->rumbleLR(duration, large, small);
+		InputDevice* controller = g_pGlobalEngine->getCurController();
+		if(controller != NULL)
+			controller->rumbleLR(duration, large, small, g_pGlobalEngine->getSeconds());
 	}
 
 	static void sendSSEvent(string eventId, int value)
@@ -190,16 +191,6 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 // Lua interface functions (can be called from lua)
 // TODO Error checking in these
 //-----------------------------------------------------------------------------------------------------------
-
-luaFunc(controller_rumble)	//void controller_rumble(float force, float sec) --force is range [0,1]
-{
-	float force = (float)lua_tonumber(L, 1);
-	float sec = (float)lua_tonumber(L, 2);
-	int priority = (int)lua_tointeger(L, 3);
-	GameEngineLua::rumble(force, sec, priority);
-	luaReturnNil();
-}
-
 luaFunc(controller_rumbleLR) //void controller_rumbleLR(uint msec, float forceLarge, float forceSmall)
 {
 	int msec = lua_tointeger(L, 1);
@@ -670,7 +661,6 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
 {
-	luaRegister(controller_rumble),
 	luaRegister(controller_rumbleLR),
 	luaRegister(getFramerate),
 	luaRegister(obj_setVelocity),

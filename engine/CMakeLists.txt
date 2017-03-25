@@ -22,6 +22,8 @@ imgui_impl_opengl2.cpp
 #imgui_impl_opengl3.cpp
 imgui_impl_sdl.cpp
 imgui_impl_sdl.h
+InputDevice.cpp
+InputDevice.h
 Lattice.cpp
 Lattice.h
 LuaDefines.h

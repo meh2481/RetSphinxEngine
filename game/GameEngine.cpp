@@ -41,8 +41,6 @@ Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
 #endif
 	showCursor();
 	
-	m_controller = NULL;
-	m_rumble = NULL;
 	player = NULL;
 	
 	//Keybinding stuff!
