@@ -107,12 +107,12 @@ InputDevice::InputDevice(int deviceIndex)
 
 InputDevice::~InputDevice()
 {
-	if(!rumbleLRSupported && m_haptic != NULL)
-		SDL_HapticRumbleStop(m_haptic);
-	else if(m_haptic != NULL)
-		SDL_HapticClose(m_haptic);
-	if(m_controller != NULL)
-		SDL_GameControllerClose(m_controller);
+	//if(!rumbleLRSupported && m_haptic != NULL)
+	//	SDL_HapticRumbleStop(m_haptic);
+	//else if(m_haptic != NULL)
+	//	SDL_HapticClose(m_haptic);
+	//if(m_controller != NULL)
+	//	SDL_GameControllerClose(m_controller);
 }
 
 int InputDevice::getAxis(int axis)

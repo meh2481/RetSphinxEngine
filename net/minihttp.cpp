@@ -61,7 +61,8 @@
 #endif
 
 #ifdef _DEBUG
-#  define traceprint(...) {printf(__VA_ARGS__);}
+//#  define traceprint(...) {printf(__VA_ARGS__);}
+#  define traceprint(...) {}
 #else
 #  define traceprint(...) {}
 #endif

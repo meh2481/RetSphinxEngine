@@ -7,6 +7,7 @@
 #include "LevelEditor.h"
 #include "InputDevice.h"
 #include <vector>
+#include <list>
 #include <climits>
 using namespace std;
 
@@ -15,7 +16,7 @@ DebugUI::DebugUI(GameEngine *ge)
 	visible = false;
 	hadFocus = false;
 	_ge = ge;
-	rumbleMenu = false;
+	rumbleMenu = true;
 	windowFlags = ImGuiWindowFlags_ShowBorders;
 
 	largeMotorStrength = USHRT_MAX;
@@ -106,8 +107,12 @@ void DebugUI::_draw()
 			for(int i = 0; i < controllerList.size(); i++)
 			{
 				InputDevice* id = controllerList[i];
-				ImGui::Text("%s%s%s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getControllerName().c_str(), id->getJoystickName().c_str());
+				ImGui::Text("%s%s#%d %s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getDeviceIndex(), id->getControllerName().c_str(), id->getJoystickName().c_str());
 			}
+			ImGui::Text("\nLast messages:");
+			std::list<std::string> messages = _ge->getLastMessage();
+			for(std::list<std::string>::iterator i = messages.begin(); i != messages.end(); i++)
+				ImGui::Text(i->c_str());
 		}
 		ImGui::End();
 	}

@@ -21,12 +21,12 @@ protected:
 	virtual void _OnRecv(void *buf, unsigned int size)
 	{
 #ifdef _DEBUG
-		if(size)
-		{
-			printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
-			fwrite(buf, 1, size, stdout);
-			puts("\n===END====================");
-		}
+		//if(size)
+		//{
+		//	printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
+		//	fwrite(buf, 1, size, stdout);
+		//	puts("\n===END====================");
+		//}
 #endif
 	}
 };

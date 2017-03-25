@@ -334,6 +334,7 @@ InputDevice* Engine::getCurController()
 
 void Engine::addController(int deviceIndex)
 {
+	//removeController(deviceIndex);	//If there's an SDL problem, this could be left over after unplugging/replugging
 	InputDevice* device = new InputDevice(deviceIndex);
 	m_controllers.push_back(device);
 	m_curActiveController = m_controllers.size() - 1;	//Set this as new active controller

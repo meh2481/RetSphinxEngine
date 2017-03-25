@@ -6,7 +6,7 @@
 
 LevelEditor::LevelEditor(GameEngine * _g)
 {
-	open = true;
+	open = false;
 	ge = _g;
 }
 
