@@ -199,6 +199,7 @@ public:
 	void addController(int deviceIndex);	//Register the controller from the given SDL device 
 	void removeController(int deviceIndex);	//Deregister the controller from the given SDL device
 	void activateController(int deviceIndex);	//Set the given controller as active (player 1)
+	std::vector<InputDevice*> getControllerList() {	return m_controllers; }
 
 	//Time functions
 	float getTimeScale() { return m_fTimeScale; };

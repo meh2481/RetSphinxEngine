@@ -136,7 +136,6 @@ void GameEngine::handleEvent(SDL_Event event)
 		//Gamepad stuff!
 		case SDL_CONTROLLERDEVICEADDED:
 		{
-			cout << "Controller " << (int)event.cdevice.which << " connected." << endl;
 			//Create new controller, don't override old one
 			addController(event.cdevice.which);
 			break;
@@ -150,7 +149,6 @@ void GameEngine::handleEvent(SDL_Event event)
 				char guid[GUID_STR_SZ];
 				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 
-				cout << "Joystick " << SDL_JoystickName(joy) << " attached." << endl;
 				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
 				LOG(INFO) << "Joystick has GUID " << guid;
 				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
@@ -164,7 +162,6 @@ void GameEngine::handleEvent(SDL_Event event)
 
 		case SDL_CONTROLLERDEVICEREMOVED:
 			LOG(INFO) << "Controller " << (int)event.cdevice.which << " disconnected.";
-			cout << "Controller " << (int)event.cdevice.which << " disconnected." << endl;
 			removeController(event.cdevice.which);
 			break;
 			

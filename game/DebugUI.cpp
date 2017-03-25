@@ -6,7 +6,9 @@
 #include "ParticleEditor.h"
 #include "LevelEditor.h"
 #include "InputDevice.h"
+#include <vector>
 #include <climits>
+using namespace std;
 
 DebugUI::DebugUI(GameEngine *ge)
 {
@@ -98,6 +100,14 @@ void DebugUI::_draw()
 			ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
+			ImGui::Text("Controllers connected:");
+			vector<InputDevice*> controllerList = _ge->getControllerList();
+			InputDevice* currentController = _ge->getCurController();
+			for(int i = 0; i < controllerList.size(); i++)
+			{
+				InputDevice* id = controllerList[i];
+				ImGui::Text("%s%s%s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getControllerName().c_str(), id->getJoystickName().c_str());
+			}
 		}
 		ImGui::End();
 	}

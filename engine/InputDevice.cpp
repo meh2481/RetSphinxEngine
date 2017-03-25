@@ -34,7 +34,10 @@ InputDevice::InputDevice(int deviceIndex)
 		char guid[GUID_STR_SZ];
 		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 
-		LOG(INFO) << "Opened controller " << SDL_GameControllerName(newController);
+		joystickName = SDL_JoystickName(joy);
+		controllerName = SDL_GameControllerName(newController);
+
+		LOG(INFO) << "Opened controller " << controllerName;
 		LOG(INFO) << "Controller joystick has GUID " << guid;
 
 		SDL_Haptic* newRumble = NULL;
