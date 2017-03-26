@@ -61,7 +61,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	setup_sdl();
 	setup_opengl();
 	m_fGamma = 1.0f;
-	m_bPaused = false;
+	m_bPaused = m_bControllerDisconnected = false;
 	m_bPauseOnKeyboardFocus = true;
 	m_bCursorShow = true;
 	m_bCursorOutOfWindow = false;
@@ -225,6 +225,13 @@ bool Engine::_processEvent(SDL_Event& e)
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYHATMOTION:
 			break;
+
+		//Unpause when selecting with a new input device
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_KEYDOWN:
+			m_bControllerDisconnected = false;
+			break;
 	}
 
 	return false;
@@ -244,13 +251,13 @@ bool Engine::_frame()
 			return true;
 
 		//Pass on to derived game engine class
-		if(!m_bPaused)
+		if(!m_bPaused && !m_bControllerDisconnected)
 			handleEvent(event);
 	}
 
 	ImGui_ImplSdl_NewFrame(m_Window);
 
-	if(m_bPaused)
+	if(m_bPaused || m_bControllerDisconnected)
 	{
 		SDL_Delay(100);	//Wait 100 ms
 		return m_bQuitting;	//Break out here
@@ -387,6 +394,8 @@ void Engine::removeController(int deviceIndex)
 			//Remove this controller from the list
 			delete m_controllers[i];
 			m_controllers.erase(m_controllers.begin() + i);
+			if(i == m_curActiveController)
+				m_bControllerDisconnected = true;	//Disconnected current controller; pause game
 			if(i <= m_curActiveController)
 			{
 				//TODO: Pause game if this is the active controller

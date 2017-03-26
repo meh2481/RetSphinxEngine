@@ -69,6 +69,7 @@ private:
 	bool m_bResizable;
 	float m_fGamma;		//Overall screen brightness
 	bool m_bPaused;			//If the game is paused due to not being focused
+	bool m_bControllerDisconnected;	//If the game is paused due to a controller disconnecting
 	bool m_bPauseOnKeyboardFocus;	//If the game pauses when keyboard focus is lost
 	bool m_bSoundDied;  //If tyrsound fails to load, don't try to use it
 	int m_iMSAA;		//Antialiasing (0x, 2x, 4x, 8x, etc)

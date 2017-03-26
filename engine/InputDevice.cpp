@@ -14,8 +14,7 @@ InputDevice::InputDevice()
 }
 
 InputDevice::InputDevice(int deviceIndex)
-{
-	//m_deviceIndex = deviceIndex; //FOR SOME REASON THIS IS NOT THE SAME THING!!!!
+{ 
 	mouseKb = false;
 	m_haptic = NULL;
 	m_controller = NULL;
@@ -32,6 +31,7 @@ InputDevice::InputDevice(int deviceIndex)
 			return;
 		}
 
+		//NOT THE SAME THING AS THE INDEX PASSED INTO THIS FUNCTION! Thanks, SDL, for adding more stupidity to the world of software engineering.
 		m_deviceIndex = SDL_JoystickInstanceID(joy);
 
 		char guid[GUID_STR_SZ];
@@ -79,17 +79,6 @@ InputDevice::InputDevice(int deviceIndex)
 			LOG(TRACE) << "SDL_HAPTIC_AUTOCENTER: " << ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0);
 			LOG(TRACE) << "SDL_HAPTIC_STATUS: " << ((hapticQuery & SDL_HAPTIC_STATUS) != 0);
 			LOG(TRACE) << "SDL_HAPTIC_PAUSE: " << ((hapticQuery & SDL_HAPTIC_PAUSE) != 0);
-
-			//if (SDL_HapticRumbleInit(m_rumble) != 0)
-			//{
-			//	LOG(WARNING) << "Unable to initialize controller " << (int)event.cdevice.which << " as rumble.";
-			//	SDL_HapticClose(m_rumble);
-			//	m_rumble = NULL;
-			//}
-			//else
-			//{
-			//	LOG(INFO) << "Initialized controller " << (int)event.cdevice.which << " as rumble.";
-			//}
 
 			if(!rumbleLRSupported)
 			{
