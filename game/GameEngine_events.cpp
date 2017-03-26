@@ -133,20 +133,9 @@ void GameEngine::handleEvent(SDL_Event event)
 			}
 			break;
 			
-		//Gamepad stuff!
 		case SDL_CONTROLLERDEVICEADDED:
-		{
-			//Create new controller, don't override old one
 			addController(event.cdevice.which);
-			char msg[2];
-			msg[0] = (char)(event.cdevice.which + '0');
-			msg[1] = '\0';
-			string lastMessage = "Controller #" + string(msg) + " connected.";
-			m_lastMessage.push_back(lastMessage);
-			cout << lastMessage << endl;
-			if(m_lastMessage.size() > 15) m_lastMessage.pop_front();
 			break;
-		}
 
 		case SDL_JOYDEVICEADDED:
 		{
@@ -157,14 +146,6 @@ void GameEngine::handleEvent(SDL_Event event)
 				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 
 				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
-				char msg[2];
-				msg[0] = (char)(event.jdevice.which + '0');
-				msg[1] = '\0';
-				string lastMessage = "Joystick #" + string(msg) + " connected.";
-				m_lastMessage.push_back(lastMessage);
-				cout << lastMessage << endl;
-				if(m_lastMessage.size() > 15) m_lastMessage.pop_front();
-				
 				LOG(INFO) << "Joystick has GUID " << guid;
 				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
 				LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
@@ -176,39 +157,17 @@ void GameEngine::handleEvent(SDL_Event event)
 		}
 
 		case SDL_JOYDEVICEREMOVED:
-		{
-			char msg[2];
-			msg[0] = (char)(event.jdevice.which + '0');
-			msg[1] = '\0';
-			string lastMessage = "Joystick #" + string(msg) + " disconnected.";
-			m_lastMessage.push_back(lastMessage);
-			cout << lastMessage << endl;
-			if(m_lastMessage.size() > 15) m_lastMessage.pop_front();
-			//removeController(event.jdevice.which);
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYHATMOTION:
 			break;
-		}
 
 		case SDL_CONTROLLERDEVICEREMOVED:
-		{
 			LOG(INFO) << "Controller " << (int)event.cdevice.which << " disconnected.";
-			char msg[2];
-			msg[0] = (char)(event.cdevice.which + '0');
-			msg[1] = '\0';
-			string lastMessage = "Controller #" + string(msg) + " disconnected.";
-			m_lastMessage.push_back(lastMessage);
-			cout << lastMessage << endl;
-			if(m_lastMessage.size() > 15) m_lastMessage.pop_front();
 			removeController(event.cdevice.which);
-			break;
-		}
-
-		case SDL_JOYBUTTONDOWN:
-			cout << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button << endl;
 			break;
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
-			cout << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button << endl;
 			activateController(event.cbutton.which);
 			switch(event.cbutton.button)
 			{
@@ -219,17 +178,13 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 			
 		case SDL_CONTROLLERBUTTONUP:
-			cout << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button << endl;
+			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button << endl;
 			break;
 			
 		case SDL_CONTROLLERAXISMOTION:
 			if(abs(event.caxis.value) > JOY_AXIS_TRIP)
-				cout << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value << endl;
+				LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value << endl;
 			break;
-			
-		//case SDL_JOYHATMOTION:
-		//	LOG(TRACE) << "Joystick " << (int)event.jhat.which << " moved hat " << (int)event.jhat.hat << " to " << (int)event.jhat.value;
-		//	break;
 	}
 
 

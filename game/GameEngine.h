@@ -55,7 +55,6 @@ private:
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
 	std::list<ColorPhase> m_ColorsChanging;
-	std::list<std::string> m_lastMessage;
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
@@ -98,7 +97,6 @@ public:
 	//Other stuff
 	void warpObjectToNode(Object* o, Node* n);
 	SteelSeriesClient* getSteelSeriesClient() { return steelSeriesClient; };
-	std::list<std::string> getLastMessage() { return m_lastMessage; }
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float dt);

@@ -135,12 +135,12 @@ void Engine::setup_sdl()
 #ifdef _DEBUG
 	if(glDebugMessageCallback)
 	{
-		puts("Using GL debug callbacks");
+		LOG(DEBUG) << "Using GL debug callbacks";
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(debugCallback, NULL);
 	}
 	else
-		puts("glDebugMessageCallback() not supported");
+		LOG(DEBUG) << "glDebugMessageCallback() not supported";
 #endif
 
 	LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;

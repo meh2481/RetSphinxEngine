@@ -20,6 +20,7 @@
 #define ELPP_NO_DEFAULT_LOG_FILE
 #define ELPP_DISABLE_ASSERT
 #define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
+#define ELPP_FRESH_LOG_FILE
 
 // Compilers and C++0x/C++11 Evaluation
 #if defined(__GNUC__)

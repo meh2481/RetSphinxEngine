@@ -109,10 +109,6 @@ void DebugUI::_draw()
 				InputDevice* id = controllerList[i];
 				ImGui::Text("%s%s#%d %s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getDeviceIndex(), id->getControllerName().c_str(), id->getJoystickName().c_str());
 			}
-			ImGui::Text("\nLast messages:");
-			std::list<std::string> messages = _ge->getLastMessage();
-			for(std::list<std::string>::iterator i = messages.begin(); i != messages.end(); i++)
-				ImGui::Text(i->c_str());
 		}
 		ImGui::End();
 	}

@@ -8,21 +8,15 @@
 #include <new>
 
 static int the_panic (lua_State *L) {
-	LOG(FATAL) << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1);
+	LOG(ERROR) << "PANIC: unprotected error in call to Lua API " << lua_tostring(L, -1);
 	assert(false);
     return 0;  /* return to Lua to abort */
 }
 
 
-LuaInterface::LuaInterface(const char *script, int argc, const char * const *argv)
- : script(script), argc(argc), argv(argv), _lua(NULL)
+LuaInterface::LuaInterface(const char *script, int argc, const char * const *argv) : script(script), argc(argc), argv(argv), _lua(NULL)
 {
-#ifdef _DEBUG
-	std::cout
-#else
-	LOG(INFO)
-#endif
-		<< "LuaInterface: Using " << LUA_RELEASE;
+	LOG(INFO) << "LuaInterface: Using " << LUA_RELEASE;
 }
 
 LuaInterface::~LuaInterface()
