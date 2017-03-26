@@ -18,6 +18,8 @@
 #include "InputDevice.h"
 using namespace std;
 
+#define GUID_STR_SZ	256
+
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
 {
 	m_sTitle = sTitle;
@@ -156,38 +158,74 @@ void Engine::start()
 
 bool Engine::_processEvent(SDL_Event& e)
 {
-	//Update internal cursor position if cursor has moved
-	if(e.type == SDL_MOUSEMOTION)
+	//Engine-specific event processing
+	switch(e.type)
 	{
-		m_ptCursorPos.x = (float)e.motion.x;
-		m_ptCursorPos.y = (float)e.motion.y;
+		case SDL_MOUSEMOTION:
+			m_ptCursorPos.x = (float)e.motion.x;
+			m_ptCursorPos.y = (float)e.motion.y;
+			break;
+
+		case SDL_WINDOWEVENT:
+			if(e.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
+			{
+				m_bPaused = true;
+				pause();
+			}
+			else if(e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
+			{
+				m_bPaused = false;
+				resume();
+			}
+			else if(e.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				if(m_bResizable)
+					changeScreenResolution(e.window.data1, e.window.data2);
+				else
+					LOG(ERROR) << "Resize event generated, but resizable flag not set.";
+			}
+			else if(e.window.event == SDL_WINDOWEVENT_ENTER)
+				m_bCursorOutOfWindow = false;
+			else if(e.window.event == SDL_WINDOWEVENT_LEAVE)
+				m_bCursorOutOfWindow = true;
+			break;
+
+		case SDL_QUIT:
+			return true;
+
+		case SDL_CONTROLLERDEVICEADDED:
+			addController(e.cdevice.which);
+			break;
+
+		case SDL_CONTROLLERDEVICEREMOVED:
+			LOG(INFO) << "Controller " << (int)e.cdevice.which << " disconnected.";
+			removeController(e.cdevice.which);
+			break;
+
+		case SDL_JOYDEVICEADDED:
+		{
+			SDL_Joystick* joy = SDL_JoystickOpen(e.jdevice.which);
+			if(joy)
+			{
+				char guid[GUID_STR_SZ];
+				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
+
+				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
+				LOG(INFO) << "Joystick has GUID " << guid;
+				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
+				LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
+				LOG(INFO) << "Joystick Number of Balls: " << SDL_JoystickNumBalls(joy);
+				LOG(INFO) << "Joystick Number of Hats: " << SDL_JoystickNumHats(joy);
+				SDL_JoystickClose(joy);
+			}
+			break;
+		}
+
+		case SDL_JOYDEVICEREMOVED:
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYHATMOTION:
+			break;
 	}
-	else if(e.type == SDL_WINDOWEVENT)
-	{
-		if(e.window.event == SDL_WINDOWEVENT_FOCUS_LOST && m_bPauseOnKeyboardFocus)
-		{
-			m_bPaused = true;
-			pause();
-		}
-		else if(e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
-		{
-			m_bPaused = false;
-			resume();
-		}
-		else if(e.window.event == SDL_WINDOWEVENT_RESIZED)
-		{
-			if(m_bResizable)
-				changeScreenResolution(e.window.data1, e.window.data2);
-			else
-				LOG(ERROR) << "Resize event generated, but resizable flag not set.";
-		}
-		else if(e.window.event == SDL_WINDOWEVENT_ENTER)
-			m_bCursorOutOfWindow = false;
-		else if(e.window.event == SDL_WINDOWEVENT_LEAVE)
-			m_bCursorOutOfWindow = true;
-	}
-	else if(e.type == SDL_QUIT)
-		return true;
 
 	return false;
 }

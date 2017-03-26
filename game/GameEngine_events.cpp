@@ -14,8 +14,6 @@
 #include "ParticleEditor.h"
 using namespace std;
 
-#define GUID_STR_SZ	256
-
 typedef struct
 {
 	int w, h;
@@ -131,39 +129,6 @@ void GameEngine::handleEvent(SDL_Event event)
 					grabMouse(m_bMouseGrabOnWindowRegain);	//Grab mouse on input regain, if we should
 					break;
 			}
-			break;
-			
-		case SDL_CONTROLLERDEVICEADDED:
-			addController(event.cdevice.which);
-			break;
-
-		case SDL_JOYDEVICEADDED:
-		{
-			SDL_Joystick* joy = SDL_JoystickOpen(event.jdevice.which);
-			if(joy)
-			{
-				char guid[GUID_STR_SZ];
-				SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
-
-				LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
-				LOG(INFO) << "Joystick has GUID " << guid;
-				LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
-				LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
-				LOG(INFO) << "Joystick Number of Balls: " << SDL_JoystickNumBalls(joy);
-				LOG(INFO) << "Joystick Number of Hats: " << SDL_JoystickNumHats(joy);
-				SDL_JoystickClose(joy);
-			}
-			break;
-		}
-
-		case SDL_JOYDEVICEREMOVED:
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYHATMOTION:
-			break;
-
-		case SDL_CONTROLLERDEVICEREMOVED:
-			LOG(INFO) << "Controller " << (int)event.cdevice.which << " disconnected.";
-			removeController(event.cdevice.which);
 			break;
 			
 		case SDL_CONTROLLERBUTTONDOWN:
