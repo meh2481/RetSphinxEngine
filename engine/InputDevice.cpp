@@ -15,7 +15,7 @@ InputDevice::InputDevice()
 
 InputDevice::InputDevice(int deviceIndex)
 {
-	m_deviceIndex = deviceIndex;
+	//m_deviceIndex = deviceIndex; //FOR SOME REASON THIS IS NOT THE SAME THING!!!!
 	mouseKb = false;
 	m_haptic = NULL;
 	m_controller = NULL;
@@ -31,6 +31,9 @@ InputDevice::InputDevice(int deviceIndex)
 			LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
 			return;
 		}
+
+		m_deviceIndex = SDL_JoystickInstanceID(joy);
+
 		char guid[GUID_STR_SZ];
 		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 

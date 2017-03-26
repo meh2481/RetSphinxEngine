@@ -184,6 +184,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			m_lastMessage.push_back(lastMessage);
 			cout << lastMessage << endl;
 			if(m_lastMessage.size() > 15) m_lastMessage.pop_front();
+			//removeController(event.jdevice.which);
 			break;
 		}
 
@@ -200,6 +201,10 @@ void GameEngine::handleEvent(SDL_Event event)
 			removeController(event.cdevice.which);
 			break;
 		}
+
+		case SDL_JOYBUTTONDOWN:
+			cout << "Joystick " << (int)event.jbutton.which << " pressed button " << (int)event.jbutton.button << endl;
+			break;
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
@@ -214,12 +219,12 @@ void GameEngine::handleEvent(SDL_Event event)
 			break;
 			
 		case SDL_CONTROLLERBUTTONUP:
-			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button;
+			cout << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button << endl;
 			break;
 			
 		case SDL_CONTROLLERAXISMOTION:
 			if(abs(event.caxis.value) > JOY_AXIS_TRIP)
-				LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value;
+				cout << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value << endl;
 			break;
 			
 		//case SDL_JOYHATMOTION:
