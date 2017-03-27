@@ -219,6 +219,8 @@ void GameEngine::draw()
 		m_debugUI->particleEditor->particles->draw();
 	}
 #endif
+	glLoadIdentity();
+	glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 	
 }
 

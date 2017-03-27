@@ -265,6 +265,7 @@ bool Engine::_frame()
 	if(m_bPaused || m_bControllerDisconnected)
 	{
 		SDL_Delay(100);	//Wait 100 ms
+		_render();
 		return m_bQuitting;	//Break out here
 	}
 
@@ -298,6 +299,16 @@ void Engine::_render()
 
 	// Game-specific drawing
 	draw();
+
+	if(m_bControllerDisconnected)
+	{
+		//glLoadIdentity();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_BLEND);
+		Image* disconnectedImage = getResourceLoader()->getImage("res/util/disconnected.png");
+		if(disconnectedImage)
+			disconnectedImage->render4V(Vec2(-4.01,-1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
+	}
 
 	//Draw gamma/brightness overlay on top of everything else
 	glClear(GL_DEPTH_BUFFER_BIT);
