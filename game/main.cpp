@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	//Give logger our commandline parameters (logger isn't actually started until Engine::Engine())
 	START_EASYLOGGINGPP(argc, argv);
 	
-	GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "GameEngine", "GameEngine", ICONNAME, true); //Create our engine
+	GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Game Engine", "RetiredSphinxGameDev", "GameEngine", ICONNAME, true); //Create our engine
 
 	//Start Lua
 	LuaInterface Lua("res/lua/init.lua", argc, argv);

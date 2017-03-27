@@ -20,10 +20,11 @@ using namespace std;
 
 #define GUID_STR_SZ	256
 
-Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable)
+Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable)
 {
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
+	m_sCompanyName = sCompanyName;
 
 	//Start logger
 	el::Configurations conf("logging.conf");
@@ -78,7 +79,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName
 	m_fTimeScale = 1.0f;
 
 	LOG(INFO) << "Creating resource loader";
-	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");	//TODO: pass in pak folder from somewhere else?
+	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
 	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere?
 
@@ -302,6 +303,7 @@ void Engine::_render()
 
 	if(m_bControllerDisconnected)
 	{
+		//TODO Should really have the camera controlled by the engine, so we don't have to depend on state from draw() here...
 		//glLoadIdentity();
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_BLEND);
@@ -386,6 +388,7 @@ bool Engine::keyDown(int32_t keyCode)
 	return(m_iKeystates[keyCode]);
 }
 
+//TODO Controller/input logic should be its own class
 InputDevice* Engine::getCurController()
 {
 	if(m_curActiveController < 0 || m_curActiveController > m_controllers.size() - 1)
@@ -417,7 +420,6 @@ void Engine::removeController(int deviceIndex)
 			}
 			if(i <= m_curActiveController)
 			{
-				//TODO: Pause game if this is the active controller
 				m_curActiveController--;
 				if(m_curActiveController < 0)	//Was first in the list
 					m_curActiveController = m_controllers.size() - 1;
@@ -524,7 +526,7 @@ void Engine::commandline(list<string> argv)
 
 string Engine::getSaveLocation()
 {
-	char* cPath = SDL_GetPrefPath(m_sAppName.c_str(), m_sAppName.c_str());	//TODO: company name & etc
+	char* cPath = SDL_GetPrefPath(m_sCompanyName.c_str(), m_sAppName.c_str());	//TODO: company name & etc
 	string s;
 	if(cPath)
 		s = cPath;

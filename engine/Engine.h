@@ -43,6 +43,7 @@ private:
 	//Variables for use by the engine
 	std::string m_sTitle;
 	std::string m_sAppName;
+	std::string m_sCompanyName;
 	std::string m_sIcon;
 	SDL_Window* m_Window;
 	std::list<commandlineArg> lCommandLine;
@@ -112,7 +113,7 @@ protected:
 
 public:
 	//Constructor/destructor
-	Engine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sAppName, std::string sIcon, bool bResizable = false);
+	Engine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sCompanyName, std::string sAppName, std::string sIcon, bool bResizable = false);
 	~Engine();
 
 	//Misc. methods
@@ -124,6 +125,7 @@ public:
 	Vec2 worldPosFromCursor(Vec2 cursorpos, Vec3 Camera);	//Get the worldspace position of the given mouse cursor position
 	Vec2 worldMovement(Vec2 cursormove, Vec3 Camera);		//Get the worldspace transform of the given mouse transformation
 	std::string getAppName() { return m_sAppName; };		//Get the application name this engine was created with
+	std::string getCompanyName() { return m_sCompanyName; };		//Get the company name this engine was created with
 
 	//Drawing functions
 	Rect getScreenRect() { Rect rc(0, 0, getWidth(), getHeight()); return rc; };

@@ -37,7 +37,7 @@ class GameEngine : public Engine
 	friend class LevelEditor;
 private:
 	//Keybinding stuff
-	//TODO Keybinding class
+	//TODO Actions in appropriate classes, not keybinds
 	int32_t JOY_AXIS_TRIP;
 	SDL_Scancode KEY_UP1;
 	SDL_Scancode KEY_UP2;
@@ -58,7 +58,7 @@ private:
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
-	Object* player;		//TODO Support multiple players
+	Object* player;		//TODO Support multiple players, mapped to InputDevice
 	Rect rcSceneBounds;
 	
 	//Testing stuff that should eventually be finalized/fixed!
@@ -81,7 +81,7 @@ protected:
 
 public:
 	//GameEngine.cpp functions - fairly generic 
-	GameEngine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sAppName, std::string sIcon, bool bResizable = false);
+	GameEngine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sCompanyName, std::string sAppName, std::string sIcon, bool bResizable = false);
 	~GameEngine();
 	
 	void setLua(LuaInterface* l)	{Lua = l;};

@@ -26,8 +26,7 @@ using namespace std;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
-GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable) : 
-Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
+GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
 	g_pGlobalEngine = this;
 	
@@ -236,8 +235,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	lua_State* L = Lua->getState();
 	
 	//Have to do this manually because non-constants?
-	//TODO: Fix/move from here
-	//TODO: Also update these on user key/joystick config
+	//TODO: Use actions, not inputs
 	unsigned int JOY_BUTTON_BACK = SDL_CONTROLLER_BUTTON_BACK;
 	unsigned int JOY_BUTTON_START = SDL_CONTROLLER_BUTTON_START;
 	unsigned int JOY_BUTTON_X = SDL_CONTROLLER_BUTTON_X;
@@ -306,7 +304,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	//Start network thread, if SS engine is here
 	if(steelSeriesClient->isValid())
 	{
-		//TODO: If we have other networking stuff, this shouldn't depend on SS engine
+		//NOTE: If we have other networking stuff later, this shouldn't depend on SS engine
 		if(!NetworkThread::start())
 			LOG(ERROR) << "Unable to start networking thread";
 
