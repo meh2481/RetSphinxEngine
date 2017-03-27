@@ -158,8 +158,6 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	root->QueryBoolAttribute("emitadd", &ps->velAdd);
 
 	root->QueryBoolAttribute("fireonstart", &ps->firing);
-	//TODO What even was this?
-	//	root->QueryBoolAttribute("changecolor", &ps->changeColor);
 
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)

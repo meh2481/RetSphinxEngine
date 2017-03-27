@@ -526,7 +526,7 @@ void Engine::commandline(list<string> argv)
 
 string Engine::getSaveLocation()
 {
-	char* cPath = SDL_GetPrefPath(m_sCompanyName.c_str(), m_sAppName.c_str());	//TODO: company name & etc
+	char* cPath = SDL_GetPrefPath(m_sCompanyName.c_str(), m_sAppName.c_str());
 	string s;
 	if(cPath)
 		s = cPath;
