@@ -175,7 +175,8 @@ bool Engine::_processEvent(SDL_Event& e)
 			else if(e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED && m_bPauseOnKeyboardFocus)
 			{
 				m_bPaused = false;
-				resume();
+				if(!m_bControllerDisconnected)
+					resume();
 			}
 			else if(e.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
@@ -230,7 +231,11 @@ bool Engine::_processEvent(SDL_Event& e)
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_KEYDOWN:
-			m_bControllerDisconnected = false;
+			if(m_bControllerDisconnected)
+			{
+				resume();	//Unpause game
+				m_bControllerDisconnected = false;
+			}
 			break;
 	}
 
@@ -395,7 +400,10 @@ void Engine::removeController(int deviceIndex)
 			delete m_controllers[i];
 			m_controllers.erase(m_controllers.begin() + i);
 			if(i == m_curActiveController)
+			{
 				m_bControllerDisconnected = true;	//Disconnected current controller; pause game
+				pause();	//Pause game
+			}
 			if(i <= m_curActiveController)
 			{
 				//TODO: Pause game if this is the active controller
