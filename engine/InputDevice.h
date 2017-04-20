@@ -15,6 +15,7 @@ private:
 	std::string controllerName;
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
+	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
 
 public:
 	InputDevice();	//Init from mouse and kb
