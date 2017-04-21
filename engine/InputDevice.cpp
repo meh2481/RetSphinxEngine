@@ -1,15 +1,24 @@
 #include "InputDevice.h"
 #include "easylogging++.h"
+#include "SteelSeriesClient.h"
+#include "SteelSeriesEvents.h"
+#include "StringUtils.h"
 
 #define GUID_STR_SZ	256
+#define MOUSE_JOYSTICK_NAME "Mouse"
+#define MOUSE_CONTROLLER_NAME "Keyboard"
 
-InputDevice::InputDevice()
+const char* TEST_EVNT = "MOUSE_RUMBLE";
+InputDevice::InputDevice(SteelSeriesClient* ssc)
 {
+	ssClient = ssc;
 	rumbleLRSupported = false;
 	mouseKb = true;
 	m_controller = NULL;
-	m_deviceIndex = -1;
+	m_deviceIndex = 0;
 	curEffect = -1;
+	joystickName = MOUSE_JOYSTICK_NAME;
+	controllerName = MOUSE_CONTROLLER_NAME;
 	if(SDL_MouseIsHaptic() == SDL_TRUE)
 	{
 		m_haptic = initHapticDevice(SDL_HapticOpenFromMouse());
@@ -21,10 +30,15 @@ InputDevice::InputDevice()
 		m_haptic = NULL;
 		LOG(INFO) << "Mouse has no haptic";
 	}
+	if(ssc != NULL && ssc->isValid())
+	{
+		bindTactileEvent(TEST_EVNT, 100);
+	}
 }
 
 InputDevice::InputDevice(int deviceIndex)
-{ 
+{
+	ssClient = NULL;
 	mouseKb = false;
 	m_haptic = NULL;
 	m_controller = NULL;
@@ -162,9 +176,29 @@ void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float
 		SDL_HapticRumblePlay(m_haptic, strength, duration);
 }
 
+void InputDevice::rumbleSS(uint32_t duration, float curTime)
+{
+	static float fLastRumble = 0.0f;
+	float sec = (float)duration / 1000.0;
+
+	//Last rumble is still going or 0-msec duration
+	if(curTime < fLastRumble || duration < 1)
+		return;
+
+	fLastRumble = curTime + sec;
+
+	static int eventVal = 0;
+	ssClient->sendEvent(TEST_EVNT, ++eventVal);
+}
+
 void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime)
 {
-	if(m_haptic == NULL) return;	//Have to have an active rumble first
+	if(m_haptic == NULL)
+	{
+		if(ssClient != NULL && ssClient->isValid())
+			rumbleSS(duration, curTime);
+		return;	//Have to have an active rumble first
+	}
 
 	//If we don't support LR rumble, just do a basic one
 	if(!rumbleLRSupported)
@@ -176,7 +210,6 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
 	}
 
 	static float fLastRumble = 0.0f;
-	static int prevPriority = 0;
 	float sec = (float)duration / 1000.0;
 
 	//Last rumble is still going or 0-msec duration
@@ -212,4 +245,42 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
 	{
 		LOG(WARNING) << "Unable to run LR effect: " << SDL_GetError();
 	}
+}
+
+bool InputDevice::hasHaptic()
+{
+	return m_haptic != NULL || (ssClient != NULL && ssClient->isValid());
+}
+
+void InputDevice::bindTactileEvent(std::string eventId, int rumbleLen)
+{
+	rapidjson::Document doc(rapidjson::kObjectType);
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+	std::string appId = ssClient->getAppId();
+	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+
+	rapidjson::Value handlers(rapidjson::kArrayType);
+	rapidjson::Value handler(rapidjson::kObjectType);
+	handler.AddMember(JSON_KEY_DEVICE_TYPE, TYPE_TACTILE, allocator);
+	handler.AddMember(JSON_KEY_ZONE, ZONE_ONE, allocator);
+	handler.AddMember(JSON_KEY_MODE, MODE_VIBRATE, allocator);
+
+	rapidjson::Value rate(rapidjson::kObjectType);
+	rate.AddMember(JSON_KEY_FREQUENCY, 0.65, allocator);
+	rate.AddMember(JSON_KEY_REPEAT_LIMIT, 1, allocator);
+	handler.AddMember(JSON_KEY_RATE, rate, allocator);
+
+	rapidjson::Value patterns(rapidjson::kArrayType);
+	rapidjson::Value pattern(rapidjson::kObjectType);
+	pattern.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(EVENT_TYPE_CUSTOM), allocator);
+	pattern.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
+	patterns.PushBack(pattern, allocator);
+	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);
+
+	handlers.PushBack(handler, allocator);
+	doc.AddMember(JSON_KEY_HANDLERS, handlers, allocator);
+
+	ssClient->bindEvent(StringUtils::stringify(doc));
 }

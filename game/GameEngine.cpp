@@ -18,6 +18,7 @@
 #include "NetworkThread.h"
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
+#include "InputDevice.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -315,6 +316,8 @@ void GameEngine::init(list<commandlineArg> sArgs)
 			LOG(WARNING) << "Unable to communicate with SteelSeries drivers";
 	}
 
+	//Add kb+mouse controller
+	addController(new InputDevice(steelSeriesClient));
 }
 
 void GameEngine::pause()

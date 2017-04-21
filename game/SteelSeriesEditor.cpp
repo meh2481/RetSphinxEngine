@@ -122,7 +122,7 @@ void SteelSeriesEditor::bindTactileEvent(std::string eventId)
 	rapidjson::Value patterns(rapidjson::kArrayType);
 	rapidjson::Value pattern(rapidjson::kObjectType);
 	pattern.AddMember(JSON_KEY_TYPE, rapidjson::StringRef(eventType.c_str()), allocator);
-	if(eventType == steelSeriesTactileEvents[0])
+	if(eventType == EVENT_TYPE_CUSTOM)
 		pattern.AddMember(JSON_KEY_LENGTH_MS, rumbleLen, allocator);
 	patterns.PushBack(pattern, allocator);
 	handler.AddMember(JSON_KEY_PATTERN, patterns, allocator);

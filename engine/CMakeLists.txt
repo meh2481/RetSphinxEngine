@@ -90,4 +90,4 @@ source_group("events" FILES ${engine_events_src})
 source_group("managers" FILES ${engine_manager_src})
 
 add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src})
-target_link_libraries(engine imgui lua53 io ${BOX2D_LIBRARY} ${SDL2_LIBRARY})
+target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY})

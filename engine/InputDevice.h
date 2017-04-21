@@ -2,6 +2,8 @@
 #include "SDL.h"
 #include <string>
 
+class SteelSeriesClient;
+
 class InputDevice
 {
 private:
@@ -13,12 +15,15 @@ private:
 	int curEffect;
 	std::string joystickName;
 	std::string controllerName;
+	SteelSeriesClient* ssClient;
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
+	void rumbleSS(uint32_t duration, float curTime);
+	void bindTactileEvent(std::string eventId, int rumbleLen);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
 
 public:
-	InputDevice();	//Init from mouse and kb
+	InputDevice(SteelSeriesClient* ssc);	//Init from mouse and kb
 	InputDevice(int deviceIndex);	//Init from controller
 
 	~InputDevice();
@@ -28,7 +33,7 @@ public:
 
 	void rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime);
 
-	bool hasHaptic() { return m_haptic != NULL; }
+	bool hasHaptic();
 	int getDeviceIndex() { return m_deviceIndex; }
 	std::string getJoystickName() { return joystickName; }
 	std::string getControllerName() { return controllerName; }
