@@ -3,10 +3,10 @@
 #include "SteelSeriesEvents.h"
 #include "StringUtils.h"
 
-#define TEST_EVNT "MOUSE_RUMBLE"
-#define CLICK_10MS_100 "MOUSE_CLICK_10MS_100"	//1
-#define CLICK_10MS_60 "MOUSE_CLICK_10MS_60"		//2
-#define CLICK_10MS_30 "MOUSE_CLICK_10MS_30"		//3
+#define CUSTOM_RUMBLE_EVENT "MOUSE_RUMBLE"		//Custom length (strength 100)
+#define CLICK_10MS_100 "MOUSE_CLICK_10MS_100"	//4
+#define CLICK_10MS_60 "MOUSE_CLICK_10MS_60"		//5
+#define CLICK_10MS_30 "MOUSE_CLICK_10MS_30"		//6
 #define TICK_10MS_100 "MOUSE_TICK_10MS_100"		//24
 #define TICK_10MS_60 "MOUSE_TICK_10MS_60"		//25
 #define TICK_10MS_30 "MOUSE_TICK_10MS_30"		//26
@@ -16,7 +16,34 @@
 #define CLICK_20MS_100 "MOUSE_CLICK_20MS_100"	//21
 #define CLICK_20MS_80 "MOUSE_CLICK_20MS_80"		//22
 #define CLICK_20MS_60 "MOUSE_CLICK_20MS_60"		//23
-
+#define CLICK_60MS_100 "MOUSE_CLICK_60MS_100"	//1
+#define CLICK_60MS_60 "MOUSE_CLICK_60MS_60"		//2
+#define CLICK_60MS_30 "MOUSE_CLICK_60MS_30"		//3
+#define CLICK_75MS_100 "MOUSE_CLICK_75MS_100"	//17
+#define CLICK_75MS_80 "MOUSE_CLICK_75MS_80"		//18
+#define CLICK_75MS_60 "MOUSE_CLICK_75MS_60"		//19
+#define CLICK_75MS_30 "MOUSE_CLICK_75MS_30"		//20
+#define FUZZ_100MS_60 "MOUSE_FUZZ_100MS_60"		//13
+#define BUZZ_100MS_100 "MOUSE_BUZZ_100MS_100"	//14
+#define BUZZ_200MS_100 "MOUSE_BUZZ_200MS_100"	//47
+#define BUZZ_200MS_80 "MOUSE_BUZZ_200MS_80"		//48
+#define BUZZ_200MS_60 "MOUSE_BUZZ_200MS_60"		//49
+#define BUZZ_200MS_40 "MOUSE_BUZZ_200MS_40"		//50
+#define BUZZ_200MS_20 "MOUSE_BUZZ_200MS_20"		//51
+#define CLICK_500MS_100 "MOUSE_CLICK_500MS_100"	//58
+#define CLICK_500MS_80 "MOUSE_CLICK_500MS_80"	//59
+#define CLICK_500MS_60 "MOUSE_CLICK_500MS_60"	//60
+#define CLICK_500MS_40 "MOUSE_CLICK_500MS_40"	//61
+#define CLICK_500MS_20 "MOUSE_CLICK_500MS_20"	//62
+#define CLICK_500MS_10 "MOUSE_CLICK_500MS_10"	//63
+#define HUM_500MS_100 "MOUSE_HUM_500MS_100"		//64
+#define HUM_500MS_80 "MOUSE_HUM_500MS_80"		//65
+#define HUM_500MS_60 "MOUSE_HUM_500MS_60"		//66
+#define HUM_500MS_40 "MOUSE_HUM_500MS_40"		//67
+#define HUM_500MS_20 "MOUSE_HUM_500MS_20"		//68
+#define HUM_500MS_10 "MOUSE_HUM_500MS_10"		//69
+#define BUZZ_750MS_100 "MOUSE_BUZZ_750MS_100"	//15
+#define BUZZ_1S_100 "MOUSE_BUZZ_1S_100"			//16
 
 SteelSeriesHaptic::SteelSeriesHaptic(SteelSeriesClient * client)
 {
@@ -29,6 +56,15 @@ SteelSeriesHaptic::~SteelSeriesHaptic()
 
 void SteelSeriesHaptic::init()
 {
+	bindEvent(TICK_10MS_100, steelSeriesTactileEvents[24], 0);
+	bindEvent(CLICK_10MS_100, steelSeriesTactileEvents[4], 0);
+	bindEvent(CLICK_20MS_100, steelSeriesTactileEvents[21], 0);
+	bindEvent(CLICK_60MS_100, steelSeriesTactileEvents[1], 0);
+	bindEvent(CLICK_75MS_100, steelSeriesTactileEvents[17], 0);
+	bindEvent(BUZZ_100MS_100, steelSeriesTactileEvents[14], 0);
+	bindEvent(HUM_500MS_100, steelSeriesTactileEvents[64], 0);
+	bindEvent(BUZZ_750MS_100, steelSeriesTactileEvents[15], 0);
+	bindEvent(BUZZ_1S_100, steelSeriesTactileEvents[16], 0);
 }
 
 bool SteelSeriesHaptic::isValid()
@@ -38,7 +74,7 @@ bool SteelSeriesHaptic::isValid()
 
 void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 {
-	static int eventVal = 0;
+	static int eventVal = 0;	//Need some sort of value for this event, but we don't actually care about value, so increment each time
 	static float fLastRumble = 0.0f;
 
 	float sec = (float)duration / 1000.0;
@@ -49,8 +85,49 @@ void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 
 	fLastRumble = curTime + sec;
 
-	bindEvent(TEST_EVNT, EVENT_TYPE_CUSTOM, duration);
-	ssClient->sendEvent(TEST_EVNT, ++eventVal);
+	std::string evnt = CUSTOM_RUMBLE_EVENT;	//Event to send
+	if(duration < 8)
+	{
+		//sharp tick
+		evnt = TICK_10MS_100;
+	}
+	else if(duration < 15)
+	{
+		evnt = CLICK_10MS_100;
+	}
+	else if(duration < 40)
+	{
+		evnt = CLICK_20MS_100;
+	}
+	else if(duration < 70)
+	{
+		evnt = CLICK_60MS_100;
+	}
+	else if(duration < 88)
+	{
+		evnt = CLICK_75MS_100;
+	}
+	else if(duration < 150)
+	{
+		evnt = BUZZ_100MS_100;
+	}
+	else if(duration < 350)
+	{
+		evnt = HUM_500MS_100;
+	}
+	else if(duration < 875)
+	{
+		evnt = BUZZ_750MS_100;
+	}
+	else if(duration < 1500)
+	{
+		evnt = BUZZ_1S_100;
+	}
+	else	//Create and send custom event for larger than 1.5s buzzes
+	{
+		bindEvent(CUSTOM_RUMBLE_EVENT, EVENT_TYPE_CUSTOM, duration);
+	}
+	ssClient->sendEvent(evnt, ++eventVal);
 }
 
 void SteelSeriesHaptic::bindEvent(std::string eventId, std::string eventType, uint32_t rumbleLen)
