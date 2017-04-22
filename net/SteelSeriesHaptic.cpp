@@ -57,12 +57,33 @@ SteelSeriesHaptic::~SteelSeriesHaptic()
 void SteelSeriesHaptic::init()
 {
 	bindEvent(TICK_10MS_100, steelSeriesTactileEvents[24], 0);
+	bindEvent(TICK_10MS_60, steelSeriesTactileEvents[25], 0);
+	bindEvent(TICK_10MS_30, steelSeriesTactileEvents[26], 0);
 	bindEvent(CLICK_10MS_100, steelSeriesTactileEvents[4], 0);
+	bindEvent(CLICK_10MS_60, steelSeriesTactileEvents[5], 0);
+	bindEvent(CLICK_10MS_30, steelSeriesTactileEvents[6], 0);
 	bindEvent(CLICK_20MS_100, steelSeriesTactileEvents[21], 0);
+	bindEvent(CLICK_20MS_80, steelSeriesTactileEvents[22], 0);
+	bindEvent(CLICK_20MS_60, steelSeriesTactileEvents[23], 0);
 	bindEvent(CLICK_60MS_100, steelSeriesTactileEvents[1], 0);
+	bindEvent(CLICK_60MS_60, steelSeriesTactileEvents[2], 0);
+	bindEvent(CLICK_60MS_30, steelSeriesTactileEvents[3], 0);
 	bindEvent(CLICK_75MS_100, steelSeriesTactileEvents[17], 0);
+	bindEvent(CLICK_75MS_80, steelSeriesTactileEvents[18], 0);
+	bindEvent(CLICK_75MS_60, steelSeriesTactileEvents[19], 0);
+	bindEvent(CLICK_75MS_30, steelSeriesTactileEvents[20], 0);
 	bindEvent(BUZZ_100MS_100, steelSeriesTactileEvents[14], 0);
+	bindEvent(BUZZ_200MS_100, steelSeriesTactileEvents[47], 0);
+	bindEvent(BUZZ_200MS_80, steelSeriesTactileEvents[48], 0);
+	bindEvent(BUZZ_200MS_60, steelSeriesTactileEvents[49], 0);
+	bindEvent(BUZZ_200MS_40, steelSeriesTactileEvents[50], 0);
+	bindEvent(BUZZ_200MS_20, steelSeriesTactileEvents[51], 0);
 	bindEvent(HUM_500MS_100, steelSeriesTactileEvents[64], 0);
+	bindEvent(HUM_500MS_80, steelSeriesTactileEvents[65], 0);
+	bindEvent(HUM_500MS_60, steelSeriesTactileEvents[66], 0);
+	bindEvent(HUM_500MS_40, steelSeriesTactileEvents[67], 0);
+	bindEvent(HUM_500MS_20, steelSeriesTactileEvents[68], 0);
+	bindEvent(HUM_500MS_10, steelSeriesTactileEvents[69], 0);
 	bindEvent(BUZZ_750MS_100, steelSeriesTactileEvents[15], 0);
 	bindEvent(BUZZ_1S_100, steelSeriesTactileEvents[16], 0);
 }
@@ -86,26 +107,53 @@ void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 	fLastRumble = curTime + sec;
 
 	std::string evnt = CUSTOM_RUMBLE_EVENT;	//Event to send
+	//Map relative strengths/lengths to the events SS has available (yuck)
 	if(duration < 8)
 	{
-		//sharp tick
-		evnt = TICK_10MS_100;
+		if(strength < 0.55f)
+			evnt = TICK_10MS_30;
+		else if(strength < 0.80f)
+			evnt = TICK_10MS_60;
+		else
+			evnt = TICK_10MS_100;
 	}
 	else if(duration < 15)
 	{
-		evnt = CLICK_10MS_100;
+		if(strength < 0.55f)
+			evnt = CLICK_10MS_30;
+		else if(strength < 0.80f)
+			evnt = CLICK_10MS_60;
+		else
+			evnt = CLICK_10MS_100;
 	}
 	else if(duration < 40)
 	{
-		evnt = CLICK_20MS_100;
+		if(strength < 0.7f)
+			evnt = CLICK_20MS_60;
+		else if(strength < 0.9f)
+			evnt = CLICK_20MS_80;
+		else
+			evnt = CLICK_20MS_100;
 	}
 	else if(duration < 70)
 	{
-		evnt = CLICK_60MS_100;
+		if(strength < 0.55f)
+			evnt = CLICK_60MS_30;
+		else if(strength < 0.80f)
+			evnt = CLICK_60MS_60;
+		else
+			evnt = CLICK_60MS_100;
 	}
 	else if(duration < 88)
 	{
-		evnt = CLICK_75MS_100;
+		if(strength < 0.55f)
+			evnt = CLICK_75MS_30;
+		else if(strength < 0.7f)
+			evnt = CLICK_75MS_60;
+		else if(strength < 0.9f)
+			evnt = CLICK_75MS_80;
+		else
+			evnt = CLICK_75MS_100;
 	}
 	else if(duration < 150)
 	{
@@ -113,7 +161,31 @@ void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 	}
 	else if(duration < 350)
 	{
-		evnt = HUM_500MS_100;
+		if(strength < 0.3f)
+			evnt = BUZZ_200MS_20;
+		else if(strength < 0.55f)
+			evnt = BUZZ_200MS_40;
+		else if(strength < 0.7f)
+			evnt = BUZZ_200MS_60;
+		else if(strength < 0.9f)
+			evnt = BUZZ_200MS_80;
+		else
+			evnt = BUZZ_200MS_100;
+	}
+	else if(duration < 625)
+	{
+		if(strength < 0.15f)
+			evnt = HUM_500MS_10;
+		else if(strength < 0.3f)
+			evnt = HUM_500MS_20;
+		else if(strength < 0.55f)
+			evnt = HUM_500MS_40;
+		else if(strength < 0.7f)
+			evnt = HUM_500MS_60;
+		else if(strength < 0.9f)
+			evnt = HUM_500MS_80;
+		else
+			evnt = HUM_500MS_100;
 	}
 	else if(duration < 875)
 	{
