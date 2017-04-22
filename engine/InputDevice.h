@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include <string>
 
+class SteelSeriesHaptic;
 class SteelSeriesClient;
 
 class InputDevice
@@ -15,10 +16,9 @@ private:
 	int curEffect;
 	std::string joystickName;
 	std::string controllerName;
-	SteelSeriesClient* ssClient;
+	SteelSeriesHaptic* ssHaptic;
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
-	void rumbleSS(uint32_t duration, float curTime);
 	void bindTactileEvent(std::string eventId, int rumbleLen);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
 
