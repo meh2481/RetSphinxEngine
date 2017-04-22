@@ -56,6 +56,7 @@ SteelSeriesHaptic::~SteelSeriesHaptic()
 
 void SteelSeriesHaptic::init()
 {
+	//Bind all our predefined events
 	bindEvent(TICK_10MS_100, steelSeriesTactileEvents[24], 0);
 	bindEvent(TICK_10MS_60, steelSeriesTactileEvents[25], 0);
 	bindEvent(TICK_10MS_30, steelSeriesTactileEvents[26], 0);

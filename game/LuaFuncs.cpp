@@ -675,7 +675,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getAngle),
 	luaRegister(obj_getFromPoint),
 	luaRegister(obj_setActive),
-        luaRegister(obj_isActive),
+	luaRegister(obj_isActive),
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
 	luaRegister(camera_centerOnXY),
