@@ -228,10 +228,12 @@ bool Engine::_processEvent(SDL_Event& e)
 		case SDL_JOYHATMOTION:
 			break;
 
-		//Unpause when selecting with a new input device
-		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_KEYDOWN:
+			m_curActiveController = 0;	//Mouse+kb control
+			//Fall through
+		case SDL_CONTROLLERBUTTONDOWN:
+			//Unpause when selecting with a new input device
 			if(m_bControllerDisconnected)
 			{
 				resume();	//Unpause game
