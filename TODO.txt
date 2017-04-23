@@ -1,4 +1,5 @@
 -Look into ETC1 compression for images
+-Use SDL_GetPowerInfo() for laptop battery reminders
 -Particles follow ship with acceleration applied
 -Particle editor breaks after F5
 -Figure out why up key doesn't work with ship flying
@@ -21,8 +22,6 @@ Overall TODO list:
 - Particle systems, objects, etc should be loaded by template, not from XML each time
 - Move all resource loading stuff to IO?
 - Move object self-creation into resource loaders where applicable
-- Revisit gamepad support - support multiple controllers, switching input modes, etc
-- Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 
