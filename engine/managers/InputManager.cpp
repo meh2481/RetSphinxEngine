@@ -4,6 +4,7 @@
 InputManager::InputManager()
 {
 	m_curActiveController = -1;
+	m_iKeystates = SDL_GetKeyboardState(NULL);	//Get key state array once; updates automagically
 }
 
 InputManager::~InputManager()
@@ -67,4 +68,18 @@ void InputManager::activateController(int deviceIndex)
 				m_curActiveController = i;
 		}
 	}
+}
+
+bool InputManager::keyDown(int32_t keyCode)
+{
+	if(m_iKeystates == NULL) return false;	//On first cycle, this can be NULL and cause segfaults otherwise
+
+	//HACK: See if one of our combined keycodes
+	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
+	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
+	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT) || keyDown(SDL_SCANCODE_RALT));
+	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI) || keyDown(SDL_SCANCODE_RGUI));
+
+	//Otherwise, just use our pre-polled list we got from SDL
+	return(m_iKeystates[keyCode]);
 }

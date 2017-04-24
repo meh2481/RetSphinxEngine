@@ -107,7 +107,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				}
 
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
-					if(keyDown(SDL_SCANCODE_ALT))
+					if(getInputManager()->keyDown(SDL_SCANCODE_ALT))
 						setFullscreen(!isFullscreen());
 					break;
 
@@ -238,17 +238,17 @@ void GameEngine::handleKeys()
 {
 #ifdef _DEBUG
 	setTimeScale(1.0f);
-	if (keyDown(SDL_SCANCODE_G))
+	if (getInputManager()->keyDown(SDL_SCANCODE_G))
 	{
 		setTimeScale(0.25f);
-		if (keyDown(SDL_SCANCODE_CTRL))
+		if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
 			setTimeScale(0.0625f);
 	}
 
-	if (keyDown(SDL_SCANCODE_H))
+	if (getInputManager()->keyDown(SDL_SCANCODE_H))
 	{
 		setTimeScale(2.0f);
-		if (keyDown(SDL_SCANCODE_CTRL))
+		if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
 			setTimeScale(3.0f);
 	}
 #endif

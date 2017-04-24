@@ -1,3 +1,6 @@
+-Input names to key checking functions should be actions, not keys
+-UTF code point lookup should use array of direct values rather than binary search
+-Pass const string& instead of string to functions
 -Look into ETC1 compression for images
 -Use SDL_GetPowerInfo() for laptop battery reminders
 -Particles follow ship with acceleration applied

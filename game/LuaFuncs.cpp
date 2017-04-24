@@ -76,7 +76,7 @@ public:
 
 	static bool keyDown(int key)
 	{
-		return g_pGlobalEngine->keyDown(key);
+		return g_pGlobalEngine->getInputManager()->keyDown(key);
 	}
 
 	static bool joyDown(int button)

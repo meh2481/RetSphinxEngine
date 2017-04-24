@@ -22,14 +22,6 @@ class InputManager;
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
 
-//SDL codes that should be defined but aren't
-#define SDL_BUTTON_FORWARD	SDL_BUTTON_X2
-#define SDL_BUTTON_BACK		SDL_BUTTON_X1
-#define SDL_SCANCODE_CTRL	(SDL_NUM_SCANCODES)
-#define SDL_SCANCODE_SHIFT 	(SDL_NUM_SCANCODES+1)
-#define SDL_SCANCODE_ALT	(SDL_NUM_SCANCODES+2)
-#define SDL_SCANCODE_GUI	(SDL_NUM_SCANCODES+3)
-
 const float soundFreqDefault = 44100.0;
 
 typedef struct
@@ -61,7 +53,6 @@ private:
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
 	int m_iWidth, m_iHeight;
-	const Uint8 *m_iKeystates;	//Keep track of keys that are pressed/released so we can poll as needed
 	int m_iNumScreenModes;	  //Number of screen modes that are available
 	bool m_bFullscreen;
 	bool m_bResizable;
@@ -191,9 +182,6 @@ public:
 	void setCursor(SDL_Cursor* cur) { SDL_SetCursor(cur); };
 	bool isMouseGrabbed();
 	void grabMouse(bool bGrab = true);
-
-	//Keyboard functions
-	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed
 
 	//Controller functions
 	InputManager* getInputManager() { return m_inputManager;  };	//Get current input manager

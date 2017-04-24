@@ -52,7 +52,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_iWidth = iWidth;
 	m_iHeight = iHeight;
 	m_iMSAA = 0;	//Default: MSAA off
-	m_iKeystates = NULL;
 	m_bShowCursor = true;
 	m_fFramerate = 60.0f;
 	setFramerate(60);	 //60 fps default
@@ -275,7 +274,6 @@ bool Engine::_frame()
 	if(m_fAccumulatedTime <= fCurTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
-		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
 #ifdef _DEBUG
 		if(!m_bSteppingPhysics || m_bStepFrame)
 		{
@@ -373,20 +371,6 @@ void Engine::fillScreen(Color col)
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-}
-
-bool Engine::keyDown(int32_t keyCode)
-{
-	if(m_iKeystates == NULL) return false;	//On first cycle, this can be NULL and cause segfaults otherwise
-
-	//HACK: See if one of our combined keycodes
-	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
-	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
-	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT) || keyDown(SDL_SCANCODE_RALT));
-	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI) || keyDown(SDL_SCANCODE_RGUI));
-
-	//Otherwise, just use our pre-polled list we got from SDL
-	return(m_iKeystates[keyCode]);
 }
 
 void Engine::setFramerate(float fFramerate)
