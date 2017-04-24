@@ -17,7 +17,7 @@ class Image;
 class ResourceLoader;
 class EntityManager;
 class Stringbank;
-class InputDevice;
+class InputManager;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -58,9 +58,6 @@ private:
 	float m_fAccumulatedTime;
 	float m_fTargetTime;
 
-	std::vector<InputDevice*> m_controllers;
-	int m_curActiveController;
-
 	bool m_bQuitting;   //Stop the game if this turns true
 	float m_fTimeScale;	//So we can scale time if we want
 	int m_iWidth, m_iHeight;
@@ -83,6 +80,7 @@ private:
 	ResourceLoader* m_resourceLoader;
 	EntityManager* m_entityManager;
 	Stringbank* m_stringBank;
+	InputManager* m_inputManager;
 
 
 	//multimap<string, FMOD_CHANNEL*> m_channels;
@@ -198,12 +196,7 @@ public:
 	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed
 
 	//Controller functions
-	InputDevice* getCurController();	//Return current controller, or NULL if none
-	void addController(int deviceIndex);	//Register the controller from the given SDL device 
-	void addController(InputDevice* device);	//Register the given device as a controller
-	void removeController(int deviceIndex);	//Deregister the controller from the given SDL device
-	void activateController(int deviceIndex);	//Set the given controller as active (player 1)
-	std::vector<InputDevice*> getControllerList() {	return m_controllers; }
+	InputManager* getInputManager() { return m_inputManager;  };	//Get current input manager
 
 	//Time functions
 	float getTimeScale() { return m_fTimeScale; };

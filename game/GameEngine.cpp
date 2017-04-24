@@ -19,6 +19,7 @@
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
 #include "InputDevice.h"
+#include "InputManager.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -317,7 +318,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	}
 
 	//Add kb+mouse controller
-	addController(new InputDevice(steelSeriesClient));
+	getInputManager()->addController(new InputDevice(steelSeriesClient));
 }
 
 void GameEngine::pause()

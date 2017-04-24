@@ -8,6 +8,7 @@
 #include "StringUtils.h"
 #include "SteelSeriesClient.h"
 #include "InputDevice.h"
+#include "InputManager.h"
 using namespace std;
 
 //Defined by SDL
@@ -80,7 +81,7 @@ public:
 
 	static bool joyDown(int button)
 	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
+		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
 			return controller->getButton(button);
 		return false;
@@ -88,7 +89,7 @@ public:
 
 	static int joyAxis(int axis)
 	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
+		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
 			return controller->getAxis(axis);
 		return 0;
@@ -158,7 +159,7 @@ public:
 
 	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
+		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
 			controller->rumbleLR(duration, large, small, g_pGlobalEngine->getSeconds());
 	}

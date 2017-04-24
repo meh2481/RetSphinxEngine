@@ -80,6 +80,8 @@ managers/SceneryManager.cpp
 managers/SceneryManager.h
 managers/Stringbank.cpp
 managers/Stringbank.h
+managers/InputManager.cpp
+managers/InputManager.h
 )
 
 include_directories (.)

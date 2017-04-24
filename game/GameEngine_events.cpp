@@ -12,6 +12,7 @@
 #include "ResourceCache.h"
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
+#include "InputManager.h"
 using namespace std;
 
 typedef struct
@@ -133,7 +134,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
-			activateController(event.cbutton.which);
+			getInputManager()->activateController(event.cbutton.which);
 			switch(event.cbutton.button)
 			{
 				case SDL_CONTROLLER_BUTTON_BACK:	//TODO Not hardcoded
