@@ -1,5 +1,4 @@
 set(engine_src
-Action.h
 Arc.cpp
 Arc.h
 Color.cpp
@@ -85,12 +84,28 @@ managers/InputManager.cpp
 managers/InputManager.h
 )
 
+set(engine_actions_src
+actions/Action.h
+actions/ActionBind.h
+actions/NoAction.h
+actions/AxisAction.h
+actions/AxisAction.cpp
+actions/JoyButtonAction.h
+actions/JoyButtonAction.cpp
+actions/KeyboardAction.h
+actions/KeyboardAction.cpp
+actions/MouseButtonAction.h
+actions/MouseButtonAction.cpp
+)
+
 include_directories (.)
 include_directories (events)
 include_directories (managers)
+include_directories (actions)
 
 source_group("events" FILES ${engine_events_src})
 source_group("managers" FILES ${engine_manager_src})
+source_group("actions" FILES ${engine_actions_src})
 
-add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src})
+add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src} ${engine_actions_src})
 target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY})

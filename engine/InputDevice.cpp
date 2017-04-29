@@ -11,7 +11,6 @@
 InputDevice::InputDevice(SteelSeriesClient* ssc)
 {
 	rumbleLRSupported = false;
-	mouseKb = true;
 	m_controller = NULL;
 	m_deviceIndex = 0;
 	curEffect = -1;
@@ -40,7 +39,6 @@ InputDevice::InputDevice(SteelSeriesClient* ssc)
 InputDevice::InputDevice(int deviceIndex)
 {
 	ssHaptic = NULL;
-	mouseKb = false;
 	m_haptic = NULL;
 	m_controller = NULL;
 	rumbleLRSupported = false;
@@ -133,6 +131,8 @@ SDL_Haptic* InputDevice::initHapticDevice(SDL_Haptic* newRumble)
 
 InputDevice::~InputDevice()
 {
+	for(int i = 0; i < NUM_ACTIONS; i++)
+		delete actions[i];
 	if(!rumbleLRSupported && m_haptic != NULL)
 		SDL_HapticRumbleStop(m_haptic);
 	else if(m_haptic != NULL)
@@ -143,39 +143,18 @@ InputDevice::~InputDevice()
 		delete ssHaptic;
 }
 
-Vec2 InputDevice::getMovement()
+int InputDevice::getAxis(int axis)
 {
-	return Vec2();
+	if(m_controller == NULL)
+		return 0;
+	return SDL_GameControllerGetAxis(m_controller, (SDL_GameControllerAxis)axis);
 }
 
-bool InputDevice::getDigitalAction(Action act)
+bool InputDevice::getButton(int buttonIndex)
 {
-	return false;
-}
-
-float InputDevice::getAnalogAction(Action act)
-{
-	return 0.0f;
-}
-
-int InputDevice::getAxis(int axis)	//DEPRECATED
-{
-	if(!mouseKb)
-	{
-		if(m_controller == NULL) return false;
-		return SDL_GameControllerGetAxis(m_controller, (SDL_GameControllerAxis)axis);
-	}
-	return 0;	//TODO Return kb state depending on axis
-}
-
-bool InputDevice::getButton(int buttonIndex)	//DEPRECATED
-{
-	if(!mouseKb)
-	{
-		if(m_controller == NULL) return false;
-		return(SDL_GameControllerGetButton(m_controller, (SDL_GameControllerButton)buttonIndex) > 0);
-	}
-	return false;	//TODO Return button state if kb
+	if(m_controller == NULL) 
+		return false;
+	return(SDL_GameControllerGetButton(m_controller, (SDL_GameControllerButton)buttonIndex) > 0);
 }
 
 void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float curTime)

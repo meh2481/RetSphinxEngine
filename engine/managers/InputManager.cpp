@@ -1,5 +1,6 @@
 #include "InputManager.h"
 #include "InputDevice.h"
+#include "ActionBind.h"
 
 InputManager::InputManager()
 {
@@ -72,8 +73,6 @@ void InputManager::activateController(int deviceIndex)
 
 bool InputManager::keyDown(int32_t keyCode)
 {
-	if(m_iKeystates == NULL) return false;	//On first cycle, this can be NULL and cause segfaults otherwise
-
 	//HACK: See if one of our combined keycodes
 	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
 	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
@@ -82,4 +81,24 @@ bool InputManager::keyDown(int32_t keyCode)
 
 	//Otherwise, just use our pre-polled list we got from SDL
 	return(m_iKeystates[keyCode]);
+}
+
+bool InputManager::getDigitalAction(Action a)
+{
+	return false;
+}
+
+float InputManager::getAnalogAction(Action a)
+{
+	return 0.0f;
+}
+
+Vec2 InputManager::getMovement1()
+{
+	return Vec2();
+}
+
+Vec2 InputManager::getMovement2()
+{
+	return Vec2();
 }
