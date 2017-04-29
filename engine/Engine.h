@@ -185,6 +185,7 @@ public:
 
 	//Controller functions
 	InputManager* getInputManager() { return m_inputManager;  };	//Get current input manager
+	bool isControllerDisconnected() { return m_bControllerDisconnected; }
 
 	//Time functions
 	float getTimeScale() { return m_fTimeScale; };

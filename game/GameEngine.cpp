@@ -23,6 +23,8 @@
 using namespace std;
 
 //#define DEBUG_INPUT
+#define CONFIG_FILE "config.xml"
+#define CONTROLLER_DISCONNECTED_IMAGE "res/util/disconnected.png"
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
@@ -67,7 +69,7 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string 
 GameEngine::~GameEngine()
 {
 	LOG(INFO) << "~GameEngine()";
-	saveConfig(getSaveLocation() + "config.xml");
+	saveConfig(getSaveLocation() + CONFIG_FILE);
 	getEntityManager()->cleanup();
 	delete m_debugUI;
 	delete steelSeriesClient;
@@ -220,8 +222,17 @@ void GameEngine::draw()
 		m_debugUI->particleEditor->particles->draw();
 	}
 #endif
-	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
+
+	if(isControllerDisconnected())
+	{
+		glLoadIdentity();
+		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_BLEND);
+		Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
+		if(disconnectedImage)
+			disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
+	}
 	
 }
 
@@ -232,7 +243,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such
-	loadConfig(getSaveLocation() + "config.xml");
+	loadConfig(getSaveLocation() + CONFIG_FILE);
 	
 	lua_State* L = Lua->getState();
 	

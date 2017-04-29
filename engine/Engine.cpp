@@ -19,6 +19,11 @@
 using namespace std;
 
 #define GUID_STR_SZ	256
+#define STRINGBANK_LOCATION "res/stringbank.xml"
+#define PAK_LOCATION "res/pak"
+#define IMGUI_INI "imgui.ini"
+#define LOGGING_CONF "logging.conf"
+#define LOGFILE_NAME "logfile.log"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable)
 {
@@ -27,9 +32,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_sCompanyName = sCompanyName;
 
 	//Start logger
-	el::Configurations conf("logging.conf");
+	el::Configurations conf(LOGGING_CONF);
 	if(!conf.hasConfiguration(el::ConfigurationType::Filename))
-		conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + "logfile.log").c_str());
+		conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + LOGFILE_NAME).c_str());
 	el::Loggers::reconfigureAllLoggers(conf);
 
 	m_sIcon = sIcon;
@@ -77,9 +82,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_fTimeScale = 1.0f;
 
 	LOG(INFO) << "Creating resource loader";
-	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");
+	m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
-	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere?
+	m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
 
 	_loadicon();	//Load our window icon
 
@@ -108,7 +113,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	}*/
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
-	static const string sIniFile = getSaveLocation() + "imgui.ini";
+	static const string sIniFile = getSaveLocation() + IMGUI_INI;
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
@@ -299,17 +304,6 @@ void Engine::_render()
 
 	// Game-specific drawing
 	draw();
-
-	if(m_bControllerDisconnected)
-	{
-		//TODO Should really have the camera controlled by the engine, so we don't have to depend on state from draw() here...
-		//glLoadIdentity();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		Image* disconnectedImage = getResourceLoader()->getImage("res/util/disconnected.png");
-		if(disconnectedImage)
-			disconnectedImage->render4V(Vec2(-4.01,-1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
-	}
 
 	//Draw gamma/brightness overlay on top of everything else
 	glClear(GL_DEPTH_BUFFER_BIT);
