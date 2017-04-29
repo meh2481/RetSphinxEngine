@@ -1,5 +1,7 @@
 #pragma once
 #include "SDL.h"
+#include "Rect.h"
+#include "Action.h"
 #include <string>
 
 class SteelSeriesHaptic;
@@ -19,7 +21,6 @@ private:
 	SteelSeriesHaptic* ssHaptic;
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
-	void bindTactileEvent(std::string eventId, int rumbleLen);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
 
 public:
@@ -28,8 +29,12 @@ public:
 
 	~InputDevice();
 
-	int getAxis(int axis);
-	bool getButton(int buttonIndex);
+	Vec2 getMovement();
+	bool getDigitalAction(Action act);
+	float getAnalogAction(Action act);
+
+	int getAxis(int axis);	//DEPRECATED
+	bool getButton(int buttonIndex);	//DEPRECATED
 
 	void rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime);
 

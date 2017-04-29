@@ -143,7 +143,22 @@ InputDevice::~InputDevice()
 		delete ssHaptic;
 }
 
-int InputDevice::getAxis(int axis)
+Vec2 InputDevice::getMovement()
+{
+	return Vec2();
+}
+
+bool InputDevice::getDigitalAction(Action act)
+{
+	return false;
+}
+
+float InputDevice::getAnalogAction(Action act)
+{
+	return 0.0f;
+}
+
+int InputDevice::getAxis(int axis)	//DEPRECATED
 {
 	if(!mouseKb)
 	{
@@ -153,7 +168,7 @@ int InputDevice::getAxis(int axis)
 	return 0;	//TODO Return kb state depending on axis
 }
 
-bool InputDevice::getButton(int buttonIndex)
+bool InputDevice::getButton(int buttonIndex)	//DEPRECATED
 {
 	if(!mouseKb)
 	{
