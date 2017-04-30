@@ -9,6 +9,7 @@
 #include "SteelSeriesClient.h"
 #include "InputDevice.h"
 #include "InputManager.h"
+#include "Action.h"
 using namespace std;
 
 //Defined by SDL
@@ -74,12 +75,12 @@ public:
 		g_pGlobalEngine->m_sLoadNode = sNode;
 	}
 
-	static bool keyDown(int key)
+	static bool keyDown(int key)//DEPRECATED
 	{
 		return g_pGlobalEngine->getInputManager()->keyDown(key);
 	}
 
-	static bool joyDown(int button)
+	static bool joyDown(int button)//DEPRECATED
 	{
 		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
@@ -87,7 +88,7 @@ public:
 		return false;
 	}
 
-	static int joyAxis(int axis)
+	static int joyAxis(int axis)//DEPRECATED
 	{
 		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
@@ -172,6 +173,16 @@ public:
 	static void bindSSEvent(string filename)
 	{
 		g_pGlobalEngine->getSteelSeriesClient()->bindEvent(g_pGlobalEngine->getResourceLoader()->getTextFile(filename));
+	}
+
+	static float getAnalogAction(int action)
+	{
+		return g_pGlobalEngine->getInputManager()->getAnalogAction((Action)action);
+	}
+
+	static bool getDigitalAction(int action)
+	{
+		return g_pGlobalEngine->getInputManager()->getDigitalAction((Action)action);
 	}
 };
 
@@ -591,16 +602,19 @@ luaFunc(particles_setEmitAngle)	//void particles_setEmitAngle(ParticleSystem* p,
 //-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
+//DEPRECATED
 luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
 {
 	luaReturnBool(GameEngineLua::keyDown((int)lua_tointeger(L, 1)));
 }
 
+//DEPRECATED
 luaFunc(joy_isDown) //bool joy_isDown(int button)
 {
 	luaReturnBool(GameEngineLua::joyDown((int)lua_tointeger(L, 1)));
 }
 
+//DEPRECATED
 luaFunc(joy_getAxis) //int joy_getAxis(int axis)
 {
 	luaReturnInt(GameEngineLua::joyAxis((int)lua_tointeger(L, 1)));
@@ -658,6 +672,23 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Actions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(action_analog)	//float action_analog(int eventId)
+{
+	if(lua_isinteger(L, 1))
+		luaReturnNum(GameEngineLua::getAnalogAction((int)lua_tointeger(L, 1)));
+	luaReturnNum(0.0f);
+}
+
+luaFunc(action_digital)	//bool action_analog(int eventId)
+{
+	if(lua_isinteger(L, 1))
+		luaReturnBool(GameEngineLua::getDigitalAction((int)lua_tointeger(L, 1)));
+	luaReturnBool(false);
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
@@ -696,15 +727,17 @@ static LuaFunctions s_functab[] =
 	luaRegister(particles_setEmitPos),
 	luaRegister(particles_setEmitVel),
 	luaRegister(particles_setEmitAngle),
-	luaRegister(key_isDown),
-	luaRegister(joy_isDown),
-	luaRegister(joy_getAxis),
+	luaRegister(key_isDown),//DEPRECATED
+	luaRegister(joy_isDown),//DEPRECATED
+	luaRegister(joy_getAxis),//DEPRECATED
 	luaRegister(mouse_isDown),
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),
 	luaRegister(mouse_setCursor),
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),
+	luaRegister(action_analog),
+	luaRegister(action_digital),
 	{NULL, NULL}
 };
 
@@ -715,19 +748,26 @@ static const struct
 	int value;
 } luaConstantTable[] = {
 
-	//Joystick
+	//DEPRECATED: Joystick
 	luaConstant(JOY_AXIS_MIN),
 	luaConstant(JOY_AXIS_MAX),
 
-	//Mouse
+	//DEPRECATED: Mouse
 	luaConstant(SDL_BUTTON_LEFT),
 	luaConstant(SDL_BUTTON_RIGHT),
 	luaConstant(SDL_BUTTON_MIDDLE),
 	luaConstant(SDL_BUTTON_FORWARD),
 	luaConstant(SDL_BUTTON_BACK),
 
-	//Keyboard
+	//DEPRECATED: Keyboard
 	luaConstant(SDL_SCANCODE_SPACE),
+
+	//Actions
+	luaConstant(JUMP),
+	luaConstant(RUN),
+	luaConstant(SHIP_THRUST),
+	luaConstant(EXAMINE),
+	luaConstant(ATTACK),
 };
 
 void lua_register_all(lua_State *L)

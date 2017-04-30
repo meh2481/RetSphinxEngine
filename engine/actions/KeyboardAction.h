@@ -10,7 +10,7 @@ private:
 	KeyboardAction() {};
 
 public:
-	KeyboardAction(int keyToUse, Uint8* keystatesToUse);
+	KeyboardAction(int keyToUse);
 
 	bool getDigitalAction();
 	float getAnalogAction();

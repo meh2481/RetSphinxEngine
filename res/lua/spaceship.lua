@@ -103,16 +103,17 @@ function spaceship:update(dt)
 	--Check for thrusting input
 	local max_ship_vel = self.MAX_SHIP_SPEED
 	local ship_accel = self.SHIP_ACCEL
-	local ltAxis = joy_getAxis(JOY_AXIS_LT)
-	if ltAxis > JOY_AXIS_TRIP then
-		local diff = ltAxis - JOY_AXIS_TRIP
-		local totalDiff = JOY_AXIS_MAX - JOY_AXIS_TRIP
-		local fac = diff/totalDiff
+	local fac = action_analog(SHIP_THRUST)
+	print(fac)
+	if fac > 0 then
+		--local diff = ltAxis - JOY_AXIS_TRIP
+		--local totalDiff = JOY_AXIS_MAX - JOY_AXIS_TRIP
+		--local fac = diff/totalDiff
 		max_ship_vel = max_ship_vel * (1 + (self.MAX_THRUST - 1) * fac)
 		ship_accel = ship_accel * (1 + (self.THRUST_ACCEL - 1) * fac)
-	elseif key_isDown(SDL_SCANCODE_SPACE) then --TODO Determine keyconfig for C/Lua interaction instead of just SDL_SCANCODE_SPACE here
-		max_ship_vel = max_ship_vel * self.MAX_THRUST	--Thrusting increases maximum speed
-		ship_accel = ship_accel * self.THRUST_ACCEL
+	--elseif key_isDown(SDL_SCANCODE_SPACE) then --TODO Determine keyconfig for C/Lua interaction instead of just SDL_SCANCODE_SPACE here
+	--	max_ship_vel = max_ship_vel * self.MAX_THRUST	--Thrusting increases maximum speed
+	--	ship_accel = ship_accel * self.THRUST_ACCEL
 	end
 	
 	--Keep track of if there is current ship-move input with this vector

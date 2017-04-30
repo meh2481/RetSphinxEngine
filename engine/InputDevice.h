@@ -22,6 +22,8 @@ private:
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
+	void bindMouseKbActions();
+	void bindControllerActions();
 
 public:
 	InputDevice(SteelSeriesClient* ssc);	//Init from mouse and kb

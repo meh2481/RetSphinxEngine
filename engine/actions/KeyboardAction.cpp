@@ -1,9 +1,10 @@
 #include "KeyboardAction.h"
+#include "SDL_keyboard.h"
 
-KeyboardAction::KeyboardAction(int keyToUse, Uint8* keystatesToUse)
+KeyboardAction::KeyboardAction(int keyToUse)
 {
 	key = keyToUse;
-	keystates = keystatesToUse;
+	keystates = SDL_GetKeyboardState(NULL);
 }
 
 bool KeyboardAction::getDigitalAction()

@@ -85,12 +85,12 @@ bool InputManager::keyDown(int32_t keyCode)
 
 bool InputManager::getDigitalAction(Action a)
 {
-	return false;
+	return m_controllers[m_curActiveController]->getDigitalAction(a);
 }
 
 float InputManager::getAnalogAction(Action a)
 {
-	return 0.0f;
+	return m_controllers[m_curActiveController]->getAnalogAction(a);
 }
 
 Vec2 InputManager::getMovement1()

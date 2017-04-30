@@ -2,7 +2,7 @@
 #include "ActionBind.h"
 
 //Class for unbound actions
-class NoAction : ActionBind
+class NoAction : public ActionBind
 {
 public:
 	bool getDigitalAction() { return false; }

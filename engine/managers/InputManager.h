@@ -37,8 +37,8 @@ public:
 	bool keyDown(int32_t keyCode);  //Test and see if a key is currently pressed (for raw keyboard input)
 
 	//Action (input) handling
-	bool getDigitalAction(Action a);	//Get a true/false for this action
-	float getAnalogAction(Action a);	//Get a normalized 0..1 for this action (emulated if digital input)
+	bool getDigitalAction(Action a);	//Get a true/false for this action for the current input device
+	float getAnalogAction(Action a);	//Get a normalized 0..1 for this action (emulated if digital input) for the current input device
 	Vec2 getMovement1();				//Get the vector for movement input 1
 	Vec2 getMovement2();				//Get the vector for movement input 2
 };

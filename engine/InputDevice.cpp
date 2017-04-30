@@ -3,7 +3,13 @@
 #include "SteelSeriesClient.h"
 #include "SteelSeriesHaptic.h"
 #include "StringUtils.h"
+#include "NoAction.h"
+#include "KeyboardAction.h"
+#include "JoyButtonAction.h"
+#include "AxisAction.h"
+#include "MouseButtonAction.h"
 
+#define JOY_AXIS_TRIP 20000
 #define GUID_STR_SZ	256
 #define MOUSE_JOYSTICK_NAME "Mouse"
 #define MOUSE_CONTROLLER_NAME "Keyboard"
@@ -34,53 +40,56 @@ InputDevice::InputDevice(SteelSeriesClient* ssc)
 	}
 	else
 		ssHaptic = NULL;
+
+	bindMouseKbActions();
 }
 
 InputDevice::InputDevice(int deviceIndex)
 {
 	ssHaptic = NULL;
 	m_haptic = NULL;
-	m_controller = NULL;
 	rumbleLRSupported = false;
 	curEffect = -1;
 
-	SDL_GameController* newController = SDL_GameControllerOpen(deviceIndex);
-	if(newController)
+	m_controller = SDL_GameControllerOpen(deviceIndex);
+	if(m_controller)
 	{
-		SDL_Joystick* joy = SDL_GameControllerGetJoystick(newController);
+		SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
 		if(!joy)
 		{
 			LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
-			return;
-		}
-
-		//NOT THE SAME THING AS THE INDEX PASSED INTO THIS FUNCTION! Thanks, SDL, for adding more stupidity to the world of software engineering.
-		m_deviceIndex = SDL_JoystickInstanceID(joy);
-
-		char guid[GUID_STR_SZ];
-		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
-
-		joystickName = SDL_JoystickName(joy);
-		controllerName = SDL_GameControllerName(newController);
-
-		LOG(INFO) << "Opened controller " << controllerName;
-		LOG(INFO) << "Controller joystick has GUID " << guid;
-
-		SDL_Haptic* newRumble = NULL;
-		if(SDL_JoystickIsHaptic(joy))
-			newRumble = SDL_HapticOpenFromJoystick(joy);
-		if(newRumble)
-		{
-			LOG(INFO) << "Initialized controller " << (int)deviceIndex << "\'s haptic.";
-			m_haptic = initHapticDevice(newRumble);
 		}
 		else
-			LOG(INFO) << "Controller " << (int)deviceIndex << " has no rumble support.";
+		{
 
-		m_controller = newController;
+			//NOT THE SAME THING AS THE INDEX PASSED INTO THIS FUNCTION! Thanks, SDL, for adding more stupidity to the world of software engineering.
+			m_deviceIndex = SDL_JoystickInstanceID(joy);
+
+			char guid[GUID_STR_SZ];
+			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
+
+			joystickName = SDL_JoystickName(joy);
+			controllerName = SDL_GameControllerName(m_controller);
+
+			LOG(INFO) << "Opened controller " << controllerName;
+			LOG(INFO) << "Controller joystick has GUID " << guid;
+
+			SDL_Haptic* newRumble = NULL;
+			if(SDL_JoystickIsHaptic(joy))
+				newRumble = SDL_HapticOpenFromJoystick(joy);
+			if(newRumble)
+			{
+				LOG(INFO) << "Initialized controller " << (int)deviceIndex << "\'s haptic.";
+				m_haptic = initHapticDevice(newRumble);
+			}
+			else
+				LOG(INFO) << "Controller " << (int)deviceIndex << " has no rumble support.";
+		}
 	}
 	else
 		LOG(WARNING) << "Couldn't open controller " << (int)deviceIndex;
+
+	bindControllerActions();
 }
 
 
@@ -127,6 +136,33 @@ SDL_Haptic* InputDevice::initHapticDevice(SDL_Haptic* newRumble)
 			newRumble = NULL;	//Cannot rumble with this device
 	}
 	return newRumble;
+}
+
+void InputDevice::bindMouseKbActions()
+{
+	//TODO: Example; can be expanded upon
+	actions[JUMP] = new NoAction();
+	actions[RUN] = new NoAction();
+	actions[SHIP_THRUST] = new KeyboardAction(SDL_SCANCODE_SPACE);
+	actions[EXAMINE] = new KeyboardAction(SDL_SCANCODE_W);
+	actions[ATTACK] = new MouseButtonAction(SDL_BUTTON_LEFT);
+}
+
+void InputDevice::bindControllerActions()
+{
+	if(!m_controller)
+	{
+		for(int i = 0; i < NUM_ACTIONS; i++)
+			actions[i] = new NoAction();
+		return;
+	}
+
+	//TODO: Example; can be expanded upon
+	actions[JUMP] = new NoAction();
+	actions[RUN] = new NoAction();
+	actions[SHIP_THRUST] = new AxisAction(m_controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT, JOY_AXIS_TRIP/10);
+	actions[EXAMINE] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
+	actions[ATTACK] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
 }
 
 InputDevice::~InputDevice()
@@ -232,4 +268,14 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
 bool InputDevice::hasHaptic()
 {
 	return m_haptic != NULL || (ssHaptic != NULL && ssHaptic->isValid());
+}
+
+bool InputDevice::getDigitalAction(Action a)
+{
+	return actions[a]->getDigitalAction();
+}
+
+float InputDevice::getAnalogAction(Action a)
+{
+	return actions[a]->getAnalogAction();
 }
