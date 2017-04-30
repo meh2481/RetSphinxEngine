@@ -674,17 +674,27 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 //-----------------------------------------------------------------------------------------------------------
 // Actions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(action_analog)	//float action_analog(int eventId)
+luaFunc(action_analog)	//float action_analog(int eventId)	//return in range 0..1
 {
 	if(lua_isinteger(L, 1))
-		luaReturnNum(GameEngineLua::getAnalogAction((int)lua_tointeger(L, 1)));
+	{
+		int action = (int)lua_tointeger(L, 1);
+		if(action >= NUM_ACTIONS)
+			luaReturnNum(0.0f);
+		luaReturnNum(GameEngineLua::getAnalogAction(action));
+	}
 	luaReturnNum(0.0f);
 }
 
-luaFunc(action_digital)	//bool action_analog(int eventId)
+luaFunc(action_digital)	//bool action_digital(int eventId)
 {
 	if(lua_isinteger(L, 1))
-		luaReturnBool(GameEngineLua::getDigitalAction((int)lua_tointeger(L, 1)));
+	{
+		int action = (int)lua_tointeger(L, 1);
+		if(action >= NUM_ACTIONS)
+			luaReturnBool(false);
+		luaReturnBool(GameEngineLua::getDigitalAction(action));
+	}
 	luaReturnBool(false);
 }
 

@@ -104,7 +104,6 @@ function spaceship:update(dt)
 	local max_ship_vel = self.MAX_SHIP_SPEED
 	local ship_accel = self.SHIP_ACCEL
 	local fac = action_analog(SHIP_THRUST)
-	print(fac)
 	if fac > 0 then
 		--local diff = ltAxis - JOY_AXIS_TRIP
 		--local totalDiff = JOY_AXIS_MAX - JOY_AXIS_TRIP
