@@ -2,6 +2,7 @@
 #include <vector>
 #include "SDL_scancode.h"
 #include "Action.h"
+#include "Movement.h"
 #include "Rect.h"
 
 //SDL codes that should be defined but aren't
@@ -39,6 +40,5 @@ public:
 	//Action (input) handling
 	bool getDigitalAction(Action a);	//Get a true/false for this action for the current input device
 	float getAnalogAction(Action a);	//Get a normalized 0..1 for this action (emulated if digital input) for the current input device
-	Vec2 getMovement1();				//Get the vector for movement input 1
-	Vec2 getMovement2();				//Get the vector for movement input 2
+	Vec2 getMovement(Movement m);		//Get the vector for movement
 };

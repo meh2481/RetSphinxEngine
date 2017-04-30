@@ -8,6 +8,11 @@
 #include "JoyButtonAction.h"
 #include "AxisAction.h"
 #include "MouseButtonAction.h"
+#include "MovementBind.h"
+#include "DpadMovement.h"
+#include "JoystickMovement.h"
+#include "KeyboardMovement.h"
+#include "NoMovement.h"
 
 #define JOY_AXIS_TRIP 20000
 #define GUID_STR_SZ	256
@@ -146,6 +151,10 @@ void InputDevice::bindMouseKbActions()
 	actions[SHIP_THRUST] = new KeyboardAction(SDL_SCANCODE_SPACE);
 	actions[EXAMINE] = new KeyboardAction(SDL_SCANCODE_W);
 	actions[ATTACK] = new MouseButtonAction(SDL_BUTTON_LEFT);
+
+	movements[MOVE] = new KeyboardMovement(SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S);
+	movements[AIM] = new KeyboardMovement(SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN);
+	movements[PAN] = new NoMovement();
 }
 
 void InputDevice::bindControllerActions()
@@ -163,12 +172,18 @@ void InputDevice::bindControllerActions()
 	actions[SHIP_THRUST] = new AxisAction(m_controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT, JOY_AXIS_TRIP/10);
 	actions[EXAMINE] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
 	actions[ATTACK] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
+
+	movements[MOVE] = new JoystickMovement(m_controller, SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, JOY_AXIS_TRIP);
+	movements[AIM] = new JoystickMovement(m_controller, SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY, JOY_AXIS_TRIP);
+	movements[PAN] = new DpadMovement(m_controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
 }
 
 InputDevice::~InputDevice()
 {
 	for(int i = 0; i < NUM_ACTIONS; i++)
 		delete actions[i];
+	for(int i = 0; i < NUM_MOVEMENTS; i++)
+		delete movements[i];
 	if(!rumbleLRSupported && m_haptic != NULL)
 		SDL_HapticRumbleStop(m_haptic);
 	else if(m_haptic != NULL)
@@ -179,14 +194,14 @@ InputDevice::~InputDevice()
 		delete ssHaptic;
 }
 
-int InputDevice::getAxis(int axis)
+int InputDevice::getAxis(int axis)//DEPRECATED
 {
 	if(m_controller == NULL)
 		return 0;
 	return SDL_GameControllerGetAxis(m_controller, (SDL_GameControllerAxis)axis);
 }
 
-bool InputDevice::getButton(int buttonIndex)
+bool InputDevice::getButton(int buttonIndex)//DEPRECATED
 {
 	if(m_controller == NULL) 
 		return false;
@@ -278,4 +293,9 @@ bool InputDevice::getDigitalAction(Action a)
 float InputDevice::getAnalogAction(Action a)
 {
 	return actions[a]->getAnalogAction();
+}
+
+Vec2 InputDevice::getMovement(Movement m)
+{
+	return movements[m]->getMovement();
 }

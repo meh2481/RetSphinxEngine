@@ -22,5 +22,5 @@ float AxisAction::getAnalogAction()
 	int val = SDL_GameControllerGetAxis(controller, (SDL_GameControllerAxis)axis);
 	if(abs(val) < joyAxisTrip)
 		return 0.0f;
-	return std::min(val / JOY_AXIS_MAX, 1.0f);
+	return std::max(std::min(val / JOY_AXIS_MAX, 1.0f), -1.0f);
 }

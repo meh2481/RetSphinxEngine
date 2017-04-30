@@ -1,11 +1,14 @@
 #pragma once
 #include "SDL.h"
 #include "Action.h"
+#include "Movement.h"
+#include "Rect.h"
 #include <string>
 
 class SteelSeriesHaptic;
 class SteelSeriesClient;
 class ActionBind;
+class MovementBind;
 
 class InputDevice
 {
@@ -19,6 +22,7 @@ private:
 	std::string controllerName;
 	SteelSeriesHaptic* ssHaptic;
 	ActionBind* actions[NUM_ACTIONS];
+	MovementBind* movements[NUM_MOVEMENTS];
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
@@ -30,8 +34,8 @@ public:
 	InputDevice(int deviceIndex);	//Init from controller
 	~InputDevice();
 
-	int getAxis(int axis);
-	bool getButton(int buttonIndex);
+	int getAxis(int axis);//DEPRECATED
+	bool getButton(int buttonIndex);//DEPRECATED
 
 	void rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime);
 
@@ -43,4 +47,5 @@ public:
 	//Action (input) handling
 	bool getDigitalAction(Action a);	//Get a true/false for this action
 	float getAnalogAction(Action a);	//Get a normalized 0..1 for this action (emulated if digital input)
+	Vec2 getMovement(Movement m);		//Get the vector for movement
 };

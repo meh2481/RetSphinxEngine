@@ -93,12 +93,7 @@ float InputManager::getAnalogAction(Action a)
 	return m_controllers[m_curActiveController]->getAnalogAction(a);
 }
 
-Vec2 InputManager::getMovement1()
+Vec2 InputManager::getMovement(Movement m)
 {
-	return Vec2();
-}
-
-Vec2 InputManager::getMovement2()
-{
-	return Vec2();
+	return m_controllers[m_curActiveController]->getMovement(m);
 }

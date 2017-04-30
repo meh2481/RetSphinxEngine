@@ -51,7 +51,6 @@ bool GameEngine::loadConfig(string sFilename)
 		bool bPausesOnFocus = pausesOnFocusLost();
 		int iVsync = getVsync();
 		int iMSAA = getMSAA();
-//		bool bTexAntialias = getImgBlur();
 		float fGamma = getGamma();
 		
 		window->QueryUnsignedAttribute("width", &width);

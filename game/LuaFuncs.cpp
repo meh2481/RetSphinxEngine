@@ -10,6 +10,7 @@
 #include "InputDevice.h"
 #include "InputManager.h"
 #include "Action.h"
+#include "Movement.h"
 using namespace std;
 
 //Defined by SDL
@@ -183,6 +184,11 @@ public:
 	static bool getDigitalAction(int action)
 	{
 		return g_pGlobalEngine->getInputManager()->getDigitalAction((Action)action);
+	}
+
+	static Vec2 getMovement(int movement)
+	{
+		return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
 	}
 };
 
@@ -674,7 +680,7 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 //-----------------------------------------------------------------------------------------------------------
 // Actions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(action_analog)	//float action_analog(int eventId)	//return in range 0..1
+luaFunc(action_analog)	//float action_analog(int actionId)	//return in range 0..1
 {
 	if(lua_isinteger(L, 1))
 	{
@@ -686,7 +692,7 @@ luaFunc(action_analog)	//float action_analog(int eventId)	//return in range 0..1
 	luaReturnNum(0.0f);
 }
 
-luaFunc(action_digital)	//bool action_digital(int eventId)
+luaFunc(action_digital)	//bool action_digital(int actionId)
 {
 	if(lua_isinteger(L, 1))
 	{
@@ -696,6 +702,19 @@ luaFunc(action_digital)	//bool action_digital(int eventId)
 		luaReturnBool(GameEngineLua::getDigitalAction(action));
 	}
 	luaReturnBool(false);
+}
+
+luaFunc(movement_vec)	//x,y movement_vec(int movementId)
+{
+	if(lua_isinteger(L, 1))
+	{
+		int movement = (int)lua_tointeger(L, 1);
+		if(movement >= NUM_MOVEMENTS)
+			luaReturnVec2(0.0f, 0.0f);
+		Vec2 v = GameEngineLua::getMovement(movement);
+		luaReturnVec2(v.x, v.y);
+	}
+	luaReturnVec2(0.0f, 0.0f);
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -748,6 +767,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(ss_sendEvent),
 	luaRegister(action_analog),
 	luaRegister(action_digital),
+	luaRegister(movement_vec),
 	{NULL, NULL}
 };
 
@@ -778,6 +798,10 @@ static const struct
 	luaConstant(SHIP_THRUST),
 	luaConstant(EXAMINE),
 	luaConstant(ATTACK),
+
+	luaConstant(MOVE),
+	luaConstant(AIM),
+	luaConstant(PAN),
 };
 
 void lua_register_all(lua_State *L)

@@ -96,6 +96,15 @@ actions/KeyboardAction.h
 actions/KeyboardAction.cpp
 actions/MouseButtonAction.h
 actions/MouseButtonAction.cpp
+actions/Movement.h
+actions/MovementBind.h
+actions/NoMovement.h
+actions/JoystickMovement.h
+actions/JoystickMovement.cpp
+actions/KeyboardMovement.h
+actions/KeyboardMovement.cpp
+actions/DpadMovement.h
+actions/DpadMovement.cpp
 )
 
 include_directories (.)
