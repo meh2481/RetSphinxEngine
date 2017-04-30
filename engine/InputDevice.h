@@ -34,9 +34,6 @@ public:
 	InputDevice(int deviceIndex);	//Init from controller
 	~InputDevice();
 
-	int getAxis(int axis);//DEPRECATED
-	bool getButton(int buttonIndex);//DEPRECATED
-
 	void rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime);
 
 	bool hasHaptic();

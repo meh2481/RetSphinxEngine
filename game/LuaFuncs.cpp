@@ -76,27 +76,6 @@ public:
 		g_pGlobalEngine->m_sLoadNode = sNode;
 	}
 
-	static bool keyDown(int key)//DEPRECATED
-	{
-		return g_pGlobalEngine->getInputManager()->keyDown(key);
-	}
-
-	static bool joyDown(int button)//DEPRECATED
-	{
-		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
-		if(controller != NULL)
-			return controller->getButton(button);
-		return false;
-	}
-
-	static int joyAxis(int axis)//DEPRECATED
-	{
-		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
-		if(controller != NULL)
-			return controller->getAxis(axis);
-		return 0;
-	}
-
 	static Vec2 getMousePos()
 	{
 		return g_pGlobalEngine->getCursorPos();
@@ -608,24 +587,6 @@ luaFunc(particles_setEmitAngle)	//void particles_setEmitAngle(ParticleSystem* p,
 //-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
-//DEPRECATED
-luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
-{
-	luaReturnBool(GameEngineLua::keyDown((int)lua_tointeger(L, 1)));
-}
-
-//DEPRECATED
-luaFunc(joy_isDown) //bool joy_isDown(int button)
-{
-	luaReturnBool(GameEngineLua::joyDown((int)lua_tointeger(L, 1)));
-}
-
-//DEPRECATED
-luaFunc(joy_getAxis) //int joy_getAxis(int axis)
-{
-	luaReturnInt(GameEngineLua::joyAxis((int)lua_tointeger(L, 1)));
-}
-
 luaFunc(mouse_getPos) //int x, int y mouse_getPos()
 {
 	Vec2 p = GameEngineLua::getMousePos();
@@ -756,9 +717,6 @@ static LuaFunctions s_functab[] =
 	luaRegister(particles_setEmitPos),
 	luaRegister(particles_setEmitVel),
 	luaRegister(particles_setEmitAngle),
-	luaRegister(key_isDown),//DEPRECATED
-	luaRegister(joy_isDown),//DEPRECATED
-	luaRegister(joy_getAxis),//DEPRECATED
 	luaRegister(mouse_isDown),
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),

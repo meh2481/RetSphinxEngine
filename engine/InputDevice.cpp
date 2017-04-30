@@ -194,20 +194,6 @@ InputDevice::~InputDevice()
 		delete ssHaptic;
 }
 
-int InputDevice::getAxis(int axis)//DEPRECATED
-{
-	if(m_controller == NULL)
-		return 0;
-	return SDL_GameControllerGetAxis(m_controller, (SDL_GameControllerAxis)axis);
-}
-
-bool InputDevice::getButton(int buttonIndex)//DEPRECATED
-{
-	if(m_controller == NULL) 
-		return false;
-	return(SDL_GameControllerGetButton(m_controller, (SDL_GameControllerButton)buttonIndex) > 0);
-}
-
 void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float curTime)
 {
 	static float fLastRumble = 0.0f;
