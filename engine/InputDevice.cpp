@@ -23,7 +23,7 @@ InputDevice::InputDevice(SteelSeriesClient* ssc)
 {
 	rumbleLRSupported = false;
 	m_controller = NULL;
-	m_deviceIndex = 0;
+	m_deviceIndex = KB_MOUSE_DEVICE_INDEX;
 	curEffect = -1;
 	joystickName = MOUSE_JOYSTICK_NAME;
 	controllerName = MOUSE_CONTROLLER_NAME;

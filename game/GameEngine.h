@@ -36,19 +36,8 @@ class GameEngine : public Engine
 	friend class GameEngineLua;
 	friend class LevelEditor;
 private:
-	//Keybinding stuff
-	//TODO Actions in appropriate classes, not keybinds
+	//TODO Trip thresh in input handler & stuff
 	int32_t JOY_AXIS_TRIP;
-	SDL_Scancode KEY_UP1;
-	SDL_Scancode KEY_UP2;
-	SDL_Scancode KEY_DOWN1;
-	SDL_Scancode KEY_DOWN2;
-	SDL_Scancode KEY_LEFT1;
-	SDL_Scancode KEY_LEFT2;
-	SDL_Scancode KEY_RIGHT1;
-	SDL_Scancode KEY_RIGHT2;
-	SDL_Scancode KEY_ENTER1;
-	SDL_Scancode KEY_ENTER2;
 
 	//Important general-purpose game variables!
 	Vec3 cameraPos;

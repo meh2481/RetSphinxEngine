@@ -10,6 +10,8 @@ class SteelSeriesClient;
 class ActionBind;
 class MovementBind;
 
+#define KB_MOUSE_DEVICE_INDEX -1
+
 class InputDevice
 {
 private:
@@ -17,7 +19,7 @@ private:
 	SDL_GameController* m_controller;
 	bool rumbleLRSupported;
 	int m_deviceIndex;
-	int curEffect;
+	int curEffect;	//Current effect index for haptic
 	std::string joystickName;
 	std::string controllerName;
 	SteelSeriesHaptic* ssHaptic;

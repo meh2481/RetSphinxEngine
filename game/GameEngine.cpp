@@ -48,16 +48,6 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string 
 	
 	//Keybinding stuff!
 	JOY_AXIS_TRIP = 20000;
-	KEY_UP1 = SDL_SCANCODE_W;
-	KEY_UP2 = SDL_SCANCODE_UP;
-	KEY_DOWN1 = SDL_SCANCODE_S;
-	KEY_DOWN2 = SDL_SCANCODE_DOWN;
-	KEY_LEFT1 = SDL_SCANCODE_A;
-	KEY_LEFT2 = SDL_SCANCODE_LEFT;
-	KEY_RIGHT1 = SDL_SCANCODE_D;
-	KEY_RIGHT2 = SDL_SCANCODE_RIGHT;
-	KEY_ENTER1 = SDL_SCANCODE_SPACE;
-	KEY_ENTER2 = SDL_SCANCODE_RETURN;
 
 	g_fParticleFac = 1.0f;
 
@@ -246,64 +236,6 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	loadConfig(getSaveLocation() + CONFIG_FILE);
 	
 	lua_State* L = Lua->getState();
-	
-	//Have to do this manually because non-constants?
-	//TODO: Use actions, not inputs
-	unsigned int JOY_BUTTON_BACK = SDL_CONTROLLER_BUTTON_BACK;
-	unsigned int JOY_BUTTON_START = SDL_CONTROLLER_BUTTON_START;
-	unsigned int JOY_BUTTON_X = SDL_CONTROLLER_BUTTON_X;
-	unsigned int JOY_BUTTON_Y = SDL_CONTROLLER_BUTTON_Y;
-	unsigned int JOY_BUTTON_A = SDL_CONTROLLER_BUTTON_A;
-	unsigned int JOY_BUTTON_B = SDL_CONTROLLER_BUTTON_B;
-	unsigned int JOY_BUTTON_LB = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
-	unsigned int JOY_BUTTON_RB = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
-	unsigned int JOY_BUTTON_LSTICK = SDL_CONTROLLER_BUTTON_LEFTSTICK;
-	unsigned int JOY_BUTTON_RSTICK = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
-	unsigned int JOY_AXIS_HORIZ = SDL_CONTROLLER_AXIS_LEFTX;
-	unsigned int JOY_AXIS_VERT = SDL_CONTROLLER_AXIS_LEFTY;
-	unsigned int JOY_AXIS2_HORIZ = SDL_CONTROLLER_AXIS_RIGHTX;
-	unsigned int JOY_AXIS2_VERT = SDL_CONTROLLER_AXIS_RIGHTY;
-	unsigned int JOY_AXIS_LT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
-	unsigned int JOY_AXIS_RT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
-	unsigned int JOY_DPAD_UP = SDL_CONTROLLER_BUTTON_DPAD_UP;
-	unsigned int JOY_DPAD_DOWN = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-	unsigned int JOY_DPAD_LEFT = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
-	unsigned int JOY_DPAD_RIGHT = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
-
-	//Set joystick config
-	luaSetGlobal(JOY_BUTTON_BACK);
-	luaSetGlobal(JOY_BUTTON_START);
-	luaSetGlobal(JOY_BUTTON_X);
-	luaSetGlobal(JOY_BUTTON_Y);
-	luaSetGlobal(JOY_BUTTON_A);
-	luaSetGlobal(JOY_BUTTON_B);
-	luaSetGlobal(JOY_BUTTON_LB);
-	luaSetGlobal(JOY_BUTTON_RB);
-	luaSetGlobal(JOY_BUTTON_LSTICK);
-	luaSetGlobal(JOY_BUTTON_RSTICK);
-	luaSetGlobal(JOY_AXIS_HORIZ);
-	luaSetGlobal(JOY_AXIS_VERT);
-	luaSetGlobal(JOY_AXIS2_HORIZ);
-	luaSetGlobal(JOY_AXIS2_VERT);
-	luaSetGlobal(JOY_AXIS_LT);
-	luaSetGlobal(JOY_AXIS_RT);
-	luaSetGlobal(JOY_AXIS_TRIP);
-	luaSetGlobal(JOY_DPAD_UP);
-	luaSetGlobal(JOY_DPAD_DOWN);
-	luaSetGlobal(JOY_DPAD_LEFT);
-	luaSetGlobal(JOY_DPAD_RIGHT);
-
-	//Set key config
-	luaSetGlobal(KEY_UP1);
-	luaSetGlobal(KEY_UP2);
-	luaSetGlobal(KEY_DOWN1);
-	luaSetGlobal(KEY_DOWN2);
-	luaSetGlobal(KEY_LEFT1);
-	luaSetGlobal(KEY_LEFT2);
-	luaSetGlobal(KEY_RIGHT1);
-	luaSetGlobal(KEY_RIGHT2);
-	luaSetGlobal(KEY_ENTER1);
-	luaSetGlobal(KEY_ENTER2);
 	
 	Lua->call("loadLua");
 

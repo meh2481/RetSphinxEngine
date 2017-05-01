@@ -736,20 +736,6 @@ static const struct
 	int value;
 } luaConstantTable[] = {
 
-	//DEPRECATED: Joystick
-	luaConstant(JOY_AXIS_MIN),
-	luaConstant(JOY_AXIS_MAX),
-
-	//DEPRECATED: Mouse
-	luaConstant(SDL_BUTTON_LEFT),
-	luaConstant(SDL_BUTTON_RIGHT),
-	luaConstant(SDL_BUTTON_MIDDLE),
-	luaConstant(SDL_BUTTON_FORWARD),
-	luaConstant(SDL_BUTTON_BACK),
-
-	//DEPRECATED: Keyboard
-	luaConstant(SDL_SCANCODE_SPACE),
-
 	//Actions
 	luaConstant(JUMP),
 	luaConstant(RUN),
@@ -757,6 +743,7 @@ static const struct
 	luaConstant(EXAMINE),
 	luaConstant(ATTACK),
 
+	//Movement actions
 	luaConstant(MOVE),
 	luaConstant(AIM),
 	luaConstant(PAN),
