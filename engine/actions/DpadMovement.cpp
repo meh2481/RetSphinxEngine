@@ -1,25 +1,25 @@
 #include "DpadMovement.h"
+#include "InputDevice.h"
 
-DpadMovement::DpadMovement(SDL_GameController * c, int l, int r, int u, int d)
+DpadMovement::DpadMovement(int l, int r, int u, int d)
 {
 	up = u;
 	down = d;
 	left = l;
 	right = r;
-	controller = c;
 }
 
-Vec2 DpadMovement::getMovement()
+Vec2 DpadMovement::getMovement(InputDevice* d)
 {
 	Vec2 v(0.0f, 0.0f);
 
-	if(SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)up) > 0)
+	if(d->getButton(up))
 		v.y = v.y + 1.0f;
-	if(SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)down) > 0)
+	if(d->getButton(down))
 		v.y = v.y - 1.0f;
-	if(SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)right) > 0)
+	if(d->getButton(right))
 		v.x = v.x + 1.0f;
-	if(SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)left) > 0)
+	if(d->getButton(left))
 		v.x = v.x - 1.0f;
 
 	//TODO Normalize

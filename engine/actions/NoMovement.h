@@ -5,5 +5,5 @@
 class NoMovement : public MovementBind
 {
 public:
-	Vec2 getMovement() { return Vec2(); }
+	Vec2 getMovement(InputDevice* d) { return Vec2(); }
 };

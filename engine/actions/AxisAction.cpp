@@ -5,21 +5,20 @@
 //Defined by SDL
 #define JOY_AXIS_MAX	32767.0f	//Technically 32768 on the negative axis but who's counting
 
-AxisAction::AxisAction(SDL_GameController* c, int axisToUse, int trip)
+AxisAction::AxisAction(int axisToUse, int trip)
 {
 	joyAxisTrip = trip;
 	axis = axisToUse;
-	controller = c;
 }
 
-bool AxisAction::getDigitalAction()
+bool AxisAction::getDigitalAction(InputDevice* d)
 {
-	return (abs(SDL_GameControllerGetAxis(controller, (SDL_GameControllerAxis)axis)) > joyAxisTrip);
+	return (abs(d->getAxis(axis)) > joyAxisTrip);
 }
 
-float AxisAction::getAnalogAction()
+float AxisAction::getAnalogAction(InputDevice* d)
 {
-	int val = SDL_GameControllerGetAxis(controller, (SDL_GameControllerAxis)axis);
+	int val = d->getAxis(axis);
 	if(abs(val) < joyAxisTrip)
 		return 0.0f;
 	return std::max(std::min(val / JOY_AXIS_MAX, 1.0f), -1.0f);

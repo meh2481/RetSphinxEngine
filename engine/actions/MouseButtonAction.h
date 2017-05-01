@@ -10,6 +10,6 @@ private:
 public:
 	MouseButtonAction(int button);
 
-	bool getDigitalAction();
-	float getAnalogAction();
+	bool getDigitalAction(InputDevice* d);
+	float getAnalogAction(InputDevice* d);
 };

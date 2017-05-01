@@ -7,12 +7,11 @@ class JoystickMovement : public MovementBind
 private:
 	int xAxis, yAxis;
 	int joyAxisTrip;
-	SDL_GameController* controller;
 
 	JoystickMovement() {};
 
 public:
-	JoystickMovement(SDL_GameController* controller, int xAxis, int yAxis, int trip);
+	JoystickMovement(int xAxis, int yAxis, int trip);
 
-	Vec2 getMovement();
+	Vec2 getMovement(InputDevice* d);
 };

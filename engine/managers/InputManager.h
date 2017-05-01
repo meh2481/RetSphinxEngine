@@ -15,13 +15,21 @@
 
 //Class predeclarations
 class InputDevice;
+class ActionBind;
+class MovementBind;
 
 class InputManager
 {
 private:
+	//TODO Better mouse/kb handling than separate arrays here
+	ActionBind* actions[2][NUM_ACTIONS];
+	MovementBind* movements[2][NUM_MOVEMENTS];
 	std::vector<InputDevice*> m_controllers;
 	int m_curActiveController;
 	const Uint8 *m_iKeystates;	//Keep track of keys that are pressed/released so we can poll as needed
+
+	void bindMouseKbActions();
+	void bindControllerActions();
 
 public:
 	InputManager();

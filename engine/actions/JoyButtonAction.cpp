@@ -1,20 +1,19 @@
 #include "JoyButtonAction.h"
 #include "InputDevice.h"
 
-JoyButtonAction::JoyButtonAction(SDL_GameController* c, int buttonIndex)
+JoyButtonAction::JoyButtonAction(int buttonIndex)
 {
-	controller = c;
 	button = buttonIndex;
 }
 
-bool JoyButtonAction::getDigitalAction()
+bool JoyButtonAction::getDigitalAction(InputDevice* d)
 {
-	return(SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)button) > 0);
+	return d->getButton(button);
 }
 
-float JoyButtonAction::getAnalogAction()
+float JoyButtonAction::getAnalogAction(InputDevice* d)
 {
-	if(getDigitalAction())
+	if(getDigitalAction(d))
 		return 1.0f;
 	return 0.0f;
 }

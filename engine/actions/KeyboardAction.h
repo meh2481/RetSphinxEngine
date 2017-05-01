@@ -12,6 +12,6 @@ private:
 public:
 	KeyboardAction(int keyToUse);
 
-	bool getDigitalAction();
-	float getAnalogAction();
+	bool getDigitalAction(InputDevice* d);
+	float getAnalogAction(InputDevice* d);
 };

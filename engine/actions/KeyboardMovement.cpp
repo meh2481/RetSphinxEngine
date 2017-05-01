@@ -10,7 +10,7 @@ KeyboardMovement::KeyboardMovement(int l, int r, int u, int d)
 	keystates = SDL_GetKeyboardState(NULL);
 }
 
-Vec2 KeyboardMovement::getMovement()
+Vec2 KeyboardMovement::getMovement(InputDevice* d)
 {
 	Vec2 v(0.0f, 0.0f);
 

@@ -5,6 +5,6 @@
 class NoAction : public ActionBind
 {
 public:
-	bool getDigitalAction() { return false; }
-	float getAnalogAction() { return 0.0f; }
+	bool getDigitalAction(InputDevice* d) { return false; }
+	float getAnalogAction(InputDevice* d) { return 0.0f; }
 };

@@ -3,18 +3,7 @@
 #include "SteelSeriesClient.h"
 #include "SteelSeriesHaptic.h"
 #include "StringUtils.h"
-#include "NoAction.h"
-#include "KeyboardAction.h"
-#include "JoyButtonAction.h"
-#include "AxisAction.h"
-#include "MouseButtonAction.h"
-#include "MovementBind.h"
-#include "DpadMovement.h"
-#include "JoystickMovement.h"
-#include "KeyboardMovement.h"
-#include "NoMovement.h"
 
-#define JOY_AXIS_TRIP 20000
 #define GUID_STR_SZ	256
 #define MOUSE_JOYSTICK_NAME "Mouse"
 #define MOUSE_CONTROLLER_NAME "Keyboard"
@@ -45,8 +34,6 @@ InputDevice::InputDevice(SteelSeriesClient* ssc)
 	}
 	else
 		ssHaptic = NULL;
-
-	bindMouseKbActions();
 }
 
 InputDevice::InputDevice(int deviceIndex)
@@ -93,8 +80,6 @@ InputDevice::InputDevice(int deviceIndex)
 	}
 	else
 		LOG(WARNING) << "Couldn't open controller " << (int)deviceIndex;
-
-	bindControllerActions();
 }
 
 
@@ -143,47 +128,8 @@ SDL_Haptic* InputDevice::initHapticDevice(SDL_Haptic* newRumble)
 	return newRumble;
 }
 
-void InputDevice::bindMouseKbActions()
-{
-	//TODO: Example; can be expanded upon
-	actions[JUMP] = new NoAction();
-	actions[RUN] = new NoAction();
-	actions[SHIP_THRUST] = new KeyboardAction(SDL_SCANCODE_SPACE);
-	actions[EXAMINE] = new KeyboardAction(SDL_SCANCODE_W);
-	actions[ATTACK] = new MouseButtonAction(SDL_BUTTON_LEFT);
-
-	movements[MOVE] = new KeyboardMovement(SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S);
-	movements[AIM] = new KeyboardMovement(SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN);
-	movements[PAN] = new NoMovement();
-}
-
-void InputDevice::bindControllerActions()
-{
-	if(!m_controller)
-	{
-		for(int i = 0; i < NUM_ACTIONS; i++)
-			actions[i] = new NoAction();
-		return;
-	}
-
-	//TODO: Example; can be expanded upon
-	actions[JUMP] = new NoAction();
-	actions[RUN] = new NoAction();
-	actions[SHIP_THRUST] = new AxisAction(m_controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT, JOY_AXIS_TRIP/10);
-	actions[EXAMINE] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
-	actions[ATTACK] = new JoyButtonAction(m_controller, SDL_CONTROLLER_BUTTON_A);
-
-	movements[MOVE] = new JoystickMovement(m_controller, SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, JOY_AXIS_TRIP);
-	movements[AIM] = new JoystickMovement(m_controller, SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY, JOY_AXIS_TRIP);
-	movements[PAN] = new DpadMovement(m_controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-}
-
 InputDevice::~InputDevice()
 {
-	for(int i = 0; i < NUM_ACTIONS; i++)
-		delete actions[i];
-	for(int i = 0; i < NUM_MOVEMENTS; i++)
-		delete movements[i];
 	if(!rumbleLRSupported && m_haptic != NULL)
 		SDL_HapticRumbleStop(m_haptic);
 	else if(m_haptic != NULL)
@@ -271,17 +217,12 @@ bool InputDevice::hasHaptic()
 	return m_haptic != NULL || (ssHaptic != NULL && ssHaptic->isValid());
 }
 
-bool InputDevice::getDigitalAction(Action a)
+int InputDevice::getAxis(int axis)
 {
-	return actions[a]->getDigitalAction();
+	return SDL_GameControllerGetAxis(m_controller, (SDL_GameControllerAxis)axis);
 }
 
-float InputDevice::getAnalogAction(Action a)
+bool InputDevice::getButton(int button)
 {
-	return actions[a]->getAnalogAction();
-}
-
-Vec2 InputDevice::getMovement(Movement m)
-{
-	return movements[m]->getMovement();
+	return(SDL_GameControllerGetButton(m_controller, (SDL_GameControllerButton)button) > 0);
 }

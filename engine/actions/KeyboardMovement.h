@@ -11,5 +11,5 @@ private:
 public:
 	KeyboardMovement(int left, int right, int up, int down);
 
-	Vec2 getMovement();
+	Vec2 getMovement(InputDevice* d);
 };

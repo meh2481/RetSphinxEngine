@@ -7,14 +7,14 @@ KeyboardAction::KeyboardAction(int keyToUse)
 	keystates = SDL_GetKeyboardState(NULL);
 }
 
-bool KeyboardAction::getDigitalAction()
+bool KeyboardAction::getDigitalAction(InputDevice* d)
 {
 	return(keystates[key]);
 }
 
-float KeyboardAction::getAnalogAction()
+float KeyboardAction::getAnalogAction(InputDevice* d)
 {
-	if(getDigitalAction())
+	if(getDigitalAction(d))
 		return 1.0f;
 	return 0.0f;
 }

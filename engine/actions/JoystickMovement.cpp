@@ -1,20 +1,20 @@
 #include "JoystickMovement.h"
+#include "InputDevice.h"
 #include <algorithm>    // std::min
 
 #define JOY_AXIS_MAX	32767.0f
 
-JoystickMovement::JoystickMovement(SDL_GameController* c, int x, int y, int trip)
+JoystickMovement::JoystickMovement(int x, int y, int trip)
 {
 	xAxis = x;
 	yAxis = y;
-	controller = c;
 	joyAxisTrip = trip;
 }
 
-Vec2 JoystickMovement::getMovement()
+Vec2 JoystickMovement::getMovement(InputDevice* d)
 {
-	int x = SDL_GameControllerGetAxis(controller, (SDL_GameControllerAxis)xAxis);
-	int y = SDL_GameControllerGetAxis(controller, (SDL_GameControllerAxis)yAxis);
+	int x = d->getAxis(xAxis);
+	int y = d->getAxis(yAxis);
 	if(abs(x) < joyAxisTrip && abs(y) < joyAxisTrip)
 		return Vec2(0.0f, 0.0f);
 	float xf = std::max(std::min(x / JOY_AXIS_MAX, 1.0f), -1.0f);

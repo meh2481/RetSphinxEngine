@@ -6,13 +6,12 @@ class JoyButtonAction : public ActionBind
 {
 private:
 	int button;
-	SDL_GameController* controller;
 
 	JoyButtonAction() {};
 
 public:
-	JoyButtonAction(SDL_GameController* c, int buttonIndex);
+	JoyButtonAction(int buttonIndex);
 
-	bool getDigitalAction();
-	float getAnalogAction();
+	bool getDigitalAction(InputDevice* d);
+	float getAnalogAction(InputDevice* d);
 };

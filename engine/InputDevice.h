@@ -23,13 +23,9 @@ private:
 	std::string joystickName;
 	std::string controllerName;
 	SteelSeriesHaptic* ssHaptic;
-	ActionBind* actions[NUM_ACTIONS];
-	MovementBind* movements[NUM_MOVEMENTS];
 
 	void rumbleControllerBasic(float strength, uint32_t duration, float curTime);
 	SDL_Haptic* initHapticDevice(SDL_Haptic* newRumble);
-	void bindMouseKbActions();
-	void bindControllerActions();
 
 public:
 	InputDevice(SteelSeriesClient* ssc);	//Init from mouse and kb
@@ -38,13 +34,11 @@ public:
 
 	void rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime);
 
+	int getAxis(int axis);
+	bool getButton(int button);
+
 	bool hasHaptic();
 	int getDeviceIndex() { return m_deviceIndex; }
 	std::string getJoystickName() { return joystickName; }
 	std::string getControllerName() { return controllerName; }
-
-	//Action (input) handling
-	bool getDigitalAction(Action a);	//Get a true/false for this action
-	float getAnalogAction(Action a);	//Get a normalized 0..1 for this action (emulated if digital input)
-	Vec2 getMovement(Movement m);		//Get the vector for movement
 };
