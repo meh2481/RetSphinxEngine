@@ -23,6 +23,5 @@ Vec2 KeyboardMovement::getMovement(InputDevice* d)
 	if(keystates[left])
 		v.x = v.x - 1.0f;
 
-	//TODO Normalize
 	return v;
 }

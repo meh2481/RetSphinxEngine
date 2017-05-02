@@ -151,12 +151,12 @@ function spaceship:update(dt)
 	end
 	if key_isDown(KEY_LEFT1) or key_isDown(KEY_LEFT2) then
 		shipMoveVecX = shipMoveVecX - 1.0
-	end--]=]
+	end
 	
 	--Since the input is in the form of a 1,1 box, make sure the overall length isn't greater than 1
 	if vec2_length(shipMoveVecX, shipMoveVecY) > 1.0 then
 		shipMoveVecX, shipMoveVecY = vec2_normalize(shipMoveVecX, shipMoveVecY)
-	end
+	end--]=]
 	
 	local nonex = 0.0
 	local noney = 0.0

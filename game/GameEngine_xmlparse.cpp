@@ -128,7 +128,6 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("pauseminimized", pausesOnFocusLost());
 	root->InsertEndChild(window);
 	
-	//TODO: Unbreak joystick config
 	tinyxml2::XMLElement* joystick = doc->NewElement("joystick");
 	joystick->SetAttribute("axistripthreshold", JOY_AXIS_TRIP);
 	//joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);

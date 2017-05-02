@@ -22,6 +22,5 @@ Vec2 DpadMovement::getMovement(InputDevice* d)
 	if(d->getButton(left))
 		v.x = v.x - 1.0f;
 
-	//TODO Normalize
 	return v;
 }

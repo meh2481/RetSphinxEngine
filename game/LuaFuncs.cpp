@@ -729,7 +729,6 @@ static LuaFunctions s_functab[] =
 	{NULL, NULL}
 };
 
-//TODO: This is messed up; shouldn't be using SDL scancodes in Lua, shouldn't be defining joy axis min/max outside of where we define joy buttons
 static const struct
 {
 	const char *name;

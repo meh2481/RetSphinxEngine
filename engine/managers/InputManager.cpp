@@ -130,7 +130,12 @@ Vec2 InputManager::getMovement(Movement m)
 	int mousekb = CONTROLLER;
 	if(m_controllers[m_curActiveController]->getDeviceIndex() == KB_MOUSE_DEVICE_INDEX)
 		mousekb = MOUSE_KB;
-	return movements[mousekb][m]->getMovement(m_controllers[m_curActiveController]);
+	Vec2 ret = movements[mousekb][m]->getMovement(m_controllers[m_curActiveController]);
+	//Normalize
+	float len = ret.length();
+	if(len > 1.0f)
+		ret /= len;
+	return ret;
 }
 
 void InputManager::bindMouseKbActions()
