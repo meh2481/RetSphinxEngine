@@ -61,7 +61,6 @@ private:
 	bool m_bPaused;			//If the game is paused due to not being focused
 	bool m_bControllerDisconnected;	//If the game is paused due to a controller disconnecting
 	bool m_bPauseOnKeyboardFocus;	//If the game pauses when keyboard focus is lost
-	bool m_bSoundDied;  //If tyrsound fails to load, don't try to use it
 	int m_iMSAA;		//Antialiasing (0x, 2x, 4x, 8x, etc)
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
@@ -69,16 +68,13 @@ private:
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
 #endif
+
+	//Managers
 	ResourceLoader* m_resourceLoader;
 	EntityManager* m_entityManager;
 	Stringbank* m_stringBank;
 	InputManager* m_inputManager;
 	SoundManager* m_soundManager;
-
-
-	//multimap<string, FMOD_CHANNEL*> m_channels;
-	//map<string, FMOD_SOUND*> m_sounds;
-	//FMOD_SYSTEM* m_audioSystem;
 
 	//Engine-use function definitions
 	bool _frame();

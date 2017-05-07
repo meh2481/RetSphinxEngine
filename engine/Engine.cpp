@@ -77,7 +77,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 
 	//Initialize engine stuff
 	m_fAccumulatedTime = 0.0;
-	//m_bFirstMusic = true;
 	m_bQuitting = false;
 	Random::seed(SDL_GetTicks());
 	m_fTimeScale = 1.0f;
@@ -89,29 +88,8 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 
 	_loadicon();	//Load our window icon
 
-	m_bSoundDied = true;
-	//TODO: Fix FMOD or find replacement
+	//Init sound manager
 	m_soundManager = new SoundManager();
-	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
-	{
-		LOG(ERROR) << "Failed to init FMOD."
-		m_bSoundDied = true;
-	}
-	else
-	{
-		m_bSoundDied = false;
-		//Figure out what sound drivers for input we have here
-		int numDrivers = 0;
-		FMOD_System_GetRecordNumDrivers(m_audioSystem, &numDrivers);
-		const int DRIVER_INFO_STR_SIZE = 512;
-		char driverInfoStr[DRIVER_INFO_STR_SIZE];
-		LOG(TRACE) << numDrivers << " recording drivers available."
-		for(int i = 0; i < numDrivers; i++)
-		{
-			FMOD_System_GetRecordDriverInfo(m_audioSystem, i, driverInfoStr, DRIVER_INFO_STR_SIZE, NULL);
-			LOG(TRACE) << "Driver " << i << ": " << driverInfoStr
-		}
-	}*/
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
 	static const string sIniFile = getSaveLocation() + IMGUI_INI;
@@ -124,28 +102,17 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 
 Engine::~Engine()
 {
+	//Clean up managers
 	delete m_entityManager;
 	delete m_resourceLoader;
 	delete m_inputManager;
 	delete m_soundManager;
 
+	//Clean up ImGui
 	ImGui_Impl_GL2_Shutdown();
 
+	//Clean up SDL
 	SDL_DestroyWindow(m_Window);
-
-	//Clean up our sound effects
-	/*if(!m_bSoundDied)
-	{
-		for(map<string, FMOD_SOUND*>::iterator i = m_sounds.begin(); i != m_sounds.end(); i++)
-			FMOD_Sound_Release(i->second);
-	}
-
-	//Clean up FMOD
-	if(!m_bSoundDied)
-	{
-		FMOD_System_Close(m_audioSystem);
-		FMOD_System_Release(m_audioSystem);
-	}*/
 
 	// Clean up and shutdown
 	LOG(INFO) << "Deleting phys world";
@@ -272,7 +239,7 @@ bool Engine::_frame()
 
 	if(m_bPaused || m_bControllerDisconnected)
 	{
-		SDL_Delay(100);	//Wait 100 ms
+		SDL_Delay(100);	//Wait 100 ms until next frame to save CPU
 		_render();
 		return m_bQuitting;	//Break out here
 	}
