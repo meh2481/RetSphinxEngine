@@ -8,7 +8,6 @@ DrawableItem.h
 Engine.cpp
 Engine.h
 Engine_GL.cpp
-Engine_Sound.cpp
 Engine_Window.cpp
 EngineContactListener.cpp
 EngineContactListener.h

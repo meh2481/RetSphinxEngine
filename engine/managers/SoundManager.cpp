@@ -1,12 +1,17 @@
 #include "SoundManager.h"
-#include "fmod.hpp"
+#include "easylogging++.h"
 #include <cstring>
 
-#define ERRCHECK(x)
+void ERRCHECK(FMOD_RESULT x)
+{
+	if(x)
+		LOG(INFO) << "Result: " << x;
+}
 
+//Example initialization code from FMOD API doc
 int SoundManager::init()
 {
-	FMOD::System *system;
+	LOG(INFO) << "Initializing FMOD...";
 	FMOD_RESULT result;
 	unsigned int version;
 	int numdrivers;
@@ -22,7 +27,7 @@ int SoundManager::init()
 	ERRCHECK(result);
 	if(version < FMOD_VERSION)
 	{
-		//printf("Error! You are using an old version of FMOD %08x. This program requires %08x\n", version, FMOD_VERSION);
+		LOG(ERROR) << "Error! You are using an old version of FMOD " << version << ". This program requires " << FMOD_VERSION;
 		return 1;
 	}
 	result = system->getNumDrivers(&numdrivers);
@@ -31,6 +36,7 @@ int SoundManager::init()
 	{
 		result = system->setOutput(FMOD_OUTPUTTYPE_NOSOUND);
 		ERRCHECK(result);
+		LOG(WARNING) << "No sound driver";
 	}
 	else
 	{
@@ -77,10 +83,89 @@ int SoundManager::init()
 		result = system->init(100, FMOD_INIT_NORMAL, 0);
 	}
 	ERRCHECK(result);
+	LOG(INFO) << "FMOD Init success";
 	return 0;
 }
 
 SoundManager::SoundManager()
 {
 	init();
+}
+
+SoundManager::~SoundManager()
+{
+	FMOD_RESULT result = system->release();
+	if(result)
+		LOG(WARNING) << "Unable to close FMOD: " << result;
+}
+
+void SoundManager::update()
+{
+	system->update();
+}
+
+SoundHandle* SoundManager::loadSound(const std::string & filename)
+{
+	SoundHandle* handle = NULL;
+
+	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
+	if(result)
+		LOG(WARNING) << "Unable to create sound resource " << filename << ", error " << result;
+
+	return handle;
+}
+
+MusicHandle* SoundManager::loadMusic(const std::string & filename)
+{
+	SoundHandle* handle = NULL;
+
+	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM, NULL, &handle);
+	if(result)
+		LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
+
+	return handle;
+}
+
+Channel * SoundManager::playSound(SoundHandle * sound)
+{
+	Channel* ret = NULL;
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
+	return ret;
+}
+
+Channel * SoundManager::playMusic(MusicHandle * music)
+{
+	return playSound(music);
+}
+
+void SoundManager::pause(Channel * channel)
+{
+	channel->setPaused(true);
+}
+
+void SoundManager::resume(Channel * channel)
+{
+	channel->setPaused(false);
+}
+
+bool SoundManager::isPaused(Channel * channel)
+{
+	bool paused;
+	channel->getPaused(&paused);
+	return paused;
+}
+
+void SoundManager::stop(Channel * channel)
+{
+	channel->stop();
+}
+
+void SoundManager::pauseMusic()
+{
+	//TODO
+}
+
+void SoundManager::playMusic()
+{
+	//TODO
 }

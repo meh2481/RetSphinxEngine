@@ -138,24 +138,6 @@ public:
 	uint16_t getWidth() { return m_iWidth; };
 	uint16_t getHeight() { return m_iHeight; };
 
-	//Sound functions - engine_sound.cpp
-	void createSound(std::string sPath, std::string sName);   //Creates a sound from this name and file path
-	virtual void playSound(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play a sound
-	//FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
-	void playMusic(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play looping music, or resume paused music
-	void musicLoop(float startSec, float endSec);	//Set the starting and ending loop points for the currently-playing song
-	void pauseMusic();									//Pause music that's currently playing
-	void resumeMusic();									//Resume music that was paused
-	void restartMusic();
-	void stopMusic();
-	void seekMusic(float fTime);
-	float getMusicPos();								//Opposite of seekMusic() -- get where we currently are
-	void volumeMusic(float fVol);						//Set the music to a particular volume
-	void setMusicFrequency(float freq);
-	float getMusicFrequency();
-	bool hasMic();										//If we have some form of mic-like input
-	void updateSound();
-
 	//Physics functions
 	b2Body* createBody(b2BodyDef* bdef);
 	void setGravity(Vec2 ptGravity);
@@ -216,4 +198,6 @@ public:
 	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
 
 	Stringbank* getStringbank() { return m_stringBank; };
+
+	SoundManager* getSoundManager() { return m_soundManager; }
 };

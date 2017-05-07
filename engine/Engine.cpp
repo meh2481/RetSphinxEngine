@@ -89,7 +89,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 
 	_loadicon();	//Load our window icon
 
-	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
 	//TODO: Fix FMOD or find replacement
 	m_soundManager = new SoundManager();
@@ -253,7 +252,7 @@ bool Engine::_processEvent(SDL_Event& e)
 
 bool Engine::_frame()
 {
-	updateSound();
+	m_soundManager->update();
 
 	//Handle input events from SDL
 	SDL_Event event;

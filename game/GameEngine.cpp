@@ -20,6 +20,7 @@
 #include "ParticleEditor.h"
 #include "InputDevice.h"
 #include "InputManager.h"
+#include "SoundManager.h"
 using namespace std;
 
 //#define DEBUG_INPUT
@@ -266,12 +267,12 @@ void GameEngine::init(list<commandlineArg> sArgs)
 
 void GameEngine::pause()
 {
-	pauseMusic();
+	getSoundManager()->pauseMusic();
 }
 
 void GameEngine::resume()
 {
-	resumeMusic();
+	getSoundManager()->playMusic();
 }
 
 void GameEngine::warpObjectToNode(Object* o, Node* n)
