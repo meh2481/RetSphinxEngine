@@ -8,6 +8,9 @@
 #include "StringUtils.h"
 #include "SteelSeriesClient.h"
 #include "InputDevice.h"
+#include "InputManager.h"
+#include "Action.h"
+#include "Movement.h"
 using namespace std;
 
 //Defined by SDL
@@ -71,27 +74,6 @@ public:
 	{
 		g_pGlobalEngine->m_sLoadScene = sMap;
 		g_pGlobalEngine->m_sLoadNode = sNode;
-	}
-
-	static bool keyDown(int key)
-	{
-		return g_pGlobalEngine->keyDown(key);
-	}
-
-	static bool joyDown(int button)
-	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
-		if(controller != NULL)
-			return controller->getButton(button);
-		return false;
-	}
-
-	static int joyAxis(int axis)
-	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
-		if(controller != NULL)
-			return controller->getAxis(axis);
-		return 0;
 	}
 
 	static Vec2 getMousePos()
@@ -158,7 +140,7 @@ public:
 
 	static void rumbleLR(uint32_t duration, uint16_t large, uint16_t small)
 	{
-		InputDevice* controller = g_pGlobalEngine->getCurController();
+		InputDevice* controller = g_pGlobalEngine->getInputManager()->getCurController();
 		if(controller != NULL)
 			controller->rumbleLR(duration, large, small, g_pGlobalEngine->getSeconds());
 	}
@@ -171,6 +153,21 @@ public:
 	static void bindSSEvent(string filename)
 	{
 		g_pGlobalEngine->getSteelSeriesClient()->bindEvent(g_pGlobalEngine->getResourceLoader()->getTextFile(filename));
+	}
+
+	static float getAnalogAction(int action)
+	{
+		return g_pGlobalEngine->getInputManager()->getAnalogAction((Action)action);
+	}
+
+	static bool getDigitalAction(int action)
+	{
+		return g_pGlobalEngine->getInputManager()->getDigitalAction((Action)action);
+	}
+
+	static Vec2 getMovement(int movement)
+	{
+		return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
 	}
 };
 
@@ -590,21 +587,6 @@ luaFunc(particles_setEmitAngle)	//void particles_setEmitAngle(ParticleSystem* p,
 //-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(key_isDown) //bool key_isDown(SDL_Scancode key)
-{
-	luaReturnBool(GameEngineLua::keyDown((int)lua_tointeger(L, 1)));
-}
-
-luaFunc(joy_isDown) //bool joy_isDown(int button)
-{
-	luaReturnBool(GameEngineLua::joyDown((int)lua_tointeger(L, 1)));
-}
-
-luaFunc(joy_getAxis) //int joy_getAxis(int axis)
-{
-	luaReturnInt(GameEngineLua::joyAxis((int)lua_tointeger(L, 1)));
-}
-
 luaFunc(mouse_getPos) //int x, int y mouse_getPos()
 {
 	Vec2 p = GameEngineLua::getMousePos();
@@ -657,6 +639,46 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Actions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(action_analog)	//float action_analog(int actionId)	//return in range 0..1
+{
+	if(lua_isinteger(L, 1))
+	{
+		int action = (int)lua_tointeger(L, 1);
+		if(action >= NUM_ACTIONS)
+			luaReturnNum(0.0f);
+		luaReturnNum(GameEngineLua::getAnalogAction(action));
+	}
+	luaReturnNum(0.0f);
+}
+
+luaFunc(action_digital)	//bool action_digital(int actionId)
+{
+	if(lua_isinteger(L, 1))
+	{
+		int action = (int)lua_tointeger(L, 1);
+		if(action >= NUM_ACTIONS)
+			luaReturnBool(false);
+		luaReturnBool(GameEngineLua::getDigitalAction(action));
+	}
+	luaReturnBool(false);
+}
+
+luaFunc(movement_vec)	//x,y movement_vec(int movementId)
+{
+	if(lua_isinteger(L, 1))
+	{
+		int movement = (int)lua_tointeger(L, 1);
+		if(movement >= NUM_MOVEMENTS)
+			luaReturnVec2(0.0f, 0.0f);
+		Vec2 v = GameEngineLua::getMovement(movement);
+		luaReturnVec2(v.x, v.y);
+	}
+	luaReturnVec2(0.0f, 0.0f);
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
@@ -675,7 +697,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_getAngle),
 	luaRegister(obj_getFromPoint),
 	luaRegister(obj_setActive),
-        luaRegister(obj_isActive),
+	luaRegister(obj_isActive),
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
 	luaRegister(camera_centerOnXY),
@@ -695,38 +717,35 @@ static LuaFunctions s_functab[] =
 	luaRegister(particles_setEmitPos),
 	luaRegister(particles_setEmitVel),
 	luaRegister(particles_setEmitAngle),
-	luaRegister(key_isDown),
-	luaRegister(joy_isDown),
-	luaRegister(joy_getAxis),
 	luaRegister(mouse_isDown),
 	luaRegister(mouse_getPos),
 	luaRegister(mouse_transformToWorld),
 	luaRegister(mouse_setCursor),
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),
+	luaRegister(action_analog),
+	luaRegister(action_digital),
+	luaRegister(movement_vec),
 	{NULL, NULL}
 };
 
-//TODO: This is messed up; shouldn't be using SDL scancodes in Lua, shouldn't be defining joy axis min/max outside of where we define joy buttons
 static const struct
 {
 	const char *name;
 	int value;
 } luaConstantTable[] = {
 
-	//Joystick
-	luaConstant(JOY_AXIS_MIN),
-	luaConstant(JOY_AXIS_MAX),
+	//Actions
+	luaConstant(JUMP),
+	luaConstant(RUN),
+	luaConstant(SHIP_THRUST),
+	luaConstant(EXAMINE),
+	luaConstant(ATTACK),
 
-	//Mouse
-	luaConstant(SDL_BUTTON_LEFT),
-	luaConstant(SDL_BUTTON_RIGHT),
-	luaConstant(SDL_BUTTON_MIDDLE),
-	luaConstant(SDL_BUTTON_FORWARD),
-	luaConstant(SDL_BUTTON_BACK),
-
-	//Keyboard
-	luaConstant(SDL_SCANCODE_SPACE),
+	//Movement actions
+	luaConstant(MOVE),
+	luaConstant(AIM),
+	luaConstant(PAN),
 };
 
 void lua_register_all(lua_State *L)

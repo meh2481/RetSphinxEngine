@@ -6,6 +6,7 @@
 #include "ParticleEditor.h"
 #include "LevelEditor.h"
 #include "InputDevice.h"
+#include "InputManager.h"
 #include <vector>
 #include <list>
 #include <climits>
@@ -94,7 +95,7 @@ void DebugUI::_draw()
 			//Controller rumble testing
 			if(ImGui::Button("Test controller rumble"))
 			{
-				InputDevice* controller = _ge->getCurController();
+				InputDevice* controller = _ge->getInputManager()->getCurController();
 				if(controller != NULL)
 					controller->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength, _ge->getSeconds());
 			}
@@ -102,8 +103,8 @@ void DebugUI::_draw()
 			ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
 			ImGui::Text("Controllers connected:");
-			vector<InputDevice*> controllerList = _ge->getControllerList();
-			InputDevice* currentController = _ge->getCurController();
+			vector<InputDevice*> controllerList = _ge->getInputManager()->getControllerList();
+			InputDevice* currentController = _ge->getInputManager()->getCurController();
 			for(int i = 0; i < controllerList.size(); i++)
 			{
 				InputDevice* id = controllerList[i];

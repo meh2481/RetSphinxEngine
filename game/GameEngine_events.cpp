@@ -12,6 +12,7 @@
 #include "ResourceCache.h"
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
+#include "InputManager.h"
 using namespace std;
 
 typedef struct
@@ -106,7 +107,7 @@ void GameEngine::handleEvent(SDL_Event event)
 				}
 
 				case SDL_SCANCODE_RETURN:	//Alt-Enter toggles fullscreen
-					if(keyDown(SDL_SCANCODE_ALT))
+					if(getInputManager()->keyDown(SDL_SCANCODE_ALT))
 						setFullscreen(!isFullscreen());
 					break;
 
@@ -133,7 +134,7 @@ void GameEngine::handleEvent(SDL_Event event)
 			
 		case SDL_CONTROLLERBUTTONDOWN:
 			LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
-			activateController(event.cbutton.which);
+			getInputManager()->activateController(event.cbutton.which);
 			switch(event.cbutton.button)
 			{
 				case SDL_CONTROLLER_BUTTON_BACK:	//TODO Not hardcoded
@@ -237,17 +238,17 @@ void GameEngine::handleKeys()
 {
 #ifdef _DEBUG
 	setTimeScale(1.0f);
-	if (keyDown(SDL_SCANCODE_G))
+	if (getInputManager()->keyDown(SDL_SCANCODE_G))
 	{
 		setTimeScale(0.25f);
-		if (keyDown(SDL_SCANCODE_CTRL))
+		if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
 			setTimeScale(0.0625f);
 	}
 
-	if (keyDown(SDL_SCANCODE_H))
+	if (getInputManager()->keyDown(SDL_SCANCODE_H))
 	{
 		setTimeScale(2.0f);
-		if (keyDown(SDL_SCANCODE_CTRL))
+		if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
 			setTimeScale(3.0f);
 	}
 #endif

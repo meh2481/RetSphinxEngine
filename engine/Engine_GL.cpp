@@ -147,9 +147,6 @@ void Engine::setup_sdl()
 	if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
 		LOG(WARNING) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
 
-	//TODO: Load mouse haptic if available
-	LOG(INFO) << "Mouse haptic: " << SDL_MouseIsHaptic();
-
 }
 
 //Set up OpenGL

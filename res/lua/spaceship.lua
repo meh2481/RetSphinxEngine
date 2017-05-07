@@ -48,9 +48,10 @@ end
 --Zoom in and out using the dpad on the joystick
 function spaceship:checkDpadZoom()
 	local x,y,z = camera_getPos()
-	if joy_isDown(JOY_DPAD_UP) then
+	local panX, panY = movement_vec(PAN)
+	if panY > 0 then
 		z = z + self.CAMERA_ZOOM_FAC
-	elseif joy_isDown(JOY_DPAD_DOWN) then
+	elseif panY < 0 then
 		z = z - self.CAMERA_ZOOM_FAC
 	end
 	camera_setPos(x, y, z)
@@ -61,16 +62,15 @@ function spaceship:shoot(x, y, vx, vy, dt)
 
 	particles_setEmitPos(self.fireParticles, x-vx*dt, y-vy*dt)
 	particles_setEmitVel(self.fireParticles, vx, vy)
-	local horizAxis = joy_getAxis(JOY_AXIS2_HORIZ)
-	local vertAxis = joy_getAxis(JOY_AXIS2_VERT)
-	local rStickX = 0
-	local rStickY = 0
+	--local horizAxis = joy_getAxis(JOY_AXIS2_HORIZ)
+	--local vertAxis = joy_getAxis(JOY_AXIS2_VERT)
+	local rStickX, rStickY = movement_vec(AIM)
 	--Make sure we're outside of our trip radius before moving
-	joytripmove = vec2_length(horizAxis, vertAxis)
-	if joytripmove > JOY_AXIS_TRIP then
+	--joytripmove = vec2_length(horizAxis, vertAxis)
+	if rStickX ~= 0 or rStickY ~= 0 then
 		local angle = 1.0
 		particles_setFireRate(self.fireParticles, 1.0)	--firing
-		if vertAxis > 0 then		-- down
+		--[=[if vertAxis > 0 then		-- down
 			rStickY = vertAxis / JOY_AXIS_MAX
 			rStickY = -rStickY
 		else						-- up
@@ -81,7 +81,7 @@ function spaceship:shoot(x, y, vx, vy, dt)
 		else						-- left
 			rStickX = horizAxis / JOY_AXIS_MIN
 			rStickX = -rStickX
-		end
+		end--]=]
 		
 		particles_setEmitAngle(self.fireParticles, vec2_angle(rStickX,rStickY)*180/3.14159)
 	else
@@ -103,25 +103,25 @@ function spaceship:update(dt)
 	--Check for thrusting input
 	local max_ship_vel = self.MAX_SHIP_SPEED
 	local ship_accel = self.SHIP_ACCEL
-	local ltAxis = joy_getAxis(JOY_AXIS_LT)
-	if ltAxis > JOY_AXIS_TRIP then
-		local diff = ltAxis - JOY_AXIS_TRIP
-		local totalDiff = JOY_AXIS_MAX - JOY_AXIS_TRIP
-		local fac = diff/totalDiff
+	local fac = action_analog(SHIP_THRUST)
+	if fac > 0 then
+		--local diff = ltAxis - JOY_AXIS_TRIP
+		--local totalDiff = JOY_AXIS_MAX - JOY_AXIS_TRIP
+		--local fac = diff/totalDiff
 		max_ship_vel = max_ship_vel * (1 + (self.MAX_THRUST - 1) * fac)
 		ship_accel = ship_accel * (1 + (self.THRUST_ACCEL - 1) * fac)
-	elseif key_isDown(SDL_SCANCODE_SPACE) then --TODO Determine keyconfig for C/Lua interaction instead of just SDL_SCANCODE_SPACE here
-		max_ship_vel = max_ship_vel * self.MAX_THRUST	--Thrusting increases maximum speed
-		ship_accel = ship_accel * self.THRUST_ACCEL
+	--elseif key_isDown(SDL_SCANCODE_SPACE) then --TODO Determine keyconfig for C/Lua interaction instead of just SDL_SCANCODE_SPACE here
+	--	max_ship_vel = max_ship_vel * self.MAX_THRUST	--Thrusting increases maximum speed
+	--	ship_accel = ship_accel * self.THRUST_ACCEL
 	end
 	
 	--Keep track of if there is current ship-move input with this vector
-	local shipMoveVecX = 0
-	local shipMoveVecY = 0
+	local shipMoveVecX, shipMoveVecY = movement_vec(MOVE)
 	
 	--Check for joypad input
-	local horizAxis = joy_getAxis(JOY_AXIS_HORIZ)
+	--[=[local horizAxis = joy_getAxis(JOY_AXIS_HORIZ)
 	local vertAxis = joy_getAxis(JOY_AXIS_VERT)
+	print(horizAxis, vertAxis)
 	--Make sure we're outside of our trip radius before moving
 	local joytripmove = vec2_length(horizAxis, vertAxis)
 	if joytripmove > JOY_AXIS_TRIP then
@@ -156,7 +156,7 @@ function spaceship:update(dt)
 	--Since the input is in the form of a 1,1 box, make sure the overall length isn't greater than 1
 	if vec2_length(shipMoveVecX, shipMoveVecY) > 1.0 then
 		shipMoveVecX, shipMoveVecY = vec2_normalize(shipMoveVecX, shipMoveVecY)
-	end
+	end--]=]
 	
 	local nonex = 0.0
 	local noney = 0.0

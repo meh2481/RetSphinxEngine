@@ -15,10 +15,15 @@
 #include "EntityManager.h"
 #include "Stringbank.h"
 #include "stb_image.h"
-#include "InputDevice.h"
+#include "InputManager.h"
 using namespace std;
 
 #define GUID_STR_SZ	256
+#define STRINGBANK_LOCATION "res/stringbank.xml"
+#define PAK_LOCATION "res/pak"
+#define IMGUI_INI "imgui.ini"
+#define LOGGING_CONF "logging.conf"
+#define LOGFILE_NAME "logfile.log"
 
 Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable)
 {
@@ -27,9 +32,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_sCompanyName = sCompanyName;
 
 	//Start logger
-	el::Configurations conf("logging.conf");
+	el::Configurations conf(LOGGING_CONF);
 	if(!conf.hasConfiguration(el::ConfigurationType::Filename))
-		conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + "logfile.log").c_str());
+		conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + LOGFILE_NAME).c_str());
 	el::Loggers::reconfigureAllLoggers(conf);
 
 	m_sIcon = sIcon;
@@ -52,12 +57,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_iWidth = iWidth;
 	m_iHeight = iHeight;
 	m_iMSAA = 0;	//Default: MSAA off
-	m_iKeystates = NULL;
 	m_bShowCursor = true;
 	m_fFramerate = 60.0f;
 	setFramerate(60);	 //60 fps default
 	m_bFullscreen = true;
-	m_curActiveController = -1;
 
 	setup_sdl();
 	setup_opengl();
@@ -79,9 +82,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	m_fTimeScale = 1.0f;
 
 	LOG(INFO) << "Creating resource loader";
-	m_resourceLoader = new ResourceLoader(m_physicsWorld, "res/pak");
+	m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
 	m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
-	m_stringBank = m_resourceLoader->getStringbank("res/stringbank.xml"); //TODO: load from elsewhere?
+	m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
 
 	_loadicon();	//Load our window icon
 
@@ -110,19 +113,19 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	}*/
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
-	static const string sIniFile = getSaveLocation() + "imgui.ini";
+	static const string sIniFile = getSaveLocation() + IMGUI_INI;
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
+
+	m_inputManager = new InputManager();
 }
 
 Engine::~Engine()
 {
 	delete m_entityManager;
 	delete m_resourceLoader;
-
-	for(vector<InputDevice*>::iterator i = m_controllers.begin(); i != m_controllers.end(); i++)
-		delete *i;
+	delete m_inputManager;
 
 	ImGui_Impl_GL2_Shutdown();
 
@@ -196,12 +199,12 @@ bool Engine::_processEvent(SDL_Event& e)
 			return true;
 
 		case SDL_CONTROLLERDEVICEADDED:
-			addController(e.cdevice.which);
+			m_inputManager->addController(e.cdevice.which);
 			break;
 
 		case SDL_CONTROLLERDEVICEREMOVED:
 			LOG(INFO) << "Controller " << (int)e.cdevice.which << " disconnected.";
-			removeController(e.cdevice.which);
+			m_inputManager->removeController(e.cdevice.which);
 			break;
 
 		case SDL_JOYDEVICEADDED:
@@ -228,10 +231,12 @@ bool Engine::_processEvent(SDL_Event& e)
 		case SDL_JOYHATMOTION:
 			break;
 
-		//Unpause when selecting with a new input device
-		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_KEYDOWN:
+			m_inputManager->activateController(-1);	//Mouse+kb control
+			//Fall through
+		case SDL_CONTROLLERBUTTONDOWN:
+			//Unpause when selecting with a new input device
 			if(m_bControllerDisconnected)
 			{
 				resume();	//Unpause game
@@ -274,7 +279,6 @@ bool Engine::_frame()
 	if(m_fAccumulatedTime <= fCurTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
-		m_iKeystates = SDL_GetKeyboardState(NULL);	//Get current key state
 #ifdef _DEBUG
 		if(!m_bSteppingPhysics || m_bStepFrame)
 		{
@@ -300,17 +304,6 @@ void Engine::_render()
 
 	// Game-specific drawing
 	draw();
-
-	if(m_bControllerDisconnected)
-	{
-		//TODO Should really have the camera controlled by the engine, so we don't have to depend on state from draw() here...
-		//glLoadIdentity();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		Image* disconnectedImage = getResourceLoader()->getImage("res/util/disconnected.png");
-		if(disconnectedImage)
-			disconnectedImage->render4V(Vec2(-4.01,-1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
-	}
 
 	//Draw gamma/brightness overlay on top of everything else
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -372,70 +365,6 @@ void Engine::fillScreen(Color col)
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-}
-
-bool Engine::keyDown(int32_t keyCode)
-{
-	if(m_iKeystates == NULL) return false;	//On first cycle, this can be NULL and cause segfaults otherwise
-
-	//HACK: See if one of our combined keycodes
-	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
-	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
-	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT) || keyDown(SDL_SCANCODE_RALT));
-	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI) || keyDown(SDL_SCANCODE_RGUI));
-
-	//Otherwise, just use our pre-polled list we got from SDL
-	return(m_iKeystates[keyCode]);
-}
-
-//TODO Controller/input logic should be its own class
-InputDevice* Engine::getCurController()
-{
-	if(m_curActiveController < 0 || m_curActiveController > m_controllers.size() - 1)
-		return NULL;
-	return m_controllers[m_curActiveController];
-}
-
-void Engine::addController(int deviceIndex)
-{
-	//removeController(deviceIndex);	//If there's an SDL problem, this could be left over after unplugging/replugging
-	InputDevice* device = new InputDevice(deviceIndex);
-	m_controllers.push_back(device);
-	m_curActiveController = m_controllers.size() - 1;	//Set this as new active controller
-}
-
-void Engine::removeController(int deviceIndex)
-{
-	for(int i = 0; i < m_controllers.size(); i++)
-	{
-		if(deviceIndex == m_controllers[i]->getDeviceIndex())
-		{
-			//Remove this controller from the list
-			delete m_controllers[i];
-			m_controllers.erase(m_controllers.begin() + i);
-			if(i == m_curActiveController)
-			{
-				m_bControllerDisconnected = true;	//Disconnected current controller; pause game
-				pause();	//Pause game
-			}
-			if(i <= m_curActiveController)
-			{
-				m_curActiveController--;
-				if(m_curActiveController < 0)	//Was first in the list
-					m_curActiveController = m_controllers.size() - 1;
-			}
-			break;
-		}
-	}
-}
-
-void Engine::activateController(int deviceIndex)
-{
-	for(int i = 0; i < m_controllers.size(); i++)
-	{
-		if(deviceIndex == m_controllers[i]->getDeviceIndex())
-			m_curActiveController = i;
-	}
 }
 
 void Engine::setFramerate(float fFramerate)

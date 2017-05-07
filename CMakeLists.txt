@@ -35,11 +35,13 @@ include_directories(dep/lua)
 include_directories(dep/imgui)
 
 add_subdirectory(net)
-add_subdirectory(engine)
 
 include_directories(net)
+add_subdirectory(engine)
+
 include_directories(engine)
 include_directories(engine/events)
 include_directories(engine/managers)
+include_directories(engine/actions)
 add_subdirectory(game)
 add_subdirectory(tools)

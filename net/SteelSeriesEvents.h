@@ -38,8 +38,10 @@
 #define MODE_SCREEN "screen"
 #define MODE_VIBRATE "vibrate"
 
+#define EVENT_TYPE_CUSTOM "custom"
+
 static const char* steelSeriesTactileEvents[] = {
-	"custom",
+	EVENT_TYPE_CUSTOM,
 	"ti_predefined_strongclick_100",
 	"ti_predefined_strongclick_60",
 	"ti_predefined_strongclick_30",

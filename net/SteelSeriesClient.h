@@ -25,4 +25,6 @@ public:
 
 	void bindEvent(std::string eventJSON);					//Create an event with this (stringified) JSON
 	void sendEvent(std::string eventId, int value);			//Send an update to this event
+
+	std::string getAppId() { return appId; }
 };

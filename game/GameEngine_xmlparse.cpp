@@ -51,7 +51,6 @@ bool GameEngine::loadConfig(string sFilename)
 		bool bPausesOnFocus = pausesOnFocusLost();
 		int iVsync = getVsync();
 		int iMSAA = getMSAA();
-//		bool bTexAntialias = getImgBlur();
 		float fGamma = getGamma();
 		
 		window->QueryUnsignedAttribute("width", &width);
@@ -90,56 +89,15 @@ bool GameEngine::loadConfig(string sFilename)
 	{
 		joystick->QueryIntAttribute("axistripthreshold", &JOY_AXIS_TRIP);
 		//joystick->QueryUnsignedAttribute("backbutton", &JOY_BUTTON_BACK);
-		//joystick->QueryUnsignedAttribute("startbutton", &JOY_BUTTON_START);
-		//joystick->QueryUnsignedAttribute("Y", &JOY_BUTTON_Y);
-		//joystick->QueryUnsignedAttribute("X", &JOY_BUTTON_X);
-		//joystick->QueryUnsignedAttribute("A", &JOY_BUTTON_A);
-		//joystick->QueryUnsignedAttribute("B", &JOY_BUTTON_B);
-		//joystick->QueryUnsignedAttribute("LB", &JOY_BUTTON_LB);
-		//joystick->QueryUnsignedAttribute("RB", &JOY_BUTTON_RB);
-		//joystick->QueryUnsignedAttribute("leftstick", &JOY_BUTTON_LSTICK);
-		//joystick->QueryUnsignedAttribute("rightstick", &JOY_BUTTON_RSTICK);
-		//joystick->QueryUnsignedAttribute("horizontalaxis1", &JOY_AXIS_HORIZ);
-		//joystick->QueryUnsignedAttribute("verticalaxis1", &JOY_AXIS_VERT);
-		//joystick->QueryUnsignedAttribute("horizontalaxis2", &JOY_AXIS2_HORIZ);
-		//joystick->QueryUnsignedAttribute("verticalaxis2", &JOY_AXIS2_VERT);
-		//joystick->QueryUnsignedAttribute("ltaxis", &JOY_AXIS_LT);
 		//joystick->QueryUnsignedAttribute("rtaxis", &JOY_AXIS_RT);
 	}
 	
 	tinyxml2::XMLElement* keyboard = root->FirstChildElement("keyboard");
 	if(keyboard != NULL)
 	{
-		const char* cUpKey1 = keyboard->Attribute("upkey1");
-		const char* cUpKey2 = keyboard->Attribute("upkey2");
-		const char* cDownKey1 = keyboard->Attribute("downkey1");
-		const char* cDownKey2 = keyboard->Attribute("downkey2");
-		const char* cLeftKey1 = keyboard->Attribute("leftkey1");
-		const char* cLeftKey2 = keyboard->Attribute("leftkey2");
-		const char* cRightKey1 = keyboard->Attribute("rightkey1");
-		const char* cRightKey2 = keyboard->Attribute("rightkey2");
-		const char* cEnter1 = keyboard->Attribute("enter1");
-		const char* cEnter2 = keyboard->Attribute("enter2");
-		if(cUpKey1)
-			KEY_UP1 = SDL_GetScancodeFromName(cUpKey1);
-		if(cUpKey2)
-			KEY_UP2 = SDL_GetScancodeFromName(cUpKey2);
-		if(cDownKey1)
-			KEY_DOWN1 = SDL_GetScancodeFromName(cDownKey1);
-		if(cDownKey2)
-			KEY_DOWN2 = SDL_GetScancodeFromName(cDownKey2);
-		if(cLeftKey1)
-			KEY_LEFT1 = SDL_GetScancodeFromName(cLeftKey1);
-		if(cLeftKey2)
-			KEY_LEFT2 = SDL_GetScancodeFromName(cLeftKey2);
-		if(cRightKey1)
-			KEY_RIGHT1 = SDL_GetScancodeFromName(cRightKey1);
-		if(cRightKey2)
-			KEY_RIGHT2 = SDL_GetScancodeFromName(cRightKey2);
-		if(cEnter1)
-			KEY_ENTER1 = SDL_GetScancodeFromName(cEnter1);
-		if(cEnter2)
-			KEY_ENTER2 = SDL_GetScancodeFromName(cEnter2);
+		//const char* cEnter2 = keyboard->Attribute("enter2");
+		//if(cEnter2)
+		//	KEY_ENTER2 = SDL_GetScancodeFromName(cEnter2);
 	}
 	
 	delete doc;
@@ -166,43 +124,18 @@ void GameEngine::saveConfig(string sFilename)
 	window->SetAttribute("vsync", getVsync());
 	window->SetAttribute("doublebuf", getDoubleBuffered());
 	window->SetAttribute("MSAA", getMSAA());
-//	window->SetAttribute("textureantialias", getImgBlur());
 	window->SetAttribute("brightness", getGamma());
 	window->SetAttribute("pauseminimized", pausesOnFocusLost());
 	root->InsertEndChild(window);
 	
-	//TODO: Unbreak joystick config
 	tinyxml2::XMLElement* joystick = doc->NewElement("joystick");
 	joystick->SetAttribute("axistripthreshold", JOY_AXIS_TRIP);
 	//joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);
-	//joystick->SetAttribute("startbutton", JOY_BUTTON_START);
-	//joystick->SetAttribute("Y", JOY_BUTTON_Y);
-	//joystick->SetAttribute("X", JOY_BUTTON_X);
-	//joystick->SetAttribute("A", JOY_BUTTON_A);
-	//joystick->SetAttribute("B", JOY_BUTTON_B);
-	//joystick->SetAttribute("LB", JOY_BUTTON_LB);
-	//joystick->SetAttribute("RB", JOY_BUTTON_RB);
-	//joystick->SetAttribute("leftstick", JOY_BUTTON_LSTICK);
-	//joystick->SetAttribute("rightstick", JOY_BUTTON_RSTICK);
-	//joystick->SetAttribute("horizontalaxis1", JOY_AXIS_HORIZ);
-	//joystick->SetAttribute("verticalaxis1", JOY_AXIS_VERT);
-	//joystick->SetAttribute("horizontalaxis2", JOY_AXIS2_HORIZ);
-	//joystick->SetAttribute("verticalaxis2", JOY_AXIS2_VERT);
-	//joystick->SetAttribute("ltaxis", JOY_AXIS_LT);
 	//joystick->SetAttribute("rtaxis", JOY_AXIS_RT);
 	root->InsertEndChild(joystick);
 	
 	tinyxml2::XMLElement* keyboard = doc->NewElement("keyboard");
-	keyboard->SetAttribute("upkey1", SDL_GetScancodeName(KEY_UP1));
-	keyboard->SetAttribute("upkey2", SDL_GetScancodeName(KEY_UP2));
-	keyboard->SetAttribute("downkey1", SDL_GetScancodeName(KEY_DOWN1));
-	keyboard->SetAttribute("downkey2", SDL_GetScancodeName(KEY_DOWN2));
-	keyboard->SetAttribute("leftkey1", SDL_GetScancodeName(KEY_LEFT1));
-	keyboard->SetAttribute("leftkey2", SDL_GetScancodeName(KEY_LEFT2));
-	keyboard->SetAttribute("rightkey1", SDL_GetScancodeName(KEY_RIGHT1));
-	keyboard->SetAttribute("rightkey2", SDL_GetScancodeName(KEY_RIGHT2));
-	keyboard->SetAttribute("enter1", SDL_GetScancodeName(KEY_ENTER1));
-	keyboard->SetAttribute("enter2", SDL_GetScancodeName(KEY_ENTER2));
+	//keyboard->SetAttribute("upkey1", SDL_GetScancodeName(KEY_UP1));
 	root->InsertEndChild(keyboard);
 	
 	doc->InsertFirstChild(root);
