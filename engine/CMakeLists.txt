@@ -82,6 +82,8 @@ managers/Stringbank.cpp
 managers/Stringbank.h
 managers/InputManager.cpp
 managers/InputManager.h
+managers/SoundManager.h
+managers/SoundManager.cpp
 )
 
 set(engine_actions_src
@@ -117,4 +119,4 @@ source_group("managers" FILES ${engine_manager_src})
 source_group("actions" FILES ${engine_actions_src})
 
 add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src} ${engine_actions_src})
-target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY})
+target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY} ${FMOD_LIBRARIES})

@@ -16,6 +16,7 @@
 #include "Stringbank.h"
 #include "stb_image.h"
 #include "InputManager.h"
+#include "SoundManager.h"
 using namespace std;
 
 #define GUID_STR_SZ	256
@@ -91,6 +92,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	LOG(INFO) << "Initializing FMOD...";
 	m_bSoundDied = true;
 	//TODO: Fix FMOD or find replacement
+	m_soundManager = new SoundManager();
 	/*if(FMOD_System_Create(&m_audioSystem) != FMOD_OK || FMOD_System_Init(m_audioSystem, 128, FMOD_INIT_NORMAL, 0) != FMOD_OK)
 	{
 		LOG(ERROR) << "Failed to init FMOD."
@@ -126,6 +128,7 @@ Engine::~Engine()
 	delete m_entityManager;
 	delete m_resourceLoader;
 	delete m_inputManager;
+	delete m_soundManager;
 
 	ImGui_Impl_GL2_Shutdown();
 

@@ -18,6 +18,7 @@ class ResourceLoader;
 class EntityManager;
 class Stringbank;
 class InputManager;
+class SoundManager;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -72,6 +73,7 @@ private:
 	EntityManager* m_entityManager;
 	Stringbank* m_stringBank;
 	InputManager* m_inputManager;
+	SoundManager* m_soundManager;
 
 
 	//multimap<string, FMOD_CHANNEL*> m_channels;
