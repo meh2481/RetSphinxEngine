@@ -15,13 +15,13 @@ Vec2 KeyboardMovement::getMovement(InputDevice* d)
 	Vec2 v(0.0f, 0.0f);
 
 	if(keystates[up])
-		v.y = v.y + 1.0f;
+		v.y += 1.0f;
 	if(keystates[down])
-		v.y = v.y - 1.0f;
+		v.y -= 1.0f;
 	if(keystates[right])
-		v.x = v.x + 1.0f;
+		v.x += 1.0f;
 	if(keystates[left])
-		v.x = v.x - 1.0f;
+		v.x -= 1.0f;
 
 	return v;
 }

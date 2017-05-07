@@ -33,6 +33,7 @@ res/**/*.xml
 res/**/*.txt
 res/json/*
 res/shaders/*
+res/mus/*
 dev/*
 workspace.np
 gamecontrollerdb.txt

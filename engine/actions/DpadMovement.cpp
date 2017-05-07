@@ -14,13 +14,13 @@ Vec2 DpadMovement::getMovement(InputDevice* d)
 	Vec2 v(0.0f, 0.0f);
 
 	if(d->getButton(up))
-		v.y = v.y + 1.0f;
+		v.y += 1.0f;
 	if(d->getButton(down))
-		v.y = v.y - 1.0f;
+		v.y -= 1.0f;
 	if(d->getButton(right))
-		v.x = v.x + 1.0f;
+		v.x += 1.0f;
 	if(d->getButton(left))
-		v.x = v.x - 1.0f;
+		v.x -= 1.0f;
 
 	return v;
 }

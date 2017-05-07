@@ -99,7 +99,7 @@ void InputManager::activateController(int deviceIndex)
 
 bool InputManager::keyDown(int32_t keyCode)
 {
-	//HACK: See if one of our combined keycodes
+	//See if one of our combined keycodes
 	if(keyCode == SDL_SCANCODE_CTRL) return (keyDown(SDL_SCANCODE_LCTRL) || keyDown(SDL_SCANCODE_RCTRL));
 	if(keyCode == SDL_SCANCODE_SHIFT) return (keyDown(SDL_SCANCODE_LSHIFT) || keyDown(SDL_SCANCODE_RSHIFT));
 	if(keyCode == SDL_SCANCODE_ALT) return (keyDown(SDL_SCANCODE_LALT) || keyDown(SDL_SCANCODE_RALT));
