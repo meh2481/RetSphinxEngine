@@ -11,6 +11,7 @@
 #include "InputManager.h"
 #include "Action.h"
 #include "Movement.h"
+#include "SoundManager.h"
 using namespace std;
 
 //Defined by SDL
@@ -168,6 +169,12 @@ public:
 	static Vec2 getMovement(int movement)
 	{
 		return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
+	}
+
+	static void playSong(const std::string& songFilename)
+	{
+		MusicHandle* mus = g_pGlobalEngine->getSoundManager()->loadMusic(songFilename);
+		g_pGlobalEngine->getSoundManager()->playMusic(mus);
 	}
 };
 
@@ -679,6 +686,16 @@ luaFunc(movement_vec)	//x,y movement_vec(int movementId)
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Sound functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(music_play)	//void music_play(string songPath)
+{
+	if(lua_isstring(L, 1))
+		GameEngineLua::playSong(lua_tostring(L, 1));
+	luaReturnNil();
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
@@ -711,6 +728,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_get),
 	luaRegister(node_isInside),
 	luaRegister(map_load),
+	luaRegister(music_play),
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),
 	luaRegister(particles_setFireRate),

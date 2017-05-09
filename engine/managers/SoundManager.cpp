@@ -82,8 +82,6 @@ int SoundManager::init()
 	}
 	ERRCHECK(result);
 	LOG(INFO) << "FMOD Init success";
-
-	system->createChannelGroup("All sounds", &soundGroup);
 	musicChannel = NULL;
 
 	return 0;
@@ -108,6 +106,7 @@ void SoundManager::update()
 
 SoundHandle* SoundManager::loadSound(const std::string & filename)
 {
+	LOG(INFO) << "Loading sound " << filename;
 	SoundHandle* handle = NULL;
 
 	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
@@ -119,6 +118,7 @@ SoundHandle* SoundManager::loadSound(const std::string & filename)
 
 MusicHandle* SoundManager::loadMusic(const std::string & filename)
 {
+	LOG(INFO) << "Loading music " << filename;
 	SoundHandle* handle = NULL;
 
 	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM, NULL, &handle);
@@ -134,8 +134,6 @@ Channel * SoundManager::playSound(SoundHandle * sound)
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
 	if(result)
 		LOG(WARNING) << "Unable to play sound: " << result;
-	if(ret)
-		ret->setChannelGroup(soundGroup);
 	return ret;
 }
 
@@ -177,16 +175,4 @@ void SoundManager::resumeMusic()
 {
 	if(musicChannel)
 		musicChannel->setPaused(false);
-}
-
-void SoundManager::pauseAll()
-{
-	if(soundGroup)
-		soundGroup->setPaused(true);
-}
-
-void SoundManager::resumeAll()
-{
-	if(soundGroup)
-		soundGroup->setPaused(true);
 }
