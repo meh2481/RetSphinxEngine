@@ -4,7 +4,7 @@
 
 const float soundFreqDefault = 44100.0;
 
-#define ERRCHECK(x) { LOG_IF(x, WARNING) << "FMOD Error: " << x; return 1; }
+#define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
 
 //Example initialization code from FMOD API doc
 int SoundManager::init()
@@ -81,6 +81,17 @@ int SoundManager::init()
 		result = system->init(100, FMOD_INIT_NORMAL, 0);
 	}
 	ERRCHECK(result);
+
+	result = system->createChannelGroup("Master", &masterChannelGroup);
+	ERRCHECK(result);
+	result = system->createChannelGroup("Music", &musicGroup);
+	ERRCHECK(result);
+	result = system->createChannelGroup("SFX", &sfxGroup);
+	ERRCHECK(result);
+
+	masterChannelGroup->addGroup(musicGroup);
+	masterChannelGroup->addGroup(sfxGroup);
+
 	LOG(INFO) << "FMOD Init success";
 	musicChannel = NULL;
 
@@ -134,12 +145,16 @@ Channel * SoundManager::playSound(SoundHandle * sound)
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
 	if(result)
 		LOG(WARNING) << "Unable to play sound: " << result;
+	ret->setChannelGroup(sfxGroup);
 	return ret;
 }
 
 Channel * SoundManager::playMusic(MusicHandle * music)
 {
-	musicChannel = playSound(music);
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, false, &musicChannel);
+	if(result)
+		LOG(WARNING) << "Unable to play music: " << result;
+	musicChannel->setChannelGroup(musicGroup);
 	return musicChannel;
 }
 
@@ -175,4 +190,16 @@ void SoundManager::resumeMusic()
 {
 	if(musicChannel)
 		musicChannel->setPaused(false);
+}
+
+void SoundManager::pauseAll()
+{
+	if(masterChannelGroup)
+		masterChannelGroup->setPaused(true);
+}
+
+void SoundManager::resumeAll()
+{
+	if(masterChannelGroup)
+		masterChannelGroup->setPaused(false);
 }
