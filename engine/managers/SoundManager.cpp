@@ -2,11 +2,9 @@
 #include "easylogging++.h"
 #include <cstring>
 
-void ERRCHECK(FMOD_RESULT x)
-{
-	if(x)
-		LOG(INFO) << "Result: " << x;
-}
+const float soundFreqDefault = 44100.0;
+
+#define ERRCHECK(x) { LOG_IF(x, WARNING) << "FMOD Error: " << x; return 1; }
 
 //Example initialization code from FMOD API doc
 int SoundManager::init()
@@ -84,6 +82,10 @@ int SoundManager::init()
 	}
 	ERRCHECK(result);
 	LOG(INFO) << "FMOD Init success";
+
+	system->createChannelGroup("All sounds", &soundGroup);
+	musicChannel = NULL;
+
 	return 0;
 }
 
@@ -130,12 +132,17 @@ Channel * SoundManager::playSound(SoundHandle * sound)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
+	if(result)
+		LOG(WARNING) << "Unable to play sound: " << result;
+	if(ret)
+		ret->setChannelGroup(soundGroup);
 	return ret;
 }
 
 Channel * SoundManager::playMusic(MusicHandle * music)
 {
-	return playSound(music);
+	musicChannel = playSound(music);
+	return musicChannel;
 }
 
 void SoundManager::pause(Channel * channel)
@@ -162,10 +169,24 @@ void SoundManager::stop(Channel * channel)
 
 void SoundManager::pauseMusic()
 {
-	//TODO
+	if(musicChannel)
+		musicChannel->setPaused(true);
 }
 
-void SoundManager::playMusic()
+void SoundManager::resumeMusic()
 {
-	//TODO
+	if(musicChannel)
+		musicChannel->setPaused(false);
+}
+
+void SoundManager::pauseAll()
+{
+	if(soundGroup)
+		soundGroup->setPaused(true);
+}
+
+void SoundManager::resumeAll()
+{
+	if(soundGroup)
+		soundGroup->setPaused(true);
 }

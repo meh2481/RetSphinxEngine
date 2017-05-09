@@ -23,8 +23,6 @@ class SoundManager;
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
 
-const float soundFreqDefault = 44100.0;
-
 typedef struct
 {
 	std::string sSwitch, sValue;

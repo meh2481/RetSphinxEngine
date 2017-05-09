@@ -267,12 +267,12 @@ void GameEngine::init(list<commandlineArg> sArgs)
 
 void GameEngine::pause()
 {
-	getSoundManager()->pauseMusic();
+	getSoundManager()->pauseAll();
 }
 
 void GameEngine::resume()
 {
-	getSoundManager()->playMusic();
+	getSoundManager()->resumeAll();
 }
 
 void GameEngine::warpObjectToNode(Object* o, Node* n)

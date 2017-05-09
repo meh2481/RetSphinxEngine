@@ -10,6 +10,8 @@ class SoundManager
 {
 private:
 	FMOD::System* system;
+	FMOD::ChannelGroup* soundGroup;
+	Channel* musicChannel;
 
 	int init();
 public:
@@ -30,5 +32,8 @@ public:
 	void stop(Channel* channel);
 
 	void pauseMusic();
-	void playMusic();
+	void resumeMusic();
+
+	void pauseAll();
+	void resumeAll();
 };
