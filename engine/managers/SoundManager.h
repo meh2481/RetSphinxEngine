@@ -1,6 +1,7 @@
 #pragma once
 #include "fmod.hpp"
 #include <string>
+#include <map>
 
 #define SoundHandle FMOD::Sound
 #define MusicHandle FMOD::Sound
@@ -9,6 +10,9 @@
 class SoundManager
 {
 private:
+	//TODO: Free sounds if not used after a period of time?
+	std::map<const std::string, FMOD::Sound*> sounds;	//Cache for loaded sounds
+	std::map<FMOD::Sound*, unsigned int> musicPositions;	//Last play position for each song
 	FMOD::System* system;
 	Channel* musicChannel;
 	FMOD::ChannelGroup* masterChannelGroup;

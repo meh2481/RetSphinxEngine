@@ -115,31 +115,43 @@ void SoundManager::update()
 	system->update();
 }
 
-SoundHandle* SoundManager::loadSound(const std::string & filename)
+SoundHandle* SoundManager::loadSound(const std::string& filename)
 {
-	LOG(INFO) << "Loading sound " << filename;
-	SoundHandle* handle = NULL;
+	std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
+	if(existing == sounds.end())	//Doesn't exist; load
+	{
+		LOG(INFO) << "Loading sound " << filename;
+		SoundHandle* handle = NULL;
 
-	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
-	if(result)
-		LOG(WARNING) << "Unable to create sound resource " << filename << ", error " << result;
+		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
+		if(result)
+			LOG(WARNING) << "Unable to create sound resource " << filename << ", error " << result;
 
-	return handle;
+		sounds[filename] = handle;
+		return handle;
+	}
+	return existing->second;
 }
 
-MusicHandle* SoundManager::loadMusic(const std::string & filename)
+MusicHandle* SoundManager::loadMusic(const std::string& filename)
 {
-	LOG(INFO) << "Loading music " << filename;
-	SoundHandle* handle = NULL;
+	std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
+	if(existing == sounds.end())	//Doesn't exist; load
+	{
+		LOG(INFO) << "Loading music " << filename;
+		SoundHandle* handle = NULL;
 
-	FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM, NULL, &handle);
-	if(result)
-		LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
+		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM, NULL, &handle);
+		if(result)
+			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
 
-	return handle;
+		sounds[filename] = handle;
+		return handle;
+	}
+	return existing->second;
 }
 
-Channel* SoundManager::playSound(SoundHandle * sound)
+Channel* SoundManager::playSound(SoundHandle* sound)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
@@ -149,20 +161,34 @@ Channel* SoundManager::playSound(SoundHandle * sound)
 	return ret;
 }
 
-Channel* SoundManager::playMusic(MusicHandle * music)
+Channel* SoundManager::playMusic(MusicHandle* music)
 {
+	//Check if we have a song currently playing
 	if(musicChannel != NULL)
 	{
-		bool playing;
+		bool playing = false;
 		FMOD_RESULT result = musicChannel->isPlaying(&playing);
 		ERRCHECK(result);
 		if(playing)
+		{
+			//Save the last playing position
+			unsigned int pos = 0;
+			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
+			ERRCHECK(result);
+			musicPositions[music] = pos;
 			musicChannel->stop();
+		}
 	}
-	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, false, &musicChannel);
-	if(result)
-		LOG(WARNING) << "Unable to play music: " << result;
+	//Paused at start so can seek
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, true, &musicChannel);
+	ERRCHECK(result);
+	//Start where we last stopped playing this song
+	std::map<FMOD::Sound*, unsigned int>::iterator existing = musicPositions.find(music);
+	if(existing != musicPositions.end())
+		musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
+	//Set group and start playing
 	musicChannel->setChannelGroup(musicGroup);
+	musicChannel->setPaused(false);
 	return musicChannel;
 }
 
