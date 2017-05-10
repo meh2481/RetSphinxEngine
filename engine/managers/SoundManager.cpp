@@ -82,7 +82,7 @@ int SoundManager::init()
 	}
 	ERRCHECK(result);
 
-	result = system->createChannelGroup("Master", &masterChannelGroup);
+	result = system->createChannelGroup("Master", &masterChannelGroup);	//Can't use system->getMasterChannelGroup() as we can't pause/resume that group
 	ERRCHECK(result);
 	result = system->createChannelGroup("Music", &musicGroup);
 	ERRCHECK(result);
@@ -139,7 +139,7 @@ MusicHandle* SoundManager::loadMusic(const std::string & filename)
 	return handle;
 }
 
-Channel * SoundManager::playSound(SoundHandle * sound)
+Channel* SoundManager::playSound(SoundHandle * sound)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
@@ -149,8 +149,16 @@ Channel * SoundManager::playSound(SoundHandle * sound)
 	return ret;
 }
 
-Channel * SoundManager::playMusic(MusicHandle * music)
+Channel* SoundManager::playMusic(MusicHandle * music)
 {
+	if(musicChannel != NULL)
+	{
+		bool playing;
+		FMOD_RESULT result = musicChannel->isPlaying(&playing);
+		ERRCHECK(result);
+		if(playing)
+			musicChannel->stop();
+	}
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, false, &musicChannel);
 	if(result)
 		LOG(WARNING) << "Unable to play music: " << result;
