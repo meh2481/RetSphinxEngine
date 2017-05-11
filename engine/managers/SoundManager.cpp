@@ -91,13 +91,13 @@ int SoundManager::init()
 	masterChannelGroup->addGroup(sfxGroup);
 
 	LOG(INFO) << "FMOD Init success";
-	musicChannel = NULL;
 
 	return 0;
 }
 
 SoundManager::SoundManager()
 {
+	musicChannel = NULL;
 	init();
 }
 
@@ -180,7 +180,7 @@ Channel* SoundManager::playMusic(MusicHandle* music)
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, true, &musicChannel);
 	ERRCHECK(result);
 	//Start where we last stopped playing this song
-	std::map<FMOD::Sound*, unsigned int>::iterator existing = musicPositions.find(music);
+	std::map<MusicHandle*, unsigned int>::iterator existing = musicPositions.find(music);
 	if(existing != musicPositions.end())
 		musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
 	//Set group and start playing
@@ -240,6 +240,16 @@ void SoundManager::getSpectrum(Channel* channel, float* outSpec, int specLen)
 
 	delete[] outL;
 	delete[] outR;
+}
+
+void SoundManager::getSpectrumL(Channel* channel, float* outSpec, int specLen)
+{
+	ERRCHECK(channel->getSpectrum(outSpec, specLen, 0, FMOD_DSP_FFT_WINDOW_RECT));	//0 = Left
+}
+
+void SoundManager::getSpectrumR(Channel* channel, float* outSpec, int specLen)
+{
+	ERRCHECK(channel->getSpectrum(outSpec, specLen, 1, FMOD_DSP_FFT_WINDOW_RECT));	//1 = Right
 }
 
 void SoundManager::pauseMusic()
