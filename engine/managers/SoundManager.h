@@ -6,6 +6,7 @@
 #define SoundHandle FMOD::Sound
 #define MusicHandle FMOD::Sound
 #define Channel FMOD::Channel
+#define DEFAULT_SOUND_FREQ 44100.0f
 
 class SoundManager
 {
@@ -36,6 +37,9 @@ public:
 	void resume(Channel* channel);
 	bool isPaused(Channel* channel);
 	void stop(Channel* channel);
+	float getFreq(Channel* channel);
+	void setFreq(Channel* channel, float freq);
+	void getSpectrum(Channel* channel, float* outSpec, int specLen);
 
 	void pauseMusic();
 	void resumeMusic();

@@ -2,8 +2,6 @@
 #include "easylogging++.h"
 #include <cstring>
 
-const float soundFreqDefault = 44100.0;
-
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
 
 //Example initialization code from FMOD API doc
@@ -155,8 +153,7 @@ Channel* SoundManager::playSound(SoundHandle* sound)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
-	if(result)
-		LOG(WARNING) << "Unable to play sound: " << result;
+	ERRCHECK(result);
 	ret->setChannelGroup(sfxGroup);
 	return ret;
 }
@@ -192,26 +189,57 @@ Channel* SoundManager::playMusic(MusicHandle* music)
 	return musicChannel;
 }
 
-void SoundManager::pause(Channel * channel)
+void SoundManager::pause(Channel* channel)
 {
 	channel->setPaused(true);
 }
 
-void SoundManager::resume(Channel * channel)
+void SoundManager::resume(Channel* channel)
 {
 	channel->setPaused(false);
 }
 
-bool SoundManager::isPaused(Channel * channel)
+bool SoundManager::isPaused(Channel* channel)
 {
 	bool paused;
 	channel->getPaused(&paused);
 	return paused;
 }
 
-void SoundManager::stop(Channel * channel)
+void SoundManager::stop(Channel* channel)
 {
 	channel->stop();
+}
+
+float SoundManager::getFreq(Channel* channel)
+{
+	float freq = 0.0f;
+	ERRCHECK(channel->getFrequency(&freq));
+	return freq;
+}
+
+void SoundManager::setFreq(Channel* channel, float freq)
+{
+	channel->setFrequency(freq);
+}
+
+void SoundManager::getSpectrum(Channel* channel, float* outSpec, int specLen)
+{
+	float* outL = new float[specLen];
+	float* outR = new float[specLen];
+
+	//Get spectrum for both left and right
+	ERRCHECK(channel->getSpectrum(outL, specLen, 0, FMOD_DSP_FFT_WINDOW_RECT));	//0 = Left
+	ERRCHECK(channel->getSpectrum(outR, specLen, 1, FMOD_DSP_FFT_WINDOW_RECT));	//1 = Right
+
+	//Average them
+	float* l = outL;
+	float* r = outR;
+	for(int i = 0; i < specLen; i++)
+		*outSpec++ = (*l++ + *r++) / 2.0f;
+
+	delete[] outL;
+	delete[] outR;
 }
 
 void SoundManager::pauseMusic()

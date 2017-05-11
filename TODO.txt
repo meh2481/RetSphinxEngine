@@ -1,11 +1,14 @@
--Input names to key checking functions should be actions, not keys
+FMOD branch:
+-Add music + controller vibration node to test FMOD and vibration vfx
+-Load sound fx from pak
+
+Current higher pri:
 -UTF code point lookup should use array of direct values rather than binary search
 -Pass const string& instead of string to functions
 -Look into ETC1 compression for images
 -Use SDL_GetPowerInfo() for laptop battery reminders
 -Particles follow ship with acceleration applied
 -Particle editor breaks after F5
--Figure out why up key doesn't work with ship flying
 -Use JSON objects for SS event sending - SS editor should output JSON, so you can edit
 -Use level editor to create geometry/scenery
 -Fix tamerisk board
