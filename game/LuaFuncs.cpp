@@ -171,10 +171,13 @@ public:
 		return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
 	}
 
-	static void playSong(const std::string& songFilename)
+	static int playSong(const std::string& songFilename)
 	{
 		MusicHandle* mus = g_pGlobalEngine->getSoundManager()->loadMusic(songFilename);
-		g_pGlobalEngine->getSoundManager()->playMusic(mus);
+		Channel* channel = g_pGlobalEngine->getSoundManager()->playMusic(mus);
+		int channelIdx = 0;
+		channel->getIndex(&channelIdx);
+		return channelIdx;
 	}
 };
 
@@ -688,10 +691,10 @@ luaFunc(movement_vec)	//x,y movement_vec(int movementId)
 //-----------------------------------------------------------------------------------------------------------
 // Sound functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(music_play)	//void music_play(string songPath)
+luaFunc(music_play)	//int music_play(string songPath)
 {
 	if(lua_isstring(L, 1))
-		GameEngineLua::playSong(lua_tostring(L, 1));
+		luaReturnInt(GameEngineLua::playSong(lua_tostring(L, 1)));
 	luaReturnNil();
 }
 
