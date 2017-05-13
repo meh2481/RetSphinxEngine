@@ -93,6 +93,13 @@ void Object::addSegment(ObjSegment* seg)
 	seg->parent = this;
 }
 
+ObjSegment* Object::getSegment(unsigned int idx)
+{
+	if(segments.size() > idx) 
+		return segments[idx]; 
+	return NULL;
+}
+
 void Object::update(float dt)
 {
 	if(meshAnim)

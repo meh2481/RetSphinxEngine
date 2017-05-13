@@ -243,7 +243,7 @@ luaFunc(getFramerate)	//float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 // Object functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
+luaFunc(obj_setAngle)	//void obj_setAngle(Object* o, float angle)
 {
 	Object *o = getObj<Object>(L);
 	float f = (float)lua_tonumber(L, 2);
@@ -259,7 +259,7 @@ luaFunc(obj_setAngle)	//void obj_setAngle(obj* o, float angle)
 	luaReturnNil();
 }
 
-luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
+luaFunc(obj_getAngle)	//float obj_getAngle(Object* o)
 {
 	Object *o = getObj<Object>(L);
 	float f = 0.0f;
@@ -272,7 +272,7 @@ luaFunc(obj_getAngle)	//float obj_getAngle(obj* o)
 	luaReturnNum(f);
 }
 
-luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
+luaFunc(obj_setVelocity)	//void obj_setVelocity(Object* o, float xvel, float yvel)
 {
 	Object *o = getObj<Object>(L);
 	b2Vec2 p((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3));
@@ -285,7 +285,7 @@ luaFunc(obj_setVelocity)	//void obj_setVelocity(obj* o, float xvel, float yvel)
 	luaReturnNil();
 }
 
-luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
+luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(Object* o)
 {
 	b2Vec2 p(0, 0);
 	Object *o = getObj<Object>(L);
@@ -298,7 +298,7 @@ luaFunc(obj_getVelocity)	//float x, y obj_getVelocity(obj* o)
 	luaReturnVec2(p.x, p.y);
 }
 
-luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
+luaFunc(obj_applyForce)	//void obj_applyForce(Object* o, float x, float y)
 {
 	Object *o = getObj<Object>(L);
 	b2Vec2 pForce((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3));
@@ -311,7 +311,7 @@ luaFunc(obj_applyForce)	//void obj_applyForce(obj* o, float x, float y)
 	luaReturnNil();
 }
 
-luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
+luaFunc(obj_getPos)		//float x, float y obj_getPos(Object* o)
 {
 	Object *o = getObj<Object>(L);
 	b2Vec2 pt(0, 0);
@@ -324,7 +324,7 @@ luaFunc(obj_getPos)		//float x, float y obj_getPos(obj* o)
 	luaReturnVec2(pt.x, pt.y);
 }
 
-luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
+luaFunc(obj_setPos)	//void obj_setPos(Object* o, float x, float y)
 {
 	Object *o = getObj<Object>(L);
 	Vec2 p(lua_tonumber(L, 2), lua_tonumber(L, 3));
@@ -333,7 +333,7 @@ luaFunc(obj_setPos)	//void obj_setPos(obj* o, float x, float y)
 	luaReturnNil();
 }
 
-luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, float xvel, float yvel)
+luaFunc(obj_create) //Object* obj_create(string className, float xpos, float ypos, float xvel, float yvel)
 {
 	if(!lua_isstring(L, 1)) luaReturnNil();
 
@@ -356,7 +356,7 @@ luaFunc(obj_create) //obj* obj_create(string className, float xpos, float ypos, 
 	luaReturnNil();
 }
 
-luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
+luaFunc(obj_getPlayer)	//Object* obj_getPlayer()
 {
 	Object* o = GameEngineLua::getPlayerObject();
 	if(o)
@@ -364,7 +364,7 @@ luaFunc(obj_getPlayer)	//obj* obj_getPlayer()
 	luaReturnNil();
 }
 
-luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
+luaFunc(obj_registerPlayer)	//void obj_registerPlayer(Object* o)
 {
 	Object *o = getObj<Object>(L);
 	if(o)
@@ -372,7 +372,7 @@ luaFunc(obj_registerPlayer)	//void obj_registerPlayer(obj* o)
 	luaReturnNil();
 }
 
-luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
+luaFunc(obj_getFromPoint) //Object* obj_getFromPoint(float x, float y)
 {
 	Vec2 p(lua_tonumber(L, 1), lua_tonumber(L, 2));
 	Object* o = GameEngineLua::getObjAtPoint(p);
@@ -382,7 +382,7 @@ luaFunc(obj_getFromPoint) //obj* obj_getFromPoint(float x, float y)
 }
 
 //Set physics off or on for an object's body
-luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
+luaFunc(obj_setActive) //void obj_setActive(Object* o, bool b)
 {
 	Object *o = getObj<Object>(L);
 	bool b = (lua_toboolean(L, 2) != 0);
@@ -396,7 +396,7 @@ luaFunc(obj_setActive) //void obj_setActive(obj* o, bool b)
 	luaReturnNil();
 }
 
-luaFunc(obj_isActive) //bool obj_isActive(obj* o)
+luaFunc(obj_isActive) //bool obj_isActive(Object* o)
 {
 	Object *o = getObj<Object>(L);
 	if(o)
@@ -408,7 +408,7 @@ luaFunc(obj_isActive) //bool obj_isActive(obj* o)
 	luaReturnBool(false);
 }
 
-luaFunc(obj_getProperty)	//string obj_getProperty(obj* o, string sProp)
+luaFunc(obj_getProperty)	//string obj_getProperty(Object* o, string sProp)
 {
 	string s;
 	Object *o = getObj<Object>(L);
@@ -417,7 +417,7 @@ luaFunc(obj_getProperty)	//string obj_getProperty(obj* o, string sProp)
 	luaReturnString(s);
 }
 
-luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 1)
+luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int seg = 1)
 {
 	Object *o = getObj<Object>(L);
 	if(o)
@@ -426,6 +426,88 @@ luaFunc(obj_setImage)	//void obj_setImage(obj o, string sImgFilename, int seg = 
 		if(lua_isinteger(L, 3))
 			seg = lua_tointeger(L, 3);
 		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg - 1);	//Lua remains 1-indexed, C++ side 0-indexed
+	}
+	luaReturnNil();
+}
+
+
+//-----------------------------------------------------------------------------------------------------------
+// Object segment functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(seg_getSize)	//float x, float y seg_getSize(Object* o, int idx)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+			luaReturnVec2(seg->size.x, seg->size.y);
+	}
+	luaReturnNil();
+}
+
+luaFunc(seg_setSize)	//void seg_setSize(Object* o, int idx, float x, float y)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+		{
+			seg->size.x = lua_tonumber(L, 3);
+			seg->size.y = lua_tonumber(L, 4);
+		}
+	}
+	luaReturnNil();
+}
+
+luaFunc(seg_getPos)	//float x, float y seg_getPos(Object* o, int idx)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+			luaReturnVec2(seg->pos.x, seg->pos.y);
+	}
+	luaReturnNil();
+}
+
+luaFunc(seg_setPos)	//void seg_setPos(Object* o, int idx, float x, float y)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+		{
+			seg->pos.x = lua_tonumber(L, 3);
+			seg->pos.y = lua_tonumber(L, 4);
+		}
+	}
+	luaReturnNil();
+}
+
+luaFunc(seg_getRot)	//float seg_getRot(Object* o, int idx)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+			luaReturnNum(seg->rot);
+	}
+	luaReturnNil();
+}
+
+luaFunc(seg_setRot)	//void seg_setRot(Object* o, int idx, float angle)
+{
+	Object *o = getObj<Object>(L);
+	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3))
+	{
+		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		if(seg)
+			seg->rot = lua_tonumber(L, 2);
 	}
 	luaReturnNil();
 }
@@ -716,7 +798,7 @@ luaFunc(music_play)	//int music_play(string songPath)
 	luaReturnNil();
 }
 
-luaFunc(music_spectrum) //int[] music_spectrum(int channel, int num)
+luaFunc(music_spectrum) //float[] music_spectrum(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
@@ -726,14 +808,14 @@ luaFunc(music_spectrum) //int[] music_spectrum(int channel, int num)
 		float* data = new float[num];
 		GameEngineLua::getSpectrum(channel, num, data);
 		for(int i = 0; i < num; i++)
-			lua_pushinteger(L, data[i]);
+			lua_pushnumber(L, data[i]);
 		delete[] data;
 		return num;
 	}
 	luaReturnNil();
 }
 
-luaFunc(music_spectrumR) //int[] music_spectrumR(int channel, int num)
+luaFunc(music_spectrumR) //float[] music_spectrumR(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
@@ -743,14 +825,14 @@ luaFunc(music_spectrumR) //int[] music_spectrumR(int channel, int num)
 		float* data = new float[num];
 		GameEngineLua::getSpectrumR(channel, num, data);
 		for(int i = 0; i < num; i++)
-			lua_pushinteger(L, data[i]);
+			lua_pushnumber(L, data[i]);
 		delete[] data;
 		return num;
 	}
 	luaReturnNil();
 }
 
-luaFunc(music_spectrumL) //int[] music_spectrumL(int channel, int num)
+luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
@@ -760,7 +842,7 @@ luaFunc(music_spectrumL) //int[] music_spectrumL(int channel, int num)
 		float* data = new float[num];
 		GameEngineLua::getSpectrumL(channel, num, data);
 		for(int i = 0; i < num; i++)
-			lua_pushinteger(L, data[i]);
+			lua_pushnumber(L, data[i]);
 		delete[] data;
 		return num;
 	}
@@ -772,8 +854,40 @@ luaFunc(music_spectrumL) //int[] music_spectrumL(int channel, int num)
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
 {
+	//Actions (input)
+	luaRegister(action_analog),
+	luaRegister(action_digital),
+	//Camera
+	luaRegister(camera_centerOnXY),
+	luaRegister(camera_getPos),
+	luaRegister(camera_setPos),
+	//Controller rumble
 	luaRegister(controller_rumbleLR),
+	//framerate
 	luaRegister(getFramerate),
+	//map
+	luaRegister(map_load),
+	//mouse input (deprecated)
+	luaRegister(mouse_isDown),
+	luaRegister(mouse_getPos),
+	luaRegister(mouse_transformToWorld),
+	luaRegister(mouse_setCursor),
+	//Controller/kb player directional input
+	luaRegister(movement_vec),
+	//Music
+	luaRegister(music_play),
+	luaRegister(music_spectrumL),
+	luaRegister(music_spectrumR),
+	luaRegister(music_spectrum),
+	//Nodes
+	luaRegister(node_getProperty),
+	luaRegister(node_getVec2Property),
+	luaRegister(node_getPos),
+	luaRegister(node_getCollidingObj),
+	luaRegister(node_getNearestObj),
+	luaRegister(node_get),
+	luaRegister(node_isInside),
+	//Objects
 	luaRegister(obj_setVelocity),
 	luaRegister(obj_getVelocity),
 	luaRegister(obj_getPos),
@@ -789,36 +903,24 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_isActive),
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
-	luaRegister(camera_centerOnXY),
-	luaRegister(camera_getPos),
-	luaRegister(camera_setPos),
-	luaRegister(node_getProperty),
-	luaRegister(node_getVec2Property),
-	luaRegister(node_getPos),
-	luaRegister(node_getCollidingObj),
-	luaRegister(node_getNearestObj),
-	luaRegister(node_get),
-	luaRegister(node_isInside),
-	luaRegister(map_load),
-	luaRegister(music_play),
-	luaRegister(music_spectrumL),
-	luaRegister(music_spectrumR),
-	luaRegister(music_spectrum),
+	//particle fx
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),
 	luaRegister(particles_setFireRate),
 	luaRegister(particles_setEmitPos),
 	luaRegister(particles_setEmitVel),
 	luaRegister(particles_setEmitAngle),
-	luaRegister(mouse_isDown),
-	luaRegister(mouse_getPos),
-	luaRegister(mouse_transformToWorld),
-	luaRegister(mouse_setCursor),
+	//Object segments
+	luaRegister(seg_getSize),
+	luaRegister(seg_setSize),
+	luaRegister(seg_getPos),
+	luaRegister(seg_setPos),
+	luaRegister(seg_getRot),
+	luaRegister(seg_setRot),
+	//Steelseries events
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),
-	luaRegister(action_analog),
-	luaRegister(action_digital),
-	luaRegister(movement_vec),
+
 	{NULL, NULL}
 };
 

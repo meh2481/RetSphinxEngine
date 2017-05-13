@@ -18,6 +18,7 @@ enum ObjMainType
 	OT_PARTICLESYSTEM,
 	OT_TEXT,
 	OT_TINYXML2,
+	OT_SEGMENT,
 	//TODO: Figure out what we should have, and add moar / remove some
 };
 

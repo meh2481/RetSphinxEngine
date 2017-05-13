@@ -20,7 +20,6 @@ function spaceship:init()
 	particles_setFiring(self.fireParticles, true)
 	
 	obj_registerPlayer(self)
-	music_play('res/mus/song.ogg')
 end
 
 --Rumble when hitting something
