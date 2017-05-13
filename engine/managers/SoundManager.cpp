@@ -252,6 +252,13 @@ void SoundManager::getSpectrumR(Channel* channel, float* outSpec, int specLen)
 	ERRCHECK(channel->getSpectrum(outSpec, specLen, 1, FMOD_DSP_FFT_WINDOW_RECT));	//1 = Right
 }
 
+Channel* SoundManager::getChannel(int channelIdx)
+{
+	Channel* channel;
+	ERRCHECK(system->getChannel(channelIdx, &channel));
+	return channel;
+}
+
 void SoundManager::pauseMusic()
 {
 	if(musicChannel)

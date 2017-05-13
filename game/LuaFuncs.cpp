@@ -179,6 +179,24 @@ public:
 		channel->getIndex(&channelIdx);
 		return channelIdx;
 	}
+
+	static void getSpectrum(int channel, int num, float* data)
+	{
+		Channel* ch = g_pGlobalEngine->getSoundManager()->getChannel(channel);
+		g_pGlobalEngine->getSoundManager()->getSpectrum(ch, data, num);
+	}
+
+	static void getSpectrumL(int channel, int num, float* data)
+	{
+		Channel* ch = g_pGlobalEngine->getSoundManager()->getChannel(channel);
+		g_pGlobalEngine->getSoundManager()->getSpectrumL(ch, data, num);
+	}
+
+	static void getSpectrumR(int channel, int num, float* data)
+	{
+		Channel* ch = g_pGlobalEngine->getSoundManager()->getChannel(channel);
+		g_pGlobalEngine->getSoundManager()->getSpectrumR(ch, data, num);
+	}
 };
 
 
@@ -698,6 +716,57 @@ luaFunc(music_play)	//int music_play(string songPath)
 	luaReturnNil();
 }
 
+luaFunc(music_spectrum) //int[] music_spectrum(int channel, int num)
+{
+	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
+	{
+		int channel = lua_tointeger(L, 1);
+		int num = lua_tointeger(L, 2);
+
+		float* data = new float[num];
+		GameEngineLua::getSpectrum(channel, num, data);
+		for(int i = 0; i < num; i++)
+			lua_pushinteger(L, data[i]);
+		delete[] data;
+		return num;
+	}
+	luaReturnNil();
+}
+
+luaFunc(music_spectrumR) //int[] music_spectrumR(int channel, int num)
+{
+	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
+	{
+		int channel = lua_tointeger(L, 1);
+		int num = lua_tointeger(L, 2);
+
+		float* data = new float[num];
+		GameEngineLua::getSpectrumR(channel, num, data);
+		for(int i = 0; i < num; i++)
+			lua_pushinteger(L, data[i]);
+		delete[] data;
+		return num;
+	}
+	luaReturnNil();
+}
+
+luaFunc(music_spectrumL) //int[] music_spectrumL(int channel, int num)
+{
+	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
+	{
+		int channel = lua_tointeger(L, 1);
+		int num = lua_tointeger(L, 2);
+
+		float* data = new float[num];
+		GameEngineLua::getSpectrumL(channel, num, data);
+		for(int i = 0; i < num; i++)
+			lua_pushinteger(L, data[i]);
+		delete[] data;
+		return num;
+	}
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
@@ -732,6 +801,9 @@ static LuaFunctions s_functab[] =
 	luaRegister(node_isInside),
 	luaRegister(map_load),
 	luaRegister(music_play),
+	luaRegister(music_spectrumL),
+	luaRegister(music_spectrumR),
+	luaRegister(music_spectrum),
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),
 	luaRegister(particles_setFireRate),

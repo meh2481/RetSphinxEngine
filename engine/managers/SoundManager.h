@@ -43,6 +43,7 @@ public:
 	void getSpectrum(Channel* channel, float* outSpec, int specLen);
 	void getSpectrumL(Channel* channel, float* outSpec, int specLen);
 	void getSpectrumR(Channel* channel, float* outSpec, int specLen);
+	Channel* getChannel(int channelIdx);
 
 	//Music functions
 	void pauseMusic();
