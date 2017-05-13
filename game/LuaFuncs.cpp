@@ -197,6 +197,18 @@ public:
 		Channel* ch = g_pGlobalEngine->getSoundManager()->getChannel(channel);
 		g_pGlobalEngine->getSoundManager()->getSpectrumR(ch, data, num);
 	}
+
+	static int getMusicChannel()
+	{
+		Channel* ch = g_pGlobalEngine->getSoundManager()->getMusicChannel();
+		if(ch)
+		{
+			int channel = -1;
+			ch->getIndex(&channel);
+			return channel;
+		}
+		return -1;
+	}
 };
 
 
@@ -798,6 +810,14 @@ luaFunc(music_play)	//int music_play(string songPath)
 	luaReturnNil();
 }
 
+luaFunc(music_getChannel)	//int music_getChannel(void)
+{
+	int channel = GameEngineLua::getMusicChannel();
+	if(channel > 0)
+		luaReturnInt(channel);
+	luaReturnNil();
+}
+
 luaFunc(music_spectrum) //float[] music_spectrum(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
@@ -884,6 +904,7 @@ static LuaFunctions s_functab[] =
 	//Controller/kb player directional input
 	luaRegister(movement_vec),
 	//Music
+	luaRegister(music_getChannel),
 	luaRegister(music_play),
 	luaRegister(music_spectrumL),
 	luaRegister(music_spectrumR),
