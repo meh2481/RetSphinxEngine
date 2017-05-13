@@ -2,6 +2,8 @@ FMOD branch:
 -Add music + controller vibration node to test FMOD and vibration vfx
 -Load sound fx from pak
 -Save/load song location on exit?
+-Songs should loop
+-Music spectrum out of whack on song end
 
 Current higher pri:
 -UTF code point lookup should use array of direct values rather than binary search

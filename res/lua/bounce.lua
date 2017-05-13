@@ -2,9 +2,15 @@ local bounce = {}
 bounce.__index = bounce
 
 function bounce:init()
-	self.SEG = 0;
-	self.NUM = 64;
-	self.SIZE_X, self.SIZE_Y = seg_getSize(self, self.SEG);
+	self.SEG = 0
+	self.NUM = 4
+	self.ADD_FAC = 0.2
+	self.FALL_FAC = 0.15
+	self.SIZE_X, self.SIZE_Y = seg_getSize(self, self.SEG)
+	self.CUR_X = self.SIZE_X
+	self.CUR_Y = self.SIZE_Y
+	self.MAX_X = self.SIZE_X * 2.0
+	self.MAX_Y = self.SIZE_Y * 2.0
 	self.CHANNEL = music_play('res/mus/song.ogg')
 end
 
@@ -15,15 +21,41 @@ function bounce:collidewall(wallnormalX, wallnormalY)
 end
 
 function bounce:update(dt)
-	local spectrum = {music_spectrumL(self.CHANNEL, self.NUM)}
+	local spectrum = table.pack(music_spectrum(self.CHANNEL, self.NUM))
 	
 	--print(self.CHANNEL, spectrum[1])
 	--for k, v in pairs(spectrum) do
 	--   print(k, v)
 	--end
 	
-	print(self.SIZE_X, self.SIZE_Y)
-	seg_setSize(self, self.SEG, self.SIZE_X * spectrum[1], self.SIZE_Y * spectrum[1])
+	--print(self.SIZE_X, self.SIZE_Y)
+	
+	--Add fac
+	self.CUR_X = self.CUR_X + self.ADD_FAC * spectrum[1]
+	self.CUR_Y = self.CUR_Y + self.ADD_FAC * spectrum[1]
+	
+	--Bounds check
+	if self.CUR_X > self.MAX_X then
+		self.CUR_X = self.MAX_X
+	end
+	if self.CUR_Y > self.MAX_Y then
+		self.CUR_Y = self.MAX_Y
+	end
+	
+	--Set size for this frame
+	seg_setSize(self, self.SEG, self.CUR_X, self.CUR_Y)
+	
+	--Fall back for next frame
+	self.CUR_X = self.CUR_X - self.FALL_FAC
+	self.CUR_Y = self.CUR_Y - self.FALL_FAC
+	
+	--Bounds check
+	if self.CUR_X < self.SIZE_X then
+		self.CUR_X = self.SIZE_X
+	end
+	if self.CUR_Y < self.SIZE_Y then
+		self.CUR_Y = self.SIZE_Y
+	end
 end
 
 function bounce:destroy()

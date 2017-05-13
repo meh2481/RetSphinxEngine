@@ -804,9 +804,12 @@ luaFunc(music_spectrum) //float[] music_spectrum(int channel, int num)
 	{
 		int channel = lua_tointeger(L, 1);
 		int num = lua_tointeger(L, 2);
+		int actualNum = num;
+		if(actualNum < 64)	//FMOD minimum
+			actualNum = 64;
 
-		float* data = new float[num];
-		GameEngineLua::getSpectrum(channel, num, data);
+		float* data = new float[actualNum];
+		GameEngineLua::getSpectrum(channel, actualNum, data);
 		for(int i = 0; i < num; i++)
 			lua_pushnumber(L, data[i]);
 		delete[] data;
@@ -821,9 +824,12 @@ luaFunc(music_spectrumR) //float[] music_spectrumR(int channel, int num)
 	{
 		int channel = lua_tointeger(L, 1);
 		int num = lua_tointeger(L, 2);
+		int actualNum = num;
+		if(actualNum < 64)	//FMOD minimum
+			actualNum = 64;
 
-		float* data = new float[num];
-		GameEngineLua::getSpectrumR(channel, num, data);
+		float* data = new float[actualNum];
+		GameEngineLua::getSpectrumR(channel, actualNum, data);
 		for(int i = 0; i < num; i++)
 			lua_pushnumber(L, data[i]);
 		delete[] data;
@@ -838,9 +844,12 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 	{
 		int channel = lua_tointeger(L, 1);
 		int num = lua_tointeger(L, 2);
+		int actualNum = num;
+		if(actualNum < 64)	//FMOD minimum
+			actualNum = 64;
 
-		float* data = new float[num];
-		GameEngineLua::getSpectrumL(channel, num, data);
+		float* data = new float[actualNum];
+		GameEngineLua::getSpectrumL(channel, actualNum, data);
 		for(int i = 0; i < num; i++)
 			lua_pushnumber(L, data[i]);
 		delete[] data;
