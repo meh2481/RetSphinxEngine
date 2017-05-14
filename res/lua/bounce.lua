@@ -11,7 +11,6 @@ function bounce:init()
 	self.CUR_Y = self.SIZE_Y
 	self.MAX_X = self.SIZE_X * 2.0
 	self.MAX_Y = self.SIZE_Y * 2.0
-	self.CHANNEL = music_play('res/mus/song.ogg')
 end
 
 function bounce:collide(other)
@@ -21,7 +20,8 @@ function bounce:collidewall(wallnormalX, wallnormalY)
 end
 
 function bounce:update(dt)
-	local spectrum = table.pack(music_spectrum(self.CHANNEL, self.NUM))
+	local channel = music_getChannel()
+	local spectrum = table.pack(music_spectrum(channel, self.NUM))
 	
 	--print(self.CHANNEL, spectrum[1])
 	--for k, v in pairs(spectrum) do

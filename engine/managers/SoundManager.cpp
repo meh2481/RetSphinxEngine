@@ -4,6 +4,9 @@
 
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
 
+#define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
+#define LOOP_FOREVER -1
+
 //Example initialization code from FMOD API doc
 int SoundManager::init()
 {
@@ -139,7 +142,7 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 		LOG(INFO) << "Loading music " << filename;
 		SoundHandle* handle = NULL;
 
-		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM, NULL, &handle);
+		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
 		if(result)
 			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
 
@@ -177,15 +180,29 @@ Channel* SoundManager::playMusic(MusicHandle* music)
 		}
 	}
 	//Paused at start so can seek
-	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, true, &musicChannel);
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, false, &musicChannel);
 	ERRCHECK(result);
+	
+	//Set looping
+	result = musicChannel->setLoopCount(LOOP_FOREVER);
+	ERRCHECK(result);
+	//TODO result = musicChannel->setLoopPoints(loopstart, FMOD_TIMEUNIT_MS, loopend, FMOD_TIMEUNIT_MS);
+	//ERRCHECK(result);
+
+	//Set group and start playing
+	result = musicChannel->setChannelGroup(musicGroup);
+	ERRCHECK(result);
+
 	//Start where we last stopped playing this song
 	std::map<MusicHandle*, unsigned int>::iterator existing = musicPositions.find(music);
 	if(existing != musicPositions.end())
-		musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
-	//Set group and start playing
-	musicChannel->setChannelGroup(musicGroup);
-	musicChannel->setPaused(false);
+		result = musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
+	else
+		result = musicChannel->setPosition(0, FMOD_TIMEUNIT_MS);	//Set at start to force reflush of stream buffer (See FMOD API)
+	ERRCHECK(result);
+	
+	result = musicChannel->setPaused(false);
+	ERRCHECK(result);
 	return musicChannel;
 }
 
@@ -214,7 +231,8 @@ void SoundManager::stop(Channel* channel)
 float SoundManager::getFreq(Channel* channel)
 {
 	float freq = 0.0f;
-	ERRCHECK(channel->getFrequency(&freq));
+	FMOD_RESULT result = channel->getFrequency(&freq);
+	ERRCHECK(result);
 	return freq;
 }
 
@@ -229,8 +247,10 @@ void SoundManager::getSpectrum(Channel* channel, float* outSpec, int specLen)
 	float* outR = new float[specLen];
 
 	//Get spectrum for both left and right
-	ERRCHECK(channel->getSpectrum(outL, specLen, 0, FMOD_DSP_FFT_WINDOW_RECT));	//0 = Left
-	ERRCHECK(channel->getSpectrum(outR, specLen, 1, FMOD_DSP_FFT_WINDOW_RECT));	//1 = Right
+	FMOD_RESULT result = channel->getSpectrum(outL, specLen, 0, WINDOW_TYPE);
+	ERRCHECK(result);	//0 = Left
+	result = channel->getSpectrum(outR, specLen, 1, WINDOW_TYPE);
+	ERRCHECK(result);	//1 = Right
 
 	//Average them
 	float* l = outL;
@@ -244,18 +264,21 @@ void SoundManager::getSpectrum(Channel* channel, float* outSpec, int specLen)
 
 void SoundManager::getSpectrumL(Channel* channel, float* outSpec, int specLen)
 {
-	ERRCHECK(channel->getSpectrum(outSpec, specLen, 0, FMOD_DSP_FFT_WINDOW_RECT));	//0 = Left
+	FMOD_RESULT result = channel->getSpectrum(outSpec, specLen, 0, WINDOW_TYPE);
+	ERRCHECK(result);	//0 = Left
 }
 
 void SoundManager::getSpectrumR(Channel* channel, float* outSpec, int specLen)
 {
-	ERRCHECK(channel->getSpectrum(outSpec, specLen, 1, FMOD_DSP_FFT_WINDOW_RECT));	//1 = Right
+	FMOD_RESULT result = channel->getSpectrum(outSpec, specLen, 1, WINDOW_TYPE);
+	ERRCHECK(result);	//1 = Right
 }
 
 Channel* SoundManager::getChannel(int channelIdx)
 {
 	Channel* channel;
-	ERRCHECK(system->getChannel(channelIdx, &channel));
+	FMOD_RESULT result = system->getChannel(channelIdx, &channel);
+	ERRCHECK(result);
 	return channel;
 }
 
