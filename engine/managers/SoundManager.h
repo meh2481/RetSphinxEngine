@@ -8,6 +8,14 @@
 #define Channel FMOD::Channel
 #define DEFAULT_SOUND_FREQ 44100.0f
 
+typedef enum
+{
+	GROUP_MUSIC,
+	GROUP_SFX,
+	GROUP_BGFX,
+	GROUP_VOX
+} SOUND_GROUP;
+
 class SoundManager
 {
 private:
@@ -19,8 +27,11 @@ private:
 	FMOD::ChannelGroup* masterChannelGroup;
 	FMOD::ChannelGroup* musicGroup;
 	FMOD::ChannelGroup* sfxGroup;
+	FMOD::ChannelGroup* bgFxGroup;
+	FMOD::ChannelGroup* voxGroup;
 
 	int init();
+	void setGroup(Channel* ch, SOUND_GROUP group);
 public:
 	SoundManager();
 	~SoundManager();
@@ -30,8 +41,8 @@ public:
 	SoundHandle* loadSound(const std::string& filename);
 	MusicHandle* loadMusic(const std::string& filename);
 
-	Channel* playSound(SoundHandle* sound);
-	Channel* playMusic(MusicHandle* music);
+	Channel* playSound(SoundHandle* sound, SOUND_GROUP group = GROUP_SFX);
+	Channel* playMusic(MusicHandle* music, SOUND_GROUP group = GROUP_MUSIC);
 
 	//Channel functions
 	void pause(Channel* channel);

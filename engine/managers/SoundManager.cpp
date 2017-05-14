@@ -52,8 +52,10 @@ int SoundManager::init()
 			The user has the 'Acceleration' slider set to off! This is really bad
 			for latency! You might want to warn the user about this.
 			*/
+			LOG(WARNING) << "Sound acceleration disabled. May cause sound latency problems";
 			result = system->setDSPBufferSize(1024, 10);
 			ERRCHECK(result);
+
 		}
 		result = system->getDriverInfo(0, name, 256, 0);
 		ERRCHECK(result);
@@ -83,19 +85,50 @@ int SoundManager::init()
 	}
 	ERRCHECK(result);
 
-	result = system->createChannelGroup("Master", &masterChannelGroup);	//Can't use system->getMasterChannelGroup() as we can't pause/resume that group
+	//Set up sound groups
+	//Can't use system->getMasterChannelGroup() as we can't pause/resume that group
+	result = system->createChannelGroup("Master", &masterChannelGroup);
 	ERRCHECK(result);
 	result = system->createChannelGroup("Music", &musicGroup);
 	ERRCHECK(result);
 	result = system->createChannelGroup("SFX", &sfxGroup);
 	ERRCHECK(result);
+	result = system->createChannelGroup("Background Sounds", &bgFxGroup);
+	ERRCHECK(result);
+	result = system->createChannelGroup("Voices", &voxGroup);
+	ERRCHECK(result);
 
 	masterChannelGroup->addGroup(musicGroup);
 	masterChannelGroup->addGroup(sfxGroup);
+	masterChannelGroup->addGroup(bgFxGroup);
+	masterChannelGroup->addGroup(voxGroup);
 
 	LOG(INFO) << "FMOD Init success";
 
 	return 0;
+}
+
+void SoundManager::setGroup(Channel* ch, SOUND_GROUP group)
+{
+	switch(group)
+	{
+		case GROUP_MUSIC:
+			ch->setChannelGroup(musicGroup);
+			break;
+
+		case GROUP_BGFX:
+			ch->setChannelGroup(bgFxGroup);
+			break;
+
+		case GROUP_VOX:
+			ch->setChannelGroup(voxGroup);
+			break;
+
+		case GROUP_SFX:
+		default:
+			ch->setChannelGroup(sfxGroup);
+			break;
+	}
 }
 
 SoundManager::SoundManager()
@@ -142,6 +175,7 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 		LOG(INFO) << "Loading music " << filename;
 		SoundHandle* handle = NULL;
 
+		//Create a streamed, loopable sound
 		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
 		if(result)
 			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
@@ -152,16 +186,16 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 	return existing->second;
 }
 
-Channel* SoundManager::playSound(SoundHandle* sound)
+Channel* SoundManager::playSound(SoundHandle* sound, SOUND_GROUP group)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
 	ERRCHECK(result);
-	ret->setChannelGroup(sfxGroup);
+	setGroup(ret, group);
 	return ret;
 }
 
-Channel* SoundManager::playMusic(MusicHandle* music)
+Channel* SoundManager::playMusic(MusicHandle* music, SOUND_GROUP group)
 {
 	//Check if we have a song currently playing
 	if(musicChannel != NULL)
@@ -189,9 +223,8 @@ Channel* SoundManager::playMusic(MusicHandle* music)
 	//TODO result = musicChannel->setLoopPoints(loopstart, FMOD_TIMEUNIT_MS, loopend, FMOD_TIMEUNIT_MS);
 	//ERRCHECK(result);
 
-	//Set group and start playing
-	result = musicChannel->setChannelGroup(musicGroup);
-	ERRCHECK(result);
+	//Set group
+	setGroup(musicChannel, group);
 
 	//Start where we last stopped playing this song
 	std::map<MusicHandle*, unsigned int>::iterator existing = musicPositions.find(music);
@@ -201,6 +234,7 @@ Channel* SoundManager::playMusic(MusicHandle* music)
 		result = musicChannel->setPosition(0, FMOD_TIMEUNIT_MS);	//Set at start to force reflush of stream buffer (See FMOD API)
 	ERRCHECK(result);
 	
+	//Start playing
 	result = musicChannel->setPaused(false);
 	ERRCHECK(result);
 	return musicChannel;
