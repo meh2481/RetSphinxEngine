@@ -27,6 +27,7 @@ class Image;
 class ObjSegment : public DrawableItem
 {
 public:
+	enum { TYPE = OT_SEGMENT };
     b2Body*         body;		//Physics body associated with this segment
 	Lattice*		lat;		//Lattice to apply to image
 	LatticeAnim*	latanim;	//Animation to apply to lattice
@@ -65,6 +66,7 @@ public:
 
     void draw(bool bDebugInfo = false);
     void addSegment(ObjSegment* seg);
+	ObjSegment* getSegment(unsigned int idx);
 	void update(float dt);
 	b2Body* getBody();
 	Vec2 getPos();

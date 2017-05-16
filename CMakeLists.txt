@@ -10,6 +10,7 @@ set(BOX2D_INCLUDE_DIRS CACHE PATH "")
 find_package(Box2D REQUIRED)
 find_package(glm REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(FMOD REQUIRED)
 
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
@@ -18,7 +19,6 @@ endif()
 
 # HACK: Apparently not set automatically?
 set(glm_INCLUDE_DIRS "${glm_DIR}/../" CACHE STRING "Path to glm includes")
-
 
 include_directories(dep)
 add_subdirectory(dep)
@@ -31,6 +31,7 @@ add_subdirectory(io)
 include_directories("${glm_INCLUDE_DIRS}")
 include_directories("${BOX2D_INCLUDE_DIRS}/..")
 include_directories("${SDL2_INCLUDE_DIR}")
+include_directories("${FMOD_INCLUDE_DIRS}")
 include_directories(dep/lua)
 include_directories(dep/imgui)
 

@@ -18,11 +18,10 @@ class ResourceLoader;
 class EntityManager;
 class Stringbank;
 class InputManager;
+class SoundManager;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
-
-const float soundFreqDefault = 44100.0;
 
 typedef struct
 {
@@ -60,7 +59,6 @@ private:
 	bool m_bPaused;			//If the game is paused due to not being focused
 	bool m_bControllerDisconnected;	//If the game is paused due to a controller disconnecting
 	bool m_bPauseOnKeyboardFocus;	//If the game pauses when keyboard focus is lost
-	bool m_bSoundDied;  //If tyrsound fails to load, don't try to use it
 	int m_iMSAA;		//Antialiasing (0x, 2x, 4x, 8x, etc)
 	bool m_bCursorShow;
 	bool m_bCursorOutOfWindow;	//If the cursor is outside of the window, don't draw it
@@ -68,15 +66,13 @@ private:
 	bool m_bStepFrame;
 	bool m_bSteppingPhysics;
 #endif
+
+	//Managers
 	ResourceLoader* m_resourceLoader;
 	EntityManager* m_entityManager;
 	Stringbank* m_stringBank;
 	InputManager* m_inputManager;
-
-
-	//multimap<string, FMOD_CHANNEL*> m_channels;
-	//map<string, FMOD_SOUND*> m_sounds;
-	//FMOD_SYSTEM* m_audioSystem;
+	SoundManager* m_soundManager;
 
 	//Engine-use function definitions
 	bool _frame();
@@ -135,24 +131,6 @@ public:
 	bool pausesOnFocusLost() { return m_bPauseOnKeyboardFocus; };
 	uint16_t getWidth() { return m_iWidth; };
 	uint16_t getHeight() { return m_iHeight; };
-
-	//Sound functions - engine_sound.cpp
-	void createSound(std::string sPath, std::string sName);   //Creates a sound from this name and file path
-	virtual void playSound(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play a sound
-	//FMOD_CHANNEL* getChannel(string sSoundName);	//Return the channel of this sound
-	void playMusic(std::string sName, float volume = 1.0f, float pan = 0.0f, float pitch = 1.0f);	 //Play looping music, or resume paused music
-	void musicLoop(float startSec, float endSec);	//Set the starting and ending loop points for the currently-playing song
-	void pauseMusic();									//Pause music that's currently playing
-	void resumeMusic();									//Resume music that was paused
-	void restartMusic();
-	void stopMusic();
-	void seekMusic(float fTime);
-	float getMusicPos();								//Opposite of seekMusic() -- get where we currently are
-	void volumeMusic(float fVol);						//Set the music to a particular volume
-	void setMusicFrequency(float freq);
-	float getMusicFrequency();
-	bool hasMic();										//If we have some form of mic-like input
-	void updateSound();
 
 	//Physics functions
 	b2Body* createBody(b2BodyDef* bdef);
@@ -214,4 +192,6 @@ public:
 	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
 
 	Stringbank* getStringbank() { return m_stringBank; };
+
+	SoundManager* getSoundManager() { return m_soundManager; }
 };

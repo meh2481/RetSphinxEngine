@@ -10,6 +10,9 @@ function spaceship:init()
 	self.CAMERA_ZOOM_FAC = 1.0
 	self.MAX_THRUST = 2.5
 	self.THRUST_ACCEL = 2.1
+	self.FIRE_RATE = 1.0/48.951004
+	self.lastFireSound = 0
+	self.curTime = 0
 	
 	self.particles = particles_create('res/particles/shiptrail.xml')
 	particles_setFireRate(self.particles, 0)
@@ -20,6 +23,7 @@ function spaceship:init()
 	particles_setFiring(self.fireParticles, true)
 	
 	obj_registerPlayer(self)
+	--music_play('res/mus/song.ogg')
 end
 
 --Rumble when hitting something
@@ -60,6 +64,8 @@ end
 --Fire particle effect that looks like a weapon thing
 function spaceship:shoot(x, y, vx, vy, dt)
 
+	self.curTime = self.curTime + dt
+	
 	particles_setEmitPos(self.fireParticles, x-vx*dt, y-vy*dt)
 	particles_setEmitVel(self.fireParticles, vx, vy)
 	--local horizAxis = joy_getAxis(JOY_AXIS2_HORIZ)
@@ -70,6 +76,11 @@ function spaceship:shoot(x, y, vx, vy, dt)
 	if rStickX ~= 0 or rStickY ~= 0 then
 		local angle = 1.0
 		particles_setFireRate(self.fireParticles, 1.0)	--firing
+		--print(self.curTime..', '..self.lastFireSound)
+		if self.curTime > self.lastFireSound + self.FIRE_RATE then
+			sound_play('res/sfx/laser.wav')
+			self.lastFireSound = self.curTime
+		end
 		--[=[if vertAxis > 0 then		-- down
 			rStickY = vertAxis / JOY_AXIS_MAX
 			rStickY = -rStickY
