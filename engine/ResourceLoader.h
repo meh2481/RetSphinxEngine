@@ -31,7 +31,7 @@ public:
 	ResourceLoader(b2World* physicsWorld, std::string sPakDir);
 	~ResourceLoader();
 
-	PakLoader* getPakLoader() { return m_pakLoader; }
+	//Utility
 	void clearCache();
 
 	//Images
@@ -59,4 +59,7 @@ public:
 	Object* getObject(std::string sType, Vec2 ptOffset, Vec2 ptVel);
 	ObjSegment* getObjectSegment(tinyxml2::XMLElement* layer);
 	b2Fixture* getObjectFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
+
+	//Sounds (raw data since we load with FMOD)
+	unsigned char* getSound(std::string sID, unsigned int* length);
 };

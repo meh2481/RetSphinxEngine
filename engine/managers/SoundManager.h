@@ -9,7 +9,7 @@
 #define Channel FMOD::Channel
 #define DEFAULT_SOUND_FREQ 44100.0f
 
-class PakLoader;
+class ResourceLoader;
 
 typedef enum
 {
@@ -33,13 +33,13 @@ private:
 	FMOD::ChannelGroup* sfxGroup;
 	FMOD::ChannelGroup* bgFxGroup;
 	FMOD::ChannelGroup* voxGroup;
-	PakLoader* loader;
+	ResourceLoader* loader;
 
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
 	SoundManager() {};
 public:
-	SoundManager(PakLoader* loader);
+	SoundManager(ResourceLoader* loader);
 	~SoundManager();
 
 	void update();

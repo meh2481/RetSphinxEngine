@@ -864,3 +864,9 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 
 	return bod->CreateFixture(&fixtureDef);
 }
+
+unsigned char* ResourceLoader::getSound(std::string sID, unsigned int* length)
+{
+	uint64_t hash = Hash::hash(sID.c_str());
+	return m_pakLoader->loadResource(hash, length);
+}

@@ -1,6 +1,6 @@
 #include "SoundManager.h"
 #include "easylogging++.h"
-#include "PakLoader.h"
+#include "ResourceLoader.h"
 #include "Hash.h"
 #include <cstring>
 
@@ -133,7 +133,7 @@ void SoundManager::setGroup(Channel* ch, SoundGroup group)
 	}
 }
 
-SoundManager::SoundManager(PakLoader* l)
+SoundManager::SoundManager(ResourceLoader* l)
 {
 	loader = l;
 	musicChannel = NULL;
@@ -165,8 +165,8 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
 
 		//Attempt to load from pak
 		unsigned int length = 0;
-		uint64_t hash = Hash::hash(filename.c_str());
-		unsigned char* data = loader->loadResource(hash, &length);
+		
+		unsigned char* data = loader->getSound(filename, &length);
 		if(data)
 		{
 			FMOD_CREATESOUNDEXINFO info;
