@@ -1,6 +1,3 @@
-FMOD branch:
-- Load sound fx from pak
-
 Current higher pri:
 - UTF code point lookup should use array of direct values rather than binary search?
 - Pass const string& instead of string to functions
