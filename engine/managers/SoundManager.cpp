@@ -108,7 +108,7 @@ int SoundManager::init()
 	return 0;
 }
 
-void SoundManager::setGroup(Channel* ch, SOUND_GROUP group)
+void SoundManager::setGroup(Channel* ch, SoundGroup group)
 {
 	switch(group)
 	{
@@ -139,6 +139,7 @@ SoundManager::SoundManager()
 
 SoundManager::~SoundManager()
 {
+	//TODO: Save/load song location on exit?
 	FMOD_RESULT result = system->release();
 	if(result)
 		LOG(WARNING) << "Unable to close FMOD: " << result;
@@ -186,7 +187,7 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 	return existing->second;
 }
 
-Channel* SoundManager::playSound(SoundHandle* sound, SOUND_GROUP group)
+Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 {
 	Channel* ret = NULL;
 	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
@@ -195,7 +196,7 @@ Channel* SoundManager::playSound(SoundHandle* sound, SOUND_GROUP group)
 	return ret;
 }
 
-Channel* SoundManager::playMusic(MusicHandle* music, SOUND_GROUP group)
+Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 {
 	//Check if we have a song currently playing
 	if(musicChannel != NULL)

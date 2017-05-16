@@ -10,6 +10,8 @@ _gfxbase/*
 *.directory
 *.mp3
 *.flac
+*.ogg
+*.wav
 *.kate-swp
 *.blend
 *.blend1

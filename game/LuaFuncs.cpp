@@ -209,6 +209,15 @@ public:
 		}
 		return -1;
 	}
+
+	static int playSound(const std::string& soundFilename)
+	{
+		SoundHandle* sound = g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
+		Channel* channel = g_pGlobalEngine->getSoundManager()->playSound(sound);
+		int channelIdx = 0;
+		channel->getIndex(&channelIdx);
+		return channelIdx;
+	}
 };
 
 
@@ -878,6 +887,13 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 	luaReturnNil();
 }
 
+luaFunc(sound_play)	//int sound_play(string soundPath)
+{
+	if(lua_isstring(L, 1))
+		luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1)));
+	luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
@@ -947,6 +963,8 @@ static LuaFunctions s_functab[] =
 	luaRegister(seg_setPos),
 	luaRegister(seg_getRot),
 	luaRegister(seg_setRot),
+	//Sound functions
+	luaRegister(sound_play),
 	//Steelseries events
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),

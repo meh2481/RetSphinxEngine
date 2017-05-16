@@ -14,7 +14,7 @@ typedef enum
 	GROUP_SFX,
 	GROUP_BGFX,
 	GROUP_VOX
-} SOUND_GROUP;
+} SoundGroup;
 
 class SoundManager
 {
@@ -31,7 +31,7 @@ private:
 	FMOD::ChannelGroup* voxGroup;
 
 	int init();
-	void setGroup(Channel* ch, SOUND_GROUP group);
+	void setGroup(Channel* ch, SoundGroup group);
 public:
 	SoundManager();
 	~SoundManager();
@@ -41,8 +41,8 @@ public:
 	SoundHandle* loadSound(const std::string& filename);
 	MusicHandle* loadMusic(const std::string& filename);
 
-	Channel* playSound(SoundHandle* sound, SOUND_GROUP group = GROUP_SFX);
-	Channel* playMusic(MusicHandle* music, SOUND_GROUP group = GROUP_MUSIC);
+	Channel* playSound(SoundHandle* sound, SoundGroup group = GROUP_SFX);
+	Channel* playMusic(MusicHandle* music, SoundGroup group = GROUP_MUSIC);
 
 	//Channel functions
 	void pause(Channel* channel);
