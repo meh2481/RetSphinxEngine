@@ -1,5 +1,7 @@
 #include "SoundManager.h"
 #include "easylogging++.h"
+#include "PakLoader.h"
+#include "Hash.h"
 #include <cstring>
 
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
@@ -131,8 +133,9 @@ void SoundManager::setGroup(Channel* ch, SoundGroup group)
 	}
 }
 
-SoundManager::SoundManager()
+SoundManager::SoundManager(PakLoader* l)
 {
+	loader = l;
 	musicChannel = NULL;
 	init();
 }
@@ -143,6 +146,8 @@ SoundManager::~SoundManager()
 	FMOD_RESULT result = system->release();
 	if(result)
 		LOG(WARNING) << "Unable to close FMOD: " << result;
+	for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
+		delete [] *i;
 }
 
 void SoundManager::update()
@@ -158,10 +163,28 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
 		LOG(INFO) << "Loading sound " << filename;
 		SoundHandle* handle = NULL;
 
-		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
-		if(result)
-			LOG(WARNING) << "Unable to create sound resource " << filename << ", error " << result;
-
+		//Attempt to load from pak
+		unsigned int length = 0;
+		uint64_t hash = Hash::hash(filename.c_str());
+		unsigned char* data = loader->loadResource(hash, &length);
+		if(data)
+		{
+			FMOD_CREATESOUNDEXINFO info;
+			memset(&info, 0, sizeof(FMOD_CREATESOUNDEXINFO));	//Clear all fields to 0
+			info.length = length;	//Set length
+			//In pak; load from memory
+			FMOD_RESULT result = system->createSound((const char*)data, FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
+			if(result)
+				LOG(WARNING) << "Unable to create sound resource " << filename << "from pak, error " << result;
+			soundResources.push_back(data);	//Free this later
+		}
+		else
+		{
+			//Not in pak; load from file
+			FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
+			if(result)
+				LOG(WARNING) << "Unable to create sound resource " << filename << " from file, error " << result;
+		}
 		sounds[filename] = handle;
 		return handle;
 	}

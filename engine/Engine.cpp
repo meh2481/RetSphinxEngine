@@ -89,7 +89,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompany
 	_loadicon();	//Load our window icon
 
 	//Init sound manager
-	m_soundManager = new SoundManager();
+	m_soundManager = new SoundManager(m_resourceLoader->getPakLoader());
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
 	static const string sIniFile = getSaveLocation() + IMGUI_INI;

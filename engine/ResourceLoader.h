@@ -31,6 +31,7 @@ public:
 	ResourceLoader(b2World* physicsWorld, std::string sPakDir);
 	~ResourceLoader();
 
+	PakLoader* getPakLoader() { return m_pakLoader; }
 	void clearCache();
 
 	//Images

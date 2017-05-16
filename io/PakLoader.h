@@ -31,6 +31,6 @@ public:
 	void loadFromDir(std::string sDirName);
 
 	//Load a resource from the opened pak files. Returns NULL if it's not here or on error,
-	// returns a pointer to the data otherwise. This pointer must be free()d.
+	// returns a pointer to the data otherwise. This pointer must be delete[]d.
 	unsigned char* loadResource(uint64_t id, unsigned int* len = NULL);
 };

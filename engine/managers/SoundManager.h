@@ -2,11 +2,14 @@
 #include "fmod.hpp"
 #include <string>
 #include <map>
+#include <vector>
 
 #define SoundHandle FMOD::Sound
 #define MusicHandle FMOD::Sound
 #define Channel FMOD::Channel
 #define DEFAULT_SOUND_FREQ 44100.0f
+
+class PakLoader;
 
 typedef enum
 {
@@ -22,6 +25,7 @@ private:
 	//TODO: Free sounds if not used after a period of time?
 	std::map<const std::string, FMOD::Sound*> sounds;	//Cache for loaded sounds
 	std::map<MusicHandle*, unsigned int> musicPositions;	//Last play position for each song
+	std::vector<unsigned char*> soundResources;
 	FMOD::System* system;
 	Channel* musicChannel;
 	FMOD::ChannelGroup* masterChannelGroup;
@@ -29,11 +33,13 @@ private:
 	FMOD::ChannelGroup* sfxGroup;
 	FMOD::ChannelGroup* bgFxGroup;
 	FMOD::ChannelGroup* voxGroup;
+	PakLoader* loader;
 
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
+	SoundManager() {};
 public:
-	SoundManager();
+	SoundManager(PakLoader* loader);
 	~SoundManager();
 
 	void update();
