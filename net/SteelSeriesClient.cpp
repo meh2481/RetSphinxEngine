@@ -115,7 +115,7 @@ string SteelSeriesClient::getSSURL()
 #endif	//_WIN32
 }
 
-bool SteelSeriesClient::init(std::string appName)
+bool SteelSeriesClient::init(const std::string& appName)
 {
 	if(!registerApp(StringUtils::normalize(appName), appName))
 	{
@@ -140,7 +140,7 @@ void SteelSeriesClient::update(float dt)
 	}
 }
 
-bool SteelSeriesClient::registerApp(std::string ID, std::string displayName)
+bool SteelSeriesClient::registerApp(const std::string& ID, const std::string& displayName)
 {
 	appId = ID;
 
@@ -153,7 +153,7 @@ bool SteelSeriesClient::registerApp(std::string ID, std::string displayName)
 	return sendJSON(StringUtils::stringify(doc), URL_REGISTER_APP);
 }
 
-bool SteelSeriesClient::sendJSON(std::string stringifiedJSON, const char * endpoint)
+bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char * endpoint)
 {
 	if(!valid) 
 		return false;
@@ -179,12 +179,12 @@ void SteelSeriesClient::heartbeat()
 	sendJSON(StringUtils::stringify(doc), URL_HEARTBEAT);
 }
 
-void SteelSeriesClient::bindEvent(std::string eventJSON)
+void SteelSeriesClient::bindEvent(const std::string& eventJSON)
 {
 	sendJSON(eventJSON, URL_BIND_EVENT);
 }
 
-void SteelSeriesClient::sendEvent(std::string eventId, int value)
+void SteelSeriesClient::sendEvent(const std::string& eventId, int value)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();

@@ -17,7 +17,7 @@ void Subject::removeObserver(Observer * o)
 	}
 }
 
-void Subject::notify(std::string sMsg, Vec2 pos)
+void Subject::notify(const std::string& sMsg, Vec2 pos)
 {
 	for(std::list<Observer*>::iterator i = observers.begin(); i != observers.end(); i++)
 	{

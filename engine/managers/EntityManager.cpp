@@ -70,7 +70,7 @@ Node* EntityManager::getNodeUnder(Vec2 pos)
 	return nodeManager->getNodeUnder(pos);
 }
 
-Node* EntityManager::getNode(string sNodeName)
+Node* EntityManager::getNode(const std::string& sNodeName)
 {
 	return nodeManager->getNode(sNodeName);
 }

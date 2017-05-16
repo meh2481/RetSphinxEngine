@@ -96,8 +96,9 @@ void Rect::centerOn(Vec2 p)
 	offset(p.x - cen.x, p.y - cen.y);
 }
 
-void Rect::fromString(string s)
+void Rect::fromString(const string& input)
 {
+	std::string s = input;
 	s = StringUtils::stripCommas(s);
 
 	//Now, parse
@@ -113,8 +114,9 @@ std::string Rect::toString()
 	return oss.str();
 }
 
-Vec2 pointFromString(std::string s)
+Vec2 pointFromString(const std::string& input)
 {
+	std::string s = input;
 	s = StringUtils::stripCommas(s);
 
 	//Now, parse
@@ -125,8 +127,9 @@ Vec2 pointFromString(std::string s)
 	return pt;
 }
 
-Vec3 vec3FromString(std::string s)
+Vec3 vec3FromString(const std::string& input)
 {
+	std::string s = input;
 	s = StringUtils::stripCommas(s);
 
 	//Now, parse

@@ -26,7 +26,7 @@ using namespace std;
 #define LOGGING_CONF "logging.conf"
 #define LOGFILE_NAME "logfile.log"
 
-Engine::Engine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable)
+Engine::Engine(uint16_t iWidth, uint16_t iHeight, const string& sTitle, const string& sCompanyName, const string& sAppName, const string& sIcon, bool bResizable)
 {
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;

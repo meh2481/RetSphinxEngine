@@ -6,7 +6,7 @@
 #include <sstream>
 using namespace std;
 
-void PakLoader::loadFromDir(string sDirName)
+void PakLoader::loadFromDir(const string& sDirName)
 {
 	set<string> pakFiles = FileOperations::readFilesFromDir(sDirName);
 
@@ -17,7 +17,7 @@ void PakLoader::loadFromDir(string sDirName)
 	}
 }
 
-PakLoader::PakLoader(string sDirName)
+PakLoader::PakLoader(const string& sDirName)
 {
 	loadFromDir(sDirName);
 }
@@ -36,7 +36,7 @@ void PakLoader::clear()
 	m_pakFiles.clear();
 }
 
-void PakLoader::parseFile(string sFileName)
+void PakLoader::parseFile(const string& sFileName)
 {
 	LOG(TRACE) << "Parse pak file " << sFileName;
 	FILE* fp = fopen(sFileName.c_str(), "rb");

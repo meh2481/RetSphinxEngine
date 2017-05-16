@@ -17,7 +17,7 @@
 using namespace std;
 using namespace tiny3d;
 
-Mesh3D::Mesh3D(string sOBJFile)
+Mesh3D::Mesh3D(const string& sOBJFile)
 {
     m_obj = 0;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
@@ -46,7 +46,7 @@ Mesh3D::~Mesh3D()
 		glDeleteLists(m_obj, 1);
 }
 
-void Mesh3D::_fromOBJFile(string sFilename)
+void Mesh3D::_fromOBJFile(const string& sFilename)
 {
     m_sObjFilename = sFilename;
 	LOG(INFO) << "Loading 3D object " << sFilename;
@@ -190,7 +190,7 @@ void Mesh3D::_fromOBJFile(string sFilename)
 }
 
 //Fall back on pure C functions for speed
-void Mesh3D::_fromTiny3DFile(string sFilename)
+void Mesh3D::_fromTiny3DFile(const string& sFilename)
 {
 	LOG(INFO) << "Loading 3D object " << sFilename;
 	unsigned int sz = 0;

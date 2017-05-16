@@ -7,7 +7,7 @@ using namespace std;
 
 namespace FileOperations
 {
-	unsigned char* readFile(string filename, unsigned int* fileSize)
+	unsigned char* readFile(const string& filename, unsigned int* fileSize)
 	{
 		FILE *f = fopen(filename.c_str(), "rb");
 		if(f == NULL)
@@ -27,7 +27,7 @@ namespace FileOperations
 		return buf;
 	}
 
-	set<string> readFilesFromDir(string sDirPath, bool fullPath)
+	set<string> readFilesFromDir(const string& sDirPath, bool fullPath)
 	{
 		set<string> returnedFiles;
 

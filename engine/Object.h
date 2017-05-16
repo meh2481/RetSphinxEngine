@@ -75,9 +75,9 @@ public:
 	void initLua();	
 	void setPosition(Vec2 p);	//Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
 	
-	void setProperty(std::string prop, std::string value)	{propertyValues[prop] = value;};
-	void addProperty(std::string prop, std::string value) {setProperty(prop, value);};
-	std::string getProperty(std::string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
+	void setProperty(const std::string& prop, const std::string& value)	{propertyValues[prop] = value;};
+	void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
+	std::string getProperty(const std::string& prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
 	void setImage(Image* img, unsigned int seg = 0);	//Sets the image of the given physSegment
 };

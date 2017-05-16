@@ -70,7 +70,7 @@ protected:
 
 public:
 	//GameEngine.cpp functions - fairly generic 
-	GameEngine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sCompanyName, std::string sAppName, std::string sIcon, bool bResizable = false);
+	GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable = false);
 	~GameEngine();
 	
 	void setLua(LuaInterface* l)	{Lua = l;};
@@ -79,9 +79,9 @@ public:
 	void handleKeys();						//Poll the keyboard state and update the game accordingly
 	
 	//Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
-	bool loadConfig(std::string sFilename);
-	void saveConfig(std::string sFilename);
-	void loadScene(std::string sXMLFilename);	//Load scene from file
+	bool loadConfig(const std::string& sFilename);
+	void saveConfig(const std::string& sFilename);
+	void loadScene(const std::string& sXMLFilename);	//Load scene from file
 	
 	//Other stuff
 	void warpObjectToNode(Object* o, Node* n);

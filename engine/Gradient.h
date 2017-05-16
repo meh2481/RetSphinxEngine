@@ -19,6 +19,6 @@ public:
 	
 	void insert(float fVal, int32_t r, int32_t g, int32_t b, int32_t a);
 	Color getVal(float fVal);
-	bool load(std::string sXMLFilename);
+	bool load(const std::string& sXMLFilename);
 	
 };

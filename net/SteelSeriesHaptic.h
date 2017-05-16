@@ -9,7 +9,7 @@ class SteelSeriesHaptic
 private:
 	SteelSeriesClient* ssClient;
 
-	void bindEvent(std::string eventId, std::string eventType, uint32_t rumbleLen);
+	void bindEvent(const std::string& eventId, const std::string& eventType, uint32_t rumbleLen);
 
 public:
 	SteelSeriesHaptic(SteelSeriesClient* client);

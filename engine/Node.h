@@ -20,8 +20,8 @@ public:
 	void collided(Object* o);		//Collided with an object
 	void init();				//Create stuff in lua for this object
 	
-	void setProperty(std::string prop, std::string value)	{propertyValues[prop] = value;};
-	void addProperty(std::string prop, std::string value) {setProperty(prop, value);};
-	std::string getProperty(std::string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
+	void setProperty(const std::string& prop, const std::string& value)	{propertyValues[prop] = value;};
+	void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
+	std::string getProperty(const std::string prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 };
 

@@ -11,7 +11,7 @@
 using namespace std;
 
 
-Text::Text(string sXMLFilename)
+Text::Text(const string& sXMLFilename)
 {
 	m_imgFont = NULL;
 
@@ -68,10 +68,11 @@ Text::~Text()
 		delete m_imgFont;
 }
 
-void Text::render(string sText, float x, float y, float pt)
+void Text::render(const string& s, float x, float y, float pt)
 {
 	if(m_imgFont == NULL)
 		return;
+	string sText = s;
 	x = -x;
 	y = -y;
 	glColor4f(col.r, col.g, col.b, col.a);
@@ -100,9 +101,10 @@ void Text::render(string sText, float x, float y, float pt)
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
-float Text::size(string sText, float pt)
+float Text::size(const string& s, float pt)
 {
 	float len = 0.0f;
+	string sText = s;
 	for(string::iterator i = sText.begin(); i != sText.end(); i++)
 	{
 		unsigned char c = *i;

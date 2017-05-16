@@ -203,7 +203,7 @@ void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 	ssClient->sendEvent(evnt, ++eventVal);
 }
 
-void SteelSeriesHaptic::bindEvent(std::string eventId, std::string eventType, uint32_t rumbleLen)
+void SteelSeriesHaptic::bindEvent(const std::string& eventId, const std::string& eventType, uint32_t rumbleLen)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();

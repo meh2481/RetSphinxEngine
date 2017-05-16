@@ -9,14 +9,16 @@
 namespace StringUtils
 {
 	const std::string delimiters = " \n\r\t";
-	std::string trim(std::string s)
+	std::string trim(const std::string& sTrim)
 	{
+		std::string s = sTrim;
 		s.erase(s.find_last_not_of(delimiters) + 1);
 		return s.erase(0, s.find_first_not_of(delimiters));
 	}
 
-	std::string removeWhitespace(std::string s)
+	std::string removeWhitespace(const std::string& sTrim)
 	{
+		std::string s = sTrim;
 		for(size_t i = 0; i < s.length(); i++)
 		{
 			if(s.at(i) == ' ' || 
@@ -31,14 +33,15 @@ namespace StringUtils
 		return s;
 	}
 
-	std::string stripCommas(std::string s)
+	std::string stripCommas(const std::string& s)
 	{
 		//Replace all ',' characters with ' '
 		return replaceWith(s, ',', ' ');
 	}
 
-	std::string replaceWith(std::string s, char from, char to)
+	std::string replaceWith(const std::string& sRep, char from, char to)
 	{
+		std::string s = sRep;
 		//Replace all from characters with to
 		while(true)
 		{
@@ -51,7 +54,7 @@ namespace StringUtils
 		return s;
 	}
 
-	std::string getExtension(std::string filename)
+	std::string getExtension(const std::string& filename)
 	{
 		size_t len = filename.length();
 		size_t idx = len - 1;
@@ -67,8 +70,9 @@ namespace StringUtils
 		return filename.substr(idx+1);	//Since substr() returns empty string if idx == len
 	}
 
-	std::string normalize(std::string input)
+	std::string normalize(const std::string& s)
 	{
+		std::string input = s;
 		input = replaceWith(input, ' ', '_');	//Replace spaces with underscores
 		transform(input.begin(), input.end(), input.begin(), ::toupper);	//Convert to uppercase
 		input.erase(remove_if(input.begin(), input.end(), [](char c) { return (!isalnum(c) && c != '_'); }), input.end()); //Remove non alphanumeric chars
