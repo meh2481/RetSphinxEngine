@@ -13,7 +13,7 @@ using namespace std;
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
 //---------------------------------------------------------------------------------------------------------------------------
-bool GameEngine::loadConfig(string sFilename)
+bool GameEngine::loadConfig(const string& sFilename)
 {
 	LOG(INFO) << "Parsing config file " << sFilename;
 	//Open file
@@ -107,7 +107,7 @@ bool GameEngine::loadConfig(string sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Save game config to XML
 //---------------------------------------------------------------------------------------------------------------------------
-void GameEngine::saveConfig(string sFilename)
+void GameEngine::saveConfig(const string& sFilename)
 {
 	LOG(INFO) << "Saving config XML " << sFilename;
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
@@ -146,7 +146,7 @@ void GameEngine::saveConfig(string sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Load scene from XML
 //---------------------------------------------------------------------------------------------------------------------------
-void GameEngine::loadScene(string sXMLFilename)
+void GameEngine::loadScene(const string& sXMLFilename)
 {
 	getEntityManager()->cleanup();
 	player = NULL;

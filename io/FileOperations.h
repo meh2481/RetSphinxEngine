@@ -6,7 +6,7 @@ namespace FileOperations
 {
 	//Read an entire file into memory and return the buffer, NULL on error.
 	//The pointer returned from this function must be free()d.
-	unsigned char* readFile(std::string filename, unsigned int* fileSize);
+	unsigned char* readFile(const std::string& filename, unsigned int* fileSize);
 
-	std::set<std::string> readFilesFromDir(std::string sDirPath, bool fullPath = true);
+	std::set<std::string> readFilesFromDir(const std::string& sDirPath, bool fullPath = true);
 }

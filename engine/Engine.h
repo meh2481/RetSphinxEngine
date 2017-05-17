@@ -98,7 +98,7 @@ protected:
 
 public:
 	//Constructor/destructor
-	Engine(uint16_t iWidth, uint16_t iHeight, std::string sTitle, std::string sCompanyName, std::string sAppName, std::string sIcon, bool bResizable = false);
+	Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable = false);
 	~Engine();
 
 	//Misc. methods

@@ -37,7 +37,7 @@ void NodeManager::cleanup()
 	m_nodes.clear();
 }
 
-Node* NodeManager::getNode(string sNodeName)
+Node* NodeManager::getNode(const std::string& sNodeName)
 {
 	map<string, Node*>::iterator i = m_nodes.find(sNodeName);
 	if(i != m_nodes.end())

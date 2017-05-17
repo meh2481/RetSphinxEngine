@@ -54,7 +54,7 @@ Color Gradient::getVal(float fVal)
 	return c;	//No points or something; return rgba(1,1,1,1)
 }
 
-bool Gradient::load(string sXMLFilename)
+bool Gradient::load(const string& sXMLFilename)
 {
 	m_colorMap.clear();
 	

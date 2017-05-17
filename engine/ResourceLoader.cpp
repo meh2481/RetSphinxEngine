@@ -14,7 +14,7 @@
 #include "stb_image.h"
 using namespace std;
 
-ResourceLoader::ResourceLoader(b2World* physicsWorld, string sPakDir)
+ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
 	m_world = physicsWorld;
 	m_cache = new ResourceCache();
@@ -59,7 +59,7 @@ Image* ResourceLoader::getImage(uint64_t hashID)
 	return img;
 }
 
-Image* ResourceLoader::getImage(string sID)
+Image* ResourceLoader::getImage(const std::string& sID)
 {
 	LOG(TRACE) << "Loading image " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -74,7 +74,7 @@ Image* ResourceLoader::getImage(string sID)
 	return img;
 }
 
-Mesh3D* ResourceLoader::getMesh(string sID)
+Mesh3D* ResourceLoader::getMesh(const std::string& sID)
 {
 	LOG(TRACE) << "Loading 3D object " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -105,7 +105,7 @@ Mesh3D* ResourceLoader::getMesh(string sID)
 }
 
 //Particle system
-ParticleSystem* ResourceLoader::getParticleSystem(string sID)
+ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 {
 	ParticleSystem* ps = new ParticleSystem();
 	LOG(INFO) << "Loading particle system " << sID;
@@ -313,7 +313,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(string sID)
 	return ps;
 }
 
-SDL_Surface* ResourceLoader::getSDLImage(std::string sID)
+SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
 {
 	LOG(INFO) << "Load image " << sID;
 
@@ -335,7 +335,7 @@ SDL_Surface* ResourceLoader::getSDLImage(std::string sID)
 	return surface;
 }
 
-SDL_Cursor* ResourceLoader::getCursor(string sID)
+SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
 {
 	uint64_t hashVal = Hash::hash(sID.c_str());
 	SDL_Cursor* cur = NULL;
@@ -400,7 +400,7 @@ SDL_Cursor* ResourceLoader::getCursor(string sID)
 	return cur;
 }
 
-ImgFont* ResourceLoader::getFont(std::string sID)
+ImgFont* ResourceLoader::getFont(const std::string& sID)
 {
 	LOG(TRACE) << "Loading Font " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -446,7 +446,7 @@ ImgFont* ResourceLoader::getFont(std::string sID)
 	return font;
 }
 
-Stringbank * ResourceLoader::getStringbank(std::string sID)
+Stringbank * ResourceLoader::getStringbank(const std::string& sID)
 {
 	LOG(TRACE) << "Loading stringbank " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -461,7 +461,7 @@ Stringbank * ResourceLoader::getStringbank(std::string sID)
 	return sb;
 }
 
-std::string ResourceLoader::readTextFile(std::string filename)
+std::string ResourceLoader::readTextFile(const std::string& filename)
 {
 	std::string contents;
 	FILE *fp = fopen(filename.c_str(), "rb");
@@ -476,7 +476,7 @@ std::string ResourceLoader::readTextFile(std::string filename)
 	return contents;
 }
 
-std::string ResourceLoader::getTextFile(std::string sID)
+std::string ResourceLoader::getTextFile(const std::string& sID)
 {
 	LOG(TRACE) << "Loading text file " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -527,7 +527,7 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 	return seg;
 }
 
-Object* ResourceLoader::getObject(string sType, Vec2 ptOffset, Vec2 ptVel)
+Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel)
 {
 	ostringstream oss;
 	oss << "res/obj/" << sType << ".xml";
@@ -865,7 +865,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 	return bod->CreateFixture(&fixtureDef);
 }
 
-unsigned char* ResourceLoader::getSound(std::string sID, unsigned int* length)
+unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* length)
 {
 	uint64_t hash = Hash::hash(sID.c_str());
 	return m_pakLoader->loadResource(hash, length);

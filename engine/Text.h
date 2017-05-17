@@ -33,16 +33,16 @@ private:
 public:
 	Color col;
 
-	Text(std::string sXMLFilename);  //Create the font from this XML file
+	Text(const std::string& sXMLFilename);  //Create the font from this XML file
 	~Text();
 
 	//Render this text to the screen, centered on x and y
-	void render(std::string sText, float x, float y, float pt);
+	void render(const std::string& sText, float x, float y, float pt);
 
 	//Find the size of a given string of text
-	float size(std::string sText, float pt);
+	float size(const std::string& sText, float pt);
 	std::string getName()	{return m_sName;};
-	void   setName(std::string sName)	{m_sName = sName;};
+	void   setName(const std::string& sName)	{m_sName = sName;};
 
 };
 

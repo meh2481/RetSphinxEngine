@@ -31,7 +31,7 @@ using namespace std;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
-GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sCompanyName, string sAppName, string sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
+GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const string& sTitle, const string& sCompanyName, const string& sAppName, const string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
 	g_pGlobalEngine = this;
 	

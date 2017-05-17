@@ -21,7 +21,7 @@ public:
 	void add(Node* n);
 	void update(float dt);
 	void cleanup();
-	Node* getNode(std::string sNodeName);
+	Node* getNode(const std::string& sNodeName);
 	Node* getNode(Vec2 p);	//TODO rename
 	Node* getNodeUnder(Vec2 p);
 

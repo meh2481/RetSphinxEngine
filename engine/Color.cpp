@@ -25,8 +25,9 @@ void Color::from256(int ir, int ig, int ib, int ia)
 	a = (float)ia / 255.0f;
 }
 
-void Color::fromString(std::string s)
+void Color::fromString(const std::string& input)
 {
+	std::string s = input;
 	s = StringUtils::stripCommas(s);
 
 	//Now, parse

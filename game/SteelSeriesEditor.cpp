@@ -100,7 +100,7 @@ void SteelSeriesEditor::draw(int windowFlags)
 	ImGui::End();
 }
 
-void SteelSeriesEditor::bindTactileEvent(std::string eventId)
+void SteelSeriesEditor::bindTactileEvent(const std::string& eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
@@ -133,7 +133,7 @@ void SteelSeriesEditor::bindTactileEvent(std::string eventId)
 	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
 
-void SteelSeriesEditor::bindScreenEvent(std::string eventId)
+void SteelSeriesEditor::bindScreenEvent(const std::string& eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
@@ -165,7 +165,7 @@ void SteelSeriesEditor::bindScreenEvent(std::string eventId)
 	_ge->getSteelSeriesClient()->bindEvent(StringUtils::stringify(doc));
 }
 
-void SteelSeriesEditor::bindColorEvent(std::string eventId)
+void SteelSeriesEditor::bindColorEvent(const std::string& eventId)
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();

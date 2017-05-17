@@ -50,7 +50,7 @@ private:
 	char suffixBuf[SS_BUF_SZ];
 
 	//Helper functions for dealing with SteelSeries mouse testing
-	void bindTactileEvent(std::string eventId);
-	void bindScreenEvent(std::string eventId);
-	void bindColorEvent(std::string eventId);
+	void bindTactileEvent(const std::string& eventId);
+	void bindScreenEvent(const std::string& eventId);
+	void bindColorEvent(const std::string& eventId);
 };

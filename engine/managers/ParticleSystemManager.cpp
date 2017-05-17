@@ -65,7 +65,7 @@ void ParticleSystemManager::update(float dt)
 	m_updateParticles.clear();
 }
 
-void ParticleSystemManager::onNotify(string sParticleFilename, Vec2 pos)
+void ParticleSystemManager::onNotify(const std::string& sParticleFilename, Vec2 pos)
 {
 	ParticleSystem* pSys = m_loader->getParticleSystem(sParticleFilename);
 	pSys->emitFrom.centerOn(pos);

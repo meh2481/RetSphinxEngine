@@ -12,6 +12,6 @@ public:
 	void addObserver(Observer* o);
 	void removeObserver(Observer* o);
 
-	void notify(std::string sMsg, Vec2 pos);
+	void notify(const std::string& sMsg, Vec2 pos);
 
 };

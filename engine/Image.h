@@ -16,8 +16,8 @@ private:
 	std::string m_sFilename;
 	int 		m_iWidth, m_iHeight;			// width and height of original image
 	
-	void _load(std::string sFilename);
-	void _loadPNG(std::string sFilename);
+	void _load(const std::string& sFilename);
+	void _loadPNG(const std::string& sFilename);
 	void _loadBlob(unsigned char* blob, unsigned int size);
 	void _bind(unsigned char* data, unsigned int width, unsigned int height, int mode);
 
@@ -25,7 +25,7 @@ public:
 	GLuint  _getTex() {return m_hTex;};
 	
 	//Constructor/destructor
-	Image(std::string sFilename);
+	Image(const std::string& sFilename);
 	Image(unsigned char* blob, unsigned int size);
 	~Image();
 
@@ -42,6 +42,6 @@ public:
 
 	void bindTexture();	//Bind texture to OpenGL (so we don't have to bind each draw call)
 
-	void _setReloadFilename(std::string sFilename) { m_sFilename = sFilename; };
+	void _setReloadFilename(const std::string& sFilename) { m_sFilename = sFilename; };
 };
 

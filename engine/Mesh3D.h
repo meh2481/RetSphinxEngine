@@ -36,8 +36,8 @@ protected:
 	std::string m_sObjFilename;
 	
 	
-    void _fromOBJFile(std::string sFilename);
-	void _fromTiny3DFile(std::string sFilename);
+    void _fromOBJFile(const std::string& sFilename);
+	void _fromTiny3DFile(const std::string& sFilename);
 	void _fromData(const unsigned char* data, unsigned int len);
 
 	Mesh3D() {};
@@ -46,7 +46,7 @@ public:
 	bool wireframe;	//If we're drawing in wireframe mode or not
 	bool shaded;	//If we're drawing this with OpenGL shading or not
 
-    Mesh3D(std::string sOBJFile);
+    Mesh3D(const std::string& sOBJFile);
 	Mesh3D(const unsigned char* data, unsigned int len);
     ~Mesh3D();
 
