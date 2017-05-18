@@ -7,7 +7,6 @@
 #define SoundHandle FMOD::Sound
 #define MusicHandle FMOD::Sound
 #define Channel FMOD::Channel
-#define DEFAULT_SOUND_FREQ 44100.0f
 
 class ResourceLoader;
 
@@ -70,4 +69,6 @@ public:
 	//Global functions
 	void pauseAll();
 	void resumeAll();
+
+	void setPlaybackRate(float rate);	//Multiplied times default playback freq
 };

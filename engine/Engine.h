@@ -167,7 +167,7 @@ public:
 
 	//Time functions
 	float getTimeScale() { return m_fTimeScale; };
-	void setTimeScale(float fScale) { m_fTimeScale = fScale; };
+	void setTimeScale(float fScale);
 	unsigned getTicks();
 	float getSeconds();
 	void setFramerate(float fFramerate);

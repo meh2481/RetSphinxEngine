@@ -7,6 +7,8 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
+- Remove "using namespace std" declarations
+- Comments on why sound manager loads its own stuff
 
 Overall TODO list:
 - Stream resources

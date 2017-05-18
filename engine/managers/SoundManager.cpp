@@ -8,6 +8,7 @@
 
 #define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
 #define LOOP_FOREVER -1
+#define DEFAULT_SOUND_FREQ 44100.0f
 
 //Example initialization code from FMOD API doc
 int SoundManager::init()
@@ -362,4 +363,9 @@ void SoundManager::resumeAll()
 {
 	if(masterChannelGroup)
 		masterChannelGroup->setPaused(false);
+}
+
+void SoundManager::setPlaybackRate(float rate)
+{
+	masterChannelGroup->overrideFrequency(DEFAULT_SOUND_FREQ * rate);
 }

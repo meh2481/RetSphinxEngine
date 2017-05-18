@@ -572,7 +572,14 @@ unsigned Engine::getTicks()
 {
 	return SDL_GetTicks();
 }
+
 float Engine::getSeconds()
 {
 	return (float)SDL_GetTicks() / 1000.0f;
+}
+
+void Engine::setTimeScale(float fScale)
+{
+	m_fTimeScale = fScale;
+	m_soundManager->setPlaybackRate(fScale);
 }
