@@ -26,6 +26,10 @@ function soundband:update(dt)
 		spectrum = table.pack(music_spectrum(channel, self.NUM))
 	end
 		
+	--Error check
+	if spectrum[0] == nil then
+		return
+	end
 	
 	local count = self.NUM - 1
 	

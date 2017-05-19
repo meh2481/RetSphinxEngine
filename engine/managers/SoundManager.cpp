@@ -214,9 +214,11 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 {
 	Channel* ret = NULL;
-	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, false, &ret);
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, true, &ret);
 	ERRCHECK(result);
 	setGroup(ret, group);
+	result = ret->setPaused(false);
+	ERRCHECK(result);
 	return ret;
 }
 
@@ -239,7 +241,7 @@ Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 		}
 	}
 	//Paused at start so can seek
-	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, false, &musicChannel);
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, true, &musicChannel);
 	ERRCHECK(result);
 	
 	//Set looping

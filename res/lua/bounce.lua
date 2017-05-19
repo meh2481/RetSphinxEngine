@@ -23,6 +23,11 @@ function bounce:update(dt)
 	local channel = music_getChannel()
 	local spectrum = table.pack(music_spectrum(channel, self.NUM))
 	
+	--Error check
+	if spectrum[0] == nil then
+		return
+	end
+	
 	--print(self.CHANNEL, spectrum[1])
 	--for k, v in pairs(spectrum) do
 	--   print(k, v)
