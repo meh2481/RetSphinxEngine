@@ -8,12 +8,11 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "StringUtils.h"
-using namespace std;
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
 //---------------------------------------------------------------------------------------------------------------------------
-bool GameEngine::loadConfig(const string& sFilename)
+bool GameEngine::loadConfig(const std::string& sFilename)
 {
 	LOG(INFO) << "Parsing config file " << sFilename;
 	//Open file
@@ -107,7 +106,7 @@ bool GameEngine::loadConfig(const string& sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Save game config to XML
 //---------------------------------------------------------------------------------------------------------------------------
-void GameEngine::saveConfig(const string& sFilename)
+void GameEngine::saveConfig(const std::string& sFilename)
 {
 	LOG(INFO) << "Saving config XML " << sFilename;
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
@@ -146,7 +145,7 @@ void GameEngine::saveConfig(const string& sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 // Load scene from XML
 //---------------------------------------------------------------------------------------------------------------------------
-void GameEngine::loadScene(const string& sXMLFilename)
+void GameEngine::loadScene(const std::string& sXMLFilename)
 {
 	getEntityManager()->cleanup();
 	player = NULL;

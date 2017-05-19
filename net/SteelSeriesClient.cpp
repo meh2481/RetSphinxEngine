@@ -12,8 +12,6 @@
 	#include <atlstr.h>		//for CW2A
 #endif //_WIN32
 
-using namespace std;
-
 #define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"	//Location SteelSeries ini file is relative to %PROGRAMDATA%
 #define START_HREF_HTTP "http://"
 
@@ -51,7 +49,7 @@ SteelSeriesClient::~SteelSeriesClient()
 {
 }
 
-string SteelSeriesClient::getSSURL()
+std::string SteelSeriesClient::getSSURL()
 {
 #ifdef _WIN32
 	//Path on Windows is defined by SteelSeries API to be %PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json
@@ -63,16 +61,16 @@ string SteelSeriesClient::getSSURL()
 	if(SUCCEEDED(hr))
 	{
 		//Get the actual path to the file
-		string strPath = CW2A(wszPath);
-		ostringstream oss;
+		std::string strPath = CW2A(wszPath);
+		std::ostringstream oss;
 		oss << strPath << SS_FILEPATH;
 
 		//Read the contents of the file
-		ifstream jsonFile(oss.str());
+		std::ifstream jsonFile(oss.str());
 
 		if(!jsonFile.fail())
 		{
-			ostringstream buffer;
+			std::ostringstream buffer;
 			buffer << jsonFile.rdbuf();
 
 			//Parse the JSON
@@ -85,7 +83,7 @@ string SteelSeriesClient::getSSURL()
 					{
 						if(document[JSON_KEY_ADDRESS].IsString())
 						{
-							ostringstream SSURL;
+							std::ostringstream SSURL;
 							SSURL << START_HREF_HTTP << document[JSON_KEY_ADDRESS].GetString();
 							return SSURL.str();
 						}
@@ -106,7 +104,7 @@ string SteelSeriesClient::getSSURL()
 	{
 		LOG(ERROR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
 	}
-	return string();
+	return std::string();
 #else
 	#warning TODO Support other OSs for SteelSeries stuff...
         return string();
@@ -161,11 +159,11 @@ bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char 
 	//Send message to SS
 	NetworkThread::NetworkMessage msg;
 	msg.data = stringifiedJSON;
-	ostringstream ssURL;
+	std::ostringstream ssURL;
 	ssURL << url << endpoint;
 	msg.url = ssURL.str();
 
-	LOG(TRACE) << "Sending json to " << ssURL.str() << " : " << endl << stringifiedJSON;
+	LOG(TRACE) << "Sending json to " << ssURL.str() << " : " << std::endl << stringifiedJSON;
 
 	return NetworkThread::send(msg);
 }
@@ -174,7 +172,7 @@ void SteelSeriesClient::heartbeat()
 {
 	rapidjson::Document doc(rapidjson::kObjectType);
 	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
-	string heartbeatJSON = StringUtils::stringify(doc);
+	std::string heartbeatJSON = StringUtils::stringify(doc);
 
 	sendJSON(StringUtils::stringify(doc), URL_HEARTBEAT);
 }

@@ -15,7 +15,6 @@
 #include "stb_image_write.h"
 #include "easylogging++.h"
 #include "ResourceTypes.h"
-using namespace std;
 
 Image::Image(unsigned char* blob, unsigned int size)
 {
@@ -23,7 +22,7 @@ Image::Image(unsigned char* blob, unsigned int size)
 	_loadBlob(blob, size);
 }
 
-Image::Image(const string& sFilename)
+Image::Image(const std::string& sFilename)
 {
 	m_hTex = 0;
 	m_iWidth = m_iHeight = 0;
@@ -83,7 +82,7 @@ void Image::_loadBlob(unsigned char* blob, unsigned int size)
 	_bind(blob, header.width, header.height, mode);
 }
 
-void Image::_loadPNG(const string& sFilename)
+void Image::_loadPNG(const std::string& sFilename)
 {
 	int comp = 0;
 	int width = 0;
@@ -196,7 +195,7 @@ void Image::render4V(Vec2 ul, Vec2 ur, Vec2 bl, Vec2 br)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void Image::_load(const string& sFilename)
+void Image::_load(const std::string& sFilename)
 {
 	LOG(INFO) << "Load " << sFilename;
 	_loadPNG(sFilename);

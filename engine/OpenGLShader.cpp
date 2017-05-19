@@ -5,7 +5,6 @@
 #include <fstream>
 #ifdef _DEBUG
 #include <iostream>
-using namespace std;
 #endif
 
 
@@ -99,9 +98,6 @@ namespace OpenGLShader
 			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
 			glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 			LOG(ERROR) << "Error: " << &ProgramErrorMessage[0];
-#ifdef _DEBUG
-			cout << "Error: " << &ProgramErrorMessage[0] << endl;
-#endif
 		}
 
 

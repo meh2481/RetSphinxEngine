@@ -17,7 +17,6 @@
 #include "stb_image.h"
 #include "InputManager.h"
 #include "SoundManager.h"
-using namespace std;
 
 #define GUID_STR_SZ	256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -26,7 +25,7 @@ using namespace std;
 #define LOGGING_CONF "logging.conf"
 #define LOGFILE_NAME "logfile.log"
 
-Engine::Engine(uint16_t iWidth, uint16_t iHeight, const string& sTitle, const string& sCompanyName, const string& sAppName, const string& sIcon, bool bResizable)
+Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable)
 {
 	m_sTitle = sTitle;
 	m_sAppName = sAppName;
@@ -92,7 +91,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const string& sTitle, const st
 	m_soundManager = new SoundManager(m_resourceLoader);
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
-	static const string sIniFile = getSaveLocation() + IMGUI_INI;
+	static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
@@ -394,13 +393,13 @@ bool Engine::getCursorDown(int iButtonCode)
 	return (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
 }
 
-void Engine::commandline(list<string> argv)
+void Engine::commandline(std::list<std::string> argv)
 {
 	//Step through intelligently
-	for(list<string>::iterator i = argv.begin(); i != argv.end(); i++)
+	for(std::list<std::string>::iterator i = argv.begin(); i != argv.end(); i++)
 	{
 		commandlineArg cla;
-		string sSwitch = *i;
+		std::string sSwitch = *i;
 		if(sSwitch.find('-') == 0)
 		{
 			if(sSwitch.find("--") == 0)
@@ -408,7 +407,7 @@ void Engine::commandline(list<string> argv)
 			sSwitch.erase(0, 1);
 
 			cla.sSwitch = sSwitch;
-			list<string>::iterator sw = i;
+			std::list<std::string>::iterator sw = i;
 			if(++sw != argv.end())	//Switch with a value
 			{
 				cla.sValue = *sw;
@@ -422,10 +421,10 @@ void Engine::commandline(list<string> argv)
 	}
 }
 
-string Engine::getSaveLocation()
+std::string Engine::getSaveLocation()
 {
 	char* cPath = SDL_GetPrefPath(m_sCompanyName.c_str(), m_sAppName.c_str());
-	string s;
+	std::string s;
 	if(cPath)
 		s = cPath;
 	else
@@ -480,13 +479,13 @@ void Engine::stepPhysics(float dt)
 	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
 
 	//Update collisions
-	set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
+	std::set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
 	//Set join the short contacts that fired and also quit this frame
-	for(set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
+	for(std::set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
 		contacts.insert(*i);
 
 	//Iterate over all these
-	for(set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
+	for(std::set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
 	{
 		Collision c = m_clContactListener.getCollision(*i);
 		b2WorldManifold worldManifold;

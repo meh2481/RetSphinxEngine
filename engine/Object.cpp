@@ -11,8 +11,6 @@
 
 #include <Box2D/Box2D.h>
 #include "tinyxml2.h"
-using namespace tinyxml2;
-using namespace std;
 
 //----------------------------------------------------------------------------------------------------
 // obj class
@@ -37,7 +35,7 @@ Object::~Object()
 		//Cleanup Lua glue object
 		lua->deleteObject(glueObj);
 	}
-    for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
 	if(meshLattice)
 		delete meshLattice;
@@ -51,7 +49,7 @@ void Object::draw(bool bDebugInfo)
 		return;
 	
 	//Draw segments of this object
-    for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+    for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
 		if((*i)->active)	//Skip frames that shouldn't be drawn up front
 			(*i)->draw();
@@ -59,7 +57,7 @@ void Object::draw(bool bDebugInfo)
 	if(img)
 	{
 		//TODO Clarify need for object mesh image rather than ObjSegment image
-		vector<ObjSegment*>::iterator i = segments.begin();
+		std::vector<ObjSegment*>::iterator i = segments.begin();
 		if(i != segments.end())	//Not a for loop!
 		{
 			ObjSegment* seg = *i;
@@ -162,7 +160,7 @@ void Object::setPosition(Vec2 p)
 	{
 		b2Vec2 ptDiff = b->GetPosition();	//Get relative offset for all bodies
 		ptDiff = b2Vec2(p.x, p.y) - ptDiff;
-		for(vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
+		for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
 		{
 			if((*i)->body != NULL)
 			{

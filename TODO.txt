@@ -1,5 +1,4 @@
 Current higher pri:
-- Pitch shift sound/music when game timescale changes
 - Research and implement interpolation engine (B-spline, Bezier)
 	- Editor via ImGUI
 - Look into ETC1 compression for images
@@ -7,7 +6,6 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Remove "using namespace std" declarations
 - Comments on why sound manager loads its own stuff
 - Sound loop points in some resource file or something
 
@@ -44,6 +42,7 @@ Refactoring thoughts:
 
 
 Lower priority:
+- Test sound Pitch shifting; current implementation seems to not work for all sound effects as intended
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 - UTF code point lookup should use array of direct values rather than binary search?
 - Use SDL_GetPowerInfo() for laptop battery reminders

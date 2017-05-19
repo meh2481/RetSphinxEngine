@@ -12,7 +12,6 @@
 #include "Action.h"
 #include "Movement.h"
 #include "SoundManager.h"
-using namespace std;
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768
@@ -48,7 +47,7 @@ public:
 		g_pGlobalEngine->cameraPos.z = z;
 	}
 
-	static Object* xmlParseObj(string sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
+	static Object* xmlParseObj(const std::string& sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
 	{
 		Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel);
 		if(o)
@@ -71,7 +70,7 @@ public:
 		g_pGlobalEngine->player = o;
 	}
 
-	static void loadMap(string sMap, string sNode = "")
+	static void loadMap(const std::string& sMap, const std::string& sNode = "")
 	{
 		g_pGlobalEngine->m_sLoadScene = sMap;
 		g_pGlobalEngine->m_sLoadNode = sNode;
@@ -92,7 +91,7 @@ public:
 		return g_pGlobalEngine->worldPosFromCursor(p, g_pGlobalEngine->cameraPos);
 	}
 
-	static ParticleSystem* createParticles(string sName)
+	static ParticleSystem* createParticles(const std::string& sName)
 	{
 		ParticleSystem* pSys = g_pGlobalEngine->getResourceLoader()->getParticleSystem(sName);
 		g_pGlobalEngine->getEntityManager()->add(pSys);
@@ -124,7 +123,7 @@ public:
 		return g_pGlobalEngine->getWorld();
 	}
 
-	static Node* getNode(string sNodeName)
+	static Node* getNode(const std::string& sNodeName)
 	{
 		return g_pGlobalEngine->getEntityManager()->getNode(sNodeName);
 	}
@@ -134,7 +133,7 @@ public:
 		return g_pGlobalEngine->getEntityManager()->getClosestObject(p);
 	}
 
-	static void setCursor(string s)
+	static void setCursor(const std::string& s)
 	{
 		g_pGlobalEngine->setCursor(g_pGlobalEngine->getResourceLoader()->getCursor(s));
 	}
@@ -146,12 +145,12 @@ public:
 			controller->rumbleLR(duration, large, small, g_pGlobalEngine->getSeconds());
 	}
 
-	static void sendSSEvent(string eventId, int value)
+	static void sendSSEvent(const std::string& eventId, int value)
 	{
 		g_pGlobalEngine->getSteelSeriesClient()->sendEvent(eventId, value);
 	}
 
-	static void bindSSEvent(string filename)
+	static void bindSSEvent(const std::string& filename)
 	{
 		g_pGlobalEngine->getSteelSeriesClient()->bindEvent(g_pGlobalEngine->getResourceLoader()->getTextFile(filename));
 	}
@@ -431,7 +430,7 @@ luaFunc(obj_isActive) //bool obj_isActive(Object* o)
 
 luaFunc(obj_getProperty)	//string obj_getProperty(Object* o, string sProp)
 {
-	string s;
+	std::string s;
 	Object *o = getObj<Object>(L);
 	if(o)
 		s = o->getProperty(lua_tostring(L, 2));
@@ -567,7 +566,7 @@ luaFunc(camera_setPos)	//void camera_setPos(x,y,z)
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(node_getProperty)	//string node_getProperty(Node* n, string propName)
 {
-	string s;
+	std::string s;
 	Node* n = getObj<Node>(L);
 	if(n)
 		s = n->getProperty(lua_tostring(L, 2));

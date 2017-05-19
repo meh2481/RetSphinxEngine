@@ -1,7 +1,6 @@
 #include "StringUtils.h"
 #include "Rect.h"
 #include <sstream>
-using namespace std;
 
 Rect::Rect() 
 { 
@@ -96,20 +95,20 @@ void Rect::centerOn(Vec2 p)
 	offset(p.x - cen.x, p.y - cen.y);
 }
 
-void Rect::fromString(const string& input)
+void Rect::fromString(const std::string& input)
 {
 	std::string s = input;
 	s = StringUtils::stripCommas(s);
 
 	//Now, parse
-	istringstream iss(s);
+	std::istringstream iss(s);
 	if(!(iss >> left >> top >> right >> bottom))
 		set(0, 0, 0, 0);
 }
 
 std::string Rect::toString()
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << left << ", " << top << ", " << right << ", " << bottom;
 	return oss.str();
 }
@@ -142,14 +141,14 @@ Vec3 vec3FromString(const std::string& input)
 
 std::string pointToString(Vec2 pt)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << pt.x << ", " << pt.y;
 	return oss.str();
 }
 
 std::string vec3ToString(Vec3 vec)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << vec.x << ", " << vec.y << ", " << vec.z;
 	return oss.str();
 }

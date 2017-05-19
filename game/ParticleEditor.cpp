@@ -8,7 +8,6 @@
 #include "tinyxml2.h"
 #include "Rect.h"
 #include <vector>
-using namespace std;
 
 #define PARTICLE_SYSTEM_PATH "res/particles/"
 
@@ -19,7 +18,7 @@ const char* particleBlendTypes[] = {
 };
 
 //Particle systems in folder to load
-static vector<string> availableParticleSystems;
+static std::vector<std::string> availableParticleSystems;
 bool getParticleSystem(void* data, int cur, const char** toSet)
 {
 	if(cur < availableParticleSystems.size())
@@ -30,25 +29,25 @@ bool getParticleSystem(void* data, int cur, const char** toSet)
 	return false;
 }
 
-void readAvailableParticleSystems(string filePath)
+void readAvailableParticleSystems(std::string filePath)
 {
-	set<string> allFiles = FileOperations::readFilesFromDir(filePath, false);
+	std::set<std::string> allFiles = FileOperations::readFilesFromDir(filePath, false);
 	availableParticleSystems.clear();
-	for(set<string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
+	for(std::set<std::string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
 	{
-		if(i->find(".xml") != string::npos)
+		if(i->find(".xml") != std::string::npos)
 			availableParticleSystems.push_back(*i);
 	}
 }
 
-static vector<string> availableParticleSystemImages;
-void readAvailableParticleSystemImages(string filePath)
+static std::vector<std::string> availableParticleSystemImages;
+void readAvailableParticleSystemImages(std::string filePath)
 {
-	set<string> allFiles = FileOperations::readFilesFromDir(filePath, false);
+	std::set<std::string> allFiles = FileOperations::readFilesFromDir(filePath, false);
 	availableParticleSystemImages.clear();
-	for(set<string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
+	for(std::set<std::string>::iterator i = allFiles.begin(); i != allFiles.end(); i++)
 	{
-		if(i->find(".png") != string::npos)
+		if(i->find(".png") != std::string::npos)
 			availableParticleSystemImages.push_back(*i);
 	}
 }
@@ -74,7 +73,7 @@ bool spawnParticleList(void* data, int cur, const char** toSet)
 	return false;
 }
 
-static string imgRectBuffer;	//So we don't run into scoping issues with these
+static std::string imgRectBuffer;	//So we don't run into scoping issues with these
 bool imgRectList(void* data, int cur, const char** toSet)
 {
 	ParticleSystem* particles = (ParticleSystem*)data;
@@ -145,7 +144,7 @@ void ParticleEditor::draw(int windowFlags)
 					readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
 					if(!strlen(saveFilenameBuf) && availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
 					{
-						string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
+						std::string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
 						if(sFilename.size() < SAVE_BUF_SZ)
 							strcpy(saveFilenameBuf, sFilename.c_str());
 					}
@@ -358,7 +357,7 @@ void ParticleEditor::draw(int windowFlags)
 			//Error check before loading file
 			if(availableParticleSystems.size() > curSelectedLoadSaveItem)
 			{
-				string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
+				std::string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFileToLoad.size())
 				{
 					curSelectedSpawn = -1;
@@ -393,7 +392,7 @@ void ParticleEditor::draw(int windowFlags)
 		{
 			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
 			{
-				string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
+				std::string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFilename.size() < SAVE_BUF_SZ)
 					strcpy(saveFilenameBuf, sFilename.c_str());
 			}
@@ -541,7 +540,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 
 	tinyxml2::XMLElement* img = doc->NewElement("img");
 	img->SetAttribute("path", particles->img->getFilename().c_str());
-	for(vector<Rect>::iterator i = particles->imgRect.begin(); i != particles->imgRect.end(); i++)
+	for(std::vector<Rect>::iterator i = particles->imgRect.begin(); i != particles->imgRect.end(); i++)
 	{
 		tinyxml2::XMLElement* rc = doc->NewElement("rect");
 		rc->SetAttribute("val", i->toString().c_str());
@@ -614,7 +613,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 	root->InsertEndChild(life);
 
 	tinyxml2::XMLElement* spawnondeath = doc->NewElement("spawnondeath");
-	for(vector<string>::iterator i = particles->spawnOnDeath.begin(); i != particles->spawnOnDeath.end(); i++)
+	for(std::vector<std::string>::iterator i = particles->spawnOnDeath.begin(); i != particles->spawnOnDeath.end(); i++)
 	{
 		tinyxml2::XMLElement* particle = doc->NewElement("particle");
 		particle->SetAttribute("path", i->c_str());

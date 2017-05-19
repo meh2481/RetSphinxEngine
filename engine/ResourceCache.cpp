@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "Mesh3D.h"
 #include "ImgFont.h"
-using namespace std;
 
 ResourceCache::~ResourceCache()
 {
@@ -31,7 +30,7 @@ void ResourceCache::addMesh(uint64_t id, Mesh3D* mesh)
 
 Image* ResourceCache::findImage(uint64_t id)
 {
-	map<uint64_t, Image*>::iterator i = imageIDMap.find(id);
+	std::map<uint64_t, Image*>::iterator i = imageIDMap.find(id);
 	if(i == imageIDMap.end())	//This image isn't here
 		return NULL;
 	return i->second;
@@ -39,7 +38,7 @@ Image* ResourceCache::findImage(uint64_t id)
 
 ImgFont* ResourceCache::findFont(uint64_t id)
 {
-	map<uint64_t, ImgFont*>::iterator i = fontIDMap.find(id);
+	std::map<uint64_t, ImgFont*>::iterator i = fontIDMap.find(id);
 	if(i == fontIDMap.end())	//This font isn't here
 		return NULL;
 	return i->second;
@@ -47,7 +46,7 @@ ImgFont* ResourceCache::findFont(uint64_t id)
 
 Mesh3D* ResourceCache::findMesh(uint64_t id)
 {
-	map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
+	std::map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
 	if(i == meshIDMap.end())	//This mesh isn't here
 		return NULL;
 	return i->second;
@@ -63,7 +62,7 @@ Mesh3D* ResourceCache::findMesh(uint64_t id)
 
 std::string ResourceCache::findTextFile(uint64_t id)
 {
-	map<uint64_t, std::string>::iterator i = textIDMap.find(id);
+	std::map<uint64_t, std::string>::iterator i = textIDMap.find(id);
 	if(i == textIDMap.end())	//This mesh isn't here
 		return std::string();
 	return i->second;
@@ -85,21 +84,21 @@ void ResourceCache::clear()
 
 void ResourceCache::clearImages()
 {
-	for(map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
+	for(std::map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
 		delete (i->second);
 	imageIDMap.clear();
 }
 
 void ResourceCache::clearFonts()
 {
-	for(map<uint64_t, ImgFont*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
+	for(std::map<uint64_t, ImgFont*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
 		delete (i->second);
 	fontIDMap.clear();
 }
 
 void ResourceCache::clearMeshes()
 {
-	for(map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
+	for(std::map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
 		delete (i->second);
 	meshIDMap.clear();
 }

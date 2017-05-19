@@ -5,7 +5,6 @@
 
 #include "GameEngine.h"
 #include "easylogging++.h"
-using namespace std;
 
 //Define constants for logger
 INITIALIZE_EASYLOGGINGPP
@@ -32,7 +31,7 @@ int main(int argc, char** argv)
 	if (!Lua.Init()) return 1;
 	eng->setLua(&Lua);
 
-	list<string> lCommandLine;
+	std::list<std::string> lCommandLine;
 	
 	for(int i = 1; i < argc; i++)
 		lCommandLine.push_back(argv[i]);

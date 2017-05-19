@@ -3,7 +3,6 @@
 
 #include "Box2D/Box2D.h"
 #include "Random.h"
-using namespace std;
 
 void Lattice::reset(float sx, float sy)
 {	
@@ -279,7 +278,7 @@ void WobbleLatticeAnim::setEffect()
 Vec2 SoftBodyAnim::getCenter()
 {
 	b2Vec2 centroid(0,0);
-	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		centroid = centroid + i->b->GetPosition();
 	
 	centroid.x = centroid.x / bodies.size();
@@ -318,13 +317,13 @@ void SoftBodyAnim::setEffect()
 			
 			//Find total distance between this vertex and all bodies
 			float totalDist = 0.0f;
-			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Vec2 dist = vertPos - i->pos;
 				totalDist += glmx::lensqr(dist);
 			}
 			
-			for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 			{
 				Vec2 pMoved = distMoved(&(*i));
 				
@@ -362,7 +361,7 @@ Vec2 SoftBodyAnim::distMoved(BodyPos* bp)
 
 void SoftBodyAnim::init()
 {
-	for(list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		i->pos = relOffset(i->b);
     b2Vec2 p = center.b->GetPosition();
 	center.pos = Vec2(p.x, p.y);

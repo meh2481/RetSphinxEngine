@@ -3,11 +3,10 @@
 #include <sstream>
 #include "FileOperations.h"
 #include "tinydir.h"
-using namespace std;
 
 namespace FileOperations
 {
-	unsigned char* readFile(const string& filename, unsigned int* fileSize)
+	unsigned char* readFile(const std::string& filename, unsigned int* fileSize)
 	{
 		FILE *f = fopen(filename.c_str(), "rb");
 		if(f == NULL)
@@ -27,9 +26,9 @@ namespace FileOperations
 		return buf;
 	}
 
-	set<string> readFilesFromDir(const string& sDirPath, bool fullPath)
+	std::set<std::string> readFilesFromDir(const std::string& sDirPath, bool fullPath)
 	{
-		set<string> returnedFiles;
+		std::set<std::string> returnedFiles;
 
 		tinydir_dir dir;
 		tinydir_open(&dir, sDirPath.c_str());
@@ -43,7 +42,7 @@ namespace FileOperations
 			{
 				if(fullPath)
 				{
-					ostringstream oss;
+					std::ostringstream oss;
 					oss << sDirPath << "/" << file.name;
 					returnedFiles.insert(oss.str());
 				}

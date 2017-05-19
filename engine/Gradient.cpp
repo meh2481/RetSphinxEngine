@@ -1,9 +1,8 @@
 #include "Gradient.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
-using namespace std;
 
-Gradient::Gradient(string sXMLFilename)
+Gradient::Gradient(const std::string& sXMLFilename)
 {
 	load(sXMLFilename);
 }
@@ -21,13 +20,13 @@ void Gradient::insert(float fVal, int32_t r, int32_t g, int32_t b, int32_t a)
 
 Color Gradient::getVal(float fVal)
 {
-	for(map<float, Color>::iterator i = m_colorMap.begin(); i != m_colorMap.end(); i++)
+	for(std::map<float, Color>::iterator i = m_colorMap.begin(); i != m_colorMap.end(); i++)
 	{
 		if(fVal <= i->first)
 			return i->second;	//Before beginning, or exactly on one point - return this color
 		
 		//Get next color point
-		map<float, Color>::iterator next = i;
+		std::map<float, Color>::iterator next = i;
 		next++;
 		if(next == m_colorMap.end())
 			return i->second;	//Past end - return last color in list
@@ -54,7 +53,7 @@ Color Gradient::getVal(float fVal)
 	return c;	//No points or something; return rgba(1,1,1,1)
 }
 
-bool Gradient::load(const string& sXMLFilename)
+bool Gradient::load(const std::string& sXMLFilename)
 {
 	m_colorMap.clear();
 	

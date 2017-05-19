@@ -4,20 +4,19 @@
 #include "StringUtils.h"
 #include "FileOperations.h"
 #include <sstream>
-using namespace std;
 
-void PakLoader::loadFromDir(const string& sDirName)
+void PakLoader::loadFromDir(const std::string& sDirName)
 {
-	set<string> pakFiles = FileOperations::readFilesFromDir(sDirName);
+	std::set<std::string> pakFiles = FileOperations::readFilesFromDir(sDirName);
 
-	for(set<string>::iterator i = pakFiles.begin(); i != pakFiles.end(); i++)
+	for(std::set<std::string>::iterator i = pakFiles.begin(); i != pakFiles.end(); i++)
 	{
 		if(StringUtils::getExtension(*i) == PAK_FILE_TYPE)
 			parseFile(*i);
 	}
 }
 
-PakLoader::PakLoader(const string& sDirName)
+PakLoader::PakLoader(const std::string& sDirName)
 {
 	loadFromDir(sDirName);
 }
@@ -29,14 +28,14 @@ PakLoader::~PakLoader()
 
 void PakLoader::clear()
 {
-	for(list<FILE*>::iterator i = openedFiles.begin(); i != openedFiles.end(); i++)
+	for(std::list<FILE*>::iterator i = openedFiles.begin(); i != openedFiles.end(); i++)
 		fclose(*i);	//Close all our opened files
 
 	openedFiles.clear();
 	m_pakFiles.clear();
 }
 
-void PakLoader::parseFile(const string& sFileName)
+void PakLoader::parseFile(const std::string& sFileName)
 {
 	LOG(TRACE) << "Parse pak file " << sFileName;
 	FILE* fp = fopen(sFileName.c_str(), "rb");
@@ -84,7 +83,7 @@ void PakLoader::parseFile(const string& sFileName)
 unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 {
 	LOG(TRACE) << "load resource with id " << id;
-	map<uint64_t, PakPtr>::iterator it = m_pakFiles.find(id);
+	std::map<uint64_t, PakPtr>::iterator it = m_pakFiles.find(id);
 	if(it == m_pakFiles.end())
 	{
 		LOG(TRACE) << "resource was not in pak files";

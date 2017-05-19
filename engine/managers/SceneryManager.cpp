@@ -1,6 +1,5 @@
 #include "SceneryManager.h"
 #include "Object.h"
-using namespace std;
 
 SceneryManager::~SceneryManager()
 {
@@ -9,21 +8,21 @@ SceneryManager::~SceneryManager()
 
 void SceneryManager::update(float dt)
 {
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
 		(*i)->update(dt);
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
 		(*i)->update(dt);
 }
 
 void SceneryManager::renderForeground(glm::mat4 mat)
 {
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
 		(*i)->draw();	//TODO Use mat
 }
 
 void SceneryManager::renderBackground(glm::mat4 mat)
 {
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
 		(*i)->draw();	//TODO Use mat
 }
 
@@ -37,9 +36,9 @@ void SceneryManager::add(ObjSegment * seg)
 
 void SceneryManager::cleanup()
 {
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
 		delete (*i);
-	for(multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
+	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
 		delete (*i);
 
 	m_lSceneryBg.clear();

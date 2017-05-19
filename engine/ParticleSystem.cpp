@@ -10,7 +10,6 @@
 #include "easylogging++.h"
 #include "Random.h"
 #include "OpenGLShader.h"
-using namespace std;
 
 ParticleSystem::ParticleSystem()
 {

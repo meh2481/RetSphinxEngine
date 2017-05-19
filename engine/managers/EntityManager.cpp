@@ -5,7 +5,6 @@
 #include "Object.h"
 #include "ObjectManager.h"
 #include "SceneryManager.h"
-using namespace std;
 
 EntityManager::EntityManager(ResourceLoader* resourceLoader, b2World* world)
 {

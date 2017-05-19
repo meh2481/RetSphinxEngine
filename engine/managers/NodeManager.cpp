@@ -3,7 +3,6 @@
 #include "Box2D/Box2D.h"
 #include "PointQueryCallback.h"
 #include <list>
-using namespace std;
 
 NodeManager::NodeManager(b2World * world)
 {
@@ -26,20 +25,20 @@ void NodeManager::add(Node* n)
 
 void NodeManager::update(float dt)
 {
-	for(map<string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
+	for(std::map<std::string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
 		i->second->update(dt);
 }
 
 void NodeManager::cleanup()
 {
-	for(map<string, Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	for(std::map<std::string, Node*>::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
 		delete it->second;
 	m_nodes.clear();
 }
 
 Node* NodeManager::getNode(const std::string& sNodeName)
 {
-	map<string, Node*>::iterator i = m_nodes.find(sNodeName);
+	std::map<std::string, Node*>::iterator i = m_nodes.find(sNodeName);
 	if(i != m_nodes.end())
 		return i->second;
 	return NULL;
@@ -55,7 +54,7 @@ Node* NodeManager::getNodeUnder(Vec2 p)
 	physicsWorld->QueryAABB(&pqc, aabb);
 	
 	//This returns a list of possible bodies; loop through and check for actual containment
-	for(list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+	for(std::list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
 	{
 		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
 		{
@@ -75,7 +74,7 @@ Node* NodeManager::getNode(Vec2 p)
 {
 	Node* closest = NULL;
 	Vec2 closestPt;
-	for(map<string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
+	for(std::map<std::string, Node*>::iterator i = m_nodes.begin(); i != m_nodes.end(); i++)
 	{
 		float distClosest = glm::length(p - closestPt);
 		float distCur = glm::length(p - i->second->pos);

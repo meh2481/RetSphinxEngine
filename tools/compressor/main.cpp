@@ -12,7 +12,6 @@
 #include "FileOperations.h"
 #include "tinyxml2.h"
 #include "Hash.h"
-using namespace std;
 
 #define PAD_32BIT 0x50444150
 #define STB_IMAGE_IMPLEMENTATION
@@ -27,7 +26,7 @@ typedef struct
 	uint8_t* data;
 	unsigned int size;
 	uint64_t id;
-	string filename;
+	std::string filename;
 } compressionHelper;
 
 typedef struct
@@ -38,10 +37,10 @@ typedef struct
 typedef struct
 {
 	uint64_t id;
-	vector<const char*> strings;
+	std::vector<const char*> strings;
 } StringBankHelper;
 
-bool hasUpper(string s)
+bool hasUpper(const std::string& s)
 {
 	for(unsigned int i = 0; i < s.length(); i++)
 	{
@@ -56,13 +55,13 @@ bool compare_stringID(const StringBankHelper& first, const StringBankHelper& sec
 	return (first.id < second.id);
 }
 
-unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
+unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fileSize)
 {
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 	tinyxml2::XMLError err = doc->LoadFile(sFilename.c_str());
 	if(err != tinyxml2::XML_NO_ERROR)
 	{
-		cout << "Unable to open font XML " << sFilename << endl;
+		std::cout << "Unable to open font XML " << sFilename << std::endl;
 		delete doc;
 		return NULL;
 	}
@@ -70,7 +69,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	tinyxml2::XMLElement* root = doc->RootElement();
 	if(root == NULL)
 	{
-		cout << "Unable to find root element in XML " << sFilename << endl;
+		std::cout << "Unable to find root element in XML " << sFilename << std::endl;
 		delete doc;
 		return NULL;
 	}
@@ -78,13 +77,13 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	tinyxml2::XMLElement* strings = root->FirstChildElement("strings");
 	if(strings == NULL || languages == NULL)
 	{
-		cout << "Unable to find languages and strings elements in XML " << sFilename << endl;
+		std::cout << "Unable to find languages and strings elements in XML " << sFilename << std::endl;
 		delete doc;
 		return NULL;
 	}
 
 	//Read in languages and offsets
-	list<LanguageOffset> offsets;
+	std::list<LanguageOffset> offsets;
 	uint32_t off = 0;
 	for(tinyxml2::XMLElement* language = languages->FirstChildElement("language"); language != NULL; language = language->NextSiblingElement())
 	{
@@ -100,7 +99,7 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	}
 
 	//Read in actual strings
-	list<StringBankHelper> sbHelpers;
+	std::list<StringBankHelper> sbHelpers;
 	for(tinyxml2::XMLElement* stringid = strings->FirstChildElement("string"); stringid != NULL; stringid = stringid->NextSiblingElement())
 	{
 		StringBankHelper sbHelper;
@@ -125,9 +124,9 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	*fileSize += offsets.size() * sizeof(LanguageOffset);
 	*fileSize += sbHelpers.size() * sizeof(StringID);
 	*fileSize += sbHelpers.size() * offsets.size() * sizeof(StringDataPointer);
-	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)	//Add in length of all strings
+	for(std::list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)	//Add in length of all strings
 	{
-		for(vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
+		for(std::vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
 		{
 			*fileSize += strlen(*j) + 1;	//Each string will have an additional null char appended
 		}
@@ -144,14 +143,14 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	uint64_t offset = sizeof(StringBankHeader);
 
 	//Write LanguageOffsets
-	for(list<LanguageOffset>::iterator i = offsets.begin(); i != offsets.end(); i++)
+	for(std::list<LanguageOffset>::iterator i = offsets.begin(); i != offsets.end(); i++)
 	{
 		memcpy(&buf[offset], &(*i), sizeof(LanguageOffset));
 		offset += sizeof(LanguageOffset);
 	}
 
 	//Write StringIDs
-	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
+	for(std::list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
 	{
 		memcpy(&buf[offset], &(i->id), sizeof(StringID));
 		offset += sizeof(StringID);
@@ -161,9 +160,9 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	uint64_t stringWriteOffset = offset;	//Offset we're writing the strings to 
 	uint64_t actualStringOffset = 0;		//Offset from start of string data to the pointer we're currently writing
 	stringWriteOffset += sizeof(StringDataPointer)*header.numLanguages*header.numStrings;
-	for(list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
+	for(std::list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
 	{
-		for(vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
+		for(std::vector<const char*>::iterator j = i->strings.begin(); j != i->strings.end(); j++)
 		{
 			//Write the pointer
 			memcpy(&buf[offset], &actualStringOffset, sizeof(StringDataPointer));
@@ -183,23 +182,23 @@ unsigned char* extractStringbank(string sFilename, unsigned int* fileSize)
 	return buf;
 }
 
-cRect rectFromString(string s)
+cRect rectFromString(const std::string& in)
 {
 	cRect rc;
-	s = StringUtils::stripCommas(s);
+	std::string s = StringUtils::stripCommas(in);
 
 	//Now, parse
-	istringstream iss(s);
+	std::istringstream iss(s);
 	if(!(iss >> rc.left >> rc.top >> rc.right >> rc.bottom))
 		rc.left = rc.top = rc.right = rc.bottom = 0.0f;
 
 	return rc;
 }
 
-string remove_extension(const string& filename)
+std::string remove_extension(const std::string& filename)
 {
 	size_t lastdot = filename.find_last_of(".");
-	if(lastdot == string::npos) return filename;
+	if(lastdot == std::string::npos) return filename;
 	return filename.substr(0, lastdot);
 }
 
@@ -225,7 +224,7 @@ uint32_t getCodepoint(const char* str)
 	return codepoint;
 }
 
-unsigned char* extractImage(string filename, unsigned int* fileSize)
+unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 {
 	int comp = 0;
 	int width = 0;
@@ -234,7 +233,7 @@ unsigned char* extractImage(string filename, unsigned int* fileSize)
 
 	if(!imageBuf || width < 1 || height < 1)
 	{
-		cout << "Unable to load image " << filename << endl;
+		std::cout << "Unable to load image " << filename << std::endl;
 		return NULL;
 	}
 
@@ -259,13 +258,13 @@ unsigned char* extractImage(string filename, unsigned int* fileSize)
 	return finalBuf;
 }
 
-unsigned char* extractFont(string filename, unsigned int* fileSize)
+unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 {
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
 	tinyxml2::XMLError err = doc->LoadFile(filename.c_str());
 	if(err != tinyxml2::XML_NO_ERROR)
 	{
-		cout << "Unable to open font XML " << filename << endl;
+		std::cout << "Unable to open font XML " << filename << std::endl;
 		delete doc;
 		return NULL;
 	}
@@ -275,7 +274,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	const char* imgFileName = root->Attribute("img");
 	if(!imgFileName)
 	{
-		cout << "No img for font XML " << filename << endl;
+		std::cout << "No img for font XML " << filename << std::endl;
 		delete doc;
 		return NULL;
 	}
@@ -289,7 +288,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	imgHeight--;
 	if(!imageBuf || imgWidth < 1 || imgHeight < 1)
 	{
-		cout << "Unable to load image " << imgFileName << " for font " << filename << endl;
+		std::cout << "Unable to load image " << imgFileName << " for font " << filename << std::endl;
 		return NULL;
 	}
 	stbi_image_free(imageBuf);
@@ -300,8 +299,8 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	fontHeader.textureId = Hash::hash(imgFileName);
 	fontHeader.numChars = 1;
 
-	vector<uint32_t> codepoints;
-	vector<cRect> imgRects;
+	std::vector<uint32_t> codepoints;
+	std::vector<cRect> imgRects;
 
 	//First codepoint (0) is always 0,0,0,0
 	codepoints.push_back(0);
@@ -312,7 +311,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		const char* codepointStr = elem->Attribute("codepoint");
 		if(!codepointStr)
 		{
-			cout << "Skipping char missing codepoint " << fontHeader.numChars << endl;
+			std::cout << "Skipping char missing codepoint " << fontHeader.numChars << std::endl;
 			continue;
 		}
 		uint32_t codepoint = getCodepoint(codepointStr);
@@ -320,7 +319,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 		const char* imgRectStr = elem->Attribute("rect");
 		if(!imgRectStr)
 		{
-			cout << "Skipping char missing rect " << fontHeader.numChars << endl;
+			std::cout << "Skipping char missing rect " << fontHeader.numChars << std::endl;
 			continue;
 		}
 
@@ -346,7 +345,7 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	memcpy(&fontBuf[pos], codepoints.data(), sizeof(uint32_t)*fontHeader.numChars);
 	pos += sizeof(uint32_t)*fontHeader.numChars;
 
-	for(vector<cRect>::iterator i = imgRects.begin(); i != imgRects.end(); i++)
+	for(std::vector<cRect>::iterator i = imgRects.begin(); i != imgRects.end(); i++)
 	{
 		//CW winding from upper left
 		const float texCoords[] =
@@ -365,33 +364,33 @@ unsigned char* extractFont(string filename, unsigned int* fileSize)
 	return fontBuf;
 }
 
-list<string> readFilenames(string filelistFile)
+std::list<std::string> readFilenames(const std::string& filelistFile)
 {
-	list<string> lFilenames;
-	ifstream infile(filelistFile.c_str());
+	std::list<std::string> lFilenames;
+	std::ifstream infile(filelistFile.c_str());
 	if(infile.fail())
 	{
-		cout << "Cannot open " << filelistFile << ". Skipping..." << endl;
+		std::cout << "Cannot open " << filelistFile << ". Skipping..." << std::endl;
 		return lFilenames;
 	}
 
 	while(!infile.fail() && !infile.eof())	//Pull in all the lines out of this file
 	{
-		string s;
-		getline(infile, s);
+		std::string s;
+		std::getline(infile, s);
 		s = StringUtils::trim(s);
 		if(!s.length())
 			continue;	//Ignore blank lines
-		if(s.find('#') != string::npos)
+		if(s.find('#') != std::string::npos)
 			continue;	//Ignore comment lines
-		if(s.find(' ') != string::npos)
+		if(s.find(' ') != std::string::npos)
 		{
-			cout << "Ignoring file \"" << s << "\" because it contains spaces." << endl;
+			std::cout << "Ignoring file \"" << s << "\" because it contains spaces." << std::endl;
 			continue;	//Ignore lines with spaces
 		}
 		if(hasUpper(s))
 		{
-			cout << "Ignoring file \"" << s << "\" because it contains uppercase characters." << endl;
+			std::cout << "Ignoring file \"" << s << "\" because it contains uppercase characters." << std::endl;
 			continue;
 		}
 		lFilenames.push_back(s);	//Add this to our list of files to package
@@ -400,35 +399,35 @@ list<string> readFilenames(string filelistFile)
 	return lFilenames;
 }
 
-void compress(list<string> filesToPak, string pakFilename)
+void compress(std::list<std::string> filesToPak, const std::string& in)
 {
-	pakFilename = remove_extension(pakFilename);
+	std::string pakFilename = remove_extension(in);
 	pakFilename += ".pak";
-	cout << "Packing pak file \"" << pakFilename << "\"..." << endl;
+	std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
 
 	uint8_t* workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 
-	list<compressionHelper> compressedFiles;
+	std::list<compressionHelper> compressedFiles;
 
-	for(list<string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
+	for(std::list<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
-		cout << "Compressing \"" << *i << "\"..." << endl;
+		std::cout << "Compressing \"" << *i << "\"..." << std::endl;
 		unsigned int size = 0;
 		unsigned char* decompressed;
 
 		//Package these file types properly if needed
-		if(i->find(".png") != string::npos)
+		if(i->find(".png") != std::string::npos)
 			decompressed = extractImage(*i, &size);
-		else if(i->find(".font") != string::npos)
+		else if(i->find(".font") != std::string::npos)
 			decompressed = extractFont(*i, &size);
-		else if(i->find("stringbank.xml") != string::npos)
+		else if(i->find("stringbank.xml") != std::string::npos)
 			decompressed = extractStringbank(*i, &size);
 		else
 			decompressed = FileOperations::readFile(*i, &size);
 
 		if(!size || !decompressed)
 		{
-			cout << "Unable to load file " << *i << endl;
+			std::cout << "Unable to load file " << *i << std::endl;
 			continue;
 		}
 
@@ -483,7 +482,7 @@ void compress(list<string> filesToPak, string pakFilename)
 	uint64_t curOffset = (uint64_t)sizeof(PakFileHeader) + (uint64_t)compressedFiles.size() * (uint64_t)sizeof(ResourcePtr);	//Start after both these
 
 	//Write resource pointers
-	for(list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
@@ -494,7 +493,7 @@ void compress(list<string> filesToPak, string pakFilename)
 	}
 
 	//Write resource data
-	for(list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		fwrite(&i->header, 1, sizeof(CompressionHeader), fOut);
 		fwrite(i->data, 1, i->size, fOut);
@@ -511,15 +510,15 @@ void compress(list<string> filesToPak, string pakFilename)
 
 int main(int argc, char** argv)
 {
-	list<string> sFilelistNames;
+	std::list<std::string> sFilelistNames;
 	//Parse commandline
 	for(int i = 1; i < argc; i++)
 	{
-		string s = argv[i];
+		std::string s = argv[i];
 		sFilelistNames.push_back(s);
 	}
 	//Compress files
-	for(list<string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
+	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
 	{
 		compress(readFilenames(*i), *i);
 	}

@@ -8,10 +8,9 @@
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
-using namespace std;
 
 
-Text::Text(const string& sXMLFilename)
+Text::Text(const std::string& sXMLFilename)
 {
 	m_imgFont = NULL;
 
@@ -38,7 +37,7 @@ Text::Text(const string& sXMLFilename)
 	{
 		cName = elem->Name();
 		if(cName == NULL) return;
-		string sName(cName);
+		std::string sName(cName);
 		if(sName == "image" && m_imgFont == NULL)	//Image
 		{
 			const char* cPath = elem->Attribute("path");
@@ -68,23 +67,23 @@ Text::~Text()
 		delete m_imgFont;
 }
 
-void Text::render(const string& s, float x, float y, float pt)
+void Text::render(const std::string& s, float x, float y, float pt)
 {
 	if(m_imgFont == NULL)
 		return;
-	string sText = s;
+	std::string sText = s;
 	x = -x;
 	y = -y;
 	glColor4f(col.r, col.g, col.b, col.a);
 	float width = size(sText, pt);
 	x += width / 2.0f;
-	for(string::iterator i = sText.begin(); i != sText.end(); i++)
+	for(std::string::iterator i = sText.begin(); i != sText.end(); i++)
 	{
 		unsigned char c = *i;
 		if(c == '\0')
 			break;
 
-		map<unsigned char, Rect>::iterator iRect = m_mRectangles.find(c);
+		std::map<unsigned char, Rect>::iterator iRect = m_mRectangles.find(c);
 		if(iRect == m_mRectangles.end())
 			continue;   //Skip over chars we can't draw
 
@@ -101,11 +100,11 @@ void Text::render(const string& s, float x, float y, float pt)
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
-float Text::size(const string& s, float pt)
+float Text::size(const std::string& s, float pt)
 {
 	float len = 0.0f;
-	string sText = s;
-	for(string::iterator i = sText.begin(); i != sText.end(); i++)
+	std::string sText = s;
+	for(std::string::iterator i = sText.begin(); i != sText.end(); i++)
 	{
 		unsigned char c = *i;
 		if(c == '\0')

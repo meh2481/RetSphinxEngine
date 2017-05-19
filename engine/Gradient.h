@@ -13,7 +13,7 @@ protected:
 
 
 public:	
-	Gradient(std::string sXMLFilename);
+	Gradient(const std::string& sXMLFilename);
 	Gradient();
 	~Gradient() {};
 	

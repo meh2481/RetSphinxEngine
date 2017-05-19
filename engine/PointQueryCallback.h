@@ -2,7 +2,6 @@
 
 #include "Box2D/Box2D.h"
 #include <list>
-using namespace std;
 
 //-----------------------------------------------------
 // Callback helper class for finding objects
@@ -10,7 +9,7 @@ using namespace std;
 class PointQueryCallback : public b2QueryCallback
 {
 public:
-	list<b2Body*> foundBodies;
+	std::list<b2Body*> foundBodies;
 
 	bool ReportFixture(b2Fixture* fixture)
 	{

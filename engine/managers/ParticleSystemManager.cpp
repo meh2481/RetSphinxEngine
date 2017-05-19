@@ -1,6 +1,5 @@
 #include "ParticleSystemManager.h"
 #include "ParticleSystem.h"
-using namespace std;
 
 ParticleSystemManager::ParticleSystemManager(ResourceLoader* loader)
 {
@@ -30,9 +29,9 @@ void ParticleSystemManager::add(ParticleSystem * sys)
 
 void ParticleSystemManager::cleanup()
 {
-	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
+	for(std::list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		delete *i;
-	for(list<ParticleSystem*>::iterator i = m_updateParticles.begin(); i != m_updateParticles.end(); i++)
+	for(std::list<ParticleSystem*>::iterator i = m_updateParticles.begin(); i != m_updateParticles.end(); i++)
 		delete *i;
 	m_particles.clear();
 	m_updateParticles.clear();
@@ -41,14 +40,14 @@ void ParticleSystemManager::cleanup()
 void ParticleSystemManager::render(glm::mat4 mat)
 {
 	//TODO Use mat
-	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
+	for(std::list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		(*i)->draw();
 }
 
 void ParticleSystemManager::update(float dt)
 {
 	updating = true;
-	for(list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
+	for(std::list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 	{
 		(*i)->update(dt);
 		if((*i)->done())
@@ -59,7 +58,7 @@ void ParticleSystemManager::update(float dt)
 		}
 	}
 	updating = false;
-	for(list<ParticleSystem*>::iterator i = m_updateParticles.begin(); i != m_updateParticles.end(); i++)
+	for(std::list<ParticleSystem*>::iterator i = m_updateParticles.begin(); i != m_updateParticles.end(); i++)
 		m_particles.push_back(*i);
 
 	m_updateParticles.clear();

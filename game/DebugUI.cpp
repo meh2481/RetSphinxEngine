@@ -10,7 +10,6 @@
 #include <vector>
 #include <list>
 #include <climits>
-using namespace std;
 
 DebugUI::DebugUI(GameEngine *ge)
 {
@@ -103,7 +102,7 @@ void DebugUI::_draw()
 			ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
 			ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
 			ImGui::Text("Controllers connected:");
-			vector<InputDevice*> controllerList = _ge->getInputManager()->getControllerList();
+			std::vector<InputDevice*> controllerList = _ge->getInputManager()->getControllerList();
 			InputDevice* currentController = _ge->getInputManager()->getCurController();
 			for(int i = 0; i < controllerList.size(); i++)
 			{

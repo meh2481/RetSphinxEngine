@@ -14,14 +14,12 @@
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "FileOperations.h"
-using namespace std;
-using namespace tiny3d;
 
-Mesh3D::Mesh3D(const string& sOBJFile)
+Mesh3D::Mesh3D(const std::string& sOBJFile)
 {
     m_obj = 0;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
-	if(sOBJFile.find(".obj", sOBJFile.size()-4) != string::npos)
+	if(sOBJFile.find(".obj", sOBJFile.size()-4) != std::string::npos)
 		_fromOBJFile(sOBJFile);
 	else
 		_fromTiny3DFile(sOBJFile);
@@ -46,22 +44,22 @@ Mesh3D::~Mesh3D()
 		glDeleteLists(m_obj, 1);
 }
 
-void Mesh3D::_fromOBJFile(const string& sFilename)
+void Mesh3D::_fromOBJFile(const std::string& sFilename)
 {
     m_sObjFilename = sFilename;
 	LOG(INFO) << "Loading 3D object " << sFilename;
-    vector<Vertex> vVerts;
-    vector<Vertex> vNormals;
-    vector<UV> vUVs;
+	std::vector<Vertex> vVerts;
+	std::vector<Vertex> vNormals;
+	std::vector<UV> vUVs;
     UV tmp;
     tmp.u = tmp.v = 0.0;
     vUVs.push_back(tmp);    //Push a 0,0 UV coordinate in case there's no UVs in this .obj file
-    list<Face> lFaces;
+	std::list<Face> lFaces;
 
     bool bUVs = false;
     bool bNorms = false;
 
-    ifstream infile(sFilename.c_str());
+	std::ifstream infile(sFilename.c_str());
     if(infile.fail())
     {
 		LOG(ERROR) << "Error: Unable to open wavefront object file " << sFilename;
@@ -70,12 +68,12 @@ void Mesh3D::_fromOBJFile(const string& sFilename)
     //Loop until we hit eof or fail
     while(!infile.eof() && !infile.fail())
     {
-        string s;
-        getline(infile, s);
+		std::string s;
+		std::getline(infile, s);
         if(infile.eof() || infile.fail())
             break;
-        istringstream iss(s);
-        string c;
+		std::istringstream iss(s);
+		std::string c;
         if(!(iss >> c)) break;
         switch (c[0])
         {
@@ -114,9 +112,9 @@ void Mesh3D::_fromOBJFile(const string& sFilename)
                     uint32_t vertPos = 0;
                     uint32_t uvPos = 0;
                     uint32_t normPos = 0;
-                    string sCoord;
-                    getline(iss, sCoord, ' ');
-                    istringstream issCord(sCoord);
+					std::string sCoord;
+					std::getline(iss, sCoord, ' ');
+					std::istringstream issCord(sCoord);
                     issCord >> vertPos;
                     if(bNorms)
                     {
@@ -166,7 +164,7 @@ void Mesh3D::_fromOBJFile(const string& sFilename)
 	
     //Loop through and add faces
     glBegin(GL_TRIANGLES);
-    for(list<Face>::iterator i = lFaces.begin(); i != lFaces.end(); i++)
+    for(std::list<Face>::iterator i = lFaces.begin(); i != lFaces.end(); i++)
     {
         if(bNorms)
             glNormal3f(vNormals[i->norm1-1].x, vNormals[i->norm1-1].y, vNormals[i->norm1-1].z);
@@ -190,7 +188,7 @@ void Mesh3D::_fromOBJFile(const string& sFilename)
 }
 
 //Fall back on pure C functions for speed
-void Mesh3D::_fromTiny3DFile(const string& sFilename)
+void Mesh3D::_fromTiny3DFile(const std::string& sFilename)
 {
 	LOG(INFO) << "Loading 3D object " << sFilename;
 	unsigned int sz = 0;
@@ -207,33 +205,33 @@ void Mesh3D::_fromTiny3DFile(const string& sFilename)
 void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 {
 	//Make sure this is large enough to hold a header
-	if(len < sizeof(tiny3dHeader)) return;
+	if(len < sizeof(tiny3d::tiny3dHeader)) return;
 
-	tiny3dHeader*  header = (tiny3dHeader*) data;
+	tiny3d::tiny3dHeader* header = (tiny3d::tiny3dHeader*) data;
 
 	//Make sure this is large enough to hold all the data
-	if(len < sizeof(tiny3dHeader) +
-		sizeof(normal) * header->numNormals +
-		sizeof(uv) * header->numUVs +
-		sizeof(vert) * header->numVertices +
-		sizeof(face) * header->numFaces)
+	if(len < sizeof(tiny3d::tiny3dHeader) +
+		sizeof(tiny3d::normal) * header->numNormals +
+		sizeof(tiny3d::uv) * header->numUVs +
+		sizeof(tiny3d::vert) * header->numVertices +
+		sizeof(tiny3d::face) * header->numFaces)
 		return;
 
-	data += sizeof(tiny3dHeader);
+	data += sizeof(tiny3d::tiny3dHeader);
 	
-	normal* normals = (normal*)data;
+	tiny3d::normal* normals = (tiny3d::normal*)data;
 
-	data += sizeof(normal) * header->numNormals;
+	data += sizeof(tiny3d::normal) * header->numNormals;
 
-	uv* uvs = (uv*)data;
+	tiny3d::uv* uvs = (tiny3d::uv*)data;
 
-	data += sizeof(uv) * header->numUVs;
+	data += sizeof(tiny3d::uv) * header->numUVs;
 
-	vert* vertices = (vert*)data;
+	tiny3d::vert* vertices = (tiny3d::vert*)data;
 
-	data += sizeof(vert) * header->numVertices;
+	data += sizeof(tiny3d::vert) * header->numVertices;
 
-	face* faces = (face*)data;
+	tiny3d::face* faces = (tiny3d::face*)data;
 	
 	//Construct OpenGL object
     m_obj = glGenLists(1);
@@ -242,12 +240,12 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 	
     //Loop through and add faces
     glBegin(GL_TRIANGLES);
-	face* facePtr = faces;
+	tiny3d::face* facePtr = faces;
     for(unsigned i = 0; i < header->numFaces; i++)
     {
-		vert v = vertices[facePtr->v1];
-		uv UV = uvs[facePtr->uv1];
-		normal norm = normals[facePtr->norm1];
+		tiny3d::vert v = vertices[facePtr->v1];
+		tiny3d::uv UV = uvs[facePtr->uv1];
+		tiny3d::normal norm = normals[facePtr->norm1];
         glNormal3f(norm.x, norm.y, norm.z);
         glTexCoord2f(UV.u, UV.v);
         glVertex3f(v.x, v.y, v.z);

@@ -21,7 +21,6 @@
 #include "InputDevice.h"
 #include "InputManager.h"
 #include "SoundManager.h"
-using namespace std;
 
 //#define DEBUG_INPUT
 #define CONFIG_FILE "config.xml"
@@ -31,7 +30,7 @@ using namespace std;
 GameEngine* g_pGlobalEngine;
 float g_fParticleFac;
 
-GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const string& sTitle, const string& sCompanyName, const string& sAppName, const string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
+GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
 	g_pGlobalEngine = this;
 	
@@ -227,10 +226,10 @@ void GameEngine::draw()
 	
 }
 
-void GameEngine::init(list<commandlineArg> sArgs)
+void GameEngine::init(std::list<commandlineArg> sArgs)
 {
 	//Run through list for arguments we recognize
-	for (list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+	for (std::list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
 		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such
@@ -240,7 +239,7 @@ void GameEngine::init(list<commandlineArg> sArgs)
 	
 	Lua->call("loadLua");
 
-	string sLocale = SystemUtils::getCurLocale();
+	std::string sLocale = SystemUtils::getCurLocale();
 	if(sLocale.size())
 	{
 		LOG(INFO) << "Current system locale: " << sLocale;

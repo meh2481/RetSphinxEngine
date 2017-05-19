@@ -12,7 +12,6 @@
 #include "Hash.h"
 #include "Stringbank.h"
 #include "stb_image.h"
-using namespace std;
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
@@ -162,7 +161,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 	const char* blendmode = root->Attribute("blend");
 	if(blendmode != NULL)
 	{
-		string sMode = blendmode;
+		std::string sMode = blendmode;
 		if(sMode == "additive")
 			ps->blend = ADDITIVE;
 		else if(sMode == "normal")
@@ -182,7 +181,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 
 	for(tinyxml2::XMLElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
 	{
-		string sName = elem->Name();
+		std::string sName = elem->Name();
 		if(sName == "img")
 		{
 			const char* cPath = elem->Attribute("path");
@@ -529,9 +528,9 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 
 Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "res/obj/" << sType << ".xml";
-	string sXMLFilename = oss.str();
+	std::string sXMLFilename = oss.str();
 
 	LOG(INFO) << "Parsing object XML file " << sXMLFilename;
 	//Open file
@@ -575,7 +574,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 	if(cLuaClass != NULL)
 		o->luaClass = cLuaClass;
 
-	map<string, b2Body*> mBodyNames;
+	std::map<std::string, b2Body*> mBodyNames;
 
 	//Add segments
 	for(tinyxml2::XMLElement* segment = root->FirstChildElement("segment"); segment != NULL; segment = segment->NextSiblingElement("segment"))
@@ -591,7 +590,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 		tinyxml2::XMLElement* body = segment->FirstChildElement("body");
 		if(body != NULL)
 		{
-			string sBodyName;
+			std::string sBodyName;
 			const char* cBodyName = body->Attribute("name");
 			if(cBodyName)
 				sBodyName = cBodyName;
@@ -605,7 +604,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 				pos.y += p.y;
 			}
 
-			string sBodyType = "dynamic";
+			std::string sBodyType = "dynamic";
 			const char* cBodyType = body->Attribute("type");
 			if(cBodyType)
 				sBodyType = cBodyType;
@@ -645,7 +644,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 		const char* cJointType = joint->Attribute("type");
 		if(cJointType)
 		{
-			string sJointType = cJointType;
+			std::string sJointType = cJointType;
 
 			if(sJointType == "distance")
 			{
@@ -716,7 +715,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 
 				o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
 
-				string sLatticeType = cLatticeType;
+				std::string sLatticeType = cLatticeType;
 				if(sLatticeType == "softbody")
 				{
 					const char* cBodyCenter = latticeElem->Attribute("centerbody");
@@ -727,7 +726,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 						SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
 						manim->addBody(mBodyNames[cBodyCenter], true);
 						manim->size = o->meshSize;
-						for(map<string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+						for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
 						{
 							if(i->first != cBodyCenter)
 								manim->addBody(i->second);
@@ -798,7 +797,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 		LOG(ERROR) << "readFixture ERR: No fixture type";
 		return NULL;
 	}
-	string sFixType = cFixType;
+	std::string sFixType = cFixType;
 	if(sFixType == "box")
 	{
 		const char* cBoxSize = fixture->Attribute("size");
