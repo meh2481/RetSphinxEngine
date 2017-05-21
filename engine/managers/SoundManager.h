@@ -1,5 +1,6 @@
 #pragma once
 #include "fmod.hpp"
+#include "ResourceTypes.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -23,6 +24,7 @@ class SoundManager
 private:
 	//TODO: Free sounds if not used after a period of time?
 	std::map<const std::string, FMOD::Sound*> sounds;	//Cache for loaded sounds
+	std::map<MusicHandle*, SongLoop*> musicLoopPoints;	//Cache for music looping points
 	std::map<MusicHandle*, unsigned int> musicPositions;	//Last play position for each song
 	std::vector<unsigned char*> soundResources;
 	FMOD::System* system;
@@ -36,6 +38,7 @@ private:
 
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
+	void loadMusicLoopPoints(MusicHandle* mus, const std::string& filename);	//Load the loop points for a particular song
 	SoundManager() {};
 public:
 	SoundManager(ResourceLoader* loader);

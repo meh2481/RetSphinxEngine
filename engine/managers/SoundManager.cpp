@@ -2,6 +2,7 @@
 #include "easylogging++.h"
 #include "ResourceLoader.h"
 #include "Hash.h"
+#include "ResourceTypes.h"
 #include <cstring>
 
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
@@ -9,6 +10,7 @@
 #define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
 #define LOOP_FOREVER -1
 #define DEFAULT_SOUND_FREQ 44100.0f
+#define SONG_LOOP_FILE_EXT ".loop"
 
 //Example initialization code from FMOD API doc
 int SoundManager::init()
@@ -134,6 +136,17 @@ void SoundManager::setGroup(Channel* ch, SoundGroup group)
 	}
 }
 
+void SoundManager::loadMusicLoopPoints(MusicHandle* mus, const std::string& filename)
+{
+	std::map<MusicHandle*, SongLoop*>::iterator existing = musicLoopPoints.find(mus);
+	if(existing == musicLoopPoints.end())
+	{
+		SongLoop* sl = loader->getSongLoop(filename);
+		if(sl != NULL)
+			musicLoopPoints[mus] = sl;
+	}
+}
+
 SoundManager::SoundManager(ResourceLoader* l)
 {
 	loader = l;
@@ -206,6 +219,7 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
 
 		sounds[filename] = handle;
+		loadMusicLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
 		return handle;
 	}
 	return existing->second;
@@ -247,8 +261,12 @@ Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 	//Set looping
 	result = musicChannel->setLoopCount(LOOP_FOREVER);
 	ERRCHECK(result);
-	//TODO result = musicChannel->setLoopPoints(loopstart, FMOD_TIMEUNIT_MS, loopend, FMOD_TIMEUNIT_MS);
-	//ERRCHECK(result);
+	std::map<MusicHandle*, SongLoop*>::iterator loop = musicLoopPoints.find(music);
+	if(loop != musicLoopPoints.end())
+	{
+		result = musicChannel->setLoopPoints(loop->second->loopStartMsec, FMOD_TIMEUNIT_MS, loop->second->loopEndMsec, FMOD_TIMEUNIT_MS);
+		ERRCHECK(result);
+	}
 
 	//Set group
 	setGroup(musicChannel, group);

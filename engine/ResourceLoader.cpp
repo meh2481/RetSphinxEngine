@@ -12,6 +12,7 @@
 #include "Hash.h"
 #include "Stringbank.h"
 #include "stb_image.h"
+#include "ResourceTypes.h"
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
@@ -868,4 +869,9 @@ unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* le
 {
 	uint64_t hash = Hash::hash(sID.c_str());
 	return m_pakLoader->loadResource(hash, length);
+}
+
+SongLoop* ResourceLoader::getSongLoop(const std::string & sID)
+{
+	return NULL;
 }

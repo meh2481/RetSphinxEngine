@@ -109,3 +109,13 @@ typedef struct
 	uint64_t offset;	//Offset from start of string data to the start of the actual, null-terminated string
 } StringDataPointer;
 
+//--------------------------------------------------------------
+// Sound data
+//--------------------------------------------------------------
+//Song loop points
+typedef struct
+{
+	uint32_t loopStartMsec;
+	uint32_t loopEndMsec;
+} SongLoop;
+

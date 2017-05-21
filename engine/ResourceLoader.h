@@ -6,6 +6,7 @@
 #include "Box2D/Box2D.h"
 #include "Rect.h"
 #include "SDL.h"
+#include "ResourceTypes.h"
 
 class Image;
 class Object;
@@ -60,6 +61,7 @@ public:
 	ObjSegment* getObjectSegment(tinyxml2::XMLElement* layer);
 	b2Fixture* getObjectFixture(tinyxml2::XMLElement* fixture, b2Body* bod);
 
-	//Sounds (raw data since we load with FMOD)
-	unsigned char* getSound(const std::string& sID, unsigned int* length);
+	//Sounds
+	unsigned char* getSound(const std::string& sID, unsigned int* length);	// Raw data since we load with FMOD
+	SongLoop* getSongLoop(const std::string& sID);
 };

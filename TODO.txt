@@ -6,12 +6,10 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Comments on why sound manager loads its own stuff
 - Sound loop points in some resource file or something
 
 Overall TODO list:
 - Resources should be streamed from disk, not loaded upfront from .pak files
-- Stream resources
 - Sound filters
 - Sound pitch
 - Fix math for softbody lattice anim so it actually works properly
