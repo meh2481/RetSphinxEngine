@@ -873,5 +873,10 @@ unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* le
 
 SongLoop* ResourceLoader::getSongLoop(const std::string & sID)
 {
+	uint64_t hash = Hash::hash(sID.c_str());
+	unsigned char* ret = m_pakLoader->loadResource(hash);
+	if(ret)
+		return (SongLoop*)ret;
+	//Don't load song looping from file
 	return NULL;
 }
