@@ -156,12 +156,14 @@ SoundManager::SoundManager(ResourceLoader* l)
 
 SoundManager::~SoundManager()
 {
-	//TODO: Save/load song location on exit?
+	//TODO: Save/load song location on app exit?
 	FMOD_RESULT result = system->release();
 	if(result)
 		LOG(WARNING) << "Unable to close FMOD: " << result;
 	for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
 		delete [] *i;
+	for(std::map<MusicHandle*, SongLoop*>::iterator i = musicLoopPoints.begin(); i != musicLoopPoints.end(); i++)
+		delete (i->second);
 }
 
 void SoundManager::update()

@@ -6,7 +6,8 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Sound loop points in some resource file or something
+- Sound loop points
+- Sound loop sound fx, not just music
 
 Overall TODO list:
 - Resources should be streamed from disk, not loaded upfront from .pak files
