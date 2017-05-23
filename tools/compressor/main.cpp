@@ -40,6 +40,8 @@ typedef struct
 	std::vector<const char*> strings;
 } StringBankHelper;
 
+//Helper functions ----------------------------------------
+
 bool hasUpper(const std::string& s)
 {
 	for(unsigned int i = 0; i < s.length(); i++)
@@ -53,6 +55,28 @@ bool hasUpper(const std::string& s)
 bool compare_stringID(const StringBankHelper& first, const StringBankHelper& second)
 {
 	return (first.id < second.id);
+}
+
+uint32_t parseTime(const char* cStr)	//Parse time in the form mm:ss.sss
+{
+	if(!cStr)
+		return 0;
+
+	std::string s = cStr;
+
+	size_t colonPos = s.find_first_of(':');
+	std::string minutes = s.substr(0, colonPos);
+	std::string seconds = s.substr(colonPos + 1);
+
+	uint32_t m = atoi(minutes.c_str());
+	double sec = atof(seconds.c_str());
+
+	uint32_t ret = sec * 1000;
+	ret += m * 60 * 1000;
+
+	std::cout << "Converting " << s << " to " << ret << " msec" << std::endl;
+
+	return ret;
 }
 
 unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fileSize)
@@ -180,6 +204,35 @@ unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fil
 	//Done
 	delete doc;
 	return buf;
+}
+
+unsigned char* extractSoundLoop(const std::string& sFilename, unsigned int* fileSize)
+{
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+	tinyxml2::XMLError err = doc->LoadFile(sFilename.c_str());
+	if(err != tinyxml2::XML_NO_ERROR)
+	{
+		std::cout << "Unable to open song loop XML " << sFilename << std::endl;
+		delete doc;
+		return NULL;
+	}
+
+	tinyxml2::XMLElement* root = doc->RootElement();
+	if(root == NULL)
+	{
+		std::cout << "Unable to find root element in XML " << sFilename << std::endl;
+		delete doc;
+		return NULL;
+	}
+
+	*fileSize = sizeof(SongLoop);
+	SongLoop* sl = (SongLoop*)malloc(*fileSize);
+
+	sl->loopStartMsec = parseTime(root->Attribute("start"));
+	sl->loopEndMsec = parseTime(root->Attribute("end"));
+
+	delete doc;
+	return (unsigned char*)sl;
 }
 
 cRect rectFromString(const std::string& in)
@@ -422,6 +475,8 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			decompressed = extractFont(*i, &size);
 		else if(i->find("stringbank.xml") != std::string::npos)
 			decompressed = extractStringbank(*i, &size);
+		else if(i->find(".loop") != std::string::npos)
+			decompressed = extractSoundLoop(*i, &size);
 		else
 			decompressed = FileOperations::readFile(*i, &size);
 

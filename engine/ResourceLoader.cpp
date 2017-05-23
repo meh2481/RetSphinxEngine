@@ -784,8 +784,6 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 	b2CircleShape dynamicCircle;
 	b2ChainShape dynamicChain;
 
-
-
 	//Get position (center of box)
 	Vec2 pos(0, 0);
 	const char* cPos = fixture->Attribute("pos");
@@ -873,6 +871,8 @@ unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* le
 
 SongLoop* ResourceLoader::getSongLoop(const std::string & sID)
 {
+	LOG(INFO) << "Loading sound loop info from " << sID;
+
 	uint64_t hash = Hash::hash(sID.c_str());
 	unsigned char* ret = m_pakLoader->loadResource(hash);
 	if(ret)
