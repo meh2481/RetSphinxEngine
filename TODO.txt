@@ -6,7 +6,7 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Sound loop sound fx, not just music
+- Kill all sounds (except music, iff it's the same song) on map load
 
 Overall TODO list:
 - Resources should be streamed from disk, not loaded upfront from .pak files

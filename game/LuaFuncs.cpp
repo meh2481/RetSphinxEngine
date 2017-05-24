@@ -170,10 +170,10 @@ public:
 		return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
 	}
 
-	static int playSong(const std::string& songFilename)
+	static int playSong(const std::string& songFilename, SoundGroup group = GROUP_MUSIC)
 	{
 		StreamHandle* mus = g_pGlobalEngine->getSoundManager()->loadStream(songFilename);
-		Channel* channel = g_pGlobalEngine->getSoundManager()->playLoop(mus);
+		Channel* channel = g_pGlobalEngine->getSoundManager()->playLoop(mus, group);
 		int channelIdx = 0;
 		channel->getIndex(&channelIdx);
 		return channelIdx;
@@ -209,10 +209,10 @@ public:
 		return -1;
 	}
 
-	static int playSound(const std::string& soundFilename)
+	static int playSound(const std::string& soundFilename, SoundGroup group = GROUP_SFX)
 	{
 		SoundHandle* sound = g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
-		Channel* channel = g_pGlobalEngine->getSoundManager()->playSound(sound);
+		Channel* channel = g_pGlobalEngine->getSoundManager()->playSound(sound, group);
 		int channelIdx = 0;
 		channel->getIndex(&channelIdx);
 		return channelIdx;
@@ -811,10 +811,13 @@ luaFunc(movement_vec)	//x,y movement_vec(int movementId)
 //-----------------------------------------------------------------------------------------------------------
 // Sound functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(music_play)	//int music_play(string songPath)
+luaFunc(music_play)	//int music_play(string songPath, int soundGroup)
 {
+	SoundGroup group = GROUP_MUSIC;
+	if(lua_isinteger(L, 2))
+		group = (SoundGroup)lua_tointeger(L, 2);
 	if(lua_isstring(L, 1))
-		luaReturnInt(GameEngineLua::playSong(lua_tostring(L, 1)));
+		luaReturnInt(GameEngineLua::playSong(lua_tostring(L, 1), group));
 	luaReturnNil();
 }
 
@@ -886,10 +889,13 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 	luaReturnNil();
 }
 
-luaFunc(sound_play)	//int sound_play(string soundPath)
+luaFunc(sound_play)	//int sound_play(string soundPath, int soundGroup)
 {
+	SoundGroup group = GROUP_SFX;
+	if(lua_isinteger(L, 2))
+		group = (SoundGroup)lua_tointeger(L, 2);
 	if(lua_isstring(L, 1))
-		luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1)));
+		luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1), group));
 	luaReturnNil();
 }
 
@@ -988,6 +994,12 @@ static const struct
 	luaConstant(MOVE),
 	luaConstant(AIM),
 	luaConstant(PAN),
+
+	//Sound groups
+	luaConstant(GROUP_MUSIC),
+	luaConstant(GROUP_SFX),
+	luaConstant(GROUP_BGFX),
+	luaConstant(GROUP_VOX),
 };
 
 void lua_register_all(lua_State *L)
