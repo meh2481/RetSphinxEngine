@@ -225,8 +225,8 @@ unsigned char* extractSoundLoop(const std::string& sFilename, unsigned int* file
 		return NULL;
 	}
 
-	*fileSize = sizeof(SongLoop);
-	SongLoop* sl = (SongLoop*)malloc(*fileSize);
+	*fileSize = sizeof(SoundLoop);
+	SoundLoop* sl = (SoundLoop*)malloc(*fileSize);
 
 	sl->loopStartMsec = parseTime(root->Attribute("start"));
 	sl->loopEndMsec = parseTime(root->Attribute("end"));

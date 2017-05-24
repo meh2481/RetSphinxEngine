@@ -172,8 +172,8 @@ public:
 
 	static int playSong(const std::string& songFilename)
 	{
-		MusicHandle* mus = g_pGlobalEngine->getSoundManager()->loadMusic(songFilename);
-		Channel* channel = g_pGlobalEngine->getSoundManager()->playMusic(mus);
+		StreamHandle* mus = g_pGlobalEngine->getSoundManager()->loadStream(songFilename);
+		Channel* channel = g_pGlobalEngine->getSoundManager()->playLoop(mus);
 		int channelIdx = 0;
 		channel->getIndex(&channelIdx);
 		return channelIdx;

@@ -6,7 +6,7 @@
 #include <vector>
 
 #define SoundHandle FMOD::Sound
-#define MusicHandle FMOD::Sound
+#define StreamHandle FMOD::Sound
 #define Channel FMOD::Channel
 
 class ResourceLoader;
@@ -24,8 +24,8 @@ class SoundManager
 private:
 	//TODO: Free sounds if not used after a period of time?
 	std::map<const std::string, FMOD::Sound*> sounds;	//Cache for loaded sounds
-	std::map<MusicHandle*, SongLoop*> musicLoopPoints;	//Cache for music looping points
-	std::map<MusicHandle*, unsigned int> musicPositions;	//Last play position for each song
+	std::map<StreamHandle*, SoundLoop*> soundLoopPoints;	//Cache for sound looping points
+	std::map<StreamHandle*, unsigned int> musicPositions;	//Last play position for each song
 	std::vector<unsigned char*> soundResources;
 	FMOD::System* system;
 	Channel* musicChannel;
@@ -38,19 +38,23 @@ private:
 
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
-	void loadMusicLoopPoints(MusicHandle* mus, const std::string& filename);	//Load the loop points for a particular song
+	void loadLoopPoints(StreamHandle* mus, const std::string& filename);	//Load the loop points for a particular song
 	SoundManager() {};
 public:
 	SoundManager(ResourceLoader* loader);
 	~SoundManager();
 
-	void update();
+	void update();	//Call every frame
 
 	SoundHandle* loadSound(const std::string& filename);
-	MusicHandle* loadMusic(const std::string& filename);
+	StreamHandle* loadStream(const std::string& filename);
 
 	Channel* playSound(SoundHandle* sound, SoundGroup group = GROUP_SFX);
-	Channel* playMusic(MusicHandle* music, SoundGroup group = GROUP_MUSIC);
+	Channel* playLoop(StreamHandle* music, SoundGroup group = GROUP_MUSIC);
+
+	//Group functions
+	void setVolume(SoundGroup group, float fvol);
+	float getVolume(SoundGroup group);
 
 	//Channel functions
 	void pause(Channel* channel);
@@ -72,6 +76,7 @@ public:
 	//Global functions
 	void pauseAll();
 	void resumeAll();
-
 	void setPlaybackRate(float rate);	//Multiplied times default playback freq
+	void setVolume(float fvol);
+	float getVolume();
 };

@@ -1,12 +1,11 @@
 Current higher pri:
 - Research and implement interpolation engine (B-spline, Bezier)
 	- Editor via ImGUI
-- Look into ETC1 compression for images
+- Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Sound loop points
 - Sound loop sound fx, not just music
 
 Overall TODO list:

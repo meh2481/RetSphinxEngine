@@ -63,5 +63,5 @@ public:
 
 	//Sounds
 	unsigned char* getSound(const std::string& sID, unsigned int* length);	// Raw data since we load with FMOD
-	SongLoop* getSongLoop(const std::string& sID);
+	SoundLoop* getSoundLoop(const std::string& sID);
 };

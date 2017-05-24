@@ -136,14 +136,14 @@ void SoundManager::setGroup(Channel* ch, SoundGroup group)
 	}
 }
 
-void SoundManager::loadMusicLoopPoints(MusicHandle* mus, const std::string& filename)
+void SoundManager::loadLoopPoints(StreamHandle* mus, const std::string& filename)
 {
-	std::map<MusicHandle*, SongLoop*>::iterator existing = musicLoopPoints.find(mus);
-	if(existing == musicLoopPoints.end())
+	std::map<StreamHandle*, SoundLoop*>::iterator existing = soundLoopPoints.find(mus);
+	if(existing == soundLoopPoints.end())
 	{
-		SongLoop* sl = loader->getSongLoop(filename);
+		SoundLoop* sl = loader->getSoundLoop(filename);
 		if(sl != NULL)
-			musicLoopPoints[mus] = sl;
+			soundLoopPoints[mus] = sl;
 	}
 }
 
@@ -162,7 +162,7 @@ SoundManager::~SoundManager()
 		LOG(WARNING) << "Unable to close FMOD: " << result;
 	for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
 		delete [] *i;
-	for(std::map<MusicHandle*, SongLoop*>::iterator i = musicLoopPoints.begin(); i != musicLoopPoints.end(); i++)
+	for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
 		delete (i->second);
 }
 
@@ -207,7 +207,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
 	return existing->second;
 }
 
-MusicHandle* SoundManager::loadMusic(const std::string& filename)
+StreamHandle* SoundManager::loadStream(const std::string& filename)
 {
 	std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
 	if(existing == sounds.end())	//Doesn't exist; load
@@ -221,7 +221,7 @@ MusicHandle* SoundManager::loadMusic(const std::string& filename)
 			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
 
 		sounds[filename] = handle;
-		loadMusicLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
+		loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
 		return handle;
 	}
 	return existing->second;
@@ -238,7 +238,7 @@ Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 	return ret;
 }
 
-Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
+Channel* SoundManager::playLoop(StreamHandle* music, SoundGroup group)
 {
 	//Check if we have a song currently playing
 	if(musicChannel != NULL)
@@ -263,8 +263,8 @@ Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 	//Set looping
 	result = musicChannel->setLoopCount(LOOP_FOREVER);
 	ERRCHECK(result);
-	std::map<MusicHandle*, SongLoop*>::iterator loop = musicLoopPoints.find(music);
-	if(loop != musicLoopPoints.end())
+	std::map<StreamHandle*, SoundLoop*>::iterator loop = soundLoopPoints.find(music);
+	if(loop != soundLoopPoints.end())
 	{
 		result = musicChannel->setLoopPoints(loop->second->loopStartMsec, FMOD_TIMEUNIT_MS, loop->second->loopEndMsec, FMOD_TIMEUNIT_MS);
 		ERRCHECK(result);
@@ -274,7 +274,7 @@ Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 	setGroup(musicChannel, group);
 
 	//Start where we last stopped playing this song
-	std::map<MusicHandle*, unsigned int>::iterator existing = musicPositions.find(music);
+	std::map<StreamHandle*, unsigned int>::iterator existing = musicPositions.find(music);
 	if(existing != musicPositions.end())
 		result = musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
 	else
@@ -285,6 +285,54 @@ Channel* SoundManager::playMusic(MusicHandle* music, SoundGroup group)
 	result = musicChannel->setPaused(false);
 	ERRCHECK(result);
 	return musicChannel;
+}
+
+void SoundManager::setVolume(SoundGroup group, float fvol)
+{
+	switch(group)
+	{
+		case GROUP_MUSIC:
+			musicGroup->setVolume(fvol);
+			break;
+
+		case GROUP_BGFX:
+			bgFxGroup->setVolume(fvol);
+			break;
+
+		case GROUP_VOX:
+			voxGroup->setVolume(fvol);
+			break;
+
+		case GROUP_SFX:
+		default:
+			sfxGroup->setVolume(fvol);
+			break;
+	}
+}
+
+float SoundManager::getVolume(SoundGroup group)
+{
+	float fvol = 1.0f;
+	switch(group)
+	{
+		case GROUP_MUSIC:
+			musicGroup->getVolume(&fvol);
+			break;
+
+		case GROUP_BGFX:
+			bgFxGroup->getVolume(&fvol);
+			break;
+
+		case GROUP_VOX:
+			voxGroup->getVolume(&fvol);
+			break;
+
+		case GROUP_SFX:
+		default:
+			sfxGroup->getVolume(&fvol);
+			break;
+	}
+	return fvol;
 }
 
 void SoundManager::pause(Channel* channel)
@@ -390,4 +438,16 @@ void SoundManager::resumeAll()
 void SoundManager::setPlaybackRate(float rate)
 {
 	masterChannelGroup->overrideFrequency(DEFAULT_SOUND_FREQ * rate);
+}
+
+void SoundManager::setVolume(float fvol)
+{
+	masterChannelGroup->setVolume(fvol);
+}
+
+float SoundManager::getVolume()
+{
+	float fvol = 1.0f;
+	masterChannelGroup->getVolume(&fvol);
+	return fvol;
 }

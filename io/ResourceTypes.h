@@ -117,5 +117,5 @@ typedef struct
 {
 	uint32_t loopStartMsec;
 	uint32_t loopEndMsec;
-} SongLoop;
+} SoundLoop;
 
