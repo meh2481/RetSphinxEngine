@@ -205,6 +205,8 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
 	}
 
 	//Music
+	getSoundManager()->stopSounds(GROUP_SFX);	//Stop sound effects
+	getSoundManager()->stopSounds(GROUP_BGFX);	//Stop bg sound effects
 	getSoundManager()->pauseMusic();	//Stop currently-playing music
 	//TODO: Stop all currently-playing sounds
 	const char* cMusic = root->Attribute("music");

@@ -115,25 +115,7 @@ int SoundManager::init()
 
 void SoundManager::setGroup(Channel* ch, SoundGroup group)
 {
-	switch(group)
-	{
-		case GROUP_MUSIC:
-			ch->setChannelGroup(musicGroup);
-			break;
-
-		case GROUP_BGFX:
-			ch->setChannelGroup(bgFxGroup);
-			break;
-
-		case GROUP_VOX:
-			ch->setChannelGroup(voxGroup);
-			break;
-
-		case GROUP_SFX:
-		default:
-			ch->setChannelGroup(sfxGroup);
-			break;
-	}
+	ch->setChannelGroup(getGroup(group));
 }
 
 void SoundManager::loadLoopPoints(StreamHandle* mus, const std::string& filename)
@@ -145,6 +127,22 @@ void SoundManager::loadLoopPoints(StreamHandle* mus, const std::string& filename
 		if(sl != NULL)
 			soundLoopPoints[mus] = sl;
 	}
+}
+
+FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
+{
+	switch(group)
+	{
+		case GROUP_MUSIC:
+			return musicGroup;
+
+		case GROUP_BGFX:
+			return bgFxGroup;
+
+		case GROUP_VOX:
+			return voxGroup;
+	}
+	return sfxGroup;
 }
 
 SoundManager::SoundManager(ResourceLoader* l)
@@ -308,49 +306,13 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 
 void SoundManager::setVolume(SoundGroup group, float fvol)
 {
-	switch(group)
-	{
-		case GROUP_MUSIC:
-			musicGroup->setVolume(fvol);
-			break;
-
-		case GROUP_BGFX:
-			bgFxGroup->setVolume(fvol);
-			break;
-
-		case GROUP_VOX:
-			voxGroup->setVolume(fvol);
-			break;
-
-		case GROUP_SFX:
-		default:
-			sfxGroup->setVolume(fvol);
-			break;
-	}
+	getGroup(group)->setVolume(fvol);
 }
 
 float SoundManager::getVolume(SoundGroup group)
 {
 	float fvol = 1.0f;
-	switch(group)
-	{
-		case GROUP_MUSIC:
-			musicGroup->getVolume(&fvol);
-			break;
-
-		case GROUP_BGFX:
-			bgFxGroup->getVolume(&fvol);
-			break;
-
-		case GROUP_VOX:
-			voxGroup->getVolume(&fvol);
-			break;
-
-		case GROUP_SFX:
-		default:
-			sfxGroup->getVolume(&fvol);
-			break;
-	}
+	getGroup(group)->getVolume(&fvol);
 	return fvol;
 }
 
@@ -469,4 +431,11 @@ float SoundManager::getVolume()
 	float fvol = 1.0f;
 	masterChannelGroup->getVolume(&fvol);
 	return fvol;
+}
+
+void SoundManager::stopSounds(SoundGroup group)
+{
+	FMOD::ChannelGroup* sg = getGroup(group);
+	FMOD_RESULT result = sg->stop();
+	ERRCHECK(result);
 }

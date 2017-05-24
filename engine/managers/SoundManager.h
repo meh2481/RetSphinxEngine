@@ -39,6 +39,7 @@ private:
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
 	void loadLoopPoints(StreamHandle* mus, const std::string& filename);	//Load the loop points for a particular song
+	FMOD::ChannelGroup* getGroup(SoundGroup group);
 	SoundManager() {};
 public:
 	SoundManager(ResourceLoader* loader);
@@ -74,9 +75,10 @@ public:
 	Channel* getMusicChannel() { return musicChannel; }
 
 	//Global functions
-	void pauseAll();
-	void resumeAll();
+	void pauseAll();	//Pause all sounds/music
+	void resumeAll();	//Resume all paused sounds/music
 	void setPlaybackRate(float rate);	//Multiplied times default playback freq
 	void setVolume(float fvol);
 	float getVolume();
+	void stopSounds(SoundGroup group);	//Stop/free all sounds in the given group
 };
