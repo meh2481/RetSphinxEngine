@@ -248,11 +248,18 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 		ERRCHECK(result);
 		if(playing)
 		{
-			//Save the last playing position
+			//First check if we're playing this song already
+			FMOD::Sound* curPlaying = NULL;
+			result = musicChannel->getCurrentSound(&curPlaying);
+			ERRCHECK(result);
+			if(curPlaying != NULL && curPlaying == stream)
+				return;	//Don't play over a song we're already playing
+
+			//Save the last playing position for the currently-playing song
 			unsigned int pos = 0;
 			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
 			ERRCHECK(result);
-			musicPositions[stream] = pos;
+			musicPositions[curPlaying] = pos;
 			musicChannel->stop();
 		}
 	}
