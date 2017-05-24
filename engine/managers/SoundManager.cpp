@@ -218,7 +218,10 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
 		//Create a streamed, loopable sound
 		FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
 		if(result)
+		{
 			LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
+			return NULL;
+		}
 
 		sounds[filename] = handle;
 		loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
@@ -253,7 +256,10 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 			result = musicChannel->getCurrentSound(&curPlaying);
 			ERRCHECK(result);
 			if(curPlaying != NULL && curPlaying == stream)
-				return;	//Don't play over a song we're already playing
+			{
+				musicChannel->setPaused(false);
+				return musicChannel;	//Don't play over a song we're already playing
+			}
 
 			//Save the last playing position for the currently-playing song
 			unsigned int pos = 0;

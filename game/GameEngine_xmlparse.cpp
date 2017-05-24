@@ -8,6 +8,7 @@
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "StringUtils.h"
+#include "SoundManager.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -201,6 +202,17 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
 		boundShape.CreateLoop(verts, 4);
 		fixtureDef.shape = &boundShape;
 		groundBody->CreateFixture(&fixtureDef);
+	}
+
+	//Music
+	getSoundManager()->pauseMusic();	//Stop currently-playing music
+	//TODO: Stop all currently-playing sounds
+	const char* cMusic = root->Attribute("music");
+	if(cMusic)
+	{
+		StreamHandle* mus = getSoundManager()->loadStream(cMusic);
+		if(mus)
+			getSoundManager()->playLoop(mus);
 	}
 	
 	//Load layers for the scene
