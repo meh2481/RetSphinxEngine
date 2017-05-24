@@ -24,7 +24,7 @@ function bounce:update(dt)
 	local spectrum = table.pack(music_spectrum(channel, self.NUM))
 	
 	--Error check
-	if spectrum[0] == nil then
+	if spectrum[1] == nil then
 		return
 	end
 	

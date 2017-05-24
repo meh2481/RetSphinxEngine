@@ -27,7 +27,7 @@ function soundband:update(dt)
 	end
 		
 	--Error check
-	if spectrum[0] == nil then
+	if spectrum[1] == nil then
 		return
 	end
 	

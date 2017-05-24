@@ -238,10 +238,10 @@ Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 	return ret;
 }
 
-Channel* SoundManager::playLoop(StreamHandle* music, SoundGroup group)
+Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 {
-	//Check if we have a song currently playing
-	if(musicChannel != NULL)
+	//Check if this is a song and we have a song currently playing
+	if(musicChannel != NULL && group == GROUP_MUSIC)
 	{
 		bool playing = false;
 		FMOD_RESULT result = musicChannel->isPlaying(&playing);
@@ -252,39 +252,45 @@ Channel* SoundManager::playLoop(StreamHandle* music, SoundGroup group)
 			unsigned int pos = 0;
 			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
 			ERRCHECK(result);
-			musicPositions[music] = pos;
+			musicPositions[stream] = pos;
 			musicChannel->stop();
 		}
 	}
+	Channel* channel;
 	//Paused at start so can seek
-	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, music, true, &musicChannel);
+	FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, stream, true, &channel);
 	ERRCHECK(result);
-	
+
 	//Set looping
-	result = musicChannel->setLoopCount(LOOP_FOREVER);
+	result = channel->setLoopCount(LOOP_FOREVER);
 	ERRCHECK(result);
-	std::map<StreamHandle*, SoundLoop*>::iterator loop = soundLoopPoints.find(music);
+	std::map<StreamHandle*, SoundLoop*>::iterator loop = soundLoopPoints.find(stream);
 	if(loop != soundLoopPoints.end())
 	{
-		result = musicChannel->setLoopPoints(loop->second->loopStartMsec, FMOD_TIMEUNIT_MS, loop->second->loopEndMsec, FMOD_TIMEUNIT_MS);
+		result = channel->setLoopPoints(loop->second->loopStartMsec, FMOD_TIMEUNIT_MS, loop->second->loopEndMsec, FMOD_TIMEUNIT_MS);
 		ERRCHECK(result);
 	}
 
 	//Set group
-	setGroup(musicChannel, group);
+	setGroup(channel, group);
 
-	//Start where we last stopped playing this song
-	std::map<StreamHandle*, unsigned int>::iterator existing = musicPositions.find(music);
-	if(existing != musicPositions.end())
-		result = musicChannel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
-	else
-		result = musicChannel->setPosition(0, FMOD_TIMEUNIT_MS);	//Set at start to force reflush of stream buffer (See FMOD API)
-	ERRCHECK(result);
+	if(group == GROUP_MUSIC) 
+	{
+		//Start where we last stopped playing this song
+		std::map<StreamHandle*, unsigned int>::iterator existing = musicPositions.find(stream);
+		if(existing != musicPositions.end())
+			result = channel->setPosition(existing->second, FMOD_TIMEUNIT_MS);
+		else
+			result = channel->setPosition(0, FMOD_TIMEUNIT_MS);	//Set at start to force reflush of stream buffer (See FMOD API)
+		ERRCHECK(result);
+
+		musicChannel = channel;	//Save this as our new music channel
+	}
 	
 	//Start playing
-	result = musicChannel->setPaused(false);
+	result = channel->setPaused(false);
 	ERRCHECK(result);
-	return musicChannel;
+	return channel;
 }
 
 void SoundManager::setVolume(SoundGroup group, float fvol)
