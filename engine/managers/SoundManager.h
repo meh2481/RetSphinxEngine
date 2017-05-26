@@ -56,6 +56,7 @@ public:
 	//Group functions
 	void setVolume(SoundGroup group, float fvol);
 	float getVolume(SoundGroup group);
+	void stopSounds(SoundGroup group);	//Stop/free all sounds in the given group
 
 	//Channel functions
 	void pause(Channel* channel);
@@ -78,7 +79,6 @@ public:
 	void pauseAll();	//Pause all sounds/music
 	void resumeAll();	//Resume all paused sounds/music
 	void setPlaybackRate(float rate);	//Multiplied times default playback freq
-	void setVolume(float fvol);
+	void setVolume(float fvol);	//Global volume
 	float getVolume();
-	void stopSounds(SoundGroup group);	//Stop/free all sounds in the given group
 };

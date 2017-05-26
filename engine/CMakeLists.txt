@@ -23,8 +23,11 @@ imgui_impl_sdl.cpp
 imgui_impl_sdl.h
 InputDevice.cpp
 InputDevice.h
+Interpolation.h
 Lattice.cpp
 Lattice.h
+LinearInterpolation.h
+LinearInterpolation.cpp
 LuaDefines.h
 LuaFuncs.h
 LuaInterface.cpp
@@ -71,6 +74,8 @@ managers/ParticleSystemManager.h
 managers/ParticleSystemManager.cpp
 managers/EntityManager.h
 managers/EntityManager.cpp
+managers/InterpolationManager.h
+managers/InterpolationManager.cpp
 managers/NodeManager.cpp
 managers/NodeManager.h
 managers/ObjectManager.h

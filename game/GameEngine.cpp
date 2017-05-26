@@ -21,6 +21,7 @@
 #include "InputDevice.h"
 #include "InputManager.h"
 #include "SoundManager.h"
+#include "InterpolationManager.h"
 
 //#define DEBUG_INPUT
 #define CONFIG_FILE "config.xml"
@@ -80,6 +81,7 @@ void GameEngine::frame(float dt)
 		getEntityManager()->update(dt);
 	}
 	steelSeriesClient->update(dt);
+	getInterpolationManager()->update(dt);
 	
 	//Load a new scene after updating if we've been told to
 	if(m_sLoadScene.size())

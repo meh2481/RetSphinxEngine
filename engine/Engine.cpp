@@ -17,6 +17,7 @@
 #include "stb_image.h"
 #include "InputManager.h"
 #include "SoundManager.h"
+#include "InterpolationManager.h"
 
 #define GUID_STR_SZ	256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -97,6 +98,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	ImGui_Impl_GL2_CreateDeviceObjects();
 
 	m_inputManager = new InputManager();
+	m_interpolationManager = new InterpolationManager();
 }
 
 Engine::~Engine()
@@ -106,6 +108,7 @@ Engine::~Engine()
 	delete m_resourceLoader;
 	delete m_inputManager;
 	delete m_soundManager;
+	delete m_interpolationManager;
 
 	//Clean up ImGui
 	ImGui_Impl_GL2_Shutdown();

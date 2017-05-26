@@ -19,6 +19,7 @@ class EntityManager;
 class Stringbank;
 class InputManager;
 class SoundManager;
+class InterpolationManager;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -73,6 +74,7 @@ private:
 	Stringbank* m_stringBank;
 	InputManager* m_inputManager;
 	SoundManager* m_soundManager;
+	InterpolationManager* m_interpolationManager;
 
 	//Engine-use function definitions
 	bool _frame();
@@ -184,14 +186,10 @@ public:
 	float getGamma() { return m_fGamma; };
 
 	//---------------------------------------------------------
-	// Entity manager
+	// Managers
 	EntityManager* getEntityManager() { return m_entityManager; };
-
-	//---------------------------------------------------------
-	// Resource loader
 	ResourceLoader* getResourceLoader() { return m_resourceLoader; };
-
 	Stringbank* getStringbank() { return m_stringBank; };
-
 	SoundManager* getSoundManager() { return m_soundManager; }
+	InterpolationManager* getInterpolationManager() { return m_interpolationManager; }
 };

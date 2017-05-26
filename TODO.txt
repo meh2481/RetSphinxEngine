@@ -1,12 +1,18 @@
+Interpolation engine:
+- Different curve types (linear, B-spline, Bezier)
+- Curve editor via ImGUI
+- interpolation class update method returns true/false if done
+- Manager itself manages pingpong/repeat count
+
 Current higher pri:
-- Research and implement interpolation engine (B-spline, Bezier)
-	- Editor via ImGUI
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Kill all sounds (except music, iff it's the same song) on map load
+- Fade out music on stop
+- Crossfade new song start
+- Test bg sfx
 
 Overall TODO list:
 - Resources should be streamed from disk, not loaded upfront from .pak files
