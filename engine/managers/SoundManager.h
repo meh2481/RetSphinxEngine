@@ -7,9 +7,9 @@
 
 #define MUSIC_FADE_TIME 1.0f
 
-#define SoundHandle FMOD::Sound
-#define StreamHandle FMOD::Sound
-#define Channel FMOD::Channel
+typedef FMOD::Sound SoundHandle;
+typedef FMOD::Sound StreamHandle;
+typedef FMOD::Channel Channel;
 
 class ResourceLoader;
 class SoundVol;

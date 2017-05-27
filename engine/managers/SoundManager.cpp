@@ -1,10 +1,10 @@
-#include "SoundVol.h"
 #include "SoundManager.h"
 #include "easylogging++.h"
 #include "ResourceLoader.h"
 #include "Hash.h"
 #include "ResourceTypes.h"
 #include "InterpolationManager.h"
+#include "SoundVol.h"
 #include <cstring>
 
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }

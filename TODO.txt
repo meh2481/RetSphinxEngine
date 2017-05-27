@@ -1,9 +1,6 @@
 Interpolation engine:
-- Different curve types (linear, B-spline, Bezier)
-- Curve editor via ImGUI
 - Manager itself manages pingpong/repeat count
 - Remove remote branches that have been merged in already
-- Download animation editor thing
 - Fix issue when fading song in and out at the same time
 
 Current higher pri:
@@ -13,8 +10,10 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
+- Download animation editor thing
 
 Overall TODO list:
+- Curve editor via ImGUI
 - Resources should be streamed from disk, not loaded upfront from .pak files
 - Sound filters
 - Sound pitch
