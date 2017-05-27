@@ -1,8 +1,9 @@
 Interpolation engine:
 - Different curve types (linear, B-spline, Bezier)
 - Curve editor via ImGUI
-- interpolation class update method returns true/false if done
 - Manager itself manages pingpong/repeat count
+- Remove remote branches that have been merged in already
+- Download animation editor thing
 
 Current higher pri:
 - Look into ETC1/DXT compression for images

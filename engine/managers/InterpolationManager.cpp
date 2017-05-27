@@ -1,6 +1,7 @@
 #include "InterpolationManager.h"
 #include "Interpolation.h"
 #include "LinearInterpolation.h"
+#include "BezierInterpolation.h"
 
 InterpolationManager::InterpolationManager()
 {
@@ -33,6 +34,10 @@ void InterpolationManager::interpolate(float * val, float end, float time, Inter
 	{
 		case LINEAR:
 			interpolations.push_back(new LinearInterpolation(val, end, time));
+			break;
+
+		case BEZIER:
+			interpolations.push_back(new BezierInterpolation(val, end, time));
 			break;
 	}
 }

@@ -1,6 +1,8 @@
 set(engine_src
 Arc.cpp
 Arc.h
+BezierInterpolation.h
+BezierInterpolation.cpp
 Color.cpp
 Color.h
 DebugDraw.cpp
