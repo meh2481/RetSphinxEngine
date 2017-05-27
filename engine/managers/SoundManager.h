@@ -5,11 +5,15 @@
 #include <map>
 #include <vector>
 
+#define MUSIC_FADE_TIME 1.0f
+
 #define SoundHandle FMOD::Sound
 #define StreamHandle FMOD::Sound
 #define Channel FMOD::Channel
 
 class ResourceLoader;
+class SoundVol;
+class InterpolationManager;
 
 typedef enum
 {
@@ -22,10 +26,11 @@ typedef enum
 class SoundManager
 {
 private:
-	//TODO: Free sounds if not used after a period of time?
+	//TODO: Free sounds if not used after a period of time? Or does FMOD handle this already?
 	std::map<const std::string, FMOD::Sound*> sounds;	//Cache for loaded sounds
 	std::map<StreamHandle*, SoundLoop*> soundLoopPoints;	//Cache for sound looping points
 	std::map<StreamHandle*, unsigned int> musicPositions;	//Last play position for each song
+	std::vector<SoundVol*> soundVolumes;
 	std::vector<unsigned char*> soundResources;
 	FMOD::System* system;
 	Channel* musicChannel;
@@ -35,6 +40,7 @@ private:
 	FMOD::ChannelGroup* bgFxGroup;
 	FMOD::ChannelGroup* voxGroup;
 	ResourceLoader* loader;
+	InterpolationManager* interpolationManager;
 
 	int init();
 	void setGroup(Channel* ch, SoundGroup group);
@@ -42,7 +48,7 @@ private:
 	FMOD::ChannelGroup* getGroup(SoundGroup group);
 	SoundManager() {};
 public:
-	SoundManager(ResourceLoader* loader);
+	SoundManager(ResourceLoader* loader, InterpolationManager* interp);
 	~SoundManager();
 
 	void update();	//Call every frame
@@ -69,6 +75,8 @@ public:
 	void getSpectrumL(Channel* channel, float* outSpec, int specLen);
 	void getSpectrumR(Channel* channel, float* outSpec, int specLen);
 	Channel* getChannel(int channelIdx);
+	void fadeOutChannel(Channel* ch, float time);
+	void fadeInChannel(Channel* ch, float time);
 
 	//Music functions
 	void pauseMusic();

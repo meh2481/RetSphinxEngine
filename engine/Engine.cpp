@@ -88,17 +88,17 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
 	_loadicon();	//Load our window icon
 
+	m_inputManager = new InputManager();
+	m_interpolationManager = new InterpolationManager();
+
 	//Init sound manager
-	m_soundManager = new SoundManager(m_resourceLoader);
+	m_soundManager = new SoundManager(m_resourceLoader, m_interpolationManager);
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
 	static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
-
-	m_inputManager = new InputManager();
-	m_interpolationManager = new InterpolationManager();
 }
 
 Engine::~Engine()

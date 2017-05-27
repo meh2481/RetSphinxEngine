@@ -1,8 +1,10 @@
+#include "SoundVol.h"
 #include "SoundManager.h"
 #include "easylogging++.h"
 #include "ResourceLoader.h"
 #include "Hash.h"
 #include "ResourceTypes.h"
+#include "InterpolationManager.h"
 #include <cstring>
 
 #define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
@@ -145,10 +147,11 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
 	return sfxGroup;
 }
 
-SoundManager::SoundManager(ResourceLoader* l)
+SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
 {
 	loader = l;
 	musicChannel = NULL;
+	interpolationManager = interp;
 	init();
 }
 
@@ -162,11 +165,25 @@ SoundManager::~SoundManager()
 		delete [] *i;
 	for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
 		delete (i->second);
+	for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
+		delete *i;
 }
 
 void SoundManager::update()
 {
 	system->update();
+	std::vector<SoundVol*>::iterator i = soundVolumes.begin();
+	while(i != soundVolumes.end())
+	{
+		if((*i)->update())
+		{
+			//Delete & remove if done updating
+			delete *i;
+			i = soundVolumes.erase(i);
+		}
+		else
+			i++;
+	}
 }
 
 SoundHandle* SoundManager::loadSound(const std::string& filename)
@@ -264,7 +281,8 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
 			ERRCHECK(result);
 			musicPositions[curPlaying] = pos;
-			musicChannel->stop();
+			//musicChannel->stop();
+			fadeOutChannel(musicChannel, MUSIC_FADE_TIME);
 		}
 	}
 	Channel* channel;
@@ -296,6 +314,7 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 		ERRCHECK(result);
 
 		musicChannel = channel;	//Save this as our new music channel
+		fadeInChannel(musicChannel, MUSIC_FADE_TIME);
 	}
 	
 	//Start playing
@@ -390,6 +409,39 @@ Channel* SoundManager::getChannel(int channelIdx)
 	FMOD_RESULT result = system->getChannel(channelIdx, &channel);
 	ERRCHECK(result);
 	return channel;
+}
+
+void SoundManager::fadeOutChannel(Channel * ch, float time)
+{
+	if(ch == musicChannel)
+	{
+		FMOD::Sound* curPlaying = NULL;
+		FMOD_RESULT result = musicChannel->getCurrentSound(&curPlaying);
+		ERRCHECK(result);
+		if(curPlaying != NULL)
+		{
+			//Save the last playing position for the currently-playing song
+			unsigned int pos = 0;
+			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
+			ERRCHECK(result);
+			musicPositions[curPlaying] = pos;
+		}
+	}
+	SoundVol* v = new SoundVol(ch, 0.0f);
+	float* start = v->getCur();
+	ch->getVolume(start);
+	interpolationManager->interpolate(start, 0.0f, time, BEZIER);
+	soundVolumes.push_back(v);
+}
+
+void SoundManager::fadeInChannel(Channel * ch, float time)
+{
+	SoundVol* v = new SoundVol(ch, 1.0f);
+	float* start = v->getCur();
+	*start = 0.0f;
+	interpolationManager->interpolate(start, 1.0f, time, BEZIER);
+	soundVolumes.push_back(v);
+	ch->setVolume(*start);
 }
 
 void SoundManager::pauseMusic()

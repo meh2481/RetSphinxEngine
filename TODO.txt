@@ -4,6 +4,7 @@ Interpolation engine:
 - Manager itself manages pingpong/repeat count
 - Remove remote branches that have been merged in already
 - Download animation editor thing
+- Fix issue when fading song in and out at the same time
 
 Current higher pri:
 - Look into ETC1/DXT compression for images
@@ -11,8 +12,6 @@ Current higher pri:
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Fade out music on stop
-- Crossfade new song start
 - Test bg sfx
 
 Overall TODO list:

@@ -207,14 +207,18 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
 	//Music
 	getSoundManager()->stopSounds(GROUP_SFX);	//Stop sound effects
 	getSoundManager()->stopSounds(GROUP_BGFX);	//Stop bg sound effects
-	getSoundManager()->pauseMusic();	//Stop currently-playing music
-	//TODO: Stop all currently-playing sounds
 	const char* cMusic = root->Attribute("music");
+	StreamHandle* mus = NULL;
 	if(cMusic)
+		mus = getSoundManager()->loadStream(cMusic);
+	if(cMusic && mus)
+		getSoundManager()->playLoop(mus);
+	else
 	{
-		StreamHandle* mus = getSoundManager()->loadStream(cMusic);
-		if(mus)
-			getSoundManager()->playLoop(mus);
+		Channel* musicChannel = getSoundManager()->getMusicChannel();
+		if(musicChannel)
+			getSoundManager()->fadeOutChannel(musicChannel, MUSIC_FADE_TIME);
+		//getSoundManager()->pauseMusic();	//Stop currently-playing music
 	}
 	
 	//Load layers for the scene
