@@ -4,10 +4,9 @@
 
 class BezierInterpolation : public Interpolation
 {
-
+	float p2;
 	BezierInterpolation() {};
 public:
-	Vec2 p1, p2;
 	BezierInterpolation(float* v, float d, float t);
 
 	bool update(float dt);
