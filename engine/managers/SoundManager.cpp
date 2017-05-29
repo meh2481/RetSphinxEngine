@@ -281,7 +281,6 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 			result = musicChannel->getPosition(&pos, FMOD_TIMEUNIT_MS);
 			ERRCHECK(result);
 			musicPositions[curPlaying] = pos;
-			//musicChannel->stop();
 			fadeOutChannel(musicChannel, MUSIC_FADE_TIME);
 		}
 	}
@@ -426,6 +425,7 @@ void SoundManager::fadeOutChannel(Channel * ch, float time)
 			ERRCHECK(result);
 			musicPositions[curPlaying] = pos;
 		}
+		musicChannel = NULL;	//This is no longer the music channel (fixes some fadeout issues)
 	}
 	SoundVol* v = new SoundVol(ch, 0.0f);
 	float* start = v->getCur();

@@ -1,7 +1,5 @@
-Interpolation engine:
-- Fix issue when fading song in and out at the same time
-
 Current higher pri:
+- Joystick movement vec should be 0 right outside of dead zone
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
 - Particle editor breaks after F5
@@ -9,6 +7,12 @@ Current higher pri:
 - Fix tamerisk board
 - Test bg sfx
 - Download animation editor thing
+
+- Game pauses slightly when loading sound; why?
+	- Has to hit pak; but already loaded
+	- Loaded from memory
+	- ogg format slowing it down? Need some better stream?
+	- Load sfx up front?
 
 Possible sound channels:
 - BGM
