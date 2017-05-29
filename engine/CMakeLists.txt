@@ -1,6 +1,8 @@
 set(engine_src
 Arc.cpp
 Arc.h
+BezierInterpolation.h
+BezierInterpolation.cpp
 Color.cpp
 Color.h
 DebugDraw.cpp
@@ -23,8 +25,11 @@ imgui_impl_sdl.cpp
 imgui_impl_sdl.h
 InputDevice.cpp
 InputDevice.h
+Interpolation.h
 Lattice.cpp
 Lattice.h
+LinearInterpolation.h
+LinearInterpolation.cpp
 LuaDefines.h
 LuaFuncs.h
 LuaInterface.cpp
@@ -55,6 +60,8 @@ ResourceCache.h
 ResourceCache.cpp
 SystemUtils.cpp
 SystemUtils.h
+SoundVol.h
+SoundVol.cpp
 tiny3d.h
 Text.cpp
 Text.h
@@ -71,6 +78,8 @@ managers/ParticleSystemManager.h
 managers/ParticleSystemManager.cpp
 managers/EntityManager.h
 managers/EntityManager.cpp
+managers/InterpolationManager.h
+managers/InterpolationManager.cpp
 managers/NodeManager.cpp
 managers/NodeManager.h
 managers/ObjectManager.h

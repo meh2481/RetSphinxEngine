@@ -1,14 +1,30 @@
 Current higher pri:
-- Research and implement interpolation engine (B-spline, Bezier)
-	- Editor via ImGUI
+- Joystick movement vec should be 0 right outside of dead zone
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
 - Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Kill all sounds (except music, iff it's the same song) on map load
+- Test bg sfx
+- Download animation editor thing
+
+- Game pauses slightly when loading sound; why?
+	- Has to hit pak; but already loaded
+	- Loaded from memory
+	- ogg format slowing it down? Need some better stream?
+	- Load sfx up front?
+
+Possible sound channels:
+- BGM
+- SFX
+- Environmental SFX
+- System SFX
+- Voice
+- Bg voice
+- Movie
 
 Overall TODO list:
+- Curve editor via ImGUI
 - Resources should be streamed from disk, not loaded upfront from .pak files
 - Sound filters
 - Sound pitch
