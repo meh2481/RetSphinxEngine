@@ -1,6 +1,4 @@
 Interpolation engine:
-- Manager itself manages pingpong/repeat count
-- Remove remote branches that have been merged in already
 - Fix issue when fading song in and out at the same time
 
 Current higher pri:
@@ -11,6 +9,15 @@ Current higher pri:
 - Fix tamerisk board
 - Test bg sfx
 - Download animation editor thing
+
+Possible sound channels:
+- BGM
+- SFX
+- Environmental SFX
+- System SFX
+- Voice
+- Bg voice
+- Movie
 
 Overall TODO list:
 - Curve editor via ImGUI

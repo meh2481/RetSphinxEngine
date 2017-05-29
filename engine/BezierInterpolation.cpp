@@ -2,7 +2,6 @@
 
 BezierInterpolation::BezierInterpolation(float* v, float d, float t) : Interpolation(v, d, t)
 {
-	p2 = (d - *v);	//Value is y axis, control points on top/bottom of that
 }
 
 bool BezierInterpolation::update(float dt)
@@ -20,9 +19,10 @@ bool BezierInterpolation::update(float dt)
 
 	float t = curTime / time;	// range 0..1 for how far along we are (t)
 	float negt = 1.0f - t;
+	float p = (dest - start);	//Value is y axis, control points on top/bottom of that
 
 	//In our case, we only care about Y for 1D interpolation
-	*val = start + 3 * negt*t*t*p2 + t*t*t*p2;	//Simplified a lot
+	*val = start + 3 * negt*t*t*p + t*t*t*p;	//Simplified a lot
 
 	return false;
 }
