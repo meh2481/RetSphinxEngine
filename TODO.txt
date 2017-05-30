@@ -1,12 +1,14 @@
 Current higher pri:
-- Joystick movement vec should be 0 right outside of dead zone
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
-- Particle editor breaks after F5
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
-- Download animation editor thing
+
+Bugs:
+- Crashes sometimes on load
+- Framerate spikes
+- Particle editor breaks after F5
 
 - Game pauses slightly when loading sound; why?
 	- Has to hit pak; but already loaded
@@ -24,6 +26,7 @@ Possible sound channels:
 - Movie
 
 Overall TODO list:
+- Look up const declarations for variables and see if that helps optimize in C
 - Curve editor via ImGUI
 - Resources should be streamed from disk, not loaded upfront from .pak files
 - Sound filters

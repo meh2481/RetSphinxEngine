@@ -6,12 +6,12 @@ class JoystickMovement : public MovementBind
 {
 private:
 	int xAxis, yAxis;
-	int joyAxisTrip;
+	float joyAxisTrip;
 
 	JoystickMovement() {};
 
 public:
-	JoystickMovement(int xAxis, int yAxis, int trip);
+	JoystickMovement(int xAxis, int yAxis, float trip);
 
 	Vec2 getMovement(InputDevice* d);
 };

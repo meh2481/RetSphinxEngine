@@ -16,7 +16,7 @@
 #define MOUSE_KB 0
 #define CONTROLLER 1
 
-#define JOY_AXIS_TRIP 20000
+#define JOY_AXIS_TRIP 10000
 
 InputManager::InputManager()
 {
@@ -132,7 +132,8 @@ Vec2 InputManager::getMovement(Movement m)
 		mousekb = MOUSE_KB;
 	Vec2 ret = movements[mousekb][m]->getMovement(m_controllers[m_curActiveController]);
 	//Normalize
-	float len = ret.length();
+	//float len = ret.length();	//Apparently GLM is just dead wrong here; off by a factor of 2
+	float len = sqrt(ret.x*ret.x + ret.y*ret.y);
 	if(len > 1.0f)
 		ret /= len;
 	return ret;
