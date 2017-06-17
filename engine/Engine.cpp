@@ -281,20 +281,20 @@ void Engine::_render()
 	draw();
 
 	//Draw gamma/brightness overlay on top of everything else
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	Color fillCol;
-	if(m_fGamma > 1.0f)
-	{
-		glBlendFunc(GL_DST_COLOR, GL_ONE);
-		fillCol.set(m_fGamma - 1.0f, m_fGamma - 1.0f, m_fGamma - 1.0f, 1.0f);
-	}
-	else
-	{
-		glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-		fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1.0f);
-	}
-	fillScreen(fillCol);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//glEnable(GL_BLEND);
+	//Color fillCol;
+	//if(m_fGamma > 1.0f)
+	//{
+	//	glBlendFunc(GL_DST_COLOR, GL_ONE);
+	//	fillCol.set(m_fGamma - 1.0f, m_fGamma - 1.0f, m_fGamma - 1.0f, 1.0f);
+	//}
+	//else
+	//{
+	//	glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+	//	fillCol.set(m_fGamma, m_fGamma, m_fGamma, 1.0f);
+	//}
+	//fillScreen(fillCol);
 
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
