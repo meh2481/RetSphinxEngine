@@ -13,12 +13,14 @@ Engine_GL.cpp
 Engine_Window.cpp
 EngineContactListener.cpp
 EngineContactListener.h
-ImgFont.cpp
-ImgFont.h
 Gradient.cpp
 Gradient.h
+HeadTracker.cpp
+HeadTracker.h
 Image.cpp
 Image.h
+ImgFont.cpp
+ImgFont.h
 imgui_impl_opengl2.cpp
 #imgui_impl_opengl3.cpp
 imgui_impl_sdl.cpp

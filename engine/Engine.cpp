@@ -99,6 +99,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
+
 }
 
 Engine::~Engine()
@@ -192,7 +193,10 @@ bool Engine::_processEvent(SDL_Event& e)
 				LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
 				LOG(INFO) << "Joystick Number of Balls: " << SDL_JoystickNumBalls(joy);
 				LOG(INFO) << "Joystick Number of Hats: " << SDL_JoystickNumHats(joy);
-				SDL_JoystickClose(joy);
+				if(SDL_JoystickNumAxes(joy) == 3)	//Head tracker
+					m_inputManager->addHeadTracker(joy);
+				else
+					SDL_JoystickClose(joy);
 			}
 			break;
 		}
