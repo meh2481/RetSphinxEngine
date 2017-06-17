@@ -217,6 +217,11 @@ public:
 		channel->getIndex(&channelIdx);
 		return channelIdx;
 	}
+
+	static Vec3 getHeadMovement()
+	{
+		return g_pGlobalEngine->getInputManager()->getHeadMovement();
+	}
 };
 
 
@@ -808,6 +813,12 @@ luaFunc(movement_vec)	//x,y movement_vec(int movementId)
 	luaReturnVec2(0.0f, 0.0f);
 }
 
+luaFunc(movement_head)	//x,y,z movement_head()
+{
+	Vec3 v = GameEngineLua::getHeadMovement();
+	luaReturnVec3(v.x, v.y, v.z);
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Sound functions
 //-----------------------------------------------------------------------------------------------------------
@@ -924,6 +935,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(mouse_setCursor),
 	//Controller/kb player directional input
 	luaRegister(movement_vec),
+	luaRegister(movement_head),
 	//Music
 	luaRegister(music_getChannel),
 	luaRegister(music_play),

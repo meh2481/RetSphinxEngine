@@ -1,7 +1,6 @@
 #include "HeadTracker.h"
 #include "easylogging++.h"
 
-#define AXIS_MIN -32768.0
 #define AXIS_MAX 32767.0
 
 HeadTracker::HeadTracker(SDL_Joystick* joy)
@@ -15,26 +14,23 @@ HeadTracker::~HeadTracker()
 	SDL_JoystickClose(m_joy);
 }
 
-float HeadTracker::getX()
+float HeadTracker::getX()	//-x is left
 {
 	return scale(SDL_JoystickGetAxis(m_joy, 0));
 }
 
-float HeadTracker::getY()
+float HeadTracker::getY()	//-y is down
 {
 	return scale(SDL_JoystickGetAxis(m_joy, 1));
 }
 
-float HeadTracker::getZ()
+float HeadTracker::getZ()	//-z is tilt clockwise as facing screen
 {
 	return scale(SDL_JoystickGetAxis(m_joy, 2));
 }
 
 float HeadTracker::scale(Sint16 val)
 {
-	float actual = val;
-	if(actual < 0)
-		return actual / AXIS_MIN;
-	return actual / AXIS_MAX;
+	return (float)(val) / AXIS_MAX;
 }
 
