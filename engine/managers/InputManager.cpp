@@ -12,6 +12,7 @@
 #include "JoystickMovement.h"
 #include "KeyboardMovement.h"
 #include "NoMovement.h"
+#include "HeadTracker.h"
 
 #define MOUSE_KB 0
 #define CONTROLLER 1
@@ -25,6 +26,7 @@ InputManager::InputManager()
 
 	bindMouseKbActions();
 	bindControllerActions();
+	m_headTracker = NULL;
 }
 
 InputManager::~InputManager()
@@ -38,6 +40,8 @@ InputManager::~InputManager()
 	}
 	for(std::vector<InputDevice*>::iterator i = m_controllers.begin(); i != m_controllers.end(); i++)
 		delete *i;
+	if(m_headTracker)
+		delete m_headTracker;
 }
 
 InputDevice* InputManager::getCurController()
@@ -56,6 +60,17 @@ void InputManager::addController(InputDevice* device)
 {
 	m_controllers.push_back(device);
 	m_curActiveController = m_controllers.size() - 1;	//Set this as new active controller
+}
+
+void InputManager::addHeadTracker(SDL_Joystick * joy)
+{
+	if(m_headTracker != NULL)
+	{
+		//Only one head tracker at a time for now
+		SDL_JoystickClose(joy);
+		return;
+	}
+	m_headTracker = new HeadTracker(joy);
 }
 
 bool InputManager::removeController(int deviceIndex)
@@ -137,6 +152,13 @@ Vec2 InputManager::getMovement(Movement m)
 	if(len > 1.0f)
 		ret /= len;
 	return ret;
+}
+
+Vec3 InputManager::getHeadMovement()
+{
+	if(m_headTracker == NULL)
+		return Vec3(0,0,0);
+	return Vec3(m_headTracker->getX(), m_headTracker->getY(), m_headTracker->getZ());
 }
 
 void InputManager::bindMouseKbActions()

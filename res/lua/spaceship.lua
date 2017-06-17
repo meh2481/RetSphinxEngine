@@ -104,7 +104,8 @@ end
 function spaceship:update(dt)
 	--Center the camera on me
 	local x,y = obj_getPos(self)
-	camera_centerOnXY(x, y)
+	local hx, hy, hz = movement_head()
+	camera_centerOnXY(x+hx*5, y+hy*5)
 	
 	--Scroll camera in/out on dpad
 	self:checkDpadZoom()

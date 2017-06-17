@@ -20,6 +20,7 @@ class Stringbank;
 class InputManager;
 class SoundManager;
 class InterpolationManager;
+class HeadTracker;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
