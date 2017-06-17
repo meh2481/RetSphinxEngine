@@ -1,12 +1,5 @@
-EDTracker:
-- Control pan with edtracker
-	- X axis is left/right movement of your head (yaw)
-	- Y axis is up/down movement of your head (pitch)
-	- Z axis is rotational movement of your head (roll) i.e. Tilting your head to the left or right side
-- Treat any 3-axis joystick as accelerometer
-- Will likely need to smooth out input so screen doesn't jitter
-
 Current higher pri:
+- Figure out framerate jitter
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery
