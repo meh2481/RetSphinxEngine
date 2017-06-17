@@ -6,7 +6,6 @@ BezierInterpolation.cpp
 Color.cpp
 Color.h
 DebugDraw.cpp
-DrawableItem.h
 Engine.cpp
 Engine.h
 Engine_GL.cpp

@@ -15,13 +15,16 @@
 //----------------------------------------------------------------------------------------------------
 // obj class
 //----------------------------------------------------------------------------------------------------
-Object::Object() : DrawableItem()
+Object::Object()
 {
   meshLattice = NULL;
   meshAnim = NULL;
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
+  depth = 0; 
+  img = NULL; 
+  active = true;
   segments.reserve(1);	//don't expect very many segments
 }
 
@@ -173,15 +176,18 @@ void Object::setPosition(Vec2 p)
 }
 
 //----------------------------------------------------------------------------------------------------
-// physSegment class
+// ObjSegment class
 //----------------------------------------------------------------------------------------------------
-ObjSegment::ObjSegment() : DrawableItem()
+ObjSegment::ObjSegment()
 {
     body = NULL;
 	parent = NULL;
 	lat = NULL;
 	latanim = NULL;
 	obj3D = NULL;
+	depth = 0;
+	img = NULL;
+	active = true;
 
 	rot = 0.0f;
 	size.x = size.y = tile.x = tile.y = 1.0f;

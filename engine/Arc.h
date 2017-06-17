@@ -5,13 +5,13 @@
 */
 #pragma once
 
-#include "DrawableItem.h"
 #include "Rect.h"
+#include "Color.h"
 #include <string>
 
 class Image;
 
-class Arc : public DrawableItem
+class Arc
 {
 protected:
 	float* segmentPos;
@@ -27,6 +27,10 @@ public:
 	float max;
 	float height;
 	unsigned avg;
+	float depth;
+	Image* img;
+	bool active;
+	Color col;
 	
 	Arc(unsigned number, Image* img);
 	~Arc();

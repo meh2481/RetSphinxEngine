@@ -6,10 +6,10 @@
 #pragma once
 
 #include "Mesh3D.h"
-#include "DrawableItem.h"
 #include "LuaInterface.h"
 #include "LuaFuncs.h"
 #include "Rect.h"
+#include "Color.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -24,7 +24,7 @@ class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO Make SceneryLayer class that this can contain
-class ObjSegment : public DrawableItem
+class ObjSegment
 {
 public:
 	enum { TYPE = OT_SEGMENT };
@@ -38,6 +38,10 @@ public:
 	Vec2 tile;		//tile image in x and y
 	float rot;
 	Vec2 size;	//Actual texel size; not pixels
+	float depth;
+	Image* img;
+	bool active;
+	Color col;
 
     ObjSegment();
     ~ObjSegment();
@@ -47,7 +51,7 @@ public:
 };
 
 //Collections of the above all stuffed into one object for ease of use.
-class Object : public DrawableItem
+class Object
 {
 	LuaObjGlue* glueObj;
 	std::map<std::string, std::string> propertyValues;
@@ -60,6 +64,10 @@ public:
 	Vec2				meshSize;
 	LuaInterface* 			lua;
 	std::string 			luaClass;
+	float depth;
+	Image* img;
+	bool active;
+	Color col;
     
     Object();
     ~Object();
