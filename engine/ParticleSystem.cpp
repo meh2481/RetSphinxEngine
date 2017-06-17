@@ -428,6 +428,11 @@ void ParticleSystem::draw()
 	
 	float* vertexPos = m_vertexPtr;
 	float* colorPtr = m_colorPtr;
+	float r, g, b, a;
+	float x, y;
+	float rad;
+	float s, c;
+	float xnew, ynew;
 	
 	for(unsigned int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
@@ -436,54 +441,67 @@ void ParticleSystem::draw()
 			fLifeFac = 1.0;
 		if(curTime - *created <= *preFade)	//Particle hasn't started fading yet
 			fLifeFac = 0.0f;
-		Color drawcol;
-		Vec2 drawsz;
-		drawcol.r = (colEnd->r - colStart->r) * fLifeFac + colStart->r;
-		drawcol.g = (colEnd->g - colStart->g) * fLifeFac + colStart->g;
-		drawcol.b = (colEnd->b - colStart->b) * fLifeFac + colStart->b;
-		drawcol.a = (colEnd->a - colStart->a) * fLifeFac + colStart->a;
+		r = (colEnd->r - colStart->r) * fLifeFac + colStart->r;
+		g = (colEnd->g - colStart->g) * fLifeFac + colStart->g;
+		b = (colEnd->b - colStart->b) * fLifeFac + colStart->b;
+		a = (colEnd->a - colStart->a) * fLifeFac + colStart->a;
 
-		drawsz.x = (sizeEnd->x - sizeStart->x) * fLifeFac + sizeStart->x;
-		drawsz.y = (sizeEnd->y - sizeStart->y) * fLifeFac + sizeStart->y;
+		x = (sizeEnd->x - sizeStart->x) * fLifeFac + sizeStart->x;
+		y = (sizeEnd->y - sizeStart->y) * fLifeFac + sizeStart->y;
 
-		float rad;
-		if(velRotate)	//Rotate each particle according to its velocity
-			rad = -atan2(vel->x, vel->y);	//Rotate -angle. I think our coordinate system is wonky
-		else
-			rad = glm::radians(*rot);	//Rotate based on each particle's rotation
+		//if(velRotate)	//Rotate each particle according to its velocity
+		//	rad = ;	//Rotate -angle. I think our coordinate system is wonky
+		//else
+		//	rad = ;	//Rotate based on each particle's rotation
+		rad = (velRotate == true) ? -atan2(vel->x, vel->y) : glm::radians(*rot);
 
-		float s = sin(rad);
-		float c = cos(rad);
+		s = sin(rad);
+		c = cos(rad);
 
 		//Set coordinates
 		//Rotate manually
 		//TODO VBOs and stuff
-		float px = -drawsz.x / 2.0f;
-		float py = drawsz.y / 2.0f;
-		float xnew = px * c - py * s;
-		float ynew = px * s + py * c;
+		x = -x / 2.0f;
+		y = y / 2.0f;
+		xnew = x * c - y * s;
+		ynew = x * s + y * c;
 		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper left
-		px = -px;
-		xnew = px * c - py * s;
-		ynew = px * s + py * c;
+		x = -x;
+		xnew = x * c - y * s;
+		ynew = x * s + y * c;
 		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper right
-		py = -py;
-		xnew = px * c - py * s;
-		ynew = px * s + py * c;
+		y = -y;
+		xnew = x * c - y * s;
+		ynew = x * s + y * c;
 		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower right
-		px = -px;
-		xnew = px * c - py * s;
-		ynew = px * s + py * c;
+		x = -x;
+		xnew = x * c - y * s;
+		ynew = x * s + y * c;
 		*vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower left
 
 		//Set color
-		for(int j = 0; j < 4; j++)
-		{
-			*colorPtr++ = drawcol.r; 
-			*colorPtr++ = drawcol.g; 
-			*colorPtr++ = drawcol.b; 
-			*colorPtr++ = drawcol.a;
-		}
+		//for(int j = 0; j < 4; j++)
+		//{
+		*colorPtr++ = r;
+		*colorPtr++ = g;
+		*colorPtr++ = b;
+		*colorPtr++ = a;
+
+		*colorPtr++ = r;
+		*colorPtr++ = g;
+		*colorPtr++ = b;
+		*colorPtr++ = a;
+
+		*colorPtr++ = r;
+		*colorPtr++ = g;
+		*colorPtr++ = b;
+		*colorPtr++ = a;
+
+		*colorPtr++ = r;
+		*colorPtr++ = g;
+		*colorPtr++ = b;
+		*colorPtr++ = a;
+		//}
 		
 		//Increment pointers
 		created++;

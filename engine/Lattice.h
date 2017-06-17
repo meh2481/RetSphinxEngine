@@ -105,27 +105,28 @@ struct BodyPos
 	//float* weights;	//Vertex weights
 };
 
-class SoftBodyAnim : public LatticeAnim
-{
-protected:
-	std::list<BodyPos> bodies;
-	BodyPos center;
-	
-	Vec2 getCenter();
-	void setEffect();
-	Vec2 relOffset(b2Body* b);	//returns angle, dist relative to center body
-	Vec2 distMoved(BodyPos* bp);	//returns angle, dist that the body has moved relative to starting pos
-	Vec2 getVertex(LatticeVert* v);	//Get vertex in box2d coordinates
-	void setVertex(Vec2 p, LatticeVert* v);	//Set vertex position from box2d coordinates
-	
-public:
-	SoftBodyAnim(Lattice* l);
-	~SoftBodyAnim();
-	
-	Vec2 size;
-	
-	void init();
-	void update(float dt);
-	
-	void addBody(b2Body* b, bool bCenter = false);
-};
+//TODO - Way too slow to be practical
+//class SoftBodyAnim : public LatticeAnim
+//{
+//protected:
+//	std::list<BodyPos> bodies;
+//	BodyPos center;
+//	
+//	Vec2 getCenter();
+//	void setEffect();
+//	Vec2 relOffset(b2Body* b);	//returns angle, dist relative to center body
+//	Vec2 distMoved(BodyPos* bp);	//returns angle, dist that the body has moved relative to starting pos
+//	Vec2 getVertex(LatticeVert* v);	//Get vertex in box2d coordinates
+//	void setVertex(Vec2 p, LatticeVert* v);	//Set vertex position from box2d coordinates
+//	
+//public:
+//	SoftBodyAnim(Lattice* l);
+//	~SoftBodyAnim();
+//	
+//	Vec2 size;
+//	
+//	void init();
+//	void update(float dt);
+//	
+//	void addBody(b2Body* b, bool bCenter = false);
+//};
