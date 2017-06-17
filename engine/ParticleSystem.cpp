@@ -388,32 +388,16 @@ void ParticleSystem::update(float dt)
 			i--;	//Go back a particle so we don't skip anything
 			created--;
 			life--;
+		} 
+		else
+		{
+
 		}
 	}
-}
 
-void ParticleSystem::draw()
-{
-	if(img == NULL) return;
-	
-	switch(blend)
-	{
-		case ADDITIVE:
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			break;
-			
-		case NORMAL:
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			break;
-			
-		case SUBTRACTIVE:
-			//TODO This is incorrect
-			glBlendFunc(GL_DST_COLOR, GL_ONE); 
-			break;
-	}
 
 	//Pointers for speed
-	float* created = m_created;
+	created = m_created;
 	float* preFade = m_lifePreFade;
 	float* lifetime = m_lifetime;
 	Color* colStart = m_colStart;
@@ -425,7 +409,7 @@ void ParticleSystem::draw()
 	//Vec3* rotAxis = m_rotAxis;	//TODO use
 	Vec2* vel = m_vel;
 	//Rect* imgRect = m_imgRect;
-	
+
 	float* vertexPos = m_vertexPtr;
 	float* colorPtr = m_colorPtr;
 	float r, g, b, a;
@@ -433,7 +417,7 @@ void ParticleSystem::draw()
 	float rad;
 	float s, c;
 	float xnew, ynew;
-	
+
 	for(unsigned int i = 0; i < m_num; i++)	//Can't really help cache-thrashing here, so do it all in one loop
 	{
 		float fLifeFac = (curTime - *created - *preFade) / (*lifetime - *preFade);
@@ -502,7 +486,7 @@ void ParticleSystem::draw()
 		*colorPtr++ = b;
 		*colorPtr++ = a;
 		//}
-		
+
 		//Increment pointers
 		created++;
 		preFade++;
@@ -516,6 +500,27 @@ void ParticleSystem::draw()
 		//rotAxis++;
 		vel++;
 		//imgRect++;
+	}
+}
+
+void ParticleSystem::draw()
+{
+	assert(img);
+	
+	switch(blend)
+	{
+		case ADDITIVE:
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			break;
+			
+		case NORMAL:
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+			
+		case SUBTRACTIVE:
+			//TODO This is incorrect
+			glBlendFunc(GL_DST_COLOR, GL_ONE); 
+			break;
 	}
 
 	//Use this OpenGL program
