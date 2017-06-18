@@ -119,8 +119,8 @@ void GameEngine::draw()
 	//float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 	//float lightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 1.0f};
 	//float lightSpecular[]  = {0.5f, 0.5f, 0.5f, 1.0f};
-	//glClearColor(0.0, 0.0, 0.0, 0.0);
-	//glShadeModel(GL_SMOOTH);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glShadeModel(GL_SMOOTH);
 
 	//glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
@@ -136,20 +136,20 @@ void GameEngine::draw()
 	//float materialDiffuse[] = {0.0f, 0.0f, 0.0f, 1.0f };
 	//float materialSpecular[] = {0.0f, 0.0f, 0.0f, 1.0f };
 	//float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
-	//float materialShininess = 0.0f;
+	float materialShininess = 0.0f;
 	//
 	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
 	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
 	//glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
 	//glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
-	//glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
 		
 	//Set up global OpenGL lighting
 	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
+	//glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 

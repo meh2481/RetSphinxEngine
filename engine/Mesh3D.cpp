@@ -360,6 +360,8 @@ void Mesh3D::render(Image* img)
 
 	glBindTexture(GL_TEXTURE_2D, img->_getTex());
     //glCallList(m_obj);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glShadeModel(GL_SMOOTH);
 	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
 	glNormalPointer(GL_FLOAT, 0, m_normalPtr);
 	glVertexPointer(3, GL_FLOAT, 0, m_vertexPtr);
