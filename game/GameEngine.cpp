@@ -115,10 +115,10 @@ void GameEngine::draw()
 	//Set up OpenGL lights
 	//TODO: Remove or move to an actual class
 	//-------------------------------------------------------------
-	float lightPosition[] = {-cameraPos.x, -cameraPos.y, 0.0, 1.0}; //TODO Figure out how this is supposed to work
-	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
-	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	float lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
+	float lightPosition[] = {-cameraPos.x, -cameraPos.y, 10.0, 1.0}; //TODO Figure out how this is supposed to work
+	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 0.5f};
+	float lightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 0.5f};
+	float lightSpecular[]  = {1.0f, 0.5f, 0.5f, 0.5f};
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 

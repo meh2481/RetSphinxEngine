@@ -59,7 +59,8 @@ GL_FUNC(void,glLoadMatrixf,(const GLfloat *m),(m),)
 
 // drawing
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
-GL_FUNC(void,glTexCoordPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
+GL_FUNC(void, glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const GLvoid *pointer), (size, type, stride, pointer),)
+GL_FUNC(void, glNormalPointer, (GLenum type, GLsizei stride, const GLvoid *pointer), (type, stride, pointer),)
 GL_FUNC(void,glDrawArrays,(GLenum mode, GLint first, GLsizei count),(mode,first,count),)
 GL_FUNC(void,glDrawElements,(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices),(mode,count,type,indices),)
 
