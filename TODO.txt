@@ -60,14 +60,12 @@ Refactoring thoughts:
 
 
 Lower priority:
-- Test sound Pitch shifting; current implementation seems to not work for all sound effects as intended
+- Test sound pitch shifting; current implementation seems to not work for all sound effects as intended
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 - UTF code point lookup should use array of direct values rather than binary search?
 - Use SDL_GetPowerInfo() for laptop battery reminders
-- Disable exceptions/rtti?
-- Decide if map loading is engine-specific or game-specific
 - Move all resource loading stuff to IO?
-
+- Stream areas as needed vs. load maps?
 
 Reasoning behind the engine design (aka why not just use Unity or whatever):
 - Robust Lua scripting interface

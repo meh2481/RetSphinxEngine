@@ -719,23 +719,23 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 				std::string sLatticeType = cLatticeType;
 				if(sLatticeType == "softbody")
 				{
-					const char* cBodyCenter = latticeElem->Attribute("centerbody");
-					if(cBodyCenter && mBodyNames.count(cBodyCenter))
-					{
-						//Override default mesh size if we've provided one
+					//const char* cBodyCenter = latticeElem->Attribute("centerbody");
+					//if(cBodyCenter && mBodyNames.count(cBodyCenter))
+					//{
+					//	//Override default mesh size if we've provided one
 
-						SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
-						manim->addBody(mBodyNames[cBodyCenter], true);
-						manim->size = o->meshSize;
-						for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
-						{
-							if(i->first != cBodyCenter)
-								manim->addBody(i->second);
-						}
-						manim->init();
-						o->meshAnim = manim;
-						//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
-					}
+					//	SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
+					//	manim->addBody(mBodyNames[cBodyCenter], true);
+					//	manim->size = o->meshSize;
+					//	for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+					//	{
+					//		if(i->first != cBodyCenter)
+					//			manim->addBody(i->second);
+					//	}
+					//	manim->init();
+					//	o->meshAnim = manim;
+					//	//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
+					//}
 				}
 				else if(sLatticeType == "sin")
 				{

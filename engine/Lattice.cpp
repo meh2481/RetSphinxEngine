@@ -275,134 +275,134 @@ void WobbleLatticeAnim::setEffect()
 
 //-------------------------------------------------------------------------
 //Soft body animation
-Vec2 SoftBodyAnim::getCenter()
-{
-	b2Vec2 centroid(0,0);
-	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-		centroid = centroid + i->b->GetPosition();
-	
-	centroid.x = centroid.x / bodies.size();
-	centroid.y = centroid.y / bodies.size();
-	//return centroid;
-	centroid = centroid + center.b->GetPosition();
-	centroid.x /= 2.0f;
-	centroid.y /= 2.0f;
-	
-	return Vec2(centroid.x, centroid.y);
-}
-
-SoftBodyAnim::SoftBodyAnim(Lattice* l) : LatticeAnim(l)
-{
-	center.b = NULL;
-	size = Vec2(0, 0);
-}
-
-SoftBodyAnim::~SoftBodyAnim()
-{
-	//for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-	//{
-	//	delete [] i->weights;
-	//}
-}
-
-void SoftBodyAnim::setEffect()
-{
-	m_l->reset();
-	LatticeVert* ptr = m_l->vertex;
-	for(uint32 iy = 0; iy <= m_l->numy; iy++)
-	{
-		for(uint32 ix = 0; ix <= m_l->numx; ix++)
-		{
-			Vec2 vertPos = getVertex(ptr);
-			
-			//Find total distance between this vertex and all bodies
-			float totalDist = 0.0f;
-			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-			{
-				Vec2 dist = vertPos - i->pos;
-				totalDist += glmx::lensqr(dist);
-			}
-			
-			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-			{
-				Vec2 pMoved = distMoved(&(*i));
-				
-				//Distance between this vertex and this body, in resting position
-				Vec2 diff = vertPos - i->pos;
-				float distance = glmx::lensqr(diff);
-				
-				//Mul fac for moving this point
-				float fac = 1.0f - (distance / totalDist);
-				
-				
-				//TODO Better deformation method
-				vertPos.x += pMoved.x * fac;
-				vertPos.y += pMoved.y * fac;
-			}
-			setVertex(vertPos, ptr);
-			ptr++;
-		}
-	}
-	m_l->bind();
-}
-
-Vec2 SoftBodyAnim::relOffset(b2Body* b)
-{
-    b2Vec2 p = b->GetPosition();
-	return Vec2(p.x, p.y) - getCenter();
-}
-
-Vec2 SoftBodyAnim::distMoved(BodyPos* bp)
-{
-	Vec2 rel = relOffset(bp->b);
-	rel = rel - bp->pos;
-	return rel;
-}
-
-void SoftBodyAnim::init()
-{
-	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
-		i->pos = relOffset(i->b);
-    b2Vec2 p = center.b->GetPosition();
-	center.pos = Vec2(p.x, p.y);
-}
-
-void SoftBodyAnim::update(float dt)
-{
-	setEffect();
-}
-
-void SoftBodyAnim::addBody(b2Body* b, bool bCenter)
-{
-	//if(!bCenter)
-	{
-		BodyPos bp;
-		bp.b = b;
-		bodies.push_back(bp);
-	}
-	if(bCenter)
-	{
-		center.b = b;
-	}
-}
-
-Vec2 SoftBodyAnim::getVertex(LatticeVert* v)
-{
-	Vec2 p(v->x * size.x, v->y * size.y);
-	
-	return p + getCenter();
-}
-
-void SoftBodyAnim::setVertex(Vec2 p, LatticeVert* v)
-{
-	p = p - getCenter();
-	
-	p.x /= size.x;
-	p.y /= size.y;
-	
-	v->x = p.x;
-	v->y = p.y;
-}
+//Vec2 SoftBodyAnim::getCenter()
+//{
+//	b2Vec2 centroid(0,0);
+//	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+//		centroid = centroid + i->b->GetPosition();
+//	
+//	centroid.x = centroid.x / bodies.size();
+//	centroid.y = centroid.y / bodies.size();
+//	//return centroid;
+//	centroid = centroid + center.b->GetPosition();
+//	centroid.x /= 2.0f;
+//	centroid.y /= 2.0f;
+//	
+//	return Vec2(centroid.x, centroid.y);
+//}
+//
+//SoftBodyAnim::SoftBodyAnim(Lattice* l) : LatticeAnim(l)
+//{
+//	center.b = NULL;
+//	size = Vec2(0, 0);
+//}
+//
+//SoftBodyAnim::~SoftBodyAnim()
+//{
+//	//for(list<bodypos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+//	//{
+//	//	delete [] i->weights;
+//	//}
+//}
+//
+//void SoftBodyAnim::setEffect()
+//{
+//	m_l->reset();
+//	LatticeVert* ptr = m_l->vertex;
+//	for(uint32 iy = 0; iy <= m_l->numy; iy++)
+//	{
+//		for(uint32 ix = 0; ix <= m_l->numx; ix++)
+//		{
+//			Vec2 vertPos = getVertex(ptr);
+//			
+//			//Find total distance between this vertex and all bodies
+//			float totalDist = 0.0f;
+//			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+//			{
+//				Vec2 dist = vertPos - i->pos;
+//				totalDist += glmx::lensqr(dist);
+//			}
+//			
+//			for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+//			{
+//				Vec2 pMoved = distMoved(&(*i));
+//				
+//				//Distance between this vertex and this body, in resting position
+//				Vec2 diff = vertPos - i->pos;
+//				float distance = glmx::lensqr(diff);
+//				
+//				//Mul fac for moving this point
+//				float fac = 1.0f - (distance / totalDist);
+//				
+//				
+//				//TODO Better deformation method
+//				vertPos.x += pMoved.x * fac;
+//				vertPos.y += pMoved.y * fac;
+//			}
+//			setVertex(vertPos, ptr);
+//			ptr++;
+//		}
+//	}
+//	m_l->bind();
+//}
+//
+//Vec2 SoftBodyAnim::relOffset(b2Body* b)
+//{
+//    b2Vec2 p = b->GetPosition();
+//	return Vec2(p.x, p.y) - getCenter();
+//}
+//
+//Vec2 SoftBodyAnim::distMoved(BodyPos* bp)
+//{
+//	Vec2 rel = relOffset(bp->b);
+//	rel = rel - bp->pos;
+//	return rel;
+//}
+//
+//void SoftBodyAnim::init()
+//{
+//	for(std::list<BodyPos>::iterator i = bodies.begin(); i != bodies.end(); i++)
+//		i->pos = relOffset(i->b);
+//    b2Vec2 p = center.b->GetPosition();
+//	center.pos = Vec2(p.x, p.y);
+//}
+//
+//void SoftBodyAnim::update(float dt)
+//{
+//	setEffect();
+//}
+//
+//void SoftBodyAnim::addBody(b2Body* b, bool bCenter)
+//{
+//	//if(!bCenter)
+//	{
+//		BodyPos bp;
+//		bp.b = b;
+//		bodies.push_back(bp);
+//	}
+//	if(bCenter)
+//	{
+//		center.b = b;
+//	}
+//}
+//
+//Vec2 SoftBodyAnim::getVertex(LatticeVert* v)
+//{
+//	Vec2 p(v->x * size.x, v->y * size.y);
+//	
+//	return p + getCenter();
+//}
+//
+//void SoftBodyAnim::setVertex(Vec2 p, LatticeVert* v)
+//{
+//	p = p - getCenter();
+//	
+//	p.x /= size.x;
+//	p.y /= size.y;
+//	
+//	v->x = p.x;
+//	v->y = p.y;
+//}
 
 
 

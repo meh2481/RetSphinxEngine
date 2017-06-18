@@ -102,7 +102,7 @@ void GameEngine::draw()
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
 	glDisable(GL_LIGHTING);
-	fillScreen(Color(0,0,0,1));
+	//fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
@@ -112,36 +112,12 @@ void GameEngine::draw()
 	glColor4f(1,1,1,1);
 	
 	//-------------------------------------------------------------
-	//Set up OpenGL lights
-	//TODO: Remove or move to an actual class
+	// Set up OpenGL lighting
 	//-------------------------------------------------------------
-	float lightPosition[] = {-cameraPos.x, -cameraPos.y, 0.0, 1.0}; //TODO Figure out how this is supposed to work
-	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
-	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	float lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
-	
-	
-	//Set up OpenGL materials
-	float materialAmbient[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	float materialDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f };
-	float materialSpecular[] = {0.6f, 0.6f, 0.6f, 1.0f };
-	float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
-	float materialShininess = 50.0f;
-	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
+	float materialShininess = 0.0f;
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
 		
 	//Set up global OpenGL lighting
@@ -149,7 +125,7 @@ void GameEngine::draw()
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	//glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 
@@ -188,6 +164,7 @@ void GameEngine::draw()
 	}
 	glLoadIdentity();
 	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
+	//Tilted view stuff
 	//glLoadIdentity();
 	//gluLookAt(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z, -cameraPos.x, -cameraPos.y, 0.0f, 0, 0, 1);
     //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);

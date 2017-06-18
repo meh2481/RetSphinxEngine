@@ -32,8 +32,11 @@ struct Face
 class Mesh3D
 {
 protected:
-    unsigned m_obj;   //The object in 3D memory
 	std::string m_sObjFilename;
+	float* m_vertexPtr;
+	float* m_normalPtr;
+	float* m_texCoordPtr;
+	int num;
 	
 	
     void _fromOBJFile(const std::string& sFilename);
@@ -53,7 +56,7 @@ public:
     void render(Image* img);
 	
 	//Accessor methods
-	std::string getObjFilename()	{if(m_obj)return m_sObjFilename;return NO_MESH;};
+	std::string getObjFilename()	{return m_sObjFilename;};
 
 };
 

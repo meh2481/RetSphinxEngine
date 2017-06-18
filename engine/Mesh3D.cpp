@@ -17,7 +17,9 @@
 
 Mesh3D::Mesh3D(const std::string& sOBJFile)
 {
-    m_obj = 0;
+	num = 0;
+	m_sObjFilename = NO_MESH;
+	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
 	//Load with OBJ loader or Tiny3D loader, depending on file type (Tiny3D should be _far_ faster)
 	if(sOBJFile.find(".obj", sOBJFile.size()-4) != std::string::npos)
 		_fromOBJFile(sOBJFile);
@@ -30,7 +32,9 @@ Mesh3D::Mesh3D(const std::string& sOBJFile)
 
 Mesh3D::Mesh3D(const unsigned char* data, unsigned int len)
 {
-	m_obj = 0;
+	num = 0;
+	m_sObjFilename = NO_MESH;
+	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
 	wireframe = false;
 	shaded = true;
 
@@ -40,8 +44,12 @@ Mesh3D::Mesh3D(const unsigned char* data, unsigned int len)
 Mesh3D::~Mesh3D()
 {
 	//Free OpenGL graphics memory
-	if(m_obj)
-		glDeleteLists(m_obj, 1);
+	if(m_vertexPtr)
+		delete[] m_vertexPtr;
+	if(m_normalPtr)
+		delete[] m_normalPtr;
+	if(m_texCoordPtr)
+		delete[] m_texCoordPtr;
 }
 
 void Mesh3D::_fromOBJFile(const std::string& sFilename)
@@ -159,32 +167,48 @@ void Mesh3D::_fromOBJFile(const std::string& sFilename)
     infile.close();
 
     //Done with file; create object
-    m_obj = glGenLists(1);
-    glNewList(m_obj,GL_COMPILE);
 	
     //Loop through and add faces
-    glBegin(GL_TRIANGLES);
+	assert(bNorms);	//TODO
+	assert(bUVs);
+
+	num = lFaces.size();
+	m_vertexPtr = new float[num * 3 * 3];	//3 vertices per face, xyz per vertex
+	m_normalPtr = new float[num * 3 * 3];	//3 normals per face, xyz per normal
+	m_texCoordPtr = new float[num * 3 * 2];	//3 tex coords per face, uv per tex coord
+	float* vert = m_vertexPtr;
+	float* normal = m_normalPtr;
+	float* texCoord = m_texCoordPtr;
+
     for(std::list<Face>::iterator i = lFaces.begin(); i != lFaces.end(); i++)
     {
-        if(bNorms)
-            glNormal3f(vNormals[i->norm1-1].x, vNormals[i->norm1-1].y, vNormals[i->norm1-1].z);
-        if(bUVs)
-            glTexCoord2f(vUVs[i->uv1].u, vUVs[i->uv1].v);
-        glVertex3f(vVerts[i->v1-1].x, vVerts[i->v1-1].y, vVerts[i->v1-1].z);
-        if(bNorms)
-            glNormal3f(vNormals[i->norm2-1].x, vNormals[i->norm2-1].y, vNormals[i->norm2-1].z);
-        if(bUVs)
-            glTexCoord2f(vUVs[i->uv2].u, vUVs[i->uv2].v);
-        glVertex3f(vVerts[i->v2-1].x, vVerts[i->v2-1].y, vVerts[i->v2-1].z);
-        if(bNorms)
-            glNormal3f(vNormals[i->norm3-1].x, vNormals[i->norm3-1].y, vNormals[i->norm3-1].z);
-        if(bUVs)
-            glTexCoord2f(vUVs[i->uv3].u, vUVs[i->uv3].v);
-        glVertex3f(vVerts[i->v3-1].x, vVerts[i->v3-1].y, vVerts[i->v3-1].z);
-    }
+		*normal++ = vNormals[i->norm1 - 1].x;
+		*normal++ = vNormals[i->norm1 - 1].y;
+		*normal++ = vNormals[i->norm1 - 1].z;
+		*texCoord++ = vUVs[i->uv1].u;
+		*texCoord++ = vUVs[i->uv1].v;
+		*vert++ = vVerts[i->v1 - 1].x;
+		*vert++ = vVerts[i->v1 - 1].y;
+		*vert++ = vVerts[i->v1 - 1].z;
 
-    glEnd();
-    glEndList();
+		*normal++ = vNormals[i->norm2 - 1].x;
+		*normal++ = vNormals[i->norm2 - 1].y;
+		*normal++ = vNormals[i->norm2 - 1].z;
+		*texCoord++ = vUVs[i->uv2].u;
+		*texCoord++ = vUVs[i->uv2].v;
+		*vert++ = vVerts[i->v2 - 1].x;
+		*vert++ = vVerts[i->v2 - 1].y;
+		*vert++ = vVerts[i->v2 - 1].z;
+
+		*normal++ = vNormals[i->norm3 - 1].x;
+		*normal++ = vNormals[i->norm3 - 1].y;
+		*normal++ = vNormals[i->norm3 - 1].z;
+		*texCoord++ = vUVs[i->uv3].u;
+		*texCoord++ = vUVs[i->uv3].v;
+		*vert++ = vVerts[i->v3 - 1].x;
+		*vert++ = vVerts[i->v3 - 1].y;
+		*vert++ = vVerts[i->v3 - 1].z;
+    }
 }
 
 //Fall back on pure C functions for speed
@@ -205,17 +229,16 @@ void Mesh3D::_fromTiny3DFile(const std::string& sFilename)
 void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 {
 	//Make sure this is large enough to hold a header
-	if(len < sizeof(tiny3d::tiny3dHeader)) return;
+	assert(len >= sizeof(tiny3d::tiny3dHeader));
 
 	tiny3d::tiny3dHeader* header = (tiny3d::tiny3dHeader*) data;
 
 	//Make sure this is large enough to hold all the data
-	if(len < sizeof(tiny3d::tiny3dHeader) +
+	assert(len >= sizeof(tiny3d::tiny3dHeader) +
 		sizeof(tiny3d::normal) * header->numNormals +
 		sizeof(tiny3d::uv) * header->numUVs +
 		sizeof(tiny3d::vert) * header->numVertices +
-		sizeof(tiny3d::face) * header->numFaces)
-		return;
+		sizeof(tiny3d::face) * header->numFaces);
 
 	data += sizeof(tiny3d::tiny3dHeader);
 	
@@ -234,47 +257,69 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 	tiny3d::face* faces = (tiny3d::face*)data;
 	
 	//Construct OpenGL object
-    m_obj = glGenLists(1);
-	//TODO: Remove displaylists and replace with VBOs/VBAs
-    glNewList(m_obj,GL_COMPILE);
 	
     //Loop through and add faces
-    glBegin(GL_TRIANGLES);
+	num = header->numFaces;
+	m_vertexPtr = new float[num * 3 * 3];	//3 vertices per face, xyz per vertex
+	m_normalPtr = new float[num * 3 * 3];	//3 normals per face, xyz per normal
+	m_texCoordPtr = new float[num * 3 * 2];	//3 tex coords per face, uv per tex coord
+	float* vert = m_vertexPtr;
+	float* normal = m_normalPtr;
+	float* texCoord = m_texCoordPtr;
+
 	tiny3d::face* facePtr = faces;
-    for(unsigned i = 0; i < header->numFaces; i++)
+    for(unsigned i = 0; i < num; i++)
     {
 		tiny3d::vert v = vertices[facePtr->v1];
 		tiny3d::uv UV = uvs[facePtr->uv1];
 		tiny3d::normal norm = normals[facePtr->norm1];
-        glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
-        glVertex3f(v.x, v.y, v.z);
+
+		*normal++ = norm.x;
+		*normal++ = norm.y;
+		*normal++ = norm.z;
+		*texCoord++ = UV.u;
+		*texCoord++ = UV.v;
+		*vert++ = v.x;
+		*vert++ = v.y;
+		*vert++ = v.z;
         
 		v = vertices[facePtr->v2];
 		UV = uvs[facePtr->uv2];
 		norm = normals[facePtr->norm2];
-        glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
-        glVertex3f(v.x, v.y, v.z);
+
+		*normal++ = norm.x;
+		*normal++ = norm.y;
+		*normal++ = norm.z;
+		*texCoord++ = UV.u;
+		*texCoord++ = UV.v;
+		*vert++ = v.x;
+		*vert++ = v.y;
+		*vert++ = v.z;
 		
 		v = vertices[facePtr->v3];
 		UV = uvs[facePtr->uv3];
 		norm = normals[facePtr->norm3];
-        glNormal3f(norm.x, norm.y, norm.z);
-        glTexCoord2f(UV.u, UV.v);
-        glVertex3f(v.x, v.y, v.z);
+
+		*normal++ = norm.x;
+		*normal++ = norm.y;
+		*normal++ = norm.z;
+		*texCoord++ = UV.u;
+		*texCoord++ = UV.v;
+		*vert++ = v.x;
+		*vert++ = v.y;
+		*vert++ = v.z;
 
 		facePtr++;
     }
-
-    glEnd();
-    glEndList();
 }
 
 void Mesh3D::render(Image* img)
 {
-	assert(m_obj);
+	assert(m_vertexPtr);
+	assert(m_normalPtr);
+	assert(m_texCoordPtr);
 	assert(img);
+	assert(num > 0);
 
 	if(shaded)
 		glEnable(GL_LIGHTING);
@@ -283,7 +328,13 @@ void Mesh3D::render(Image* img)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glBindTexture(GL_TEXTURE_2D, img->_getTex());
-        glCallList(m_obj);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glShadeModel(GL_SMOOTH);
+	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
+	glNormalPointer(GL_FLOAT, 0, m_normalPtr);
+	glVertexPointer(3, GL_FLOAT, 0, m_vertexPtr);
+
+	glDrawArrays(GL_TRIANGLES, 0, num * 3);
 
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	//Reset to drawing full faces
