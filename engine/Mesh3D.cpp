@@ -167,11 +167,8 @@ void Mesh3D::_fromOBJFile(const std::string& sFilename)
     infile.close();
 
     //Done with file; create object
-    //m_obj = glGenLists(1);
-    //glNewList(m_obj,GL_COMPILE);
 	
     //Loop through and add faces
-    //glBegin(GL_TRIANGLES);
 	assert(bNorms);	//TODO
 	assert(bUVs);
 
@@ -193,9 +190,6 @@ void Mesh3D::_fromOBJFile(const std::string& sFilename)
 		*vert++ = vVerts[i->v1 - 1].x;
 		*vert++ = vVerts[i->v1 - 1].y;
 		*vert++ = vVerts[i->v1 - 1].z;
-        //glNormal3f(vNormals[i->norm1-1].x, vNormals[i->norm1-1].y, vNormals[i->norm1-1].z);
-        //glTexCoord2f(vUVs[i->uv1].u, vUVs[i->uv1].v);
-        //glVertex3f(vVerts[i->v1-1].x, vVerts[i->v1-1].y, vVerts[i->v1-1].z);
 
 		*normal++ = vNormals[i->norm2 - 1].x;
 		*normal++ = vNormals[i->norm2 - 1].y;
@@ -205,9 +199,6 @@ void Mesh3D::_fromOBJFile(const std::string& sFilename)
 		*vert++ = vVerts[i->v2 - 1].x;
 		*vert++ = vVerts[i->v2 - 1].y;
 		*vert++ = vVerts[i->v2 - 1].z;
-        //glNormal3f(vNormals[i->norm2-1].x, vNormals[i->norm2-1].y, vNormals[i->norm2-1].z);
-        //glTexCoord2f(vUVs[i->uv2].u, vUVs[i->uv2].v);
-        //glVertex3f(vVerts[i->v2-1].x, vVerts[i->v2-1].y, vVerts[i->v2-1].z);
 
 		*normal++ = vNormals[i->norm3 - 1].x;
 		*normal++ = vNormals[i->norm3 - 1].y;
@@ -217,13 +208,7 @@ void Mesh3D::_fromOBJFile(const std::string& sFilename)
 		*vert++ = vVerts[i->v3 - 1].x;
 		*vert++ = vVerts[i->v3 - 1].y;
 		*vert++ = vVerts[i->v3 - 1].z;
-        //glNormal3f(vNormals[i->norm3-1].x, vNormals[i->norm3-1].y, vNormals[i->norm3-1].z);
-        //glTexCoord2f(vUVs[i->uv3].u, vUVs[i->uv3].v);
-        //glVertex3f(vVerts[i->v3-1].x, vVerts[i->v3-1].y, vVerts[i->v3-1].z);
     }
-
-    //glEnd();
-    //glEndList();
 }
 
 //Fall back on pure C functions for speed
@@ -272,12 +257,8 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 	tiny3d::face* faces = (tiny3d::face*)data;
 	
 	//Construct OpenGL object
-    //m_obj = glGenLists(1);
-	//TODO: Remove displaylists and replace with VBOs/VBAs
-    //glNewList(m_obj,GL_COMPILE);
 	
     //Loop through and add faces
-    //glBegin(GL_TRIANGLES);
 	num = header->numFaces;
 	m_vertexPtr = new float[num * 3 * 3];	//3 vertices per face, xyz per vertex
 	m_normalPtr = new float[num * 3 * 3];	//3 normals per face, xyz per normal
@@ -301,9 +282,6 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 		*vert++ = v.x;
 		*vert++ = v.y;
 		*vert++ = v.z;
-        //glNormal3f(norm.x, norm.y, norm.z);
-        //glTexCoord2f(UV.u, UV.v);
-        //glVertex3f(v.x, v.y, v.z);
         
 		v = vertices[facePtr->v2];
 		UV = uvs[facePtr->uv2];
@@ -317,9 +295,6 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 		*vert++ = v.x;
 		*vert++ = v.y;
 		*vert++ = v.z;
-        //glNormal3f(norm.x, norm.y, norm.z);
-        //glTexCoord2f(UV.u, UV.v);
-        //glVertex3f(v.x, v.y, v.z);
 		
 		v = vertices[facePtr->v3];
 		UV = uvs[facePtr->uv3];
@@ -333,15 +308,9 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
 		*vert++ = v.x;
 		*vert++ = v.y;
 		*vert++ = v.z;
-        //glNormal3f(norm.x, norm.y, norm.z);
-        //glTexCoord2f(UV.u, UV.v);
-        //glVertex3f(v.x, v.y, v.z);
 
 		facePtr++;
     }
-
-    //glEnd();
-    //glEndList();
 }
 
 void Mesh3D::render(Image* img)
@@ -359,7 +328,6 @@ void Mesh3D::render(Image* img)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glBindTexture(GL_TEXTURE_2D, img->_getTex());
-    //glCallList(m_obj);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glShadeModel(GL_SMOOTH);
 	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
