@@ -23,6 +23,16 @@ function spaceship:init()
 	particles_setFiring(self.fireParticles, true)
 	
 	obj_registerPlayer(self)
+	
+	--Set up OpenGL things here for lack of a better place
+	opengl_light(GL_LIGHT1, GL_POSITION, 0, 0, 1, 1)
+	opengl_light(GL_LIGHT1, GL_AMBIENT, 0, 0, 0, 1)
+	opengl_light(GL_LIGHT1, GL_DIFFUSE, 1, 1, 1, 1)
+	opengl_light(GL_LIGHT1, GL_SPECULAR, 1, 1, 1, 1)
+	opengl_mat(GL_FRONT_AND_BACK, GL_AMBIENT, 0.0, 0.0, 0.0, 1.0)
+	opengl_mat(GL_FRONT_AND_BACK, GL_DIFFUSE, 1, 1, 1, 1)
+	opengl_mat(GL_FRONT_AND_BACK, GL_SPECULAR, 0.6, 0.6, 0.6, 1.0)
+	opengl_mat(GL_FRONT_AND_BACK, GL_EMISSION, 0, 0, 0, 1.0)
 end
 
 --Rumble when hitting something
@@ -106,6 +116,10 @@ function spaceship:update(dt)
 	local x,y = obj_getPos(self)
 	local hx, hy, hz = movement_head()
 	camera_centerOnXY(x+hx*5, y+hy*5)
+	
+	local mx, my = mouse_getPos()
+	mx, my = mouse_transformToWorld(mx, my)
+	opengl_light(GL_LIGHT1, GL_POSITION, mx, my, 1, 1)
 	
 	--Scroll camera in/out on dpad
 	self:checkDpadZoom()

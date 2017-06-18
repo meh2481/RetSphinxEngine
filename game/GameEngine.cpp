@@ -115,41 +115,41 @@ void GameEngine::draw()
 	//Set up OpenGL lights
 	//TODO: Remove or move to an actual class
 	//-------------------------------------------------------------
-	float lightPosition[] = {-cameraPos.x, -cameraPos.y, 10.0, 1.0}; //TODO Figure out how this is supposed to work
-	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 0.5f};
-	float lightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 0.5f};
-	float lightSpecular[]  = {1.0f, 0.5f, 0.5f, 0.5f};
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
+	//float lightPosition[] = {-cameraPos.x, -cameraPos.y, 1.0, 1.0}; //TODO Figure out how this is supposed to work
+	//float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+	//float lightDiffuse[]  = { 0.5f, 0.5f, 0.5f, 1.0f};
+	//float lightSpecular[]  = {0.5f, 0.5f, 0.5f, 1.0f};
+	//glClearColor(0.0, 0.0, 0.0, 0.0);
+	//glShadeModel(GL_SMOOTH);
 
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	//glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
+	//glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
+	//glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
 	
 	
 	//Set up OpenGL materials
-	float materialAmbient[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	float materialDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f };
-	float materialSpecular[] = {0.6f, 0.6f, 0.6f, 1.0f };
-	float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
-	float materialShininess = 50.0f;
-	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+	//float materialAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	//float materialDiffuse[] = {0.0f, 0.0f, 0.0f, 1.0f };
+	//float materialSpecular[] = {0.0f, 0.0f, 0.0f, 1.0f };
+	//float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
+	//float materialShininess = 0.0f;
+	//
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
+	//glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
 		
 	//Set up global OpenGL lighting
 	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	glDisable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 
