@@ -1,4 +1,5 @@
 //This program takes any file and outputs raw WFLZ-compressed data
+#include "main.h"
 #include "wfLZ.h"
 #include <iostream>
 #include <fstream>
@@ -279,6 +280,7 @@ uint32_t getCodepoint(const char* str)
 
 unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 {
+	addImage(filename);	//TODO: Instead of this whole thing
 	int comp = 0;
 	int width = 0;
 	int height = 0;
@@ -576,6 +578,7 @@ int main(int argc, char** argv)
 	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
 	{
 		compress(readFilenames(*i), *i);
+		packImages();
 	}
 	return 0;
 }
