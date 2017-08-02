@@ -3,4 +3,4 @@
 
 void addImage(const std::string& img);
 
-void packImages();
+void packImages(const std::string& filename);

@@ -296,7 +296,7 @@ unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 	textureHeader.width = width;
 	textureHeader.height = height;
 	textureHeader.bpp = TEXTURE_BPP_RGBA;
-	if(comp == 3)
+	if(comp == STBI_rgb)
 		textureHeader.bpp = TEXTURE_BPP_RGB;
 
 	int size = sizeof(TextureHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
@@ -578,7 +578,7 @@ int main(int argc, char** argv)
 	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
 	{
 		compress(readFilenames(*i), *i);
-		packImages();
+		packImages(*i);
 	}
 	return 0;
 }
