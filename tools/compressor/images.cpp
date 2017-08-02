@@ -27,6 +27,7 @@ typedef struct
 //-----------------------------------------------------------------------------------------------
 void copyImage(unsigned char* buf, Image* img, unsigned short xPos, unsigned short yPos, int atlasW)
 {
+	//TODO: Offset by 1 in each dir and stretch last pixels
 	assert(img->comp == STBI_rgb_alpha || img->comp == STBI_rgb);
 	unsigned char* src = img->buf;
 	for(int y = 0; y < img->height; y++)
@@ -48,6 +49,7 @@ void copyImage(unsigned char* buf, Image* img, unsigned short xPos, unsigned sho
 void packImage(stbrp_rect *rects, int rectSz, std::vector<Image>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
 {
 	unsigned char* destBuf = (unsigned char*)malloc(atlasW * atlasH * BPP);
+	memset(destBuf, 0, atlasW * atlasH * BPP);	//Clear dest buf
 	for(int i = 0; i < rectSz; i++)
 	{
 		stbrp_rect r = rects[i];
@@ -55,12 +57,14 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<Image>* images, int cu
 		{
 			Image img = images->at(r.id);
 			copyImage(destBuf, &img, r.x, r.y, atlasW);	//Copy image data over to dest buf
+			//TODO: Store coords
 		}
 	}
 
-	//Save img
+	//DEBUG: Save img
 	std::ostringstream oss;
 	oss << filename << curAtlas << ".png";
+	std::cout << "Save packed image " << oss.str() << std::endl;
 	if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf, atlasW * BPP))
 		std::cout << "stbi_write_png error while saving " << filename << ' ' << curAtlas << std::endl;
 
@@ -93,8 +97,7 @@ void addImage(const std::string& img)
 
 void packImages(const std::string& filename)
 {
-	int atlasW = DEFAULT_SZ;
-	int atlasH = DEFAULT_SZ;
+	int atlasSz = DEFAULT_SZ;
 
 	std::vector<Image> startImages;
 	for(std::vector<std::string>::iterator i = images.begin(); i != images.end(); i++)
@@ -109,15 +112,15 @@ void packImages(const std::string& filename)
 		startImages.push_back(img);
 
 		//Scale up atlas size as necessary
-		while(img.width > atlasW)
-			atlasW <<= 1;
+		while(img.width > atlasSz)
+			atlasSz <<= 1;
 
-		while(img.height > atlasH)
-			atlasH <<= 1;
+		while(img.height > atlasSz)
+			atlasSz <<= 1;
 	}
 
 	stbrp_context context;
-	int numNodes = atlasW;
+	int numNodes = atlasSz;
 
 	stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * numNodes);
 	stbrp_rect *rects = (stbrp_rect*) malloc(sizeof(stbrp_rect) * startImages.size());
@@ -125,6 +128,7 @@ void packImages(const std::string& filename)
 	//Init rects
 	for(int i = 0; i < rectsLeft; i++)
 	{
+		//TODO: +2 pixels on each side and stretch
 		rects[i].id = i;
 		rects[i].w = startImages[i].width;
 		rects[i].h = startImages[i].height;
@@ -137,14 +141,14 @@ void packImages(const std::string& filename)
 	int curAtlas = 0;
 	do
 	{
-		stbrp_init_target(&context, atlasW, atlasH, nodes, numNodes);
+		stbrp_init_target(&context, atlasSz, atlasSz, nodes, numNodes);
 		
 		packed = stbrp_pack_rects(&context, rects, rectsLeft);
 
 		//TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
 
 		//Pack into image
-		packImage(rects, rectsLeft, &startImages, curAtlas++, atlasW, atlasH, filename);
+		packImage(rects, rectsLeft, &startImages, curAtlas++, atlasSz, atlasSz, filename);
 
 		//Pull out done rects and update rectsLeft. If list is empty, packed will be 1 and we'll break out anyway. Probably. It'll be fine.
 		if(!packed)	//Only worry about removing done rects if we're not done yet
