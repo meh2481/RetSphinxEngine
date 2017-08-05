@@ -4,11 +4,10 @@
 */
 #pragma once
 #include <string>
+#include "Quad.h"
 
 #define NO_TEXTURE 	"image_none"	//Invalid image
 #define NO_MESH		"mesh_none"		//Invalid 3D mesh
-
-class Image;
 
 class Vertex
 {
@@ -53,7 +52,7 @@ public:
 	Mesh3D(const unsigned char* data, unsigned int len);
     ~Mesh3D();
 
-    void render(Image* img);
+    void render(Img* img);
 	
 	//Accessor methods
 	std::string getObjFilename()	{return m_sObjFilename;};

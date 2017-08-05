@@ -1,5 +1,4 @@
 #include "ResourceLoader.h"
-#include "Image.h"
 #include "ParticleSystem.h"
 #include "easylogging++.h"
 #include "tinyxml2.h"
@@ -11,8 +10,11 @@
 #include "ImgFont.h"
 #include "Hash.h"
 #include "Stringbank.h"
-#include "stb_image.h"
 #include "ResourceTypes.h"
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
@@ -35,10 +37,10 @@ void ResourceLoader::clearCache()
 	m_pakLoader->loadFromDir(m_sPakDir);	//re-parse
 }
 
-Image* ResourceLoader::getImage(uint64_t hashID)
+Img* ResourceLoader::getImage(uint64_t hashID)
 {
 	LOG(TRACE) << "Loading Image from ID " << hashID;
-	Image* img = m_cache->findImage(hashID);
+	Img* img = m_cache->findImage(hashID);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
@@ -47,7 +49,8 @@ Image* ResourceLoader::getImage(uint64_t hashID)
 		if(resource && len)
 		{
 			LOG(TRACE) << "Pak hit - load " << hashID << " from data";
-			img = new Image(resource, len);
+			img = new Img();
+			TODO
 			m_cache->addImage(hashID, img);
 			free(resource);						//Free memory
 		}
@@ -59,18 +62,18 @@ Image* ResourceLoader::getImage(uint64_t hashID)
 	return img;
 }
 
-Image* ResourceLoader::getImage(const std::string& sID)
+Img* ResourceLoader::getImage(const std::string& sID)
 {
 	LOG(TRACE) << "Loading image " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	Image* img = getImage(hashVal);
+	Img* img = getImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Attempting to load from file";
-		img = new Image(sID);				//Create this image
+		img = new Img();				//Create this image
+		TODO
 		m_cache->addImage(hashVal, img);	//Add to the cache
 	}
-	img->_setReloadFilename(sID);
 	return img;
 }
 
@@ -711,58 +714,58 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 			const char* cLatticeType = latticeElem->Attribute("type");
 			if(cLatticeType)
 			{
-				if(cBodyRes)
-					pMeshSize = pointFromString(cBodyRes);
+				//if(cBodyRes)
+				//	pMeshSize = pointFromString(cBodyRes);
 
-				o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
+				//o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
 
-				std::string sLatticeType = cLatticeType;
-				if(sLatticeType == "softbody")
-				{
-					//const char* cBodyCenter = latticeElem->Attribute("centerbody");
-					//if(cBodyCenter && mBodyNames.count(cBodyCenter))
-					//{
-					//	//Override default mesh size if we've provided one
+				//std::string sLatticeType = cLatticeType;
+				//if(sLatticeType == "softbody")
+				//{
+				//	//const char* cBodyCenter = latticeElem->Attribute("centerbody");
+				//	//if(cBodyCenter && mBodyNames.count(cBodyCenter))
+				//	//{
+				//	//	//Override default mesh size if we've provided one
 
-					//	SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
-					//	manim->addBody(mBodyNames[cBodyCenter], true);
-					//	manim->size = o->meshSize;
-					//	for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
-					//	{
-					//		if(i->first != cBodyCenter)
-					//			manim->addBody(i->second);
-					//	}
-					//	manim->init();
-					//	o->meshAnim = manim;
-					//	//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
-					//}
-				}
-				else if(sLatticeType == "sin")
-				{
-					SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
+				//	//	SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
+				//	//	manim->addBody(mBodyNames[cBodyCenter], true);
+				//	//	manim->size = o->meshSize;
+				//	//	for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+				//	//	{
+				//	//		if(i->first != cBodyCenter)
+				//	//			manim->addBody(i->second);
+				//	//	}
+				//	//	manim->init();
+				//	//	o->meshAnim = manim;
+				//	//	//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
+				//	//}
+				//}
+				//else if(sLatticeType == "sin")
+				//{
+				//	SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
 
-					latticeElem->QueryFloatAttribute("amp", &manim->amp);
-					latticeElem->QueryFloatAttribute("freq", &manim->freq);
-					latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
+				//	latticeElem->QueryFloatAttribute("amp", &manim->amp);
+				//	latticeElem->QueryFloatAttribute("freq", &manim->freq);
+				//	latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
 
-					manim->init();
-					o->meshAnim = manim;
-				}
-				else if(sLatticeType == "wobble")
-				{
-					WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
+				//	manim->init();
+				//	o->meshAnim = manim;
+				//}
+				//else if(sLatticeType == "wobble")
+				//{
+				//	WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
 
-					latticeElem->QueryFloatAttribute("speed", &manim->speed);
-					latticeElem->QueryFloatAttribute("dist", &manim->startdist);
-					latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
-					latticeElem->QueryFloatAttribute("angle", &manim->startangle);
-					latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
-					latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
-					latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
+				//	latticeElem->QueryFloatAttribute("speed", &manim->speed);
+				//	latticeElem->QueryFloatAttribute("dist", &manim->startdist);
+				//	latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
+				//	latticeElem->QueryFloatAttribute("angle", &manim->startangle);
+				//	latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
+				//	latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
+				//	latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
 
-					manim->init();
-					o->meshAnim = manim;
-				}
+				//	manim->init();
+				//	o->meshAnim = manim;
+				//}
 			}
 
 		}

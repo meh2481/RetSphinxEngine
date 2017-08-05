@@ -16,8 +16,6 @@ Gradient.cpp
 Gradient.h
 HeadTracker.cpp
 HeadTracker.h
-Image.cpp
-Image.h
 ImgFont.cpp
 ImgFont.h
 imgui_impl_opengl2.cpp
@@ -66,6 +64,8 @@ SoundVol.cpp
 tiny3d.h
 Text.cpp
 Text.h
+Quad.h
+Quad.cpp
 )
 
 set(engine_events_src

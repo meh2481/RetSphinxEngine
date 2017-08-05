@@ -1,15 +1,15 @@
 #pragma once
 #include <map>
 #include <string>
+#include "Quad.h"
 
-class Image;
 class Mesh3D;
 class ImgFont;
 
 class ResourceCache
 {
 	//std::map<Image*, uint32_t> imageUses;
-	std::map<uint64_t, Image*> imageIDMap;
+	std::map<uint64_t, Img*> imageIDMap;
 
 	//std::map<Mesh3D*, uint32_t> meshUses;
 	std::map<uint64_t, Mesh3D*> meshIDMap;
@@ -29,8 +29,8 @@ class ResourceCache
 public:
 	~ResourceCache();
 
-	Image* findImage(uint64_t id);
-	void addImage(uint64_t id, Image* img);
+	Img* findImage(uint64_t id);
+	void addImage(uint64_t id, Img* img);
 
 	Mesh3D* findMesh(uint64_t id);
 	void addMesh(uint64_t id, Mesh3D* mesh);

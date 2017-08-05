@@ -5,7 +5,6 @@
 #include <SDL_syswm.h>
 #include "Engine.h"
 #include "Box2D/Box2D.h"
-#include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "Random.h"

@@ -13,14 +13,12 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "Quad.h"
 
 class Object;
 class ObjSegment;
 class b2Body;
 struct b2BodyDef;
-class Lattice;
-class LatticeAnim;
-class Image;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO Make SceneryLayer class that this can contain
@@ -28,9 +26,10 @@ class ObjSegment
 {
 public:
 	enum { TYPE = OT_SEGMENT };
+
     b2Body*         body;		//Physics body associated with this segment
-	Lattice*		lat;		//Lattice to apply to image
-	LatticeAnim*	latanim;	//Animation to apply to lattice
+	//Lattice*		lat;		//Lattice to apply to image
+	//LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
 	Mesh3D*		obj3D;		//3D object
 	
@@ -39,7 +38,7 @@ public:
 	float rot;
 	Vec2 size;	//Actual texel size; not pixels
 	float depth;
-	Image* img;
+	Img* img;
 	bool active;
 	Color col;
 
@@ -47,7 +46,6 @@ public:
     ~ObjSegment();
 	
 	void draw(bool bDebugInfo = false);
-	void update(float dt);
 };
 
 //Collections of the above all stuffed into one object for ease of use.
@@ -59,13 +57,12 @@ class Object
 
 public:
 	enum { TYPE = OT_OBJECT };
-	Lattice*			meshLattice;
-	LatticeAnim*			meshAnim;
-	Vec2				meshSize;
-	LuaInterface* 			lua;
-	std::string 			luaClass;
+
+	Vec2 meshSize;
+	LuaInterface* lua;
+	std::string luaClass;
 	float depth;
-	Image* img;
+	Img* img;
 	bool active;
 	Color col;
     
@@ -87,7 +84,7 @@ public:
 	void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
 	std::string getProperty(const std::string& prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(Image* img, unsigned int seg = 0);	//Sets the image of the given physSegment
+	void setImage(Img* img, unsigned int seg = 0);	//Sets the image of the given physSegment
 };
 
 

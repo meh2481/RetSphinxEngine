@@ -9,13 +9,11 @@
 #include "Color.h"
 #include <string>
 
-class Image;
-
 class Arc
 {
 protected:
 	float* segmentPos;
-	Image* arcSegImg;
+	//Image* arcSegImg;
 	unsigned numSegments;
 	
 	Arc(){};
@@ -28,11 +26,11 @@ public:
 	float height;
 	unsigned avg;
 	float depth;
-	Image* img;
+	//Image* img;
 	bool active;
 	Color col;
 	
-	Arc(unsigned number, Image* img);
+	Arc(unsigned number);
 	~Arc();
 	
 	void init();

@@ -497,7 +497,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
 		{
-			addImage(*i);	//TODO: Exclude 3D model textures somehow
+			addImage(*i);	//TODO: Exclude 3D model textures, or re-map coords at pack time somehow
 			continue;		//TODO: Skip this, as we'll add the image/atlas later
 			//decompressed = extractImage(*i, &size);	
 			//helper.header.type = RESOURCE_TYPE_IMAGE;

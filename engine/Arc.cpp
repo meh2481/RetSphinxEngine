@@ -4,23 +4,22 @@
 */
 
 #include "Arc.h"
-#include "Image.h"
 #include "opengl-api.h"
 #include "Object.h"
 #include "Random.h"
 
-Arc::Arc(unsigned number, Image* arcSegImg)
+Arc::Arc(unsigned number)
 {
 	segmentPos = NULL;
-	if(arcSegImg == NULL || number == 0) return;
+	//if(arcSegImg == NULL || number == 0) return;
 	numSegments = number;
 	segmentPos = (float*)malloc(sizeof(float)*numSegments);
-	img = arcSegImg;
+	//img = arcSegImg;
 	add = max = 0.0f;
 	avg = 2;
 	height = 0.1f;
 	depth = 0;
-	img = NULL;
+	//img = NULL;
 	active = true;
 	init();
 }
@@ -32,7 +31,7 @@ Arc::~Arc()
 
 void Arc::draw()
 {
-	if(!active || img == NULL) return;
+	if(!active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
 	glPushMatrix();
 	
@@ -55,7 +54,7 @@ void Arc::draw()
       bl.y = ul.y + height;
       ur.y = segmentPos[i+1];
       br.y = ur.y + height;
-	  img->render4V(ul, ur, bl, br);
+	  //img->render4V(ul, ur, bl, br);
     }
 	
 	glPopMatrix();
@@ -115,7 +114,7 @@ void Arc::average()
 
 const std::string& Arc::getImageFilename()
 {
-    return img->getFilename();
+	return "";// img->getFilename();
 }
 
 

@@ -1,5 +1,4 @@
 #include "ResourceCache.h"
-#include "Image.h"
 #include "Mesh3D.h"
 #include "ImgFont.h"
 
@@ -8,7 +7,7 @@ ResourceCache::~ResourceCache()
 	clear();
 }
 
-void ResourceCache::addImage(uint64_t id, Image* img)
+void ResourceCache::addImage(uint64_t id, Img* img)
 {
 	imageIDMap[id] = img;
 }
@@ -28,9 +27,9 @@ void ResourceCache::addMesh(uint64_t id, Mesh3D* mesh)
 //	cursorIDMap[id] = cur;
 //}
 
-Image* ResourceCache::findImage(uint64_t id)
+Img* ResourceCache::findImage(uint64_t id)
 {
-	std::map<uint64_t, Image*>::iterator i = imageIDMap.find(id);
+	std::map<uint64_t, Img*>::iterator i = imageIDMap.find(id);
 	if(i == imageIDMap.end())	//This image isn't here
 		return NULL;
 	return i->second;
@@ -84,7 +83,7 @@ void ResourceCache::clear()
 
 void ResourceCache::clearImages()
 {
-	for(std::map<uint64_t, Image*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
+	for(std::map<uint64_t, Img*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
 		delete (i->second);
 	imageIDMap.clear();
 }

@@ -4,12 +4,11 @@
 */
 
 #include "Text.h"
-#include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
 
-
+//TODO: This loading code should be moved to a resource loader. And probably not be XML, either
 Text::Text(const std::string& sXMLFilename)
 {
 	m_imgFont = NULL;
@@ -42,7 +41,8 @@ Text::Text(const std::string& sXMLFilename)
 		{
 			const char* cPath = elem->Attribute("path");
 			if(cPath == NULL) return;
-			m_imgFont = new Image(cPath);   //Create image
+			assert(false);	//TODO
+			//m_imgFont = new Image(cPath);   //Create image
 
 		}
 		else if(sName == "char")	//Character
@@ -93,7 +93,8 @@ void Text::render(const std::string& s, float x, float y, float pt)
 		x -= rc.width() * (pt / rc.height())/2.0f;	//Add half the width to get the center (whyyy are we drawing from the center plz dood I fan)
 		glTranslatef(-x, -y, 0.0);
 		Vec2 sz(rc.width() * (pt / rc.height()), pt);	//Ignore kerning when drawing; we only care about that when computing position
-		m_imgFont->render(sz, rc);
+		//m_imgFont->render(sz, rc);
+		assert(false);	//TODO
 		glPopMatrix();
 		x -= (rc.width() - m_mKerning[c]*2.0f) * (pt / rc.height())/2.0f;	//Add second half of the width, plus kerning (times 2 because divided by 2... it all works out)
 	}

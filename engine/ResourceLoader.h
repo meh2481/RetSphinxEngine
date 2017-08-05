@@ -6,9 +6,9 @@
 #include "Box2D/Box2D.h"
 #include "Rect.h"
 #include "SDL.h"
+#include "Quad.h"
 #include "ResourceTypes.h"
 
-class Image;
 class Object;
 class ParticleSystem;
 class ObjSegment;
@@ -36,8 +36,8 @@ public:
 	void clearCache();
 
 	//Images
-	Image* getImage(const std::string& sID);
-	Image* getImage(uint64_t hashID);
+	Img* getImage(const std::string& sID);
+	Img* getImage(uint64_t hashID);
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes

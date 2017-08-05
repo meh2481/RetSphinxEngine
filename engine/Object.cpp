@@ -5,8 +5,7 @@
 
 #include "Object.h"
 #include "LuaFuncs.h"
-#include "Lattice.h"
-#include "Image.h"
+//#include "Lattice.h"
 #include "opengl-api.h"
 
 #include <Box2D/Box2D.h>
@@ -17,8 +16,8 @@
 //----------------------------------------------------------------------------------------------------
 Object::Object()
 {
-  meshLattice = NULL;
-  meshAnim = NULL;
+  //meshLattice = NULL;
+  //meshAnim = NULL;
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
@@ -40,10 +39,10 @@ Object::~Object()
 	}
     for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
-	if(meshLattice)
-		delete meshLattice;
-	if(meshAnim)
-		delete meshAnim;
+	//if(meshLattice)
+	//	delete meshLattice;
+	//if(meshAnim)
+	//	delete meshAnim;
 }
 
 void Object::draw(bool bDebugInfo)
@@ -70,16 +69,18 @@ void Object::draw(bool bDebugInfo)
 				//float fAngle = seg->body->GetAngle();
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
-				if(meshLattice)
-					img->renderLattice(meshLattice, meshSize);
-				else
-					img->render(meshSize);
+				//if(meshLattice)
+				//	img->renderLattice(meshLattice, meshSize);
+				//else
+
+				//TODO
+				img->render(meshSize);
 				
-				if(bDebugInfo && meshLattice)
-				{
-					glScalef(meshSize.x, meshSize.y, 1);
-					meshLattice->renderDebug();
-				}
+				//if(bDebugInfo && meshLattice)
+				//{
+				//	glScalef(meshSize.x, meshSize.y, 1);
+				//	meshLattice->renderDebug();
+				//}
 				
 				glPopMatrix();
 			}
@@ -103,8 +104,8 @@ ObjSegment* Object::getSegment(unsigned int idx)
 
 void Object::update(float dt)
 {
-	if(meshAnim)
-		meshAnim->update(dt);
+	//if(meshAnim)
+	//	meshAnim->update(dt);
 	
 	if(lua)
 		lua->callMethod(this, "update", dt);
@@ -117,7 +118,7 @@ b2Body* Object::getBody()
 	return NULL;
 }
 
-void Object::setImage(Image* img, unsigned int seg)
+void Object::setImage(Img* img, unsigned int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;
@@ -182,8 +183,8 @@ ObjSegment::ObjSegment()
 {
     body = NULL;
 	parent = NULL;
-	lat = NULL;
-	latanim = NULL;
+	//lat = NULL;
+	//latanim = NULL;
 	obj3D = NULL;
 	depth = 0;
 	img = NULL;
@@ -198,10 +199,10 @@ ObjSegment::~ObjSegment()
 	//Free Box2D body
 	if(body != NULL)
 		body->GetWorld()->DestroyBody(body);
-	if(lat)
-		delete lat;
-	if(latanim)
-		delete latanim;
+	//if(lat)
+	//	delete lat;
+	//if(latanim)
+	//	delete latanim;
 }
 
 void ObjSegment::draw(bool bDebugInfo)
@@ -224,10 +225,12 @@ void ObjSegment::draw(bool bDebugInfo)
 		}
 		else
 		{
-			if(lat)
-				img->renderLattice(lat, size);
-			else
-				img->render(size, tile.x, tile.y);
+			//if(lat)
+			//	img->renderLattice(lat, size);
+			//else
+
+			//TODO
+			img->render(size, tile.x, tile.y);
 		}
 	}
 	else
@@ -249,20 +252,17 @@ void ObjSegment::draw(bool bDebugInfo)
 		}
 		else
 		{
-			if(lat)
-				img->renderLattice(lat, size);
-			else
-				img->render(size, tile.x, tile.y);
+			//if(lat)
+			//	img->renderLattice(lat, size);
+			//else
+				
+			
+			//TODO
+			img->render(size, tile.x, tile.y);
 		}
 	}
 	glPopMatrix();
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
-}
-
-void ObjSegment::update(float dt)
-{
-	if(latanim)
-		latanim->update(dt);
 }
 
 

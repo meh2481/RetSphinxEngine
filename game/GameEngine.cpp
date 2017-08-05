@@ -6,7 +6,6 @@
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
-#include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "DebugUI.h"
@@ -198,9 +197,10 @@ void GameEngine::draw()
 		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_BLEND);
-		Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
-		if(disconnectedImage)
-			disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
+		Img* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
+		//TODO
+		//if(disconnectedImage)
+		//	disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
 	}
 	
 }

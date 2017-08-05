@@ -10,7 +10,8 @@
 #include <stdlib.h>
 #include <vector>
 #include <fstream>
-#include "Image.h"
+#include <list>
+#include <assert.h>
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "FileOperations.h"
@@ -313,7 +314,7 @@ void Mesh3D::_fromData(const unsigned char* data, unsigned int len)
     }
 }
 
-void Mesh3D::render(Image* img)
+void Mesh3D::render(Img* img)
 {
 	assert(m_vertexPtr);
 	assert(m_normalPtr);
@@ -327,7 +328,7 @@ void Mesh3D::render(Image* img)
 	if(wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glBindTexture(GL_TEXTURE_2D, img->_getTex());
+	glBindTexture(GL_TEXTURE_2D, img->tex.tex);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glShadeModel(GL_SMOOTH);
 	glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);

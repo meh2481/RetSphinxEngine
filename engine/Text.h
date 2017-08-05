@@ -5,8 +5,10 @@
 */
 #pragma once
 
-#include "Image.h"
+//#include "Image.h"
 #include "Color.h"
+#include "Quad.h"
+#include "Rect.h"
 #include <map>
 
 enum TextAlignment
@@ -19,13 +21,13 @@ enum TextAlignment
     ALIGN_BOTTOM	= 32
 };
 
-class Image;
+//class Image;
 
 class Text
 {
 private:
 	Text(){};								//Default constructor cannot be called
-	Image* m_imgFont;						//Image for this bitmap font
+	Img* m_imgFont;						//Image for this bitmap font
 	std::map<unsigned char, Rect> m_mRectangles;	//Rectangles for drawing each character
 	std::map<unsigned char, float> m_mKerning;	//Kerning info for font glyphs
 	std::string m_sName;

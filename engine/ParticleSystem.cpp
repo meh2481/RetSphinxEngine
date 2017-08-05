@@ -4,7 +4,6 @@
 */
 
 #include "ParticleSystem.h"
-#include "Image.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
 #include "easylogging++.h"
@@ -132,24 +131,18 @@ void ParticleSystem::_newParticle()
 	if(m_num == m_totalAmt) return;	//Don't create more particles than we can!
 	if(!firing) return;
 	
-	if(!imgRect.size())
-	{
-		if(img != NULL)
-			m_imgRect[m_num] = Rect(0.0f, 0.0f, (float)img->getWidth(), (float)img->getHeight());
-		else
-			m_imgRect[m_num] = Rect(0.0f, 0.0f, 0.0f, 0.0f);
-	}
-	else
-		m_imgRect[m_num] = imgRect[Random::random(imgRect.size()-1)];
-	m_pos[m_num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right),
-						 Random::randomFloat(emitFrom.top, emitFrom.bottom));
+	assert(imgRect.size());
+	assert(img != NULL);
+	m_imgRect[m_num] = imgRect[Random::random(imgRect.size()-1)];
+
+	m_pos[m_num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right), Random::randomFloat(emitFrom.top, emitFrom.bottom));
 
 	//Add proper locations from m_imgRect to tex coord ptr array here
 	float* particleTexCoord = &m_texCoordPtr[m_num * 8];
-	float left = m_imgRect[m_num].left / (float)img->getWidth();
-	float right = m_imgRect[m_num].right / (float)img->getWidth();
-	float top = m_imgRect[m_num].top / (float)img->getHeight();
-	float bottom = m_imgRect[m_num].bottom / (float)img->getHeight();
+	float left = m_imgRect[m_num].left / (float)img->width;
+	float right = m_imgRect[m_num].right / (float)img->width;
+	float top = m_imgRect[m_num].top / (float)img->height;
+	float bottom = m_imgRect[m_num].bottom / (float)img->height;
 
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
 	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
@@ -232,11 +225,11 @@ void ParticleSystem::_newParticle()
 
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
-	float* particleTexCoord = &m_texCoordPtr[idx * 8];
-	float left = m_imgRect[m_num - 1].left / (float)img->getWidth();
-	float right = m_imgRect[m_num - 1].right / (float)img->getWidth();
-	float top = m_imgRect[m_num - 1].top / (float)img->getHeight();
-	float bottom = m_imgRect[m_num - 1].bottom / (float)img->getHeight();
+	float* particleTexCoord = &m_texCoordPtr[idx * 8]; 
+	float left = m_imgRect[m_num - 1].left / (float)img->width;
+	float right = m_imgRect[m_num - 1].right / (float)img->width;
+	float top = m_imgRect[m_num - 1].top / (float)img->height;
+	float bottom = m_imgRect[m_num - 1].bottom / (float)img->height;
 
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
 	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
@@ -527,7 +520,7 @@ void ParticleSystem::draw()
 	glUseProgram(program);
 
 	//Render everything in one pass
-	img->bindTexture();	//Bind once before we draw since all our particles will use one texture
+	glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
 
 	glEnableClientState(GL_COLOR_ARRAY);
 
