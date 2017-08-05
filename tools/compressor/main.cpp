@@ -12,13 +12,11 @@
 #include "StringUtils.h"
 #include "FileOperations.h"
 #include "tinyxml2.h"
-#include "Hash.h"
 
 #define PAD_32BIT 0x50444150
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
-#include "ResourceTypes.h"
 
 //Helper struct for compression
 typedef struct
@@ -28,7 +26,8 @@ typedef struct
 	unsigned int size;
 	uint64_t id;
 	std::string filename;
-} compressionHelper;
+	uint32_t type;	//One of the CompressionHeader types
+} CompressionHelper;
 
 typedef struct
 {
@@ -462,7 +461,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 
 	uint8_t* workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 
-	std::list<compressionHelper> compressedFiles;
+	std::list<CompressionHelper> compressedFiles;
 
 	for(std::list<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
@@ -470,17 +469,35 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		unsigned int size = 0;
 		unsigned char* decompressed;
 
+		CompressionHelper helper;
+		helper.header.type = RESOURCE_TYPE_UNKNOWN;	//Default unknown type
+
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
-			decompressed = extractImage(*i, &size);
+		{
+			decompressed = extractImage(*i, &size);	//TODO: Skip this, as we'll add the image/atlas later
+			helper.header.type = RESOURCE_TYPE_IMAGE;
+		}
 		else if(i->find(".font") != std::string::npos)
+		{
 			decompressed = extractFont(*i, &size);
+			helper.header.type = RESOURCE_TYPE_FONT;
+		}
 		else if(i->find("stringbank.xml") != std::string::npos)
+		{
 			decompressed = extractStringbank(*i, &size);
+			helper.header.type = RESOURCE_TYPE_STRINGBANK;
+		}
 		else if(i->find(".loop") != std::string::npos)
+		{
 			decompressed = extractSoundLoop(*i, &size);
+			helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
+		}
 		else
-			decompressed = FileOperations::readFile(*i, &size);
+		{
+			decompressed = FileOperations::readFile(*i, &size);	//Store as-is
+			std::cout << "Warning: unknown resource type for file " << *i << std::endl;
+		}
 
 		if(!size || !decompressed)
 		{
@@ -488,9 +505,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			continue;
 		}
 
-		compressionHelper helper;
 		helper.filename = *i;
-		helper.header.pad = PAD_32BIT;
 		helper.header.compressionType = COMPRESSION_FLAGS_WFLZ;
 		helper.header.decompressedSize = size;
 		uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper.header.decompressedSize));
@@ -539,7 +554,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	uint64_t curOffset = (uint64_t)sizeof(PakFileHeader) + (uint64_t)compressedFiles.size() * (uint64_t)sizeof(ResourcePtr);	//Start after both these
 
 	//Write resource pointers
-	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
@@ -550,7 +565,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	}
 
 	//Write resource data
-	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		fwrite(&i->header, 1, sizeof(CompressionHeader), fOut);
 		fwrite(i->data, 1, i->size, fOut);

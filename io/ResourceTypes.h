@@ -4,6 +4,9 @@
 
 #define VERSION_1_0		1
 
+#define f32_t float
+#define f64_t double
+
 //------------------------------------
 // Header of the .pak file
 //------------------------------------
@@ -39,9 +42,19 @@ typedef struct
 	uint32_t compressionType;	//One of the compression flags above
 	uint32_t compressedSize;
 	uint32_t decompressedSize;
-	uint32_t pad;
+	uint32_t type;				//One of the resource types below
 	//Followed by compressed data
 } CompressionHeader;
+
+#define RESOURCE_TYPE_UNKNOWN		0	//Default for don't care
+#define RESOURCE_TYPE_IMAGE			1
+#define RESOURCE_TYPE_IMAGE_ATLAS	2
+#define RESOURCE_TYPE_SOUND			3
+#define RESOURCE_TYPE_SOUND_LOOP	4
+#define RESOURCE_TYPE_FONT			5
+#define RESOURCE_TYPE_STRINGBANK	6
+//#define RESOURCE_TYPE_
+//etc
 
 
 //--------------------------------------------------------------
@@ -49,6 +62,13 @@ typedef struct
 //--------------------------------------------------------------
 #define TEXTURE_BPP_RGBA	32
 #define TEXTURE_BPP_RGB		24
+
+#define TEXTURE_FORMAT_RAW	0
+#define TEXTURE_FORMAT_ETC1	1
+#define TEXTURE_FORMAT_ETC2	2
+#define TEXTURE_FORMAT_DXT1	3
+#define TEXTURE_FORMAT_DXT3 4
+#define TEXTURE_FORMAT_DXT5 5
 
 typedef struct
 {
@@ -59,6 +79,23 @@ typedef struct
 	//Followed by image data
 } TextureHeader;
 
+typedef struct
+{
+	uint32_t atlasSize;	//Both width and height, since square
+	uint32_t numTextures;
+	uint32_t bpp;		//One of the texture BPPs above
+	uint32_t format;	//One of the texture formats above
+	//Followed by numTextures TextureRects
+	//Followed by image data
+} AtlasHeader;
+
+typedef struct
+{
+	uint64_t id;	//Image ID hash
+	uint32_t width;	//Width of image in pixels
+	uint32_t height;//Height of image in pixels
+	f32_t coordinates[8];	//UV texture coordinates for the image in the atlas
+} TextureRect;
 
 //--------------------------------------------------------------
 // Fonts
@@ -93,7 +130,7 @@ typedef struct
 	char languageID[4];	//ISO 639-1 (if existing) or 639-2 language code in all-lowercase (en for English, es for Spanish, etc). Should only be two or three chars, others '\0'
 	uint32_t offset;	//Offset from first StringDataPointer for a string's ID to the StringDataPointer for this language
 
-//For example, for languages en=0 and es=1, for a StringID that's number 7 in the list (8th entry), 
+	//For example, for languages en=0 and es=1, for a StringID that's number 7 in the list (8th entry), 
 	//en's StringDataPointer is number 7*2+0=14 and the English string can be found at that pointer's offset
 	//es's StringDataPointer is number 7*2+1=15 and the Spanish string can be found at that pointer's offset
 

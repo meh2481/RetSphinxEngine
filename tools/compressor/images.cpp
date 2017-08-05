@@ -20,12 +20,13 @@ typedef struct
 	int width;
 	int height;
 	unsigned char* buf;
-} Image;
+	uint64_t hash;
+} ImageHelper;
 
 //-----------------------------------------------------------------------------------------------
 // Helper functions
 //-----------------------------------------------------------------------------------------------
-void copyImage(unsigned char* buf, Image* img, unsigned short xPos, unsigned short yPos, int atlasW)
+void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsigned short yPos, int atlasW)
 {
 	//TODO: Offset by 1 in each dir and stretch last pixels
 	assert(img->comp == STBI_rgb_alpha || img->comp == STBI_rgb);
@@ -46,26 +47,78 @@ void copyImage(unsigned char* buf, Image* img, unsigned short xPos, unsigned sho
 	}
 }
 
-void packImage(stbrp_rect *rects, int rectSz, std::vector<Image>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
+void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
 {
-	unsigned char* destBuf = (unsigned char*)malloc(atlasW * atlasH * BPP);
-	memset(destBuf, 0, atlasW * atlasH * BPP);	//Clear dest buf
+	//First pass: Get number of actual packed rects
+	int num = 0;	
+	for(int i = 0; i < rectSz; i++)
+	{
+		stbrp_rect r = rects[i];
+		if(r.was_packed)
+			num++;
+	}
+
+	size_t imageSize = atlasW * atlasH * BPP;
+	size_t bufferSize = imageSize + sizeof(AtlasHeader) + sizeof(TextureRect) * num;
+
+	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
+	memset(destBuf, 0, bufferSize);	//Clear dest buf
+
+	//Create header
+	AtlasHeader* header = (AtlasHeader*)destBuf;
+	assert(atlasH == atlasW);
+	header->atlasSize = atlasH;
+	header->bpp = BPP;
+	header->format = TEXTURE_FORMAT_RAW;	//TODO
+	header->numTextures = num;
+
+	int curImg = 0;
 	for(int i = 0; i < rectSz; i++)
 	{
 		stbrp_rect r = rects[i];
 		if(r.was_packed)
 		{
-			Image img = images->at(r.id);
-			copyImage(destBuf, &img, r.x, r.y, atlasW);	//Copy image data over to dest buf
-			//TODO: Store coords
+			ImageHelper img = images->at(r.id);
+			copyImage(destBuf + (bufferSize - imageSize), &img, r.x, r.y, atlasW);	//Copy image data over to dest buf, in the proper location
+
+			//Store coords
+			TextureRect* rc = (TextureRect*)((uint64_t)destBuf + sizeof(AtlasHeader) + (sizeof(TextureRect) * curImg++));
+			rc->id = img.hash;
+			rc->height = img.height;
+			rc->width = img.width;
+
+			float actualX = r.x;
+			float actualY = atlasH - (r.y + img.height);	//Y is inverted
+
+			//Get UV coordinates
+			float top = actualY / (float)atlasH;
+			float left = actualX / (float)atlasW;
+			float right = (actualX + (float)img.width) / (float)atlasW;
+			float bottom = (actualY + (float)img.height) / (float)atlasH;
+
+			//CCW winding from lower left, x/y format
+			rc->coordinates[0] = left;
+			rc->coordinates[1] = bottom;
+			rc->coordinates[2] = right;
+			rc->coordinates[3] = bottom;
+			rc->coordinates[4] = right;
+			rc->coordinates[5] = top;
+			rc->coordinates[6] = left;
+			rc->coordinates[7] = top;
 		}
 	}
 
 	//DEBUG: Save img
 	std::ostringstream oss;
+	oss << filename << curAtlas << ".bin";
+	std::cout << "Save packed image binary " << oss.str() << std::endl;
+	FILE * fp = fopen(oss.str().c_str(), "wb");
+	fwrite(destBuf, 1, bufferSize, fp);
+	fclose(fp);
+	oss.clear();
 	oss << filename << curAtlas << ".png";
-	std::cout << "Save packed image " << oss.str() << std::endl;
-	if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf, atlasW * BPP))
+	std::cout << "Save packed image PNG " << oss.str() << std::endl;
+	if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf + (bufferSize - imageSize), atlasW * BPP))
 		std::cout << "stbi_write_png error while saving " << filename << ' ' << curAtlas << std::endl;
 
 	free(destBuf);
@@ -99,15 +152,16 @@ void packImages(const std::string& filename)
 {
 	int atlasSz = DEFAULT_SZ;
 
-	std::vector<Image> startImages;
+	std::vector<ImageHelper> startImages;
 	for(std::vector<std::string>::iterator i = images.begin(); i != images.end(); i++)
 	{
-		Image img;
+		ImageHelper img;
 
 		img.comp = 0;
 		img.width = 0;
 		img.height = 0;
 		img.buf = stbi_load(i->c_str(), &img.width, &img.height, &img.comp, 0);
+		img.hash = Hash::hash(i->c_str());
 
 		startImages.push_back(img);
 
@@ -122,6 +176,8 @@ void packImages(const std::string& filename)
 	stbrp_context context;
 	int numNodes = atlasSz;
 
+	//TODO: Take texture bpp's into account when determining which atlas to pack them into
+
 	stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * numNodes);
 	stbrp_rect *rects = (stbrp_rect*) malloc(sizeof(stbrp_rect) * startImages.size());
 	int rectsLeft = startImages.size();
@@ -133,8 +189,6 @@ void packImages(const std::string& filename)
 		rects[i].w = startImages[i].width;
 		rects[i].h = startImages[i].height;
 	}
-
-	//TODO: Sort rects by area, so largest ones first
 
 	//Main packing loop
 	int packed = 1;
@@ -160,7 +214,7 @@ void packImages(const std::string& filename)
 	images.clear();
 
 	//Clean up memory
-	for(std::vector<Image>::iterator i = startImages.begin(); i != startImages.end(); i++)
+	for(std::vector<ImageHelper>::iterator i = startImages.begin(); i != startImages.end(); i++)
 		stbi_image_free(i->buf);
 	free(nodes);
 	free(rects);

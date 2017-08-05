@@ -124,8 +124,8 @@ void Image::render(Vec2 size, float tilex, float tiley)
 		tilex, tiley, // upper right
         0.0f, tiley, // upper left
     };
-    glVertexPointer(2, GL_FLOAT, 0, &vertexData);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texCoords);
+    glVertexPointer(2, GL_FLOAT, 0, vertexData);
+    glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
     glDrawArrays(GL_QUADS, 0, 4);
 }
 
