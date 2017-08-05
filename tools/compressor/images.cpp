@@ -111,17 +111,21 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	//DEBUG: Save img
 	std::ostringstream oss;
 	oss << filename << curAtlas << ".bin";
-	std::cout << "Save packed image binary " << oss.str() << std::endl;
-	FILE * fp = fopen(oss.str().c_str(), "wb");
-	fwrite(destBuf, 1, bufferSize, fp);
-	fclose(fp);
-	oss.clear();
-	oss << filename << curAtlas << ".png";
-	std::cout << "Save packed image PNG " << oss.str() << std::endl;
-	if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf + (bufferSize - imageSize), atlasW * BPP))
-		std::cout << "stbi_write_png error while saving " << filename << ' ' << curAtlas << std::endl;
+	//std::cout << "Save packed image binary " << oss.str() << std::endl;
+	//FILE * fp = fopen(oss.str().c_str(), "wb");
+	//fwrite(destBuf, 1, bufferSize, fp);
+	//fclose(fp);
+	//oss.clear();
+	//oss << filename << curAtlas << ".png";
+	//std::cout << "Save packed image PNG " << oss.str() << std::endl;
+	//if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf + (bufferSize - imageSize), atlasW * BPP))
+	//	std::cout << "stbi_write_png error while saving " << filename << ' ' << curAtlas << std::endl;
+	CompressionHelper helper;
+	helper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
+	compressHelper(&helper, destBuf, bufferSize, oss.str());
+	addHelper(helper);
 
-	free(destBuf);
+	//free(destBuf);
 }
 
 void removeDone(stbrp_rect *rects, int* rectsz)

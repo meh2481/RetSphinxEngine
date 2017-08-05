@@ -18,17 +18,6 @@
 
 #include "stb_image.h"
 
-//Helper struct for compression
-typedef struct
-{
-	CompressionHeader header;
-	uint8_t* data;
-	unsigned int size;
-	uint64_t id;
-	std::string filename;
-	uint32_t type;	//One of the CompressionHeader types
-} CompressionHelper;
-
 typedef struct
 {
 	float left, right, top, bottom;
@@ -279,7 +268,6 @@ uint32_t getCodepoint(const char* str)
 
 unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 {
-	addImage(filename);	//TODO: Instead of this whole thing
 	int comp = 0;
 	int width = 0;
 	int height = 0;
@@ -453,15 +441,49 @@ std::list<std::string> readFilenames(const std::string& filelistFile)
 	return lFilenames;
 }
 
+static uint8_t* workMem;
+void compressHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size, const std::string& filename)
+{
+	helper->filename = filename;
+	helper->header.compressionType = COMPRESSION_FLAGS_WFLZ;
+	helper->header.decompressedSize = size;
+	uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper->header.decompressedSize));
+	helper->header.compressedSize = wfLZ_CompressFast(decompressed, size, compressed, workMem, 0);
+
+	//See if compression made the file larger
+	if(helper->header.compressedSize >= helper->header.decompressedSize)
+	{
+		//It did; use the uncompressed data instead
+		helper->header.compressionType = COMPRESSION_FLAGS_UNCOMPRESSED;
+		helper->header.compressedSize = helper->header.decompressedSize;
+		helper->data = decompressed;
+		free(compressed);
+	}
+	else
+	{
+		//It didn't; use the compressed data
+		helper->data = compressed;
+		free(decompressed);
+	}
+
+	//Add this compression helper to our list
+	helper->size = helper->header.compressedSize;
+	helper->id = Hash::hash(filename.c_str());
+}
+
+static std::list<CompressionHelper> compressedFiles;
+void addHelper(const CompressionHelper& helper)
+{
+	compressedFiles.push_back(helper);
+}
+
 void compress(std::list<std::string> filesToPak, const std::string& in)
 {
+	compressedFiles.clear();
+
 	std::string pakFilename = remove_extension(in);
 	pakFilename += ".pak";
 	std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
-
-	uint8_t* workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
-
-	std::list<CompressionHelper> compressedFiles;
 
 	for(std::list<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
@@ -475,8 +497,10 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
 		{
-			decompressed = extractImage(*i, &size);	//TODO: Skip this, as we'll add the image/atlas later
-			helper.header.type = RESOURCE_TYPE_IMAGE;
+			addImage(*i);	//TODO: Exclude 3D model textures somehow
+			continue;
+			//decompressed = extractImage(*i, &size);	//TODO: Skip this, as we'll add the image/atlas later
+			//helper.header.type = RESOURCE_TYPE_IMAGE;
 		}
 		else if(i->find(".font") != std::string::npos)
 		{
@@ -493,6 +517,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			decompressed = extractSoundLoop(*i, &size);
 			helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
 		}
+		//TODO: A 3D model is the linking between a mesh ID and a texture ID
 		else
 		{
 			decompressed = FileOperations::readFile(*i, &size);	//Store as-is
@@ -505,34 +530,12 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			continue;
 		}
 
-		helper.filename = *i;
-		helper.header.compressionType = COMPRESSION_FLAGS_WFLZ;
-		helper.header.decompressedSize = size;
-		uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper.header.decompressedSize));
-		helper.header.compressedSize = wfLZ_CompressFast(decompressed, size, compressed, workMem, 0);
-
-		//See if compression made the file larger
-		if(helper.header.compressedSize >= helper.header.decompressedSize)
-		{
-			//It did; use the uncompressed data instead
-			helper.header.compressionType = COMPRESSION_FLAGS_UNCOMPRESSED;
-			helper.header.compressedSize = helper.header.decompressedSize;
-			helper.data = decompressed;
-			free(compressed);
-		}
-		else
-		{
-			//It didn't; use the compressed data
-			helper.data = compressed;
-			free(decompressed);
-		}
-
-		//Add this compression helper to our list
-		helper.size = helper.header.compressedSize;
-		helper.id = Hash::hash(i->c_str());
-
-		compressedFiles.push_back(helper);
+		compressHelper(&helper, decompressed, size, *i);
+		addHelper(helper);
 	}
+
+	//Now that we have all images, pack any atlases
+	packImages(in);
 
 	//Open output file
 	FILE *fOut = fopen(pakFilename.c_str(), "wb");
@@ -573,27 +576,27 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		free(i->data);	//Free image data while we're at it
 	}
 
-	//Free our WFLZ working memory
-	free(workMem);
-
 	//Close output file
 	fclose(fOut);
 }
 
 int main(int argc, char** argv)
 {
+	workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 	std::list<std::string> sFilelistNames;
+
 	//Parse commandline
 	for(int i = 1; i < argc; i++)
 	{
 		std::string s = argv[i];
 		sFilelistNames.push_back(s);
 	}
+
 	//Compress files
 	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
-	{
 		compress(readFilenames(*i), *i);
-		packImages(*i);
-	}
+
+	//Free our WFLZ working memory
+	free(workMem);
 	return 0;
 }
