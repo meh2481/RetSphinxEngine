@@ -53,6 +53,10 @@ typedef struct
 #define RESOURCE_TYPE_SOUND_LOOP	4
 #define RESOURCE_TYPE_FONT			5
 #define RESOURCE_TYPE_STRINGBANK	6
+#define RESOURCE_TYPE_OBJ			7
+#define RESOURCE_TYPE_MESH			8
+#define RESOURCE_TYPE_JSON			9
+#define RESOURCE_TYPE_XML			10	//Prolly wanna remove this at some point as we migrate away from xml formats
 //#define RESOURCE_TYPE_
 //etc
 
@@ -60,40 +64,28 @@ typedef struct
 //--------------------------------------------------------------
 // Textures
 //--------------------------------------------------------------
-#define TEXTURE_BPP_RGBA	32
 #define TEXTURE_BPP_RGB		24
+#define TEXTURE_BPP_RGBA	32
 
-#define TEXTURE_FORMAT_RAW	0
+#define TEXTURE_FORMAT_RAW	0	//Image is just plain RGB or RGBA values
 #define TEXTURE_FORMAT_ETC1	1
 #define TEXTURE_FORMAT_ETC2	2
 #define TEXTURE_FORMAT_DXT1	3
 #define TEXTURE_FORMAT_DXT3 4
 #define TEXTURE_FORMAT_DXT5 5
 
-typedef struct
+typedef struct //Structure for texture data (Non-atlas'ed)
 {
-	uint32_t bpp; //One of the texture BPPs above
-	uint32_t width;
-	uint32_t height;
-	uint32_t pad;
+	uint32_t bpp;		//One of the texture BPPs above
+	uint32_t width;		//Width of image
+	uint32_t height;	//Height of image
+	uint32_t format;	//One of the texture formats above
 	//Followed by image data
 } TextureHeader;
 
-typedef struct
+typedef struct //Structure for image indices into the atlas TextureHeader
 {
-	uint32_t atlasSize;	//Both width and height, since square
-	uint32_t numTextures;
-	uint32_t bpp;		//One of the texture BPPs above
-	uint32_t format;	//One of the texture formats above
-	//Followed by numTextures TextureRects
-	//Followed by image data
-} AtlasHeader;
-
-typedef struct
-{
-	uint64_t id;	//Image ID hash
-	uint32_t width;	//Width of image in pixels
-	uint32_t height;//Height of image in pixels
+	uint64_t atlasId;	//Atlas ID hash
 	f32_t coordinates[8];	//UV texture coordinates for the image in the atlas
 } TextureRect;
 

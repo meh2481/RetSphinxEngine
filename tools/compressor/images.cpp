@@ -12,7 +12,7 @@
 #include <sstream>
 
 #define DEFAULT_SZ 2048
-#define BPP 4
+#define BYTES_PER_PIXEL 4
 
 typedef struct
 {
@@ -33,7 +33,7 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 	unsigned char* src = img->buf;
 	for(int y = 0; y < img->height; y++)
 	{
-		unsigned char* dst = &buf[(atlasW * BPP * (y + yPos)) + (xPos * BPP)];
+		unsigned char* dst = &buf[(atlasW * BYTES_PER_PIXEL * (y + yPos)) + (xPos * BYTES_PER_PIXEL)];
 		for(int x = 0; x < img->width; x++)
 		{
 			*dst++ = *src++;	//R
@@ -49,44 +49,31 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 
 void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
 {
-	//First pass: Get number of actual packed rects
-	int num = 0;	
-	for(int i = 0; i < rectSz; i++)
-	{
-		stbrp_rect r = rects[i];
-		if(r.was_packed)
-			num++;
-	}
-
-	size_t imageSize = atlasW * atlasH * BPP;
-	size_t bufferSize = imageSize + sizeof(AtlasHeader) + sizeof(TextureRect) * num;
-
+	//Create destination buffer for atlas
+	size_t bufferSize = atlasW * atlasH * BYTES_PER_PIXEL + sizeof(TextureHeader);
 	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
 	memset(destBuf, 0, bufferSize);	//Clear dest buf
-
-	//Create header
-	AtlasHeader* header = (AtlasHeader*)destBuf;
-	assert(atlasH == atlasW);
-	header->atlasSize = atlasH;
-	header->bpp = BPP;
-	header->format = TEXTURE_FORMAT_RAW;	//TODO
-	header->numTextures = num;
-
-	int curImg = 0;
+	
+	//Create compression helper for atlas
+	std::ostringstream oss;
+	oss << filename << curAtlas << ".bin";
+	CompressionHelper atlasHelper;
+	atlasHelper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
+	atlasHelper.id = Hash::hash(oss.str().c_str());
+	
+	//Create Textures that point to locations in this atlas
 	for(int i = 0; i < rectSz; i++)
 	{
 		stbrp_rect r = rects[i];
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(destBuf + (bufferSize - imageSize), &img, r.x, r.y, atlasW);	//Copy image data over to dest buf, in the proper location
+			copyImage(destBuf + sizeof(TextureHeader), &img, r.x, r.y, atlasW);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
-			TextureRect* rc = (TextureRect*)((uint64_t)destBuf + sizeof(AtlasHeader) + (sizeof(TextureRect) * curImg++));
-			rc->id = img.hash;
-			rc->height = img.height;
-			rc->width = img.width;
-
+			TextureRect* rc = (TextureRect*)malloc(sizeof(TextureRect));
+			rc->atlasId = atlasHelper.id;
+			
 			float actualX = r.x;
 			float actualY = atlasH - (r.y + img.height);	//Y is inverted
 
@@ -105,27 +92,27 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			rc->coordinates[5] = top;
 			rc->coordinates[6] = left;
 			rc->coordinates[7] = top;
+
+			//Add texture to pak
+			CompressionHelper textureHelper;
+			textureHelper.header.type = RESOURCE_TYPE_IMAGE;
+			textureHelper.id = img.hash;
+			createCompressionHelper(&textureHelper, (unsigned char*)rc, sizeof(TextureRect));
+			addHelper(textureHelper);
 		}
 	}
 
-	//DEBUG: Save img
-	std::ostringstream oss;
-	oss << filename << curAtlas << ".bin";
-	//std::cout << "Save packed image binary " << oss.str() << std::endl;
-	//FILE * fp = fopen(oss.str().c_str(), "wb");
-	//fwrite(destBuf, 1, bufferSize, fp);
-	//fclose(fp);
-	//oss.clear();
-	//oss << filename << curAtlas << ".png";
-	//std::cout << "Save packed image PNG " << oss.str() << std::endl;
-	//if(!stbi_write_png(oss.str().c_str(), atlasW, atlasH, BPP, destBuf + (bufferSize - imageSize), atlasW * BPP))
-	//	std::cout << "stbi_write_png error while saving " << filename << ' ' << curAtlas << std::endl;
-	CompressionHelper helper;
-	helper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
-	compressHelper(&helper, destBuf, bufferSize, oss.str());
-	addHelper(helper);
+	//Create header for atlas
+	TextureHeader* header = (TextureHeader*)destBuf;
+	assert(atlasH == atlasW);
+	header->height = atlasH;
+	header->width = atlasW;
+	header->bpp = BYTES_PER_PIXEL;
+	header->format = TEXTURE_FORMAT_RAW;	//TODO Support different texture formats
 
-	//free(destBuf);
+	//Add atlas to .pak
+	createCompressionHelper(&atlasHelper, destBuf, bufferSize);
+	addHelper(atlasHelper);
 }
 
 void removeDone(stbrp_rect *rects, int* rectsz)

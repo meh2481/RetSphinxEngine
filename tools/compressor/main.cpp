@@ -442,9 +442,8 @@ std::list<std::string> readFilenames(const std::string& filelistFile)
 }
 
 static uint8_t* workMem;
-void compressHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size, const std::string& filename)
+void createCompressionHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size)
 {
-	helper->filename = filename;
 	helper->header.compressionType = COMPRESSION_FLAGS_WFLZ;
 	helper->header.decompressedSize = size;
 	uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper->header.decompressedSize));
@@ -468,7 +467,7 @@ void compressHelper(CompressionHelper* helper, unsigned char* decompressed, unsi
 
 	//Add this compression helper to our list
 	helper->size = helper->header.compressedSize;
-	helper->id = Hash::hash(filename.c_str());
+	//helper->id = Hash::hash(filename.c_str());
 }
 
 static std::list<CompressionHelper> compressedFiles;
@@ -493,13 +492,14 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 
 		CompressionHelper helper;
 		helper.header.type = RESOURCE_TYPE_UNKNOWN;	//Default unknown type
+		helper.id = Hash::hash(i->c_str());
 
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
 		{
 			addImage(*i);	//TODO: Exclude 3D model textures somehow
-			continue;
-			//decompressed = extractImage(*i, &size);	//TODO: Skip this, as we'll add the image/atlas later
+			continue;		//TODO: Skip this, as we'll add the image/atlas later
+			//decompressed = extractImage(*i, &size);	
 			//helper.header.type = RESOURCE_TYPE_IMAGE;
 		}
 		else if(i->find(".font") != std::string::npos)
@@ -517,7 +517,22 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			decompressed = extractSoundLoop(*i, &size);
 			helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
 		}
-		//TODO: A 3D model is the linking between a mesh ID and a texture ID
+		else if(i->find(".tiny3d") != std::string::npos)
+		{
+			//TODO: A 3D model is the linking between a mesh ID and a texture ID
+			helper.header.type = RESOURCE_TYPE_OBJ;
+			decompressed = FileOperations::readFile(*i, &size);
+		}
+		else if(i->find(".json") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_JSON;
+			decompressed = FileOperations::readFile(*i, &size);
+		}
+		else if(i->find(".xml") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_XML;
+			decompressed = FileOperations::readFile(*i, &size);
+		}
 		else
 		{
 			decompressed = FileOperations::readFile(*i, &size);	//Store as-is
@@ -530,7 +545,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			continue;
 		}
 
-		compressHelper(&helper, decompressed, size, *i);
+		createCompressionHelper(&helper, decompressed, size);
 		addHelper(helper);
 	}
 

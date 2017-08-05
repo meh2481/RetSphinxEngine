@@ -10,13 +10,12 @@ typedef struct
 	uint8_t* data;
 	unsigned int size;
 	uint64_t id;
-	std::string filename;
 	uint32_t type;	//One of the CompressionHeader types
 } CompressionHelper;
 
 //main.cpp
 void addHelper(const CompressionHelper& helper);
-void compressHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size, const std::string& filename);
+void createCompressionHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size);
 
 //images.cpp
 void addImage(const std::string& img);
