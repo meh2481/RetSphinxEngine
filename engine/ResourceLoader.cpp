@@ -898,7 +898,7 @@ Img* ResourceLoader::loadImageFromFile(std::string filename)
 	unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
 	
 	int mode = GL_RGBA;     // RGBA 32bit
-	if(comp == 3) // RGB 24bit
+	if(comp == STBI_rgb) // RGB 24bit
 		mode = GL_RGB;
 	
 	if((cBuf == 0) || (width == 0) || (height == 0))

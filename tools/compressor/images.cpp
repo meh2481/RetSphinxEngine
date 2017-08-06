@@ -12,7 +12,8 @@
 #include <sstream>
 
 #define DEFAULT_SZ 2048
-#define BYTES_PER_PIXEL 4
+#define BYTES_PER_PIXEL_RGBA 4
+#define BYTES_PER_PIXEL_RGB  3
 
 typedef struct
 {
@@ -26,22 +27,22 @@ typedef struct
 //-----------------------------------------------------------------------------------------------
 // Helper functions
 //-----------------------------------------------------------------------------------------------
-void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsigned short yPos, int atlasW)
+void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsigned short yPos, int atlasW, int bytesPerPixel)
 {
 	//TODO: Offset by 1 in each dir and stretch last pixels
 	assert(img->comp == STBI_rgb_alpha || img->comp == STBI_rgb);
 	unsigned char* src = img->buf;
 	for(int y = 0; y < img->height; y++)
 	{
-		unsigned char* dst = &buf[(atlasW * BYTES_PER_PIXEL * (y + yPos)) + (xPos * BYTES_PER_PIXEL)];
+		unsigned char* dst = &buf[(atlasW * bytesPerPixel * (y + yPos)) + (xPos * bytesPerPixel)];
 		for(int x = 0; x < img->width; x++)
 		{
 			*dst++ = *src++;	//R
 			*dst++ = *src++;	//G
 			*dst++ = *src++;	//B
-			if(img->comp == STBI_rgb_alpha)
+			if(img->comp == STBI_rgb_alpha && bytesPerPixel == BYTES_PER_PIXEL_RGBA)
 				*dst++ = *src++;	//A
-			else
+			else if(bytesPerPixel == BYTES_PER_PIXEL_RGBA)
 				*dst++ = 255;	//Alpha of 255
 		}
 	}
@@ -49,8 +50,25 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 
 void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
 {
+	//First pass: See if RGB or RGBA
+	//TODO: Probably want to pack only RGB->RGB and RGBA->RGBA unless there's some kind of space saving we can do?
+	int bytesPerPixel = BYTES_PER_PIXEL_RGB;
+	for(int i = 0; i < rectSz; i++)
+	{
+		stbrp_rect r = rects[i];
+		if(r.was_packed)
+		{
+			ImageHelper img = images->at(r.id);
+			if(img.comp == STBI_rgb_alpha)
+			{
+				bytesPerPixel = BYTES_PER_PIXEL_RGBA;
+				break;
+			}
+		}
+	}
+
 	//Create destination buffer for atlas
-	size_t bufferSize = atlasW * atlasH * BYTES_PER_PIXEL + sizeof(TextureHeader);
+	size_t bufferSize = atlasW * atlasH * bytesPerPixel + sizeof(TextureHeader);
 	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
 	memset(destBuf, 0, bufferSize);	//Clear dest buf
 	
@@ -68,7 +86,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(destBuf + sizeof(TextureHeader), &img, r.x, r.y, atlasW);	//Copy image data over to dest buf, in the proper location
+			copyImage(destBuf + sizeof(TextureHeader), &img, r.x, r.y, atlasW, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
 			TextureRect* rc = (TextureRect*)malloc(sizeof(TextureRect));
@@ -107,8 +125,15 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	assert(atlasH == atlasW);
 	header->height = atlasH;
 	header->width = atlasW;
-	header->bpp = BYTES_PER_PIXEL;
+	header->bpp = bytesPerPixel * 8;
 	header->format = TEXTURE_FORMAT_RAW;	//TODO Support different texture formats
+
+	//TEST: Output PNG
+	std::ostringstream oss2;
+	oss2 << filename << " - atlas " << curAtlas << ".png";
+	std::cout << "Save " << oss2.str() << std::endl;
+	if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(TextureHeader), atlasW * bytesPerPixel))
+		std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 
 	//Add atlas to .pak
 	createCompressionHelper(&atlasHelper, destBuf, bufferSize);
