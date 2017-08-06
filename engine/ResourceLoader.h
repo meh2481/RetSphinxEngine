@@ -29,6 +29,7 @@ class ResourceLoader
 	Img* loadImageFromFile(std::string filename); 
 	Img* loadImageFromData(unsigned char* data, unsigned int len);
 	Img* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
+	TextureHandle* getAtlas(uint64_t atlasId);
 
 	ResourceLoader() {};
 public:

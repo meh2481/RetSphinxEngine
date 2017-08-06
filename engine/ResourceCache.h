@@ -18,12 +18,15 @@ class ResourceCache
 
 	std::map<uint64_t, std::string> textIDMap;
 
+	std::map<uint64_t, TextureHandle*> textureIDMap;
+
 	//std::map<uint64_t, MouseCursor*> cursorIDMap;
 
 	void clearImages();
 	void clearFonts();
 	void clearMeshes();
 	void clearTextFiles();
+	void clearTextures();
 	//void clearCursors();
 
 public:
@@ -43,6 +46,9 @@ public:
 
 	std::string findTextFile(uint64_t id);
 	void addTextFile(uint64_t id, const std::string& str);
+
+	TextureHandle* findTexture(uint64_t id);
+	void addTexture(uint64_t id, TextureHandle* handle);
 
 	void clear();
 };

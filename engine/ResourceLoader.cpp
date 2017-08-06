@@ -913,29 +913,44 @@ Img* ResourceLoader::loadImageFromFile(std::string filename)
 
 Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 {
-	if(len < sizeof(TextureHeader))
+	if(len < sizeof(TextureRect))
 	{
 		LOG(ERROR) << "Decompressed image data smaller than texture header";
-		return;
+		return NULL;
+	}
+	if(len > sizeof(TextureRect))
+	{
+		LOG(WARNING) << "Ignoring extra " << len - sizeof(TextureRect) << " bytes for texture";
 	}
 	
 	//Read header
-	TextureHeader header;
-	memcpy(&header, data, sizeof(TextureHeader));
-	data += sizeof(TextureHeader);
-	len -= sizeof(TextureHeader);
+	TextureRect header;
+	memcpy(&header, data, sizeof(TextureRect));
+
+	TextureHandle* atlas = getAtlas(header.atlasId);
+
+	Img* img = new Img;
+	img->width = atlas->width;
+	img->height = atlas->height;
+	memcpy(img->tex.uv, header.coordinates, sizeof(float) * 8);
+	img->tex.tex = atlas->tex;
+
+	return img;
+
+	//data += sizeof(TextureHeader);
+	//len -= sizeof(TextureHeader);
 	
-	if(len < header.width * header.height * header.bpp / 8)
-	{
-		LOG(ERROR) << "Insufficient image data. Expected: " << header.width * header.height * header.bpp / 8 << ", actual: " << len;
-		return;
-	}
-	
-	int mode = GL_RGBA;     // RGBA 32bit
-	if(header.bpp == TEXTURE_BPP_RGB) // RGB 24bit
-	mode = GL_RGB;
-	
-	bindImage(data, header.width, header.height, mode);
+	//if(len < header.width * header.height * header.bpp / 8)
+	//{
+	//	LOG(ERROR) << "Insufficient image data. Expected: " << header.width * header.height * header.bpp / 8 << ", actual: " << len;
+	//	return;
+	//}
+	//
+	//int mode = GL_RGBA;     // RGBA 32bit
+	//if(header.bpp == TEXTURE_BPP_RGB) // RGB 24bit
+	//	mode = GL_RGB;
+	//
+	//bindImage(data, header.width, header.height, mode);
 }
 
 Img* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs)
@@ -953,5 +968,42 @@ Img* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned
 	glTexImage2D(GL_TEXTURE_2D, 0, mode, img->width, img->height, 0, mode, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	return img;
 }
 
+TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
+{
+	LOG(TRACE) << "Loading image atlas " << atlasId;
+	TextureHandle* texHandle = m_cache->findTexture(atlasId);
+	if(!texHandle)	//This image isn't here; load it
+	{
+		LOG(TRACE) << "Cache miss, load atlas from pak";
+
+		unsigned int len = 0;
+		unsigned char* buf = m_pakLoader->loadResource(atlasId, &len);
+		if(buf == NULL || len < sizeof(TextureHeader))
+		{
+			LOG(ERROR) << "Unable to load image atlas " << atlasId << " from pak";
+			return NULL;
+		}
+
+		//TODO: Don't re-use Img code here, thazzdumb
+		TextureHeader* header = (TextureHeader*)buf;
+		int mode = GL_RGBA;
+		if(header->bpp == 24)
+			mode = GL_RGB;
+		Img* img = bindImage(buf + sizeof(TextureHeader), header->width, header->height, mode, default_uvs);
+
+		texHandle = new TextureHandle;
+		texHandle->height = img->height;
+		texHandle->width = img->width;
+		texHandle->tex = img->tex.tex;
+
+		delete img;
+		free(buf);
+
+		m_cache->addTexture(atlasId, texHandle);	//Add to the cache
+	}
+	return texHandle;
+}

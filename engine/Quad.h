@@ -1,6 +1,14 @@
 #pragma once
 #include "SDL_opengl.h"
 
+//TODO: Don't like the redundant structures here
+typedef struct
+{
+	GLuint tex;
+	unsigned int width;
+	unsigned int height;
+} TextureHandle;
+
 typedef struct
 {
 	GLuint tex;

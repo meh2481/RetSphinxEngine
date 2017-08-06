@@ -75,7 +75,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			rc->atlasId = atlasHelper.id;
 			
 			float actualX = r.x;
-			float actualY = atlasH - (r.y + img.height);	//Y is inverted
+			float actualY = r.y;	//Y is inverted
 
 			//Get UV coordinates
 			float top = actualY / (float)atlasH;
@@ -83,7 +83,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			float right = (actualX + (float)img.width) / (float)atlasW;
 			float bottom = (actualY + (float)img.height) / (float)atlasH;
 
-			//CCW winding from lower left, x/y format
+			//CCW winding from lower left (Inverted Y for some reason), x/y format
 			rc->coordinates[0] = left;
 			rc->coordinates[1] = bottom;
 			rc->coordinates[2] = right;

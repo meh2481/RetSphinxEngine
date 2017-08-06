@@ -78,6 +78,7 @@ void ResourceCache::clear()
 	clearMeshes();
 	clearFonts();
 	clearTextFiles();
+	clearTextures();
 //	clearCursors();
 }
 
@@ -107,9 +108,29 @@ void ResourceCache::clearTextFiles()
 	textIDMap.clear();
 }
 
+void ResourceCache::clearTextures()
+{
+	for(std::map<uint64_t, TextureHandle*>::iterator i = textureIDMap.begin(); i != textureIDMap.end(); i++)
+		delete (i->second);
+	textureIDMap.clear();
+}
+
 //void ResourceCache::clearCursors()
 //{
 //	for(map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.begin(); i != cursorIDMap.end(); i++)
 //		delete (i->second);
 //	cursorIDMap.clear();
 //}
+
+TextureHandle* ResourceCache::findTexture(uint64_t id)
+{
+	std::map<uint64_t, TextureHandle*>::iterator i = textureIDMap.find(id);
+	if(i == textureIDMap.end())
+		return NULL;
+	return i->second;
+}
+
+void ResourceCache::addTexture(uint64_t id, TextureHandle* handle)
+{
+	textureIDMap[id] = handle;
+}
