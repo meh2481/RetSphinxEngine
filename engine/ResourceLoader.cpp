@@ -992,7 +992,7 @@ TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 		//TODO: Don't re-use Img code here, thazzdumb
 		TextureHeader* header = (TextureHeader*)buf;
 		int mode = GL_RGBA;
-		if(header->bpp == 24)
+		if(header->bpp == TEXTURE_BPP_RGB)
 			mode = GL_RGB;
 		Img* img = bindImage(buf + sizeof(TextureHeader), header->width, header->height, mode, default_uvs);
 
