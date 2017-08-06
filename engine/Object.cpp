@@ -73,8 +73,19 @@ void Object::draw(bool bDebugInfo)
 				//	img->renderLattice(meshLattice, meshSize);
 				//else
 
-				//TODO
-				img->render(meshSize);
+				Quad q;
+				q.tex = img->tex;
+				q.pos[0] = -meshSize.x / 2.0f;
+				q.pos[1] = meshSize.y / 2.0f; // upper left
+				q.pos[2] = meshSize.x / 2.0f;
+				q.pos[3] = meshSize.y / 2.0f; // upper right
+				q.pos[4] = meshSize.x / 2.0f;
+				q.pos[5] = -meshSize.y / 2.0f; // lower right
+				q.pos[6] = -meshSize.x / 2.0f;
+				q.pos[7] = -meshSize.y / 2.0f; // lower left
+				Draw::drawQuad(&q);
+
+				//img->render(meshSize);
 				
 				//if(bDebugInfo && meshLattice)
 				//{
@@ -229,8 +240,18 @@ void ObjSegment::draw(bool bDebugInfo)
 			//	img->renderLattice(lat, size);
 			//else
 
-			//TODO
-			img->render(size, tile.x, tile.y);
+			Quad q;
+			q.tex = img->tex;
+			q.pos[0] = -size.x / 2.0f;
+			q.pos[1] = size.y / 2.0f; // upper left
+			q.pos[2] = size.x / 2.0f;
+			q.pos[3] = size.y / 2.0f; // upper right
+			q.pos[4] = size.x / 2.0f;
+			q.pos[5] = -size.y / 2.0f; // lower right
+			q.pos[6] = -size.x / 2.0f;
+			q.pos[7] = -size.y / 2.0f; // lower left
+			Draw::drawQuad(&q);
+			//img->render(size, tile.x, tile.y);
 		}
 	}
 	else
@@ -257,8 +278,18 @@ void ObjSegment::draw(bool bDebugInfo)
 			//else
 				
 			
-			//TODO
-			img->render(size, tile.x, tile.y);
+			Quad q;
+			q.tex = img->tex;
+			q.pos[0] = -size.x / 2.0f;
+			q.pos[1] = size.y / 2.0f; // upper left
+			q.pos[2] = size.x / 2.0f;
+			q.pos[3] = size.y / 2.0f; // upper right
+			q.pos[4] = size.x / 2.0f;
+			q.pos[5] = -size.y / 2.0f; // lower right
+			q.pos[6] = -size.x / 2.0f;
+			q.pos[7] = -size.y / 2.0f; // lower left
+			Draw::drawQuad(&q);
+			//img->render(size, tile.x, tile.y);
 		}
 	}
 	glPopMatrix();

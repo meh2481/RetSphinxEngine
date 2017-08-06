@@ -49,8 +49,7 @@ Img* ResourceLoader::getImage(uint64_t hashID)
 		if(resource && len)
 		{
 			LOG(TRACE) << "Pak hit - load " << hashID << " from data";
-			img = new Img();
-			TODO
+			img = loadImageFromData(resource, len);
 			m_cache->addImage(hashID, img);
 			free(resource);						//Free memory
 		}
@@ -70,8 +69,7 @@ Img* ResourceLoader::getImage(const std::string& sID)
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Attempting to load from file";
-		img = new Img();				//Create this image
-		TODO
+		img = loadImageFromFile(sID);				//Create this image
 		m_cache->addImage(hashVal, img);	//Add to the cache
 	}
 	return img;
@@ -883,3 +881,77 @@ SoundLoop* ResourceLoader::getSoundLoop(const std::string & sID)
 	//Don't load song looping from file
 	return NULL;
 }
+
+static const float default_uvs[] =
+{
+	0.0f, 0.0f, // lower left
+	1.0f, 0.0f, // lower right
+	1.0f, 1.0f, // upper right
+	0.0f, 1.0f, // upper left
+};
+
+Img* ResourceLoader::loadImageFromFile(std::string filename)
+{
+	int comp = 0;
+	int width = 0;
+	int height = 0;
+	unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
+	
+	int mode = GL_RGBA;     // RGBA 32bit
+	if(comp == 3) // RGB 24bit
+		mode = GL_RGB;
+	
+	if((cBuf == 0) || (width == 0) || (height == 0))
+	{
+		LOG(ERROR) << "Unable to load image " << filename;
+		return NULL;
+	}
+	
+	bindImage(cBuf, width, height, mode, default_uvs);
+	stbi_image_free(cBuf);
+}
+
+Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
+{
+	if(len < sizeof(TextureHeader))
+	{
+		LOG(ERROR) << "Decompressed image data smaller than texture header";
+		return;
+	}
+	
+	//Read header
+	TextureHeader header;
+	memcpy(&header, data, sizeof(TextureHeader));
+	data += sizeof(TextureHeader);
+	len -= sizeof(TextureHeader);
+	
+	if(len < header.width * header.height * header.bpp / 8)
+	{
+		LOG(ERROR) << "Insufficient image data. Expected: " << header.width * header.height * header.bpp / 8 << ", actual: " << len;
+		return;
+	}
+	
+	int mode = GL_RGBA;     // RGBA 32bit
+	if(header.bpp == TEXTURE_BPP_RGB) // RGB 24bit
+	mode = GL_RGB;
+	
+	bindImage(data, header.width, header.height, mode);
+}
+
+Img* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs)
+{
+	Img* img = new Img;
+	img->width = width;
+	img->height = height;
+	memcpy(img->tex.uv, uvs, sizeof(float) * 8);
+	
+	//generate an OpenGL texture ID for this texture
+	glGenTextures(1, &img->tex.tex);
+	//bind to the new texture ID
+	glBindTexture(GL_TEXTURE_2D, img->tex.tex);
+	//store the texture data for OpenGL use
+	glTexImage2D(GL_TEXTURE_2D, 0, mode, img->width, img->height, 0, mode, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+

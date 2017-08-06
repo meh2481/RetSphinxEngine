@@ -18,4 +18,9 @@ typedef struct
 	unsigned int width;		//Width in pixels
 	unsigned int height;	//Height in pixels
 	Texture tex;
-} Img;	//TODO Rename Image when migration is done
+} Img;	//TODO Rename to Image when migration is done
+
+namespace Draw
+{
+	void drawQuad(Quad* q);	//Yeeeeaaaaaaah
+}

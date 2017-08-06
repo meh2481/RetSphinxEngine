@@ -26,6 +26,9 @@ class ResourceLoader
 	std::string m_sPakDir;
 
 	std::string readTextFile(const std::string& filename);
+	Img* loadImageFromFile(std::string filename); 
+	Img* loadImageFromData(unsigned char* data, unsigned int len);
+	Img* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
 
 	ResourceLoader() {};
 public:
