@@ -884,10 +884,10 @@ SoundLoop* ResourceLoader::getSoundLoop(const std::string & sID)
 
 static const float default_uvs[] =
 {
-	0.0f, 0.0f, // lower left
-	1.0f, 0.0f, // lower right
-	1.0f, 1.0f, // upper right
-	0.0f, 1.0f, // upper left
+	0.0f, 1.0f, // lower left
+	1.0f, 1.0f, // lower right
+	1.0f, 0.0f, // upper right
+	0.0f, 0.0f, // upper left
 };
 
 Img* ResourceLoader::loadImageFromFile(std::string filename)
@@ -907,8 +907,9 @@ Img* ResourceLoader::loadImageFromFile(std::string filename)
 		return NULL;
 	}
 	
-	bindImage(cBuf, width, height, mode, default_uvs);
+	Img* img = bindImage(cBuf, width, height, mode, default_uvs);
 	stbi_image_free(cBuf);
+	return img;
 }
 
 Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
@@ -929,7 +930,7 @@ Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 
 	TextureHandle* atlas = getAtlas(header.atlasId);
 
-	Img* img = new Img;
+	Img* img = new Img();
 	img->width = atlas->width;
 	img->height = atlas->height;
 	memcpy(img->tex.uv, header.coordinates, sizeof(float) * 8);
@@ -955,7 +956,7 @@ Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 
 Img* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs)
 {
-	Img* img = new Img;
+	Img* img = new Img();
 	img->width = width;
 	img->height = height;
 	memcpy(img->tex.uv, uvs, sizeof(float) * 8);
@@ -995,7 +996,7 @@ TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 			mode = GL_RGB;
 		Img* img = bindImage(buf + sizeof(TextureHeader), header->width, header->height, mode, default_uvs);
 
-		texHandle = new TextureHandle;
+		texHandle = new TextureHandle();
 		texHandle->height = img->height;
 		texHandle->width = img->width;
 		texHandle->tex = img->tex.tex;
