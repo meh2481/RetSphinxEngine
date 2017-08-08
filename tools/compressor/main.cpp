@@ -18,6 +18,8 @@
 
 #include "stb_image.h"
 
+bool g_bImageOut;
+
 typedef struct
 {
 	float left, right, top, bottom;
@@ -597,6 +599,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 
 int main(int argc, char** argv)
 {
+	g_bImageOut = false;
 	workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 	std::list<std::string> sFilelistNames;
 
@@ -604,7 +607,10 @@ int main(int argc, char** argv)
 	for(int i = 1; i < argc; i++)
 	{
 		std::string s = argv[i];
-		sFilelistNames.push_back(s);
+		if(s == "--img")
+			g_bImageOut = true;
+		else
+			sFilelistNames.push_back(s);
 	}
 
 	//Compress files

@@ -15,6 +15,8 @@
 #define BYTES_PER_PIXEL_RGBA 4
 #define BYTES_PER_PIXEL_RGB  3
 
+extern bool g_bImageOut;
+
 typedef struct
 {
 	int comp;
@@ -129,11 +131,14 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	header->format = TEXTURE_FORMAT_RAW;	//TODO Support different texture formats
 
 	//TEST: Output PNG
-	std::ostringstream oss2;
-	oss2 << filename << " - atlas " << curAtlas << ".png";
-	std::cout << "Save " << oss2.str() << std::endl;
-	if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(TextureHeader), atlasW * bytesPerPixel))
-		std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+	if(g_bImageOut)
+	{
+		std::ostringstream oss2;
+		oss2 << filename << " - atlas " << curAtlas << ".png";
+		std::cout << "Save " << oss2.str() << std::endl;
+		if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(TextureHeader), atlasW * bytesPerPixel))
+			std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+	}
 
 	//Add atlas to .pak
 	createCompressionHelper(&atlasHelper, destBuf, bufferSize);
