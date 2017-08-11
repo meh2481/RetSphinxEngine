@@ -70,7 +70,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	}
 
 	//Create destination buffer for atlas
-	size_t bufferSize = atlasW * atlasH * bytesPerPixel + sizeof(TextureHeader);
+	size_t bufferSize = atlasW * atlasH * bytesPerPixel + sizeof(AtlasHeader);
 	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
 	memset(destBuf, 0, bufferSize);	//Clear dest buf
 	
@@ -88,10 +88,10 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(destBuf + sizeof(TextureHeader), &img, r.x, r.y, atlasW, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
+			copyImage(destBuf + sizeof(AtlasHeader), &img, r.x, r.y, atlasW, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
-			TextureRect* rc = (TextureRect*)malloc(sizeof(TextureRect));
+			TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
 			rc->atlasId = atlasHelper.id;
 			
 			float actualX = r.x;
@@ -117,13 +117,13 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			CompressionHelper textureHelper;
 			textureHelper.header.type = RESOURCE_TYPE_IMAGE;
 			textureHelper.id = img.hash;
-			createCompressionHelper(&textureHelper, (unsigned char*)rc, sizeof(TextureRect));
+			createCompressionHelper(&textureHelper, (unsigned char*)rc, sizeof(TextureHeader));
 			addHelper(textureHelper);
 		}
 	}
 
 	//Create header for atlas
-	TextureHeader* header = (TextureHeader*)destBuf;
+	AtlasHeader* header = (AtlasHeader*)destBuf;
 	assert(atlasH == atlasW);
 	header->height = atlasH;
 	header->width = atlasW;
@@ -136,7 +136,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		std::ostringstream oss2;
 		oss2 << filename << " - atlas " << curAtlas << ".png";
 		std::cout << "Save " << oss2.str() << std::endl;
-		if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(TextureHeader), atlasW * bytesPerPixel))
+		if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(AtlasHeader), atlasW * bytesPerPixel))
 			std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 	}
 

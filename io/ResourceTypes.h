@@ -53,8 +53,8 @@ typedef struct
 #define RESOURCE_TYPE_SOUND_LOOP	4
 #define RESOURCE_TYPE_FONT			5
 #define RESOURCE_TYPE_STRINGBANK	6
-#define RESOURCE_TYPE_OBJ			7
-#define RESOURCE_TYPE_MESH			8
+#define RESOURCE_TYPE_OBJ			7	//3D object (linking between a 3D mesh and a texture)
+#define RESOURCE_TYPE_MESH			8	//3D mesh
 #define RESOURCE_TYPE_JSON			9
 #define RESOURCE_TYPE_XML			10	//Prolly wanna remove this at some point as we migrate away from xml formats
 //#define RESOURCE_TYPE_
@@ -74,20 +74,20 @@ typedef struct
 #define TEXTURE_FORMAT_DXT3 4
 #define TEXTURE_FORMAT_DXT5 5
 
-typedef struct //Structure for texture data (Non-atlas'ed)
+typedef struct //Structure for texture data
 {
 	uint32_t bpp;		//One of the texture BPPs above
 	uint32_t width;		//Width of image
 	uint32_t height;	//Height of image
 	uint32_t format;	//One of the texture formats above
 	//Followed by image data
-} TextureHeader;
+} AtlasHeader;
 
-typedef struct //Structure for image indices into the atlas TextureHeader
+typedef struct //Structure for image indices into the atlas AtlasHeader
 {
-	uint64_t atlasId;	//Atlas ID hash
+	uint64_t atlasId;	//ID of AtlasHeader
 	f32_t coordinates[8];	//UV texture coordinates for the image in the atlas
-} TextureRect;
+} TextureHeader;
 
 //--------------------------------------------------------------
 // Fonts
@@ -147,4 +147,21 @@ typedef struct
 	uint32_t loopStartMsec;
 	uint32_t loopEndMsec;
 } SoundLoop;
+
+//--------------------------------------------------------------
+// Mesh data
+//--------------------------------------------------------------
+typedef struct
+{
+	uint32_t numVertices;
+	//Followed by vertex data
+	//Followed by texture coordinate data
+	//Followed by normal data
+} MeshHeader;
+
+typedef struct
+{
+	uint64_t meshId;	//ID of MeshHeader
+	uint64_t textureId;	//ID of TextureHeader
+} Object3DHeader;
 

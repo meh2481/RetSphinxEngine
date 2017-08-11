@@ -914,19 +914,19 @@ Img* ResourceLoader::loadImageFromFile(std::string filename)
 
 Img* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 {
-	if(len < sizeof(TextureRect))
+	if(len < sizeof(TextureHeader))
 	{
 		LOG(ERROR) << "Decompressed image data smaller than texture header";
 		return NULL;
 	}
-	if(len > sizeof(TextureRect))
+	if(len > sizeof(TextureHeader))
 	{
-		LOG(WARNING) << "Ignoring extra " << len - sizeof(TextureRect) << " bytes for texture";
+		LOG(WARNING) << "Ignoring extra " << len - sizeof(TextureHeader) << " bytes for texture";
 	}
 	
 	//Read header
-	TextureRect header;
-	memcpy(&header, data, sizeof(TextureRect));
+	TextureHeader header;
+	memcpy(&header, data, sizeof(TextureHeader));
 
 	TextureHandle* atlas = getAtlas(header.atlasId);
 
@@ -983,18 +983,18 @@ TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 
 		unsigned int len = 0;
 		unsigned char* buf = m_pakLoader->loadResource(atlasId, &len);
-		if(buf == NULL || len < sizeof(TextureHeader))
+		if(buf == NULL || len < sizeof(AtlasHeader))
 		{
 			LOG(ERROR) << "Unable to load image atlas " << atlasId << " from pak";
 			return NULL;
 		}
 
 		//TODO: Don't re-use Img code here, thazzdumb
-		TextureHeader* header = (TextureHeader*)buf;
+		AtlasHeader* header = (AtlasHeader*)buf;
 		int mode = GL_RGBA;
 		if(header->bpp == TEXTURE_BPP_RGB)
 			mode = GL_RGB;
-		Img* img = bindImage(buf + sizeof(TextureHeader), header->width, header->height, mode, default_uvs);
+		Img* img = bindImage(buf + sizeof(AtlasHeader), header->width, header->height, mode, default_uvs);
 
 		texHandle = new TextureHandle();
 		texHandle->height = img->height;

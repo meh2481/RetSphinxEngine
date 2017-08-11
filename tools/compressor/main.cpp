@@ -281,22 +281,22 @@ unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 		return NULL;
 	}
 
-	TextureHeader textureHeader;
+	AtlasHeader textureHeader;
 	textureHeader.width = width;
 	textureHeader.height = height;
 	textureHeader.bpp = TEXTURE_BPP_RGBA;
 	if(comp == STBI_rgb)
 		textureHeader.bpp = TEXTURE_BPP_RGB;
 
-	int size = sizeof(TextureHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
+	int size = sizeof(AtlasHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
 
 	if(fileSize)
 		*fileSize = size;
 
 	unsigned char* finalBuf = (unsigned char*)malloc(size);
 
-	memcpy(finalBuf, &textureHeader, sizeof(TextureHeader));
-	memcpy(&finalBuf[sizeof(TextureHeader)], imageBuf, size - sizeof(TextureHeader));
+	memcpy(finalBuf, &textureHeader, sizeof(AtlasHeader));
+	memcpy(&finalBuf[sizeof(AtlasHeader)], imageBuf, size - sizeof(AtlasHeader));
 
 	stbi_image_free(imageBuf);
 	return finalBuf;
