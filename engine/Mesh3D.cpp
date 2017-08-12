@@ -7,7 +7,7 @@
 #include "opengl-api.h"
 #include "ResourceTypes.h"
 
-Mesh3D::Mesh3D(unsigned char* data, unsigned int len, Texture* tex)
+Object3D::Object3D(unsigned char* data, unsigned int len, Texture* tex)
 {
 	num = 0;
 	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
@@ -16,12 +16,12 @@ Mesh3D::Mesh3D(unsigned char* data, unsigned int len, Texture* tex)
 	_fromData(data, len, tex);
 }
 
-Mesh3D::~Mesh3D()
+Object3D::~Object3D()
 {
 	free(m_data);
 }
 
-void Mesh3D::_fromData(unsigned char* data, unsigned int len, Texture* tex)
+void Object3D::_fromData(unsigned char* data, unsigned int len, Texture* tex)
 {
 	assert(len >= sizeof(MeshHeader));
 
@@ -56,7 +56,7 @@ void Mesh3D::_fromData(unsigned char* data, unsigned int len, Texture* tex)
 	m_texCoordPtr = tempUv;	//Store over in const pointer
 }
 
-void Mesh3D::render()
+void Object3D::render()
 {
 	assert(m_vertexPtr);
 	assert(m_normalPtr);

@@ -31,7 +31,7 @@ public:
 	//Lattice*		lat;		//Lattice to apply to image
 	//LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
-	Mesh3D*		obj3D;		//3D object
+	Object3D*		obj3D;		//3D object
 	
 	Vec2 pos;		//Offset (after rotation)
 	Vec2 tile;		//tile image in x and y

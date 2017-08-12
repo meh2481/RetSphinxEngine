@@ -1,12 +1,12 @@
 /*
- RetSphinxEngine source - Mesh3D.h
+ RetSphinxEngine source - Object3D.h
  Copyright (c) 2013 Mark Hutcheson
 */
 #pragma once
 #include <string>
 #include "Quad.h"
 
-class Mesh3D
+class Object3D
 {
 protected:
 	const float* m_vertexPtr;
@@ -18,11 +18,11 @@ protected:
 	
 	void _fromData(unsigned char* data, unsigned int len, Texture* tex);
 
-	Mesh3D() {};
+	Object3D() {};
 
 public:
-	Mesh3D(unsigned char* data, unsigned int len, Texture* tex);
-    ~Mesh3D();
+	Object3D(unsigned char* data, unsigned int len, Texture* tex);
+    ~Object3D();
 
     void render();
 };

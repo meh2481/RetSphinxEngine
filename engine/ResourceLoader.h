@@ -13,7 +13,7 @@ class Object;
 class ParticleSystem;
 class ObjSegment;
 class ResourceCache;
-class Mesh3D;
+class Object3D;
 class PakLoader;
 class ImgFont;
 class Stringbank;
@@ -45,7 +45,7 @@ public:
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes
-	Mesh3D* getMesh(const std::string& sID, Texture* tex);
+	Object3D* getMesh(const std::string& sID, Texture* tex);
 
 	//Particles
 	ParticleSystem* getParticleSystem(const std::string& sID);

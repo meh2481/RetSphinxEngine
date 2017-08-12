@@ -7,130 +7,21 @@ ResourceCache::~ResourceCache()
 	clear();
 }
 
-void ResourceCache::addImage(uint64_t id, Img* img)
+void ResourceCache::add(uint64_t id, void* item)
 {
-	imageIDMap[id] = img;
+	map[id] = item;
 }
 
-void ResourceCache::addFont(uint64_t id, ImgFont* font)
+void* ResourceCache::find(uint64_t id)
 {
-	fontIDMap[id] = font;
-}
-
-void ResourceCache::addMesh(uint64_t id, Mesh3D* mesh)
-{
-	meshIDMap[id] = mesh;
-}
-
-//void ResourceCache::addCursor(uint64_t id, MouseCursor* cur)
-//{
-//	cursorIDMap[id] = cur;
-//}
-
-Img* ResourceCache::findImage(uint64_t id)
-{
-	std::map<uint64_t, Img*>::iterator i = imageIDMap.find(id);
-	if(i == imageIDMap.end())	//This image isn't here
+	std::map<uint64_t, void*>::iterator i = map.find(id);
+	if(i == map.end())	//This image isn't here
 		return NULL;
 	return i->second;
 }
-
-ImgFont* ResourceCache::findFont(uint64_t id)
-{
-	std::map<uint64_t, ImgFont*>::iterator i = fontIDMap.find(id);
-	if(i == fontIDMap.end())	//This font isn't here
-		return NULL;
-	return i->second;
-}
-
-Mesh3D* ResourceCache::findMesh(uint64_t id)
-{
-	std::map<uint64_t, Mesh3D*>::iterator i = meshIDMap.find(id);
-	if(i == meshIDMap.end())	//This mesh isn't here
-		return NULL;
-	return i->second;
-}
-
-//MouseCursor* ResourceCache::findCursor(uint64_t id)
-//{
-//	map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.find(id);
-//	if(i == cursorIDMap.end())	//This cursor isn't here
-//		return NULL;
-//	return i->second;
-//}
-
-std::string ResourceCache::findTextFile(uint64_t id)
-{
-	std::map<uint64_t, std::string>::iterator i = textIDMap.find(id);
-	if(i == textIDMap.end())	//This mesh isn't here
-		return std::string();
-	return i->second;
-}
-
-void ResourceCache::addTextFile(uint64_t id, const std::string & str)
-{
-	textIDMap[id] = str;
-}
-
 void ResourceCache::clear()
 {
-	clearImages(); 
-	clearMeshes();
-	clearFonts();
-	clearTextFiles();
-	clearTextures();
-//	clearCursors();
-}
-
-void ResourceCache::clearImages()
-{
-	for(std::map<uint64_t, Img*>::iterator i = imageIDMap.begin(); i != imageIDMap.end(); i++)
+	for(std::map<uint64_t, void*>::iterator i = map.begin(); i != map.end(); i++)
 		delete (i->second);
-	imageIDMap.clear();
-}
-
-void ResourceCache::clearFonts()
-{
-	for(std::map<uint64_t, ImgFont*>::iterator i = fontIDMap.begin(); i != fontIDMap.end(); i++)
-		delete (i->second);
-	fontIDMap.clear();
-}
-
-void ResourceCache::clearMeshes()
-{
-	for(std::map<uint64_t, Mesh3D*>::iterator i = meshIDMap.begin(); i != meshIDMap.end(); i++)
-		delete (i->second);
-	meshIDMap.clear();
-}
-
-void ResourceCache::clearTextFiles()
-{
-	textIDMap.clear();
-}
-
-void ResourceCache::clearTextures()
-{
-	for(std::map<uint64_t, TextureHandle*>::iterator i = textureIDMap.begin(); i != textureIDMap.end(); i++)
-		delete (i->second);
-	textureIDMap.clear();
-}
-
-//void ResourceCache::clearCursors()
-//{
-//	for(map<uint64_t, MouseCursor*>::iterator i = cursorIDMap.begin(); i != cursorIDMap.end(); i++)
-//		delete (i->second);
-//	cursorIDMap.clear();
-//}
-
-TextureHandle* ResourceCache::findTexture(uint64_t id)
-{
-	std::map<uint64_t, TextureHandle*>::iterator i = textureIDMap.find(id);
-	if(i == textureIDMap.end())
-		return NULL;
-	return i->second;
-}
-
-void ResourceCache::addTexture(uint64_t id, TextureHandle* handle)
-{
-	textureIDMap[id] = handle;
+	map.clear();
 }

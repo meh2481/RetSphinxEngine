@@ -40,7 +40,7 @@ void ResourceLoader::clearCache()
 Img* ResourceLoader::getImage(uint64_t hashID)
 {
 	LOG(TRACE) << "Loading Image from ID " << hashID;
-	Img* img = m_cache->findImage(hashID);
+	Img* img = (Img*)m_cache->find(hashID);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
@@ -50,7 +50,7 @@ Img* ResourceLoader::getImage(uint64_t hashID)
 		{
 			LOG(TRACE) << "Pak hit - load " << hashID << " from data";
 			img = loadImageFromData(resource, len);
-			m_cache->addImage(hashID, img);
+			m_cache->add(hashID, img);
 			free(resource);						//Free memory
 		}
 		else
@@ -70,17 +70,17 @@ Img* ResourceLoader::getImage(const std::string& sID)
 	{
 		LOG(TRACE) << "Attempting to load from file";
 		img = loadImageFromFile(sID);				//Create this image
-		m_cache->addImage(hashVal, img);	//Add to the cache
+		m_cache->add(hashVal, img);	//Add to the cache
 	}
 	return img;
 }
 
-Mesh3D* ResourceLoader::getMesh(const std::string& sID, Texture* tex)
+Object3D* ResourceLoader::getMesh(const std::string& sID, Texture* tex)
 {
-	LOG(TRACE) << "Loading 3D object " << sID;
+	LOG(TRACE) << "Loading 3D mesh " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Mesh has ID " << hashVal;
-	Mesh3D* mesh = m_cache->findMesh(hashVal);
+	Object3D* mesh = (Object3D*)m_cache->find(hashVal);
 	if(!mesh)	//This mesh isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
@@ -88,14 +88,14 @@ Mesh3D* ResourceLoader::getMesh(const std::string& sID, Texture* tex)
 		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 		if(!resource || !len)
 		{
-			LOG(ERROR) << "Loading 3D object " << sID << " from file not supported";
+			LOG(ERROR) << "Loading 3D mesh " << sID << " from file not supported";
 			return NULL;
 		}
 		else
 		{
 			LOG(TRACE) << "Pak hit - load from data";
-			mesh = new Mesh3D(resource, len, tex);
-			m_cache->addMesh(hashVal, mesh);
+			mesh = new Object3D(resource, len, tex);
+			m_cache->add(hashVal, mesh);
 			//free(resource);						//Free memory
 		}
 	}
@@ -405,7 +405,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 	LOG(TRACE) << "Loading Font " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Font has ID " << hashVal;
-	ImgFont* font = m_cache->findFont(hashVal);
+	ImgFont* font = (ImgFont*)m_cache->find(hashVal);
 	if(!font)	//This font isn't here; load it
 	{
 		unsigned int len = 0;
@@ -413,7 +413,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 		if(!resource || !len)
 		{
 			LOG(ERROR) << "Pak miss, and font files cannot be loaded from file";
-			//font = new Mesh3D(sID);				//Create this mesh
+			//font = new Object3D(sID);				//Create this mesh
 			//m_cache->addMesh(hashVal, mesh);	//Add to the cache
 		}
 		else
@@ -437,7 +437,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 			memcpy(imgRects, &resource[offset], imgRectSz);
 
 			font = new ImgFont(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
-			m_cache->addFont(hashVal, font);
+			m_cache->add(hashVal, font);
 			free(resource);						//Free memory
 		}
 	}
@@ -976,7 +976,7 @@ Img* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned
 TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 {
 	LOG(TRACE) << "Loading image atlas " << atlasId;
-	TextureHandle* texHandle = m_cache->findTexture(atlasId);
+	TextureHandle* texHandle = (TextureHandle*)m_cache->find(atlasId);
 	if(!texHandle)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss, load atlas from pak";
@@ -1004,7 +1004,7 @@ TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 		delete img;
 		free(buf);
 
-		m_cache->addTexture(atlasId, texHandle);	//Add to the cache
+		m_cache->add(atlasId, texHandle);	//Add to the cache
 	}
 	return texHandle;
 }
