@@ -119,10 +119,10 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 			compHeader.decompressedSize = compHeader.compressedSize;
 		}
 
-		unsigned char* uncompressedData = new unsigned char[compHeader.decompressedSize];
+		unsigned char* uncompressedData = (unsigned char*)malloc(compHeader.decompressedSize);
 		if(fread(uncompressedData, 1, compHeader.decompressedSize, it->second.fp) != compHeader.decompressedSize)
 		{
-			delete[] uncompressedData;
+			free(uncompressedData);
 			return NULL;
 		}
 
@@ -137,11 +137,11 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		if(!compHeader.compressedSize)
 			return NULL;
 
-		unsigned char* compressedData = new unsigned char[compHeader.compressedSize];
+		unsigned char* compressedData = (unsigned char*)malloc(compHeader.compressedSize);
 		if(fread(compressedData, 1, compHeader.compressedSize, it->second.fp) != compHeader.compressedSize)
 		{
 			LOG(TRACE) << "couldn\'t read compressed data";
-			delete[] compressedData;
+			free(compressedData);
 			return NULL;
 		}
 
@@ -152,12 +152,12 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 		if(!compHeader.decompressedSize)
 		{
 			LOG(TRACE) << "decompressed size wrong";
-			delete[] compressedData;
+			free(compressedData);
 			return NULL;
 		}
 
 		//Allocate memory and decompress
-		unsigned char* decompressedData = new unsigned char[compHeader.decompressedSize];
+		unsigned char* decompressedData = (unsigned char*)malloc(compHeader.decompressedSize);
 		wfLZ_Decompress(compressedData, decompressedData);
 
 		//Clean up
@@ -165,7 +165,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 			*len = compHeader.decompressedSize;
 
 		LOG(TRACE) << "all good wflz";
-		delete[] compressedData;
+		free(compressedData);
 		return decompressedData;
 	}
 

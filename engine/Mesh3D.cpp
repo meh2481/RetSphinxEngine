@@ -19,7 +19,7 @@ Mesh3D::Mesh3D(unsigned char* data, unsigned int len)
 
 Mesh3D::~Mesh3D()
 {
-	delete[] m_data;
+	free(m_data);
 }
 
 void Mesh3D::_fromData(unsigned char* data, unsigned int len)
