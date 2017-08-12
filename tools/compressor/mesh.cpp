@@ -1,4 +1,5 @@
 #include "main.h"
+#include "tinyxml2.h"
 #include <iostream>
 #include <vector>
 #include <list>
@@ -196,3 +197,43 @@ unsigned char* extractMesh(const std::string& objFilename, unsigned int* size)
 
 	return data;
 }
+
+unsigned char* extract3dObject(const std::string& xmlFilename, unsigned int* size)
+{
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
+	int iErr = doc->LoadFile(xmlFilename.c_str());
+	if(iErr != tinyxml2::XML_NO_ERROR)
+	{
+		std::cout << "Error parsing object XML file: Error " << iErr << std::endl;
+		delete doc;
+		return NULL;
+	}
+
+	//Grab root element
+	tinyxml2::XMLElement* root = doc->RootElement();
+	if(root == NULL)
+	{
+		std::cout << "Error: Root element NULL in XML file " << xmlFilename << std::endl;
+		delete doc;
+		return NULL;
+	}
+
+	const char* cMeshId = root->Attribute("meshId");
+	const char* cTextureId = root->Attribute("textureId");
+	if(!cMeshId || !cTextureId)
+	{
+		std::cout << "Error: Missing mesh or texture ID in XML file " << xmlFilename << std::endl;
+		delete doc;
+		return NULL;
+	}
+
+	Object3DHeader* header = (Object3DHeader*)malloc(sizeof(Object3DHeader));
+	header->meshId = Hash::hash(cMeshId);
+	header->textureId = Hash::hash(cTextureId);
+
+	delete doc;
+	*size = sizeof(Object3DHeader);
+	return (unsigned char*)header;
+}
+
+

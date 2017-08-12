@@ -499,10 +499,8 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
 		{
-			addImage(*i);	//TODO: Exclude 3D model textures, or re-map coords at pack time somehow
-			continue;		//TODO: Skip this, as we'll add the image/atlas later
-			//decompressed = extractImage(*i, &size);	
-			//helper.header.type = RESOURCE_TYPE_IMAGE;
+			addImage(*i);
+			continue;		//Skip this, as we'll add the image/atlas later
 		}
 		else if(i->find(".font") != std::string::npos)
 		{
@@ -533,6 +531,11 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		{
 			helper.header.type = RESOURCE_TYPE_XML;
 			decompressed = FileOperations::readFile(*i, &size);
+		}
+		else if(i->find(".3d") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_OBJ;
+			decompressed = extract3dObject(*i, &size);
 		}
 		else
 		{

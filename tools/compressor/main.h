@@ -23,3 +23,4 @@ void packImages(const std::string& filename);
 
 //mesh.cpp
 unsigned char* extractMesh(const std::string& objFilename, unsigned int* size);
+unsigned char* extract3dObject(const std::string& xmlFilename, unsigned int* size);

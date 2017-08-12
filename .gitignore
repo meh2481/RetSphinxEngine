@@ -37,6 +37,7 @@ res/json/*
 res/shaders/*
 res/mus/*
 res/pak/*
+res/3d/*
 dev/*
 workspace.np
 gamecontrollerdb.txt

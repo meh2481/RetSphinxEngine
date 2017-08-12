@@ -53,7 +53,7 @@ typedef struct
 #define RESOURCE_TYPE_SOUND_LOOP	4
 #define RESOURCE_TYPE_FONT			5
 #define RESOURCE_TYPE_STRINGBANK	6
-#define RESOURCE_TYPE_OBJ			7	//TODO: 3D object (linking between a 3D mesh and a texture)
+#define RESOURCE_TYPE_OBJ			7	//3D object (linking between a 3D mesh and a texture)
 #define RESOURCE_TYPE_MESH			8	//3D mesh
 #define RESOURCE_TYPE_JSON			9
 #define RESOURCE_TYPE_XML			10	//Prolly wanna remove this at some point as we migrate away from xml formats
