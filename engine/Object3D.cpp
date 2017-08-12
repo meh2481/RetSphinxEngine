@@ -1,19 +1,19 @@
 /*
- CutsceneEditor source - 3DObject.cpp
+ RetSphinxEngine source - Object3D.cpp
  Copyright (c) 2013 Mark Hutcheson
 */
-#include "Mesh3D.h"
+#include "Object3D.h"
 #include <assert.h>
 #include "opengl-api.h"
 #include "ResourceTypes.h"
 
-Object3D::Object3D(unsigned char* data, unsigned int len, Texture* tex)
+Object3D::Object3D(unsigned char* data, Texture* tex)
 {
 	num = 0;
 	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
 	m_tex = tex->tex;
 
-	_fromData(data, len, tex);
+	_fromData(data, tex);
 }
 
 Object3D::~Object3D()
@@ -21,23 +21,25 @@ Object3D::~Object3D()
 	free(m_data);
 }
 
-void Object3D::_fromData(unsigned char* data, unsigned int len, Texture* tex)
+void Object3D::_fromData(unsigned char* data, Texture* tex)
 {
-	assert(len >= sizeof(MeshHeader));
-
 	MeshHeader* header = (MeshHeader*)data;
 
-	assert(len >= sizeof(MeshHeader) + 
+	unsigned int len = sizeof(MeshHeader) + 
 		header->numVertices * sizeof(float) * 3 +	//Vertices = xyz
 		header->numVertices * sizeof(float) * 2 +	//UVs = uv
-		header->numVertices * sizeof(float) * 3);	//Vertex Normals = xyz
+		header->numVertices * sizeof(float) * 3;	//Vertex Normals = xyz
 
 	num = header->numVertices;
 
-	m_vertexPtr = (float*)((size_t)data + sizeof(MeshHeader));
+	//Copy data, since we'll be modifying UVs on the fly
+	//TODO: More intelligent copy that only copies over the UV coordinates, since the rest never change
+	m_data = (unsigned char*)malloc(len);
+	memcpy(m_data, data, len);
+
+	m_vertexPtr = (float*)((size_t)m_data + sizeof(MeshHeader));
 	float* tempUv = (float*)((size_t)m_vertexPtr + sizeof(float) * 3 * num);
 	m_normalPtr = (float*)((size_t)tempUv + sizeof(float) * 2 * num);
-	m_data = data;
 
 	//Offset UV coordinates by tex->uv
 	float* uv = tempUv;

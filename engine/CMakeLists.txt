@@ -33,14 +33,14 @@ LuaDefines.h
 LuaFuncs.h
 LuaInterface.cpp
 LuaInterface.h
-Mesh3D.cpp
-Mesh3D.h
 mtrand.cpp
 mtrand.h
 Node.cpp
 Node.h
 Object.cpp
 Object.h
+Object3D.cpp
+Object3D.h
 opengl-api.cpp
 opengl-api.h
 opengl-stubs.h

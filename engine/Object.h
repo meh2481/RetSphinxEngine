@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Mesh3D.h"
+#include "Object3D.h"
 #include "LuaInterface.h"
 #include "LuaFuncs.h"
 #include "Rect.h"

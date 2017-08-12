@@ -1,5 +1,5 @@
 #include "ResourceCache.h"
-#include "Mesh3D.h"
+#include "Object3D.h"
 #include "ImgFont.h"
 
 ResourceCache::~ResourceCache()

@@ -45,7 +45,7 @@ public:
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes
-	Object3D* getMesh(const std::string& sID, Texture* tex);
+	Object3D* get3dObject(const std::string& sID);
 
 	//Particles
 	ParticleSystem* getParticleSystem(const std::string& sID);

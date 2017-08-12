@@ -222,7 +222,7 @@ ObjSegment::~ObjSegment()
 
 void ObjSegment::draw(bool bDebugInfo)
 {
-	if(img == NULL || !active) return;
+	if(!active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
 	glPushMatrix();
 	if(body == NULL)
@@ -238,7 +238,7 @@ void ObjSegment::draw(bool bDebugInfo)
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_LIGHTING);
 		}
-		else
+		else if(img != NULL)
 		{
 			//if(lat)
 			//	img->renderLattice(lat, size);
@@ -279,7 +279,7 @@ void ObjSegment::draw(bool bDebugInfo)
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_LIGHTING);
 		}
-		else
+		else if(img != NULL)
 		{
 			//if(lat)
 			//	img->renderLattice(lat, size);

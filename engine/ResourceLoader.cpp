@@ -75,33 +75,49 @@ Img* ResourceLoader::getImage(const std::string& sID)
 	return img;
 }
 
-Object3D* ResourceLoader::getMesh(const std::string& sID, Texture* tex)
+Object3D* ResourceLoader::get3dObject(const std::string& sID)
 {
-	LOG(TRACE) << "Loading 3D mesh " << sID;
+	LOG(TRACE) << "Loading 3D object " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	LOG(TRACE) << "Mesh has ID " << hashVal;
-	Object3D* mesh = (Object3D*)m_cache->find(hashVal);
-	if(!mesh)	//This mesh isn't here; load it
+	LOG(TRACE) << "3D object has ID " << hashVal;
+	Object3D* object3d = (Object3D*)m_cache->find(hashVal);
+	if(!object3d)	//This object isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
 		unsigned int len = 0;
-		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
-		if(!resource || !len)
+		Object3DHeader* header = (Object3DHeader*)m_pakLoader->loadResource(hashVal, &len);
+		if(!header || len != sizeof(Object3DHeader))
 		{
-			LOG(ERROR) << "Loading 3D mesh " << sID << " from file not supported";
+			LOG(ERROR) << "Loading 3D object " << sID << " from file not supported";
 			return NULL;
 		}
 		else
 		{
 			LOG(TRACE) << "Pak hit - load from data";
-			mesh = new Object3D(resource, len, tex);
-			m_cache->add(hashVal, mesh);
+
+			//Get image
+			Img* img = getImage(header->textureId);
+
+			//Get 3D mesh
+			unsigned char* meshData = (unsigned char*)m_cache->find(header->meshId);
+			if(!meshData)
+			{
+				meshData = m_pakLoader->loadResource(header->meshId);
+				if(!meshData)
+				{
+					LOG(ERROR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
+					return NULL;
+				}
+			}
+
 			//free(resource);						//Free memory
+			object3d = new Object3D(meshData, &img->tex);
+			m_cache->add(hashVal, object3d);
 		}
 	}
 	else
 		LOG(TRACE) << "Cache hit " << sID;
-	return mesh;
+	return object3d;
 }
 
 //Particle system
@@ -520,10 +536,9 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 	if(cSegCol != NULL)
 		seg->col.fromString(cSegCol);
 
-	assert(seg->img);
 	const char* cSegObj = layer->Attribute("obj");
 	if(cSegObj != NULL)
-		seg->obj3D = getMesh(cSegObj, &seg->img->tex);
+		seg->obj3D = get3dObject(cSegObj);
 
 	return seg;
 }

@@ -16,12 +16,12 @@ protected:
 	unsigned char* m_data;
 	GLuint m_tex;
 	
-	void _fromData(unsigned char* data, unsigned int len, Texture* tex);
+	void _fromData(unsigned char* data, Texture* tex);
 
 	Object3D() {};
 
 public:
-	Object3D(unsigned char* data, unsigned int len, Texture* tex);
+	Object3D(unsigned char* data, Texture* tex);
     ~Object3D();
 
     void render();
