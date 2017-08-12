@@ -1,5 +1,6 @@
 set(compressor_src
 images.cpp
+mesh.cpp
 main.cpp
 main.h
 )

@@ -519,11 +519,10 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			decompressed = extractSoundLoop(*i, &size);
 			helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
 		}
-		else if(i->find(".tiny3d") != std::string::npos)
+		else if(i->find(".obj") != std::string::npos)
 		{
-			//TODO: A 3D model is the linking between a mesh ID and a texture ID
-			helper.header.type = RESOURCE_TYPE_OBJ;
-			decompressed = FileOperations::readFile(*i, &size);
+			helper.header.type = RESOURCE_TYPE_MESH;
+			decompressed = extractMesh(*i, &size);
 		}
 		else if(i->find(".json") != std::string::npos)
 		{

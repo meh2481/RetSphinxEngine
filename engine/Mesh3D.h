@@ -9,17 +9,18 @@
 class Mesh3D
 {
 protected:
-	float* m_vertexPtr;
-	float* m_normalPtr;
-	float* m_texCoordPtr;
-	unsigned int num;
+	const float* m_vertexPtr;
+	const float* m_normalPtr;
+	const float* m_texCoordPtr;
+	uint32_t num;
+	unsigned char* m_data;
 	
-	void _fromData(const unsigned char* data, unsigned int len);
+	void _fromData(unsigned char* data, unsigned int len);
 
 	Mesh3D() {};
 
 public:
-	Mesh3D(const unsigned char* data, unsigned int len);
+	Mesh3D(unsigned char* data, unsigned int len);
     ~Mesh3D();
 
     void render(GLuint tex);

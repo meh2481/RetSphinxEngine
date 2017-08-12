@@ -20,3 +20,6 @@ void createCompressionHelper(CompressionHelper* helper, unsigned char* decompres
 //images.cpp
 void addImage(const std::string& img);
 void packImages(const std::string& filename);
+
+//mesh.cpp
+unsigned char* extractMesh(const std::string& objFilename, unsigned int* size);

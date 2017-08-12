@@ -88,16 +88,15 @@ Mesh3D* ResourceLoader::getMesh(const std::string& sID)
 		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
 		if(!resource || !len)
 		{
-			LOG(TRACE) << "Pak miss - load from file";
-			mesh = new Mesh3D(sID);				//Create this mesh
-			m_cache->addMesh(hashVal, mesh);	//Add to the cache
+			LOG(ERROR) << "Loading 3D object " << sID << " from file not supported";
+			return NULL;
 		}
 		else
 		{
 			LOG(TRACE) << "Pak hit - load from data";
 			mesh = new Mesh3D(resource, len);
 			m_cache->addMesh(hashVal, mesh);
-			free(resource);						//Free memory
+			//free(resource);						//Free memory
 		}
 	}
 	else
