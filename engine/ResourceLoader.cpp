@@ -75,7 +75,7 @@ Img* ResourceLoader::getImage(const std::string& sID)
 	return img;
 }
 
-Mesh3D* ResourceLoader::getMesh(const std::string& sID)
+Mesh3D* ResourceLoader::getMesh(const std::string& sID, Texture* tex)
 {
 	LOG(TRACE) << "Loading 3D object " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
@@ -94,7 +94,7 @@ Mesh3D* ResourceLoader::getMesh(const std::string& sID)
 		else
 		{
 			LOG(TRACE) << "Pak hit - load from data";
-			mesh = new Mesh3D(resource, len);
+			mesh = new Mesh3D(resource, len, tex);
 			m_cache->addMesh(hashVal, mesh);
 			//free(resource);						//Free memory
 		}
@@ -520,9 +520,10 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 	if(cSegCol != NULL)
 		seg->col.fromString(cSegCol);
 
+	assert(seg->img);
 	const char* cSegObj = layer->Attribute("obj");
 	if(cSegObj != NULL)
-		seg->obj3D = getMesh(cSegObj);
+		seg->obj3D = getMesh(cSegObj, &seg->img->tex);
 
 	return seg;
 }

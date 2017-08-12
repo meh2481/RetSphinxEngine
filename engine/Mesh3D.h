@@ -14,16 +14,17 @@ protected:
 	const float* m_texCoordPtr;
 	uint32_t num;
 	unsigned char* m_data;
+	GLuint m_tex;
 	
-	void _fromData(unsigned char* data, unsigned int len);
+	void _fromData(unsigned char* data, unsigned int len, Texture* tex);
 
 	Mesh3D() {};
 
 public:
-	Mesh3D(unsigned char* data, unsigned int len);
+	Mesh3D(unsigned char* data, unsigned int len, Texture* tex);
     ~Mesh3D();
 
-    void render(GLuint tex);
+    void render();
 };
 
 
