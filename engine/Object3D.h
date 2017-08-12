@@ -11,9 +11,8 @@ class Object3D
 protected:
 	const float* m_vertexPtr;
 	const float* m_normalPtr;
-	const float* m_texCoordPtr;
+	float* m_texCoordPtr;
 	uint32_t num;
-	unsigned char* m_data;
 	GLuint m_tex;
 	
 	void _fromData(unsigned char* data, Texture* tex);

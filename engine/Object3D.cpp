@@ -18,31 +18,35 @@ Object3D::Object3D(unsigned char* data, Texture* tex)
 
 Object3D::~Object3D()
 {
-	free(m_data);
+	free(m_texCoordPtr);
 }
 
 void Object3D::_fromData(unsigned char* data, Texture* tex)
 {
 	MeshHeader* header = (MeshHeader*)data;
-
-	unsigned int len = sizeof(MeshHeader) + 
-		header->numVertices * sizeof(float) * 3 +	//Vertices = xyz
-		header->numVertices * sizeof(float) * 2 +	//UVs = uv
-		header->numVertices * sizeof(float) * 3;	//Vertex Normals = xyz
-
 	num = header->numVertices;
 
-	//Copy data, since we'll be modifying UVs on the fly
-	//TODO: More intelligent copy that only copies over the UV coordinates, since the rest never change
-	m_data = (unsigned char*)malloc(len);
-	memcpy(m_data, data, len);
+	unsigned int len = num * sizeof(float) * 2;
+	//unsigned int len = sizeof(MeshHeader) + 
+	//	num * sizeof(float) * 3 +	//Vertices = xyz
+	//	num * sizeof(float) * 2 +	//UVs = uv
+	//	num * sizeof(float) * 3;	//Vertex Normals = xyz
 
-	m_vertexPtr = (float*)((size_t)m_data + sizeof(MeshHeader));
-	float* tempUv = (float*)((size_t)m_vertexPtr + sizeof(float) * 3 * num);
-	m_normalPtr = (float*)((size_t)tempUv + sizeof(float) * 2 * num);
+
+	//Copy UV data, since we'll be modifying UVs on the fly
+	m_texCoordPtr = (float*)malloc(len);
+	memcpy(m_texCoordPtr, (void*)((size_t)data + sizeof(MeshHeader) + sizeof(float) * 3 * num), len);
+
+	m_vertexPtr = (float*)((size_t)data 
+		+ sizeof(MeshHeader));
+
+	m_normalPtr = (float*)((size_t)data 
+		+ sizeof(MeshHeader)
+		+ sizeof(float) * 2 * num 
+		+ sizeof(float) * 3 * num);
 
 	//Offset UV coordinates by tex->uv
-	float* uv = tempUv;
+	float* uv = m_texCoordPtr;
 	float left = tex->uv[0];
 	float right = tex->uv[2];
 	float top = tex->uv[5];
@@ -54,8 +58,6 @@ void Object3D::_fromData(unsigned char* data, Texture* tex)
 		*uv++ = (*uv * width + left);
 		*uv++ = (*uv * height + top);
 	}
-
-	m_texCoordPtr = tempUv;	//Store over in const pointer
 }
 
 void Object3D::render()
