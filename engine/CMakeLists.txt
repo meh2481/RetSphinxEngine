@@ -61,7 +61,6 @@ SystemUtils.cpp
 SystemUtils.h
 SoundVol.h
 SoundVol.cpp
-tiny3d.h
 Text.cpp
 Text.h
 Quad.h
