@@ -139,10 +139,10 @@ void ParticleSystem::_newParticle()
 
 	//Add proper locations from m_imgRect to tex coord ptr array here
 	float* particleTexCoord = &m_texCoordPtr[m_num * 8];
-	float left = m_imgRect[m_num].left / (float)img->width;
-	float right = m_imgRect[m_num].right / (float)img->width;
-	float top = m_imgRect[m_num].top / (float)img->height;
-	float bottom = m_imgRect[m_num].bottom / (float)img->height;
+	float left = m_imgRect[m_num].left / (float)img->tex.width;
+	float right = m_imgRect[m_num].right / (float)img->tex.width;
+	float top = m_imgRect[m_num].top / (float)img->tex.height;
+	float bottom = m_imgRect[m_num].bottom / (float)img->tex.height;
 
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
 	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
@@ -226,10 +226,10 @@ void ParticleSystem::_newParticle()
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
 	float* particleTexCoord = &m_texCoordPtr[idx * 8]; 
-	float left = m_imgRect[m_num - 1].left / (float)img->width;
-	float right = m_imgRect[m_num - 1].right / (float)img->width;
-	float top = m_imgRect[m_num - 1].top / (float)img->height;
-	float bottom = m_imgRect[m_num - 1].bottom / (float)img->height;
+	float left = m_imgRect[m_num - 1].left / (float)img->tex.width;
+	float right = m_imgRect[m_num - 1].right / (float)img->tex.width;
+	float top = m_imgRect[m_num - 1].top / (float)img->tex.height;
+	float bottom = m_imgRect[m_num - 1].bottom / (float)img->tex.height;
 
 	*particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
 	*particleTexCoord++ = right; *particleTexCoord++ = top; // upper right

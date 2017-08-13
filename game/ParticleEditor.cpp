@@ -192,17 +192,17 @@ void ParticleEditor::draw(int windowFlags)
 			if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size())
 			{
 				ImGui::Text("Current Rect:");
-				ImGui::SliderFloat("Left", &particles->imgRect.at(curSelectedImgRect).left, 0, particles->img->width - 1, "%.0f");
-				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0, particles->img->height - 1, "%.0f");
-				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->width - 1, "%.0f");
-				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->height - 1, "%.0f");
+				ImGui::SliderFloat("Left", &particles->imgRect.at(curSelectedImgRect).left, 0, particles->img->tex.width - 1, "%.0f");
+				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0, particles->img->tex.height - 1, "%.0f");
+				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->tex.width - 1, "%.0f");
+				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->tex.height - 1, "%.0f");
 				ImGui::Text("Preview:");
 				//Crop image
 				ImGui::Image(
 					(ImTextureID)particles->img->tex.tex,
 					ImVec2(particles->imgRect.at(curSelectedImgRect).width(), particles->imgRect.at(curSelectedImgRect).height()),
-					ImVec2(particles->imgRect.at(curSelectedImgRect).left / (float)particles->img->width, particles->imgRect.at(curSelectedImgRect).top / (float)particles->img->height),
-					ImVec2(particles->imgRect.at(curSelectedImgRect).right / (float)particles->img->width, particles->imgRect.at(curSelectedImgRect).bottom / (float)particles->img->height));
+					ImVec2(particles->imgRect.at(curSelectedImgRect).left / (float)particles->img->tex.width, particles->imgRect.at(curSelectedImgRect).top / (float)particles->img->tex.height),
+					ImVec2(particles->imgRect.at(curSelectedImgRect).right / (float)particles->img->tex.width, particles->imgRect.at(curSelectedImgRect).bottom / (float)particles->img->tex.height));
 			}
 		}
 

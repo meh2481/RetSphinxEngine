@@ -74,7 +74,7 @@ void Object::draw(bool bDebugInfo)
 				//else
 
 				Quad q;
-				q.tex = img->tex;
+				q.tex = *img;
 				q.pos[0] = -meshSize.x / 2.0f;
 				q.pos[1] = -meshSize.y / 2.0f; // upper left
 
@@ -133,7 +133,7 @@ b2Body* Object::getBody()
 	return NULL;
 }
 
-void Object::setImage(Img* img, unsigned int seg)
+void Object::setImage(Texture* img, unsigned int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;
@@ -245,7 +245,7 @@ void ObjSegment::draw(bool bDebugInfo)
 			//else
 
 			Quad q;
-			q.tex = img->tex;
+			q.tex = *img;
 			q.pos[0] = -size.x / 2.0f;
 			q.pos[1] = -size.y / 2.0f; // upper left
 
@@ -287,7 +287,7 @@ void ObjSegment::draw(bool bDebugInfo)
 				
 			
 			Quad q;
-			q.tex = img->tex;
+			q.tex = *img;
 			q.pos[0] = -size.x / 2.0f;
 			q.pos[1] = -size.y / 2.0f; // upper left
 

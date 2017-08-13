@@ -108,7 +108,7 @@ public:
 	Vec3	rotAxisVar;
 	
 	//Particle system variables
-	Img*				img;				//Image to use for all of these particles	//TODO: Use quad instead
+	Texture*				img;				//Image to use for all of these particles	//TODO: Use quad instead
 	std::vector<Rect>	imgRect;			//Possible positions in this image to use for each particle
 	unsigned 			max;				//Max # of particles
 	float 				rate;				//How many particles to emit per second

@@ -26,9 +26,9 @@ class ResourceLoader
 	std::string m_sPakDir;
 
 	std::string readTextFile(const std::string& filename);
-	Img* loadImageFromFile(std::string filename); 
-	Img* loadImageFromData(unsigned char* data, unsigned int len);
-	Img* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
+	Texture* loadImageFromFile(std::string filename); 
+	Texture* loadImageFromData(unsigned char* data, unsigned int len);
+	Texture* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
 	TextureHandle* getAtlas(uint64_t atlasId);
 
 	ResourceLoader() {};
@@ -40,8 +40,8 @@ public:
 	void clearCache();
 
 	//Images
-	Img* getImage(const std::string& sID);
-	Img* getImage(uint64_t hashID);
+	Texture* getImage(const std::string& sID);
+	Texture* getImage(uint64_t hashID);
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes

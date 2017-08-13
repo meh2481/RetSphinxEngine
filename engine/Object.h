@@ -38,7 +38,7 @@ public:
 	float rot;
 	Vec2 size;	//Actual texel size; not pixels
 	float depth;
-	Img* img;
+	Texture* img;
 	bool active;
 	Color col;
 
@@ -62,7 +62,7 @@ public:
 	LuaInterface* lua;
 	std::string luaClass;
 	float depth;
-	Img* img;
+	Texture* img;
 	bool active;
 	Color col;
     
@@ -84,7 +84,7 @@ public:
 	void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
 	std::string getProperty(const std::string& prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(Img* img, unsigned int seg = 0);	//Sets the image of the given physSegment
+	void setImage(Texture* img, unsigned int seg = 0);	//Sets the image of the given physSegment
 };
 
 

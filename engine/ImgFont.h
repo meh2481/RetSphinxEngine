@@ -6,7 +6,7 @@
 class ImgFont
 {
 	unsigned int num;
-	Img* img;
+	Texture* img;
 	uint32_t* codepoints;
 	float* rects;
 
@@ -18,7 +18,7 @@ class ImgFont
 	float* getNextRect(const char** str);			//Get the next image rect for the given string position & increment the pointer
 
 public:
-	ImgFont(Img* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
+	ImgFont(Texture* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
 	~ImgFont();
 
 	void renderString(const char* str, float drawPt, Vec2 drawOffset);

@@ -2,7 +2,7 @@
 #include "easylogging++.h"
 #include <cstring>
 
-ImgFont::ImgFont(Img* image, unsigned int count, uint32_t* codePoints, float* imgRects)
+ImgFont::ImgFont(Texture* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
 	//Make sure data is valid
 	assert(count > 1);
@@ -97,7 +97,7 @@ uint32_t ImgFont::getNextCodepoint(const char** strpos)
 
 void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
-	float fac = (float)img->width / (float)img->height;
+	float fac = (float)img->tex.width / (float)img->tex.height;
 	glBindTexture(GL_TEXTURE_2D, img->tex.tex);
 	const char* strptr = str;
 	while(*strptr)
@@ -124,7 +124,7 @@ void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 
 float ImgFont::stringWidth(const char* str, float drawPt)
 {
-	float fac = (float)img->width / (float)img->height;
+	float fac = (float)img->tex.width / (float)img->tex.height;
 	float width = 0.0f;
 	const char* strptr = str;
 	while(*strptr)

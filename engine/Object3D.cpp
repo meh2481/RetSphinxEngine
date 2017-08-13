@@ -11,7 +11,7 @@ Object3D::Object3D(unsigned char* data, Texture* tex)
 {
 	num = 0;
 	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
-	m_tex = tex->tex;
+	m_tex = tex->tex.tex;
 
 	_fromData(data, tex);
 }

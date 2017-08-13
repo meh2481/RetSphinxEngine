@@ -27,7 +27,7 @@ class Text
 {
 private:
 	Text(){};								//Default constructor cannot be called
-	Img* m_imgFont;						//Image for this bitmap font
+	Texture* m_imgFont;						//Image for this bitmap font
 	std::map<unsigned char, Rect> m_mRectangles;	//Rectangles for drawing each character
 	std::map<unsigned char, float> m_mKerning;	//Kerning info for font glyphs
 	std::string m_sName;
