@@ -17,7 +17,7 @@ class PakLoader;
 class ImgFont;
 class Stringbank;
 class Image;
-class TextureHandle;
+class Texture;
 
 class ResourceLoader
 {
@@ -29,8 +29,8 @@ class ResourceLoader
 	std::string readTextFile(const std::string& filename);
 	Image* loadImageFromFile(std::string filename); 
 	Image* loadImageFromData(unsigned char* data, unsigned int len);
-	Image* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
-	TextureHandle* getAtlas(uint64_t atlasId);
+	Texture* bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode);
+	Texture* getAtlas(uint64_t atlasId);
 
 	ResourceLoader() {};
 public:

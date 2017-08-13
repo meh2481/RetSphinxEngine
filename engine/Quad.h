@@ -1,7 +1,7 @@
 #pragma once
 #include "SDL_opengl.h"
 
-class TextureHandle
+class Texture
 {
 public:
 	GLuint tex;
@@ -12,7 +12,7 @@ public:
 class Image
 {
 public:
-	TextureHandle tex;
+	Texture tex;
 	GLfloat uv[8];
 };
 
