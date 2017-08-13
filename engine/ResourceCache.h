@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 
+//TODO: Move this inside ResourceLoader or something, since this is just a map
 class ResourceCache
 {
 	std::map<uint64_t, void*> map;

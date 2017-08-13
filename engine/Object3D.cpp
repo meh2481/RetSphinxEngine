@@ -26,17 +26,12 @@ void Object3D::_fromData(unsigned char* data, Texture* tex)
 	MeshHeader* header = (MeshHeader*)data;
 	num = header->numVertices;
 
-	unsigned int len = num * sizeof(float) * 2;
-	//unsigned int len = sizeof(MeshHeader) + 
-	//	num * sizeof(float) * 3 +	//Vertices = xyz
-	//	num * sizeof(float) * 2 +	//UVs = uv
-	//	num * sizeof(float) * 3;	//Vertex Normals = xyz
-
-
 	//Copy UV data, since we'll be modifying UVs on the fly
+	unsigned int len = num * sizeof(float) * 2;
 	m_texCoordPtr = (float*)malloc(len);
 	memcpy(m_texCoordPtr, (void*)((size_t)data + sizeof(MeshHeader) + sizeof(float) * 3 * num), len);
 
+	//Assign pointers to vertex/normal data
 	m_vertexPtr = (float*)((size_t)data 
 		+ sizeof(MeshHeader));
 
@@ -70,7 +65,7 @@ void Object3D::render()
 
 	glBindTexture(GL_TEXTURE_2D, m_tex);
 
-	//TODO: Move outside of rendering function to not stall pipeline for no reason
+	//TODO: Move outside of rendering function if possible
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glShadeModel(GL_SMOOTH);
 

@@ -31,13 +31,13 @@ typedef struct
 //-----------------------------------------------------------------------------------------------
 void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsigned short yPos, int atlasW, int bytesPerPixel)
 {
-	//TODO: Offset by 1 in each dir and stretch last pixels
+	//Offset by 1 in each dir and stretch first/last pixels
 	assert(img->comp == STBI_rgb_alpha || img->comp == STBI_rgb);
 	unsigned char* src = img->buf;
-	for(int y = 0; y < img->height; y++)
+	for(int y = 0; y < img->height + 2; y++)
 	{
 		unsigned char* dst = &buf[(atlasW * bytesPerPixel * (y + yPos)) + (xPos * bytesPerPixel)];
-		for(int x = 0; x < img->width; x++)
+		for(int x = 0; x < img->width + 2; x++)
 		{
 			*dst++ = *src++;	//R
 			*dst++ = *src++;	//G
@@ -46,7 +46,14 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 				*dst++ = *src++;	//A
 			else if(bytesPerPixel == BYTES_PER_PIXEL_RGBA)
 				*dst++ = 255;	//Alpha of 255
+
+			//Back up on first and last pixels of row
+			if(x == 0 || x == img->width)
+				src -= img->comp;	//Slight hack assumes STB comp = bytes per pixel
 		}
+		//Back up on first and last rows
+		if(y == 0 || y == img->height)
+			src -= img->width * img->comp;
 	}
 }
 
@@ -76,7 +83,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	
 	//Create compression helper for atlas
 	std::ostringstream oss;
-	oss << filename << curAtlas << ".bin";
+	oss << filename << curAtlas << ".atlas";	//Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
 	CompressionHelper atlasHelper;
 	atlasHelper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
 	atlasHelper.id = Hash::hash(oss.str().c_str());
@@ -94,8 +101,8 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
 			rc->atlasId = atlasHelper.id;
 			
-			float actualX = r.x;
-			float actualY = r.y;	//Y is inverted
+			float actualX = r.x + 1;	// +1 offset here for UVs
+			float actualY = r.y + 1;
 
 			//Get UV coordinates
 			float top = actualY / (float)atlasH;
@@ -103,7 +110,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			float right = (actualX + (float)img.width) / (float)atlasW;
 			float bottom = (actualY + (float)img.height) / (float)atlasH;
 
-			//CCW winding from lower left (Inverted Y for some reason), x/y format
+			//CCW winding from lower left, x/y format
 			rc->coordinates[0] = left;
 			rc->coordinates[1] = bottom;
 			rc->coordinates[2] = right;
@@ -130,7 +137,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	header->bpp = bytesPerPixel * 8;
 	header->format = TEXTURE_FORMAT_RAW;	//TODO Support different texture formats
 
-	//TEST: Output PNG
+	//Output PNG if in testing mode
 	if(g_bImageOut)
 	{
 		std::ostringstream oss2;
@@ -205,10 +212,10 @@ void packImages(const std::string& filename)
 	//Init rects
 	for(int i = 0; i < rectsLeft; i++)
 	{
-		//TODO: +2 pixels on each side and stretch
+		// +2 pixels on each side so we can stretch image and avoid UV rounding errors
 		rects[i].id = i;
-		rects[i].w = startImages[i].width;
-		rects[i].h = startImages[i].height;
+		rects[i].w = startImages[i].width + 2;
+		rects[i].h = startImages[i].height + 2;
 	}
 
 	//Main packing loop
