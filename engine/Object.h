@@ -28,8 +28,6 @@ public:
 	enum { TYPE = OT_SEGMENT };
 
     b2Body*         body;		//Physics body associated with this segment
-	//Lattice*		lat;		//Lattice to apply to image
-	//LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
 	Object3D*		obj3D;		//3D object
 	

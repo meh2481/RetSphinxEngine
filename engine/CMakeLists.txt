@@ -25,8 +25,6 @@ imgui_impl_sdl.h
 InputDevice.cpp
 InputDevice.h
 Interpolation.h
-Lattice.cpp
-Lattice.h
 LinearInterpolation.h
 LinearInterpolation.cpp
 LuaDefines.h
