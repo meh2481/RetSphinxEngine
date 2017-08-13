@@ -8,15 +8,16 @@
 #include "SDL.h"
 #include "ResourceTypes.h"
 
-class Image;
 class Object;
 class ParticleSystem;
 class ObjSegment;
 class ResourceCache;
-class Mesh3D;
+class Object3D;
 class PakLoader;
 class ImgFont;
 class Stringbank;
+class Image;
+class Texture;
 
 class ResourceLoader
 {
@@ -26,6 +27,10 @@ class ResourceLoader
 	std::string m_sPakDir;
 
 	std::string readTextFile(const std::string& filename);
+	Image* loadImageFromFile(std::string filename); 
+	Image* loadImageFromData(unsigned char* data, unsigned int len);
+	Texture* bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode);
+	Texture* getAtlas(uint64_t atlasId);
 
 	ResourceLoader() {};
 public:
@@ -41,7 +46,7 @@ public:
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes
-	Mesh3D* getMesh(const std::string& sID);
+	Object3D* get3dObject(const std::string& sID);
 
 	//Particles
 	ParticleSystem* getParticleSystem(const std::string& sID);

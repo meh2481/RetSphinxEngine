@@ -16,8 +16,6 @@ Gradient.cpp
 Gradient.h
 HeadTracker.cpp
 HeadTracker.h
-Image.cpp
-Image.h
 ImgFont.cpp
 ImgFont.h
 imgui_impl_opengl2.cpp
@@ -27,22 +25,20 @@ imgui_impl_sdl.h
 InputDevice.cpp
 InputDevice.h
 Interpolation.h
-Lattice.cpp
-Lattice.h
 LinearInterpolation.h
 LinearInterpolation.cpp
 LuaDefines.h
 LuaFuncs.h
 LuaInterface.cpp
 LuaInterface.h
-Mesh3D.cpp
-Mesh3D.h
 mtrand.cpp
 mtrand.h
 Node.cpp
 Node.h
 Object.cpp
 Object.h
+Object3D.cpp
+Object3D.h
 opengl-api.cpp
 opengl-api.h
 opengl-stubs.h
@@ -63,9 +59,10 @@ SystemUtils.cpp
 SystemUtils.h
 SoundVol.h
 SoundVol.cpp
-tiny3d.h
 Text.cpp
 Text.h
+Quad.h
+Quad.cpp
 )
 
 set(engine_events_src

@@ -8,10 +8,10 @@ SceneryManager::~SceneryManager()
 
 void SceneryManager::update(float dt)
 {
-	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
-		(*i)->update(dt);
-	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
-		(*i)->update(dt);
+	//for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
+	//	(*i)->update(dt);
+	//for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
+	//	(*i)->update(dt);
 }
 
 void SceneryManager::renderForeground(glm::mat4 mat)

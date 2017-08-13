@@ -5,9 +5,12 @@
 */
 #pragma once
 
-#include "Image.h"
+//#include "Image.h"
 #include "Color.h"
+#include "Rect.h"
 #include <map>
+
+class Image;
 
 enum TextAlignment
 {
@@ -19,7 +22,7 @@ enum TextAlignment
     ALIGN_BOTTOM	= 32
 };
 
-class Image;
+//class Image;
 
 class Text
 {

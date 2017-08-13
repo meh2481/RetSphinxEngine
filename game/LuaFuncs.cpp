@@ -1,7 +1,6 @@
 #include "LuaFuncs.h"
 #include "LuaInterface.h"
 #include "GameEngine.h"
-#include "Image.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
 #include "ParticleSystem.h"

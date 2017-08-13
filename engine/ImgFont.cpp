@@ -1,6 +1,6 @@
 #include "ImgFont.h"
-#include "Image.h"
 #include "easylogging++.h"
+#include "Quad.h"
 #include <cstring>
 
 ImgFont::ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
@@ -98,8 +98,8 @@ uint32_t ImgFont::getNextCodepoint(const char** strpos)
 
 void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
-	float fac = (float)img->getWidth() / (float)img->getHeight();
-	img->bindTexture();
+	float fac = (float)img->tex.width / (float)img->tex.height;
+	glBindTexture(GL_TEXTURE_2D, img->tex.tex);
 	const char* strptr = str;
 	while(*strptr)
 	{
@@ -125,7 +125,7 @@ void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 
 float ImgFont::stringWidth(const char* str, float drawPt)
 {
-	float fac = (float)img->getWidth() / (float)img->getHeight();
+	float fac = (float)img->tex.width / (float)img->tex.height;
 	float width = 0.0f;
 	const char* strptr = str;
 	while(*strptr)

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Mesh3D.h"
+#include "Object3D.h"
 #include "LuaInterface.h"
 #include "LuaFuncs.h"
 #include "Rect.h"
@@ -17,10 +17,8 @@
 class Object;
 class ObjSegment;
 class b2Body;
-struct b2BodyDef;
-class Lattice;
-class LatticeAnim;
 class Image;
+struct b2BodyDef;
 
 //Physical segments of objects - be they actual physics bodies or just images
 //TODO Make SceneryLayer class that this can contain
@@ -28,11 +26,10 @@ class ObjSegment
 {
 public:
 	enum { TYPE = OT_SEGMENT };
+
     b2Body*         body;		//Physics body associated with this segment
-	Lattice*		lat;		//Lattice to apply to image
-	LatticeAnim*	latanim;	//Animation to apply to lattice
 	Object* 		parent;		//Parent object
-	Mesh3D*		obj3D;		//3D object
+	Object3D*		obj3D;		//3D object
 	
 	Vec2 pos;		//Offset (after rotation)
 	Vec2 tile;		//tile image in x and y
@@ -47,7 +44,6 @@ public:
     ~ObjSegment();
 	
 	void draw(bool bDebugInfo = false);
-	void update(float dt);
 };
 
 //Collections of the above all stuffed into one object for ease of use.
@@ -59,11 +55,10 @@ class Object
 
 public:
 	enum { TYPE = OT_OBJECT };
-	Lattice*			meshLattice;
-	LatticeAnim*			meshAnim;
-	Vec2				meshSize;
-	LuaInterface* 			lua;
-	std::string 			luaClass;
+
+	Vec2 meshSize;
+	LuaInterface* lua;
+	std::string luaClass;
 	float depth;
 	Image* img;
 	bool active;

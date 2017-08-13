@@ -11,6 +11,7 @@
 #include "DebugDraw.h"
 #include "SDL.h"
 #include <vector>
+#include <list>
 
 class b2World;
 class Image;

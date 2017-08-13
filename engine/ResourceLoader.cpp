@@ -1,5 +1,4 @@
 #include "ResourceLoader.h"
-#include "Image.h"
 #include "ParticleSystem.h"
 #include "easylogging++.h"
 #include "tinyxml2.h"
@@ -11,8 +10,12 @@
 #include "ImgFont.h"
 #include "Hash.h"
 #include "Stringbank.h"
-#include "stb_image.h"
 #include "ResourceTypes.h"
+#include "Quad.h"
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
@@ -38,7 +41,7 @@ void ResourceLoader::clearCache()
 Image* ResourceLoader::getImage(uint64_t hashID)
 {
 	LOG(TRACE) << "Loading Image from ID " << hashID;
-	Image* img = m_cache->findImage(hashID);
+	Image* img = (Image*)m_cache->find(hashID);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
@@ -47,8 +50,8 @@ Image* ResourceLoader::getImage(uint64_t hashID)
 		if(resource && len)
 		{
 			LOG(TRACE) << "Pak hit - load " << hashID << " from data";
-			img = new Image(resource, len);
-			m_cache->addImage(hashID, img);
+			img = loadImageFromData(resource, len);
+			m_cache->add(hashID, img);
 			free(resource);						//Free memory
 		}
 		else
@@ -67,41 +70,55 @@ Image* ResourceLoader::getImage(const std::string& sID)
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Attempting to load from file";
-		img = new Image(sID);				//Create this image
-		m_cache->addImage(hashVal, img);	//Add to the cache
+		img = loadImageFromFile(sID);				//Create this image
+		m_cache->add(hashVal, img);	//Add to the cache
 	}
-	img->_setReloadFilename(sID);
 	return img;
 }
 
-Mesh3D* ResourceLoader::getMesh(const std::string& sID)
+Object3D* ResourceLoader::get3dObject(const std::string& sID)
 {
 	LOG(TRACE) << "Loading 3D object " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	LOG(TRACE) << "Mesh has ID " << hashVal;
-	Mesh3D* mesh = m_cache->findMesh(hashVal);
-	if(!mesh)	//This mesh isn't here; load it
+	LOG(TRACE) << "3D object has ID " << hashVal;
+	Object3D* object3d = (Object3D*)m_cache->find(hashVal);
+	if(!object3d)	//This object isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
 		unsigned int len = 0;
-		unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
-		if(!resource || !len)
+		Object3DHeader* header = (Object3DHeader*)m_pakLoader->loadResource(hashVal, &len);
+		if(!header || len != sizeof(Object3DHeader))
 		{
-			LOG(TRACE) << "Pak miss - load from file";
-			mesh = new Mesh3D(sID);				//Create this mesh
-			m_cache->addMesh(hashVal, mesh);	//Add to the cache
+			LOG(ERROR) << "Loading 3D object " << sID << " from file not supported";
+			return NULL;
 		}
 		else
 		{
 			LOG(TRACE) << "Pak hit - load from data";
-			mesh = new Mesh3D(resource, len);
-			m_cache->addMesh(hashVal, mesh);
-			free(resource);						//Free memory
+
+			//Get image
+			Image* img = getImage(header->textureId);
+
+			//Get 3D mesh
+			unsigned char* meshData = (unsigned char*)m_cache->find(header->meshId);
+			if(!meshData)
+			{
+				meshData = m_pakLoader->loadResource(header->meshId);
+				if(!meshData)
+				{
+					LOG(ERROR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
+					return NULL;
+				}
+			}
+
+			//free(resource);						//Free memory
+			object3d = new Object3D(meshData, img);
+			m_cache->add(hashVal, object3d);
 		}
 	}
 	else
 		LOG(TRACE) << "Cache hit " << sID;
-	return mesh;
+	return object3d;
 }
 
 //Particle system
@@ -405,7 +422,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 	LOG(TRACE) << "Loading Font " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
 	LOG(TRACE) << "Font has ID " << hashVal;
-	ImgFont* font = m_cache->findFont(hashVal);
+	ImgFont* font = (ImgFont*)m_cache->find(hashVal);
 	if(!font)	//This font isn't here; load it
 	{
 		unsigned int len = 0;
@@ -413,7 +430,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 		if(!resource || !len)
 		{
 			LOG(ERROR) << "Pak miss, and font files cannot be loaded from file";
-			//font = new Mesh3D(sID);				//Create this mesh
+			//font = new Object3D(sID);				//Create this mesh
 			//m_cache->addMesh(hashVal, mesh);	//Add to the cache
 		}
 		else
@@ -437,7 +454,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
 			memcpy(imgRects, &resource[offset], imgRectSz);
 
 			font = new ImgFont(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
-			m_cache->addFont(hashVal, font);
+			m_cache->add(hashVal, font);
 			free(resource);						//Free memory
 		}
 	}
@@ -522,7 +539,7 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
 
 	const char* cSegObj = layer->Attribute("obj");
 	if(cSegObj != NULL)
-		seg->obj3D = getMesh(cSegObj);
+		seg->obj3D = get3dObject(cSegObj);
 
 	return seg;
 }
@@ -711,58 +728,58 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 			const char* cLatticeType = latticeElem->Attribute("type");
 			if(cLatticeType)
 			{
-				if(cBodyRes)
-					pMeshSize = pointFromString(cBodyRes);
+				//if(cBodyRes)
+				//	pMeshSize = pointFromString(cBodyRes);
 
-				o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
+				//o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
 
-				std::string sLatticeType = cLatticeType;
-				if(sLatticeType == "softbody")
-				{
-					//const char* cBodyCenter = latticeElem->Attribute("centerbody");
-					//if(cBodyCenter && mBodyNames.count(cBodyCenter))
-					//{
-					//	//Override default mesh size if we've provided one
+				//std::string sLatticeType = cLatticeType;
+				//if(sLatticeType == "softbody")
+				//{
+				//	//const char* cBodyCenter = latticeElem->Attribute("centerbody");
+				//	//if(cBodyCenter && mBodyNames.count(cBodyCenter))
+				//	//{
+				//	//	//Override default mesh size if we've provided one
 
-					//	SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
-					//	manim->addBody(mBodyNames[cBodyCenter], true);
-					//	manim->size = o->meshSize;
-					//	for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
-					//	{
-					//		if(i->first != cBodyCenter)
-					//			manim->addBody(i->second);
-					//	}
-					//	manim->init();
-					//	o->meshAnim = manim;
-					//	//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
-					//}
-				}
-				else if(sLatticeType == "sin")
-				{
-					SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
+				//	//	SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
+				//	//	manim->addBody(mBodyNames[cBodyCenter], true);
+				//	//	manim->size = o->meshSize;
+				//	//	for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
+				//	//	{
+				//	//		if(i->first != cBodyCenter)
+				//	//			manim->addBody(i->second);
+				//	//	}
+				//	//	manim->init();
+				//	//	o->meshAnim = manim;
+				//	//	//o->meshSize.Set(1,1);	//Can't take this into account on draw time; mesh will deform by hand
+				//	//}
+				//}
+				//else if(sLatticeType == "sin")
+				//{
+				//	SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
 
-					latticeElem->QueryFloatAttribute("amp", &manim->amp);
-					latticeElem->QueryFloatAttribute("freq", &manim->freq);
-					latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
+				//	latticeElem->QueryFloatAttribute("amp", &manim->amp);
+				//	latticeElem->QueryFloatAttribute("freq", &manim->freq);
+				//	latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
 
-					manim->init();
-					o->meshAnim = manim;
-				}
-				else if(sLatticeType == "wobble")
-				{
-					WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
+				//	manim->init();
+				//	o->meshAnim = manim;
+				//}
+				//else if(sLatticeType == "wobble")
+				//{
+				//	WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
 
-					latticeElem->QueryFloatAttribute("speed", &manim->speed);
-					latticeElem->QueryFloatAttribute("dist", &manim->startdist);
-					latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
-					latticeElem->QueryFloatAttribute("angle", &manim->startangle);
-					latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
-					latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
-					latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
+				//	latticeElem->QueryFloatAttribute("speed", &manim->speed);
+				//	latticeElem->QueryFloatAttribute("dist", &manim->startdist);
+				//	latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
+				//	latticeElem->QueryFloatAttribute("angle", &manim->startangle);
+				//	latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
+				//	latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
+				//	latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
 
-					manim->init();
-					o->meshAnim = manim;
-				}
+				//	manim->init();
+				//	o->meshAnim = manim;
+				//}
 			}
 
 		}
@@ -879,4 +896,111 @@ SoundLoop* ResourceLoader::getSoundLoop(const std::string & sID)
 		return (SoundLoop*)ret;
 	//Don't load song looping from file
 	return NULL;
+}
+
+static const float default_uvs[] =
+{
+	0.0f, 1.0f, // lower left
+	1.0f, 1.0f, // lower right
+	1.0f, 0.0f, // upper right
+	0.0f, 0.0f, // upper left
+};
+
+Image* ResourceLoader::loadImageFromFile(std::string filename)
+{
+	int comp = 0;
+	int width = 0;
+	int height = 0;
+	unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
+	
+	int mode = GL_RGBA;     // RGBA 32bit
+	if(comp == STBI_rgb) // RGB 24bit
+		mode = GL_RGB;
+	
+	if((cBuf == 0) || (width == 0) || (height == 0))
+	{
+		LOG(ERROR) << "Unable to load image " << filename;
+		return NULL;
+	}
+	
+	Texture* tex = bindTexture(cBuf, width, height, mode);
+	stbi_image_free(cBuf);
+
+	Image* img = new Image();
+	img->tex = *tex;
+	memcpy(img->uv, default_uvs, sizeof(float) * 8);
+	delete tex;
+	return img;
+}
+
+Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
+{
+	if(len < sizeof(TextureHeader))
+	{
+		LOG(ERROR) << "Decompressed image data smaller than texture header";
+		return NULL;
+	}
+	if(len > sizeof(TextureHeader))
+	{
+		LOG(WARNING) << "Ignoring extra " << len - sizeof(TextureHeader) << " bytes for texture";
+	}
+	
+	//Read header
+	TextureHeader header;
+	memcpy(&header, data, sizeof(TextureHeader));
+
+	Texture* atlas = getAtlas(header.atlasId);
+
+	Image* img = new Image();
+	memcpy(img->uv, header.coordinates, sizeof(float) * 8);
+	img->tex = *atlas;
+
+	return img;
+}
+
+Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode)
+{
+	Texture* tex = new Texture();
+	tex->width = width;
+	tex->height = height;
+	
+	//generate an OpenGL texture ID for this texture
+	glGenTextures(1, &tex->tex);
+	//bind to the new texture ID
+	glBindTexture(GL_TEXTURE_2D, tex->tex);
+	//store the texture data for OpenGL use
+	glTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, mode, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	return tex;
+}
+
+Texture* ResourceLoader::getAtlas(uint64_t atlasId)
+{
+	LOG(TRACE) << "Loading image atlas " << atlasId;
+	Texture* atlas = (Texture*)m_cache->find(atlasId);
+	if(!atlas)	//This image isn't here; load it
+	{
+		LOG(TRACE) << "Cache miss, load atlas from pak";
+
+		unsigned int len = 0;
+		unsigned char* buf = m_pakLoader->loadResource(atlasId, &len);
+		if(buf == NULL || len < sizeof(AtlasHeader))
+		{
+			LOG(ERROR) << "Unable to load image atlas " << atlasId << " from pak";
+			return NULL;
+		}
+
+		AtlasHeader* header = (AtlasHeader*)buf;
+		int mode = GL_RGBA;
+		if(header->bpp == TEXTURE_BPP_RGB)
+			mode = GL_RGB;
+		atlas = bindTexture(buf + sizeof(AtlasHeader), header->width, header->height, mode);
+
+		free(buf);
+
+		m_cache->add(atlasId, atlas);	//Add to the cache
+	}
+	return atlas;
 }

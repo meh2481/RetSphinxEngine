@@ -5,9 +5,8 @@
 
 #include "Object.h"
 #include "LuaFuncs.h"
-#include "Lattice.h"
-#include "Image.h"
 #include "opengl-api.h"
+#include "Quad.h"
 
 #include <Box2D/Box2D.h>
 #include "tinyxml2.h"
@@ -17,8 +16,6 @@
 //----------------------------------------------------------------------------------------------------
 Object::Object()
 {
-  meshLattice = NULL;
-  meshAnim = NULL;
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
@@ -40,10 +37,6 @@ Object::~Object()
 	}
     for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
         delete (*i);
-	if(meshLattice)
-		delete meshLattice;
-	if(meshAnim)
-		delete meshAnim;
 }
 
 void Object::draw(bool bDebugInfo)
@@ -70,16 +63,22 @@ void Object::draw(bool bDebugInfo)
 				//float fAngle = seg->body->GetAngle();
 				glPushMatrix();
 				glTranslatef(pos.x, pos.y, depth);
-				if(meshLattice)
-					img->renderLattice(meshLattice, meshSize);
-				else
-					img->render(meshSize);
-				
-				if(bDebugInfo && meshLattice)
-				{
-					glScalef(meshSize.x, meshSize.y, 1);
-					meshLattice->renderDebug();
-				}
+
+				Quad q;
+				q.tex = *img;
+				q.pos[0] = -meshSize.x / 2.0f;
+				q.pos[1] = -meshSize.y / 2.0f; // upper left
+
+				q.pos[2] = meshSize.x / 2.0f;
+				q.pos[3] = -meshSize.y / 2.0f; // upper right
+
+				q.pos[4] = meshSize.x / 2.0f;
+				q.pos[5] = meshSize.y / 2.0f; // lower right
+
+				q.pos[6] = -meshSize.x / 2.0f;
+				q.pos[7] = meshSize.y / 2.0f; // lower left
+
+				Draw::drawQuad(&q);
 				
 				glPopMatrix();
 			}
@@ -103,9 +102,6 @@ ObjSegment* Object::getSegment(unsigned int idx)
 
 void Object::update(float dt)
 {
-	if(meshAnim)
-		meshAnim->update(dt);
-	
 	if(lua)
 		lua->callMethod(this, "update", dt);
 }
@@ -182,8 +178,6 @@ ObjSegment::ObjSegment()
 {
     body = NULL;
 	parent = NULL;
-	lat = NULL;
-	latanim = NULL;
 	obj3D = NULL;
 	depth = 0;
 	img = NULL;
@@ -198,15 +192,11 @@ ObjSegment::~ObjSegment()
 	//Free Box2D body
 	if(body != NULL)
 		body->GetWorld()->DestroyBody(body);
-	if(lat)
-		delete lat;
-	if(latanim)
-		delete latanim;
 }
 
 void ObjSegment::draw(bool bDebugInfo)
 {
-	if(img == NULL || !active) return;
+	if(!active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
 	glPushMatrix();
 	if(body == NULL)
@@ -218,16 +208,28 @@ void ObjSegment::draw(bool bDebugInfo)
 			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_LIGHTING);
-			obj3D->render(img);
+			obj3D->render();
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_LIGHTING);
 		}
-		else
+		else if(img != NULL)
 		{
-			if(lat)
-				img->renderLattice(lat, size);
-			else
-				img->render(size, tile.x, tile.y);
+			Quad q;
+			q.tex = *img;
+			q.pos[0] = -size.x / 2.0f;
+			q.pos[1] = -size.y / 2.0f; // upper left
+
+			q.pos[2] = size.x / 2.0f;
+			q.pos[3] = -size.y / 2.0f; // upper right
+
+			q.pos[4] = size.x / 2.0f;
+			q.pos[5] = size.y / 2.0f; // lower right
+
+			q.pos[6] = -size.x / 2.0f;
+			q.pos[7] = size.y / 2.0f; // lower left
+
+			Draw::drawQuad(&q);
+			//img->render(size, tile.x, tile.y);
 		}
 	}
 	else
@@ -243,26 +245,32 @@ void ObjSegment::draw(bool bDebugInfo)
 			glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_LIGHTING);
-			obj3D->render(img);
+			obj3D->render();
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_LIGHTING);
 		}
-		else
+		else if(img != NULL)
 		{
-			if(lat)
-				img->renderLattice(lat, size);
-			else
-				img->render(size, tile.x, tile.y);
+			Quad q;
+			q.tex = *img;
+			q.pos[0] = -size.x / 2.0f;
+			q.pos[1] = -size.y / 2.0f; // upper left
+
+			q.pos[2] = size.x / 2.0f;
+			q.pos[3] = -size.y / 2.0f; // upper right
+
+			q.pos[4] = size.x / 2.0f;
+			q.pos[5] = size.y / 2.0f; // lower right
+
+			q.pos[6] = -size.x / 2.0f;
+			q.pos[7] = size.y / 2.0f; // lower left
+
+			Draw::drawQuad(&q);
+			//img->render(size, tile.x, tile.y);
 		}
 	}
 	glPopMatrix();
 	glColor4f(1.0f,1.0f,1.0f,1.0f);
-}
-
-void ObjSegment::update(float dt)
-{
-	if(latanim)
-		latanim->update(dt);
 }
 
 

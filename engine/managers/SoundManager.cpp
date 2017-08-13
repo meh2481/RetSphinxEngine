@@ -162,9 +162,9 @@ SoundManager::~SoundManager()
 	if(result)
 		LOG(WARNING) << "Unable to close FMOD: " << result;
 	for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
-		delete [] *i;
+		free(*i);
 	for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
-		delete (i->second);
+		free(i->second);
 	for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
 		delete *i;
 }

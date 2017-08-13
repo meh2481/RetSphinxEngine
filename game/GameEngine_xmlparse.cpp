@@ -3,7 +3,6 @@
 #include "tinyxml2.h"
 
 #include <Box2D/Box2D.h>
-#include "Image.h"
 #include "ResourceTypes.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"

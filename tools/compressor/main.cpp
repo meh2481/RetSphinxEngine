@@ -1,4 +1,5 @@
 //This program takes any file and outputs raw WFLZ-compressed data
+#include "main.h"
 #include "wfLZ.h"
 #include <iostream>
 #include <fstream>
@@ -11,23 +12,13 @@
 #include "StringUtils.h"
 #include "FileOperations.h"
 #include "tinyxml2.h"
-#include "Hash.h"
 
 #define PAD_32BIT 0x50444150
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
-#include "ResourceTypes.h"
 
-//Helper struct for compression
-typedef struct
-{
-	CompressionHeader header;
-	uint8_t* data;
-	unsigned int size;
-	uint64_t id;
-	std::string filename;
-} compressionHelper;
+bool g_bImageOut;
 
 typedef struct
 {
@@ -290,22 +281,22 @@ unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
 		return NULL;
 	}
 
-	TextureHeader textureHeader;
+	AtlasHeader textureHeader;
 	textureHeader.width = width;
 	textureHeader.height = height;
 	textureHeader.bpp = TEXTURE_BPP_RGBA;
-	if(comp == 3)
+	if(comp == STBI_rgb)
 		textureHeader.bpp = TEXTURE_BPP_RGB;
 
-	int size = sizeof(TextureHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
+	int size = sizeof(AtlasHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
 
 	if(fileSize)
 		*fileSize = size;
 
 	unsigned char* finalBuf = (unsigned char*)malloc(size);
 
-	memcpy(finalBuf, &textureHeader, sizeof(TextureHeader));
-	memcpy(&finalBuf[sizeof(TextureHeader)], imageBuf, size - sizeof(TextureHeader));
+	memcpy(finalBuf, &textureHeader, sizeof(AtlasHeader));
+	memcpy(&finalBuf[sizeof(AtlasHeader)], imageBuf, size - sizeof(AtlasHeader));
 
 	stbi_image_free(imageBuf);
 	return finalBuf;
@@ -452,15 +443,48 @@ std::list<std::string> readFilenames(const std::string& filelistFile)
 	return lFilenames;
 }
 
+static uint8_t* workMem;
+void createCompressionHelper(CompressionHelper* helper, unsigned char* decompressed, unsigned int size)
+{
+	helper->header.compressionType = COMPRESSION_FLAGS_WFLZ;
+	helper->header.decompressedSize = size;
+	uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper->header.decompressedSize));
+	helper->header.compressedSize = wfLZ_CompressFast(decompressed, size, compressed, workMem, 0);
+
+	//See if compression made the file larger
+	if(helper->header.compressedSize >= helper->header.decompressedSize)
+	{
+		//It did; use the uncompressed data instead
+		helper->header.compressionType = COMPRESSION_FLAGS_UNCOMPRESSED;
+		helper->header.compressedSize = helper->header.decompressedSize;
+		helper->data = decompressed;
+		free(compressed);
+	}
+	else
+	{
+		//It didn't; use the compressed data
+		helper->data = compressed;
+		free(decompressed);
+	}
+
+	//Add this compression helper to our list
+	helper->size = helper->header.compressedSize;
+	//helper->id = Hash::hash(filename.c_str());
+}
+
+static std::list<CompressionHelper> compressedFiles;
+void addHelper(const CompressionHelper& helper)
+{
+	compressedFiles.push_back(helper);
+}
+
 void compress(std::list<std::string> filesToPak, const std::string& in)
 {
+	compressedFiles.clear();
+
 	std::string pakFilename = remove_extension(in);
 	pakFilename += ".pak";
 	std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
-
-	uint8_t* workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
-
-	std::list<compressionHelper> compressedFiles;
 
 	for(std::list<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
@@ -468,17 +492,56 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		unsigned int size = 0;
 		unsigned char* decompressed;
 
+		CompressionHelper helper;
+		helper.header.type = RESOURCE_TYPE_UNKNOWN;	//Default unknown type
+		helper.id = Hash::hash(i->c_str());
+
 		//Package these file types properly if needed
 		if(i->find(".png") != std::string::npos)
-			decompressed = extractImage(*i, &size);
+		{
+			addImage(*i);
+			continue;		//Skip this, as we'll add the image/atlas later
+		}
 		else if(i->find(".font") != std::string::npos)
+		{
 			decompressed = extractFont(*i, &size);
+			helper.header.type = RESOURCE_TYPE_FONT;
+		}
 		else if(i->find("stringbank.xml") != std::string::npos)
+		{
 			decompressed = extractStringbank(*i, &size);
+			helper.header.type = RESOURCE_TYPE_STRINGBANK;
+		}
 		else if(i->find(".loop") != std::string::npos)
+		{
 			decompressed = extractSoundLoop(*i, &size);
-		else
+			helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
+		}
+		else if(i->find(".obj") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_MESH;
+			decompressed = extractMesh(*i, &size);
+		}
+		else if(i->find(".json") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_JSON;
 			decompressed = FileOperations::readFile(*i, &size);
+		}
+		else if(i->find(".xml") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_XML;
+			decompressed = FileOperations::readFile(*i, &size);
+		}
+		else if(i->find(".3d") != std::string::npos)
+		{
+			helper.header.type = RESOURCE_TYPE_OBJ;
+			decompressed = extract3dObject(*i, &size);
+		}
+		else
+		{
+			decompressed = FileOperations::readFile(*i, &size);	//Store as-is
+			std::cout << "Warning: unknown resource type for file " << *i << std::endl;
+		}
 
 		if(!size || !decompressed)
 		{
@@ -486,36 +549,12 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 			continue;
 		}
 
-		compressionHelper helper;
-		helper.filename = *i;
-		helper.header.pad = PAD_32BIT;
-		helper.header.compressionType = COMPRESSION_FLAGS_WFLZ;
-		helper.header.decompressedSize = size;
-		uint8_t* compressed = (uint8_t*)malloc(wfLZ_GetMaxCompressedSize(helper.header.decompressedSize));
-		helper.header.compressedSize = wfLZ_CompressFast(decompressed, size, compressed, workMem, 0);
-
-		//See if compression made the file larger
-		if(helper.header.compressedSize >= helper.header.decompressedSize)
-		{
-			//It did; use the uncompressed data instead
-			helper.header.compressionType = COMPRESSION_FLAGS_UNCOMPRESSED;
-			helper.header.compressedSize = helper.header.decompressedSize;
-			helper.data = decompressed;
-			free(compressed);
-		}
-		else
-		{
-			//It didn't; use the compressed data
-			helper.data = compressed;
-			free(decompressed);
-		}
-
-		//Add this compression helper to our list
-		helper.size = helper.header.compressedSize;
-		helper.id = Hash::hash(i->c_str());
-
-		compressedFiles.push_back(helper);
+		createCompressionHelper(&helper, decompressed, size);
+		addHelper(helper);
 	}
+
+	//Now that we have all images, pack any atlases
+	packImages(in);
 
 	//Open output file
 	FILE *fOut = fopen(pakFilename.c_str(), "wb");
@@ -537,7 +576,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	uint64_t curOffset = (uint64_t)sizeof(PakFileHeader) + (uint64_t)compressedFiles.size() * (uint64_t)sizeof(ResourcePtr);	//Start after both these
 
 	//Write resource pointers
-	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
@@ -548,7 +587,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	}
 
 	//Write resource data
-	for(std::list<compressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		fwrite(&i->header, 1, sizeof(CompressionHeader), fOut);
 		fwrite(i->data, 1, i->size, fOut);
@@ -556,26 +595,31 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 		free(i->data);	//Free image data while we're at it
 	}
 
-	//Free our WFLZ working memory
-	free(workMem);
-
 	//Close output file
 	fclose(fOut);
 }
 
 int main(int argc, char** argv)
 {
+	g_bImageOut = false;
+	workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
 	std::list<std::string> sFilelistNames;
+
 	//Parse commandline
 	for(int i = 1; i < argc; i++)
 	{
 		std::string s = argv[i];
-		sFilelistNames.push_back(s);
+		if(s == "--img")
+			g_bImageOut = true;
+		else
+			sFilelistNames.push_back(s);
 	}
+
 	//Compress files
 	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
-	{
 		compress(readFilenames(*i), *i);
-	}
+
+	//Free our WFLZ working memory
+	free(workMem);
 	return 0;
 }

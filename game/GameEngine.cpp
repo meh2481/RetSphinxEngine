@@ -6,7 +6,6 @@
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
-#include "Image.h"
 #include "opengl-api.h"
 #include "easylogging++.h"
 #include "DebugUI.h"
@@ -29,7 +28,6 @@
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
-float g_fParticleFac;
 
 GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
@@ -49,8 +47,6 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTi
 	
 	//Keybinding stuff!
 	JOY_AXIS_TRIP = 20000;
-
-	g_fParticleFac = 1.0f;
 
 	m_debugUI = new DebugUI(this);
 
@@ -199,8 +195,9 @@ void GameEngine::draw()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_BLEND);
 		Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
-		if(disconnectedImage)
-			disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
+		//TODO
+		//if(disconnectedImage)
+		//	disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
 	}
 	
 }

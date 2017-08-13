@@ -2,7 +2,6 @@
 #include <ctime>
 #include <climits>
 #include <iomanip>
-#include "Image.h"
 #include "easylogging++.h"
 #include <SDL_opengl.h>
 #include "stb_image_write.h"
