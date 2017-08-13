@@ -1,8 +1,9 @@
 #include "ImgFont.h"
 #include "easylogging++.h"
+#include "Quad.h"
 #include <cstring>
 
-ImgFont::ImgFont(Texture* image, unsigned int count, uint32_t* codePoints, float* imgRects)
+ImgFont::ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
 	//Make sure data is valid
 	assert(count > 1);

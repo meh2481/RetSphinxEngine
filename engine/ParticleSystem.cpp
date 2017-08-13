@@ -9,6 +9,7 @@
 #include "easylogging++.h"
 #include "Random.h"
 #include "OpenGLShader.h"
+#include "Quad.h"
 
 ParticleSystem::ParticleSystem()
 {
@@ -316,7 +317,7 @@ void ParticleSystem::update(float dt)
 	else if(firing)
 		startedFiring = curTime;
 	
-	spawnCounter += dt * rate * curRate * g_fParticleFac;
+	spawnCounter += dt * rate * curRate;
 
 	int iSpawnAmt = (int)floor(spawnCounter);
 	spawnCounter -= iSpawnAmt;
@@ -542,7 +543,7 @@ void ParticleSystem::init()
 	if(m_num)
 		_deleteAll();
 	
-	m_totalAmt = (unsigned int)ceilf(max * g_fParticleFac);
+	m_totalAmt = max;
 	
 	if(!m_totalAmt) return;
 	

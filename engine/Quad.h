@@ -1,24 +1,27 @@
 #pragma once
 #include "SDL_opengl.h"
 
-typedef struct
+class TextureHandle
 {
+public:
 	GLuint tex;
 	unsigned int width;
 	unsigned int height;
-} TextureHandle;
+};
 
-typedef struct
+class Image
 {
+public:
 	TextureHandle tex;
 	GLfloat uv[8];
-} Texture;
+};
 
-typedef struct
+class Quad
 {
-	Texture tex;
+public:
+	Image tex;
 	GLfloat pos[8];
-} Quad;
+};
 
 namespace Draw
 {

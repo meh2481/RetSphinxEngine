@@ -11,6 +11,7 @@
 #include "Hash.h"
 #include "Stringbank.h"
 #include "ResourceTypes.h"
+#include "Quad.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
@@ -37,10 +38,10 @@ void ResourceLoader::clearCache()
 	m_pakLoader->loadFromDir(m_sPakDir);	//re-parse
 }
 
-Texture* ResourceLoader::getImage(uint64_t hashID)
+Image* ResourceLoader::getImage(uint64_t hashID)
 {
 	LOG(TRACE) << "Loading Image from ID " << hashID;
-	Texture* img = (Texture*)m_cache->find(hashID);
+	Image* img = (Image*)m_cache->find(hashID);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Cache miss";
@@ -61,11 +62,11 @@ Texture* ResourceLoader::getImage(uint64_t hashID)
 	return img;
 }
 
-Texture* ResourceLoader::getImage(const std::string& sID)
+Image* ResourceLoader::getImage(const std::string& sID)
 {
 	LOG(TRACE) << "Loading image " << sID;
 	uint64_t hashVal = Hash::hash(sID.c_str());
-	Texture* img = getImage(hashVal);
+	Image* img = getImage(hashVal);
 	if(!img)	//This image isn't here; load it
 	{
 		LOG(TRACE) << "Attempting to load from file";
@@ -96,7 +97,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
 			LOG(TRACE) << "Pak hit - load from data";
 
 			//Get image
-			Texture* img = getImage(header->textureId);
+			Image* img = getImage(header->textureId);
 
 			//Get 3D mesh
 			unsigned char* meshData = (unsigned char*)m_cache->find(header->meshId);
@@ -905,7 +906,7 @@ static const float default_uvs[] =
 	0.0f, 0.0f, // upper left
 };
 
-Texture* ResourceLoader::loadImageFromFile(std::string filename)
+Image* ResourceLoader::loadImageFromFile(std::string filename)
 {
 	int comp = 0;
 	int width = 0;
@@ -922,12 +923,12 @@ Texture* ResourceLoader::loadImageFromFile(std::string filename)
 		return NULL;
 	}
 	
-	Texture* img = bindImage(cBuf, width, height, mode, default_uvs);
+	Image* img = bindImage(cBuf, width, height, mode, default_uvs);
 	stbi_image_free(cBuf);
 	return img;
 }
 
-Texture* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
+Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 {
 	if(len < sizeof(TextureHeader))
 	{
@@ -945,7 +946,7 @@ Texture* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len
 
 	TextureHandle* atlas = getAtlas(header.atlasId);
 
-	Texture* img = new Texture();
+	Image* img = new Image();
 	memcpy(img->uv, header.coordinates, sizeof(float) * 8);
 	img->tex = *atlas;
 
@@ -967,9 +968,9 @@ Texture* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len
 	//bindImage(data, header.width, header.height, mode);
 }
 
-Texture* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs)
+Image* ResourceLoader::bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs)
 {
-	Texture* img = new Texture();
+	Image* img = new Image();
 	img->tex.width = width;
 	img->tex.height = height;
 	memcpy(img->uv, uvs, sizeof(float) * 8);
@@ -1002,12 +1003,12 @@ TextureHandle* ResourceLoader::getAtlas(uint64_t atlasId)
 			return NULL;
 		}
 
-		//TODO: Don't re-use Texture code here, thazzdumb
+		//TODO: Don't re-use Image code here, thazzdumb
 		AtlasHeader* header = (AtlasHeader*)buf;
 		int mode = GL_RGBA;
 		if(header->bpp == TEXTURE_BPP_RGB)
 			mode = GL_RGB;
-		Texture* img = bindImage(buf + sizeof(AtlasHeader), header->width, header->height, mode, default_uvs);
+		Image* img = bindImage(buf + sizeof(AtlasHeader), header->width, header->height, mode, default_uvs);
 
 		texHandle = new TextureHandle();
 		texHandle->height = img->tex.height;

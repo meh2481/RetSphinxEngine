@@ -6,8 +6,9 @@
 #include <assert.h>
 #include "opengl-api.h"
 #include "ResourceTypes.h"
+#include "Quad.h"
 
-Object3D::Object3D(unsigned char* data, Texture* tex)
+Object3D::Object3D(unsigned char* data, Image* tex)
 {
 	num = 0;
 	m_vertexPtr = m_normalPtr = m_texCoordPtr = NULL;
@@ -21,7 +22,7 @@ Object3D::~Object3D()
 	free(m_texCoordPtr);
 }
 
-void Object3D::_fromData(unsigned char* data, Texture* tex)
+void Object3D::_fromData(unsigned char* data, Image* tex)
 {
 	MeshHeader* header = (MeshHeader*)data;
 	num = header->numVertices;

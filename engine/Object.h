@@ -13,11 +13,11 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Quad.h"
 
 class Object;
 class ObjSegment;
 class b2Body;
+class Image;
 struct b2BodyDef;
 
 //Physical segments of objects - be they actual physics bodies or just images
@@ -38,7 +38,7 @@ public:
 	float rot;
 	Vec2 size;	//Actual texel size; not pixels
 	float depth;
-	Texture* img;
+	Image* img;
 	bool active;
 	Color col;
 
@@ -62,7 +62,7 @@ public:
 	LuaInterface* lua;
 	std::string luaClass;
 	float depth;
-	Texture* img;
+	Image* img;
 	bool active;
 	Color col;
     
@@ -84,7 +84,7 @@ public:
 	void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
 	std::string getProperty(const std::string& prop)				{if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
 	
-	void setImage(Texture* img, unsigned int seg = 0);	//Sets the image of the given physSegment
+	void setImage(Image* img, unsigned int seg = 0);	//Sets the image of the given physSegment
 };
 
 

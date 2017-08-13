@@ -1,12 +1,13 @@
 #pragma once
 #include <stdint.h>
 #include "Rect.h"
-#include "Quad.h"
+
+class Image;
 
 class ImgFont
 {
 	unsigned int num;
-	Texture* img;
+	Image* img;
 	uint32_t* codepoints;
 	float* rects;
 
@@ -18,7 +19,7 @@ class ImgFont
 	float* getNextRect(const char** str);			//Get the next image rect for the given string position & increment the pointer
 
 public:
-	ImgFont(Texture* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
+	ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects);	//codepoint/imgrect mem will be freed on obj deletion NOTE MUST BE CREATED WITH MALLOC
 	~ImgFont();
 
 	void renderString(const char* str, float drawPt, Vec2 drawOffset);

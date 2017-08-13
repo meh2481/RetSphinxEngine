@@ -6,7 +6,6 @@
 #include "Box2D/Box2D.h"
 #include "Rect.h"
 #include "SDL.h"
-#include "Quad.h"
 #include "ResourceTypes.h"
 
 class Object;
@@ -17,6 +16,8 @@ class Object3D;
 class PakLoader;
 class ImgFont;
 class Stringbank;
+class Image;
+class TextureHandle;
 
 class ResourceLoader
 {
@@ -26,9 +27,9 @@ class ResourceLoader
 	std::string m_sPakDir;
 
 	std::string readTextFile(const std::string& filename);
-	Texture* loadImageFromFile(std::string filename); 
-	Texture* loadImageFromData(unsigned char* data, unsigned int len);
-	Texture* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
+	Image* loadImageFromFile(std::string filename); 
+	Image* loadImageFromData(unsigned char* data, unsigned int len);
+	Image* bindImage(unsigned char* data, unsigned int width, unsigned int height, int mode, const float* uvs);
 	TextureHandle* getAtlas(uint64_t atlasId);
 
 	ResourceLoader() {};
@@ -40,8 +41,8 @@ public:
 	void clearCache();
 
 	//Images
-	Texture* getImage(const std::string& sID);
-	Texture* getImage(uint64_t hashID);
+	Image* getImage(const std::string& sID);
+	Image* getImage(uint64_t hashID);
 	SDL_Surface* getSDLImage(const std::string& sID);
 
 	//Meshes

@@ -2,7 +2,7 @@
 	GameEngine source - Text.cpp
 	Copyright (c) 2014 Mark Hutcheson
 */
-
+#include "Quad.h"
 #include "Text.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"

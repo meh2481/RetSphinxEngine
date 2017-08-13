@@ -7,6 +7,7 @@
 #include "GameEngine.h"
 #include "tinyxml2.h"
 #include "Rect.h"
+#include "Quad.h"
 #include <vector>
 
 #define PARTICLE_SYSTEM_PATH "res/particles/"

@@ -7,6 +7,7 @@
 #include "LuaFuncs.h"
 //#include "Lattice.h"
 #include "opengl-api.h"
+#include "Quad.h"
 
 #include <Box2D/Box2D.h>
 #include "tinyxml2.h"
@@ -133,7 +134,7 @@ b2Body* Object::getBody()
 	return NULL;
 }
 
-void Object::setImage(Texture* img, unsigned int seg)
+void Object::setImage(Image* img, unsigned int seg)
 {
 	if(segments.size() > seg)
 		segments[seg]->img = img;

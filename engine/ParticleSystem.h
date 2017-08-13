@@ -11,10 +11,9 @@
 #include "Subject.h"
 #include "Rect.h"
 #include "Color.h"
-#include "Quad.h"
 #include <vector>
 
-extern float g_fParticleFac;
+class Image;
 
 typedef enum 
 {
@@ -108,7 +107,7 @@ public:
 	Vec3	rotAxisVar;
 	
 	//Particle system variables
-	Texture*				img;				//Image to use for all of these particles	//TODO: Use quad instead
+	Image*				img;				//Image to use for all of these particles	//TODO: Use quad instead
 	std::vector<Rect>	imgRect;			//Possible positions in this image to use for each particle
 	unsigned 			max;				//Max # of particles
 	float 				rate;				//How many particles to emit per second

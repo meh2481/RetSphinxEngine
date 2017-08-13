@@ -4,7 +4,9 @@
 */
 #pragma once
 #include <string>
-#include "Quad.h"
+#include "SDL_opengl.h"
+
+class Image;
 
 class Object3D
 {
@@ -15,12 +17,12 @@ protected:
 	uint32_t num;
 	GLuint m_tex;
 	
-	void _fromData(unsigned char* data, Texture* tex);
+	void _fromData(unsigned char* data, Image* tex);
 
 	Object3D() {};
 
 public:
-	Object3D(unsigned char* data, Texture* tex);
+	Object3D(unsigned char* data, Image* tex);
     ~Object3D();
 
     void render();
