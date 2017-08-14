@@ -1,6 +1,7 @@
 #include "ImgFont.h"
 #include "easylogging++.h"
 #include "Quad.h"
+#include "SDL_opengl.h"
 #include <cstring>
 
 ImgFont::ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)

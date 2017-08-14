@@ -1,4 +1,5 @@
 #include "Quad.h"
+#include "SDL_opengl.h"
 
 namespace Draw
 {
