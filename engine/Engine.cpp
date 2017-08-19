@@ -230,7 +230,8 @@ bool Engine::_frame()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
-		ImGui_ImplSdl_ProcessEvent(&event);
+		if(drawDebugUI())
+			ImGui_ImplSdl_ProcessEvent(&event);
 
 		if(_processEvent(event))
 			return true;
@@ -240,7 +241,8 @@ bool Engine::_frame()
 			handleEvent(event);
 	}
 
-	ImGui_ImplSdl_NewFrame(m_Window);
+	if(drawDebugUI())
+		ImGui_ImplSdl_NewFrame(m_Window);
 
 	if(m_bPaused || m_bControllerDisconnected)
 	{
@@ -298,7 +300,8 @@ void Engine::_render()
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	ImGui::Render();
+	if(drawDebugUI())
+		ImGui::Render();
 
 	glPopMatrix();
 

@@ -10,12 +10,10 @@ class Image;
 class Object3D
 {
 protected:
-	unsigned long m_vertexPtr;
-	unsigned long m_normalPtr;
-	unsigned long m_texCoordPtr;
 	uint32_t num;
 	unsigned int m_tex;
 	unsigned int vertBuf;
+	unsigned int vertArray;
 	
 	void _fromData(unsigned char* data, Image* tex);
 

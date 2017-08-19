@@ -12,7 +12,6 @@
 Object3D::Object3D(unsigned char* data, Image* tex)
 {
 	num = 0;
-	m_vertexPtr = m_normalPtr = m_texCoordPtr = 0;
 	m_tex = tex->tex.tex;
 
 	_fromData(data, tex);
@@ -34,12 +33,12 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	memcpy(bufferData, (void*)((size_t)data + sizeof(MeshHeader)), len);
 
 	//Assign pointers to vertex/texture/normal data
-	m_vertexPtr = 0;
-	m_texCoordPtr = m_vertexPtr + sizeof(float) * 3 * num;
-	m_normalPtr = m_texCoordPtr + sizeof(float) * 2 * num;
+	unsigned long vertexPtr = 0;
+	unsigned long texCoordPtr = vertexPtr + sizeof(float) * 3 * num;
+	unsigned long normalPtr = texCoordPtr + sizeof(float) * 2 * num;
 
 	//Offset UV coordinates by tex->uv
-	float* uv = (float*)(m_texCoordPtr + (unsigned long)bufferData);
+	float* uv = (float*)(texCoordPtr + (unsigned long)bufferData);
 	float left = tex->uv[0];
 	float right = tex->uv[2];
 	float top = tex->uv[5];
@@ -53,10 +52,19 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	}
 
 	//Gen vertex buffer
+	glGenVertexArrays(1, &vertArray);
+	glBindVertexArray(vertArray);
 	glGenBuffers(1, &vertBuf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
 	glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 0, (void*)vertexPtr);
+	glEnableClientState(GL_VERTEX_ARRAY);	//TODO: Shaders and glEnableVertexAttribArray() instead
+	glTexCoordPointer(2, GL_FLOAT, 0, (void*)texCoordPtr);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, (void*)normalPtr);
+	glEnableClientState(GL_NORMAL_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	//Free buffer data
 	free(bufferData);
@@ -68,14 +76,9 @@ void Object3D::render()
 	assert(num > 0);
 
 	glBindTexture(GL_TEXTURE_2D, m_tex);	//Bind texture
-	glBindBuffer(GL_ARRAY_BUFFER, vertBuf);	//Bind buffer
 
 	//Set pointers
-	glTexCoordPointer(2, GL_FLOAT, 0, (void*)m_texCoordPtr);
-	glNormalPointer(GL_FLOAT, 0, (void*)m_normalPtr);
-	glVertexPointer(3, GL_FLOAT, 0, (void*)m_vertexPtr);
-
+	glBindVertexArray(vertArray);
 	glDrawArrays(GL_TRIANGLES, 0, num);	//Render
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);	//Unbind buffer
+	glBindVertexArray(0);
 }

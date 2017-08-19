@@ -256,7 +256,10 @@ void GameEngine::warpObjectToNode(Object* o, Node* n)
 		o->setPosition(n->pos);
 }
 
-
+bool GameEngine::drawDebugUI()
+{
+	return m_debugUI->visible;
+}
 
 
 
