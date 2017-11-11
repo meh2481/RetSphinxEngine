@@ -348,8 +348,9 @@ void Engine::fillScreen(Color col)
 
 void Engine::setFramerate(float fFramerate)
 {
-	if(fFramerate < 30.0)
-		fFramerate = 30.0;	//30fps is bare minimum
+	LOG(TRACE) << "Setting framerate to " << fFramerate;
+	if(fFramerate < 60.0)
+		fFramerate = 60.0;	//60fps is bare minimum
 	if(m_fFramerate == 0.0)
 		m_fAccumulatedTime = (float)SDL_GetTicks() / 1000.0f;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
 	m_fFramerate = fFramerate;
