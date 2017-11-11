@@ -99,6 +99,7 @@ protected:
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
+	virtual bool drawDebugUI() = 0;	//Test to see if debug (imGui) should be drawn
 
 public:
 	//Constructor/destructor

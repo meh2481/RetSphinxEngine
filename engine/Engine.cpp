@@ -230,7 +230,8 @@ bool Engine::_frame()
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
-		ImGui_ImplSdl_ProcessEvent(&event);
+		if(drawDebugUI())
+			ImGui_ImplSdl_ProcessEvent(&event);
 
 		if(_processEvent(event))
 			return true;
@@ -240,7 +241,8 @@ bool Engine::_frame()
 			handleEvent(event);
 	}
 
-	ImGui_ImplSdl_NewFrame(m_Window);
+	if(drawDebugUI())
+		ImGui_ImplSdl_NewFrame(m_Window);
 
 	if(m_bPaused || m_bControllerDisconnected)
 	{
@@ -250,7 +252,7 @@ bool Engine::_frame()
 	}
 
 	float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
-	if(m_fAccumulatedTime <= fCurTime)
+	if(m_fAccumulatedTime <= fCurTime + m_fTargetTime * 2.0f)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 #ifdef _DEBUG
@@ -260,13 +262,15 @@ bool Engine::_frame()
 #endif
 
 			frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+			
 #ifdef _DEBUG
 		}
 #endif
-		_render();
 	}
+	_render();	//Render at uncapped FPS
 
-	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
+
+    if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
 		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
 	return m_bQuitting;
 }
@@ -298,7 +302,8 @@ void Engine::_render()
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	ImGui::Render();
+	if(drawDebugUI())
+		ImGui::Render();
 
 	glPopMatrix();
 
@@ -343,8 +348,9 @@ void Engine::fillScreen(Color col)
 
 void Engine::setFramerate(float fFramerate)
 {
-	if(fFramerate < 30.0)
-		fFramerate = 30.0;	//30fps is bare minimum
+	LOG(TRACE) << "Setting framerate to " << fFramerate;
+	if(fFramerate < 60.0)
+		fFramerate = 60.0;	//60fps is bare minimum
 	if(m_fFramerate == 0.0)
 		m_fAccumulatedTime = (float)SDL_GetTicks() / 1000.0f;	 //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
 	m_fFramerate = fFramerate;
@@ -540,7 +546,8 @@ bool Engine::getDoubleBuffered()
 
 void Engine::setVsync(int iVsync)
 {
-	SDL_GL_SetSwapInterval(iVsync);
+	if(SDL_GL_SetSwapInterval(iVsync) == -1)
+		SDL_GL_SetSwapInterval(1); //Default to vsync on if this fails
 }
 
 int Engine::getVsync()

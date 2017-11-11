@@ -1,7 +1,9 @@
 Current higher pri:
-- Figure out framerate jitter
+- Burgermaking minigame time!
+- Ship stops suddenly when moving joystick slowly towards center position
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
+- Along the same vein, particles are affected by framerate
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx

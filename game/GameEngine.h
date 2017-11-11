@@ -64,6 +64,7 @@ protected:
 	void init(std::list<commandlineArg> sArgs);
 	void pause();
 	void resume();
+	bool drawDebugUI();
 	
 	//Defined in GameEngine_events.cpp
 	void handleEvent(SDL_Event event);

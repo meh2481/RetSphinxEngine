@@ -4,18 +4,16 @@
 */
 #pragma once
 #include <string>
-#include "SDL_opengl.h"
 
 class Image;
 
 class Object3D
 {
 protected:
-	const float* m_vertexPtr;
-	const float* m_normalPtr;
-	float* m_texCoordPtr;
 	uint32_t num;
-	GLuint m_tex;
+	unsigned int m_tex;
+	unsigned int vertBuf;
+	unsigned int vertArray;
 	
 	void _fromData(unsigned char* data, Image* tex);
 
