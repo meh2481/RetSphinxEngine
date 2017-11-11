@@ -79,7 +79,7 @@ void Engine::setup_sdl()
 		LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
 		exit(1);
 	}
-	assert(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == 0);	//TODO: Figure out vsync and add way to enable/disable
+	assert(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == 0);
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3) == 0);
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0) == 0);
 
@@ -99,8 +99,7 @@ void Engine::setup_sdl()
             LOG(ERROR) << "Error creating OpenGL context: " << SDL_GetError();
             exit(1);
         }
-	if(SDL_GL_SetSwapInterval(-1) == -1) //Apparently Vsync or something
-		SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(1);	//Default to vsync on
 
 	SDL_DisplayMode mode;
 	SDL_GetDisplayMode(0, 0, &mode);

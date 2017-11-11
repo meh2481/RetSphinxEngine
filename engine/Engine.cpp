@@ -252,7 +252,7 @@ bool Engine::_frame()
 	}
 
 	float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
-	if(m_fAccumulatedTime <= fCurTime + (m_fTargetTime * 2.0f))
+	if(m_fAccumulatedTime <= fCurTime + m_fTargetTime)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 #ifdef _DEBUG
@@ -262,15 +262,16 @@ bool Engine::_frame()
 #endif
 
 			frame(m_fTargetTime);	//Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+			
 #ifdef _DEBUG
 		}
 #endif
 	}
-
 	_render();	//Render at uncapped FPS
 
-//	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
-//		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
+
+    if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
+		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
 	return m_bQuitting;
 }
 
@@ -544,7 +545,8 @@ bool Engine::getDoubleBuffered()
 
 void Engine::setVsync(int iVsync)
 {
-	SDL_GL_SetSwapInterval(iVsync);
+	if(SDL_GL_SetSwapInterval(iVsync) == -1)
+		SDL_GL_SetSwapInterval(1); //Default to vsync on if this fails
 }
 
 int Engine::getVsync()
