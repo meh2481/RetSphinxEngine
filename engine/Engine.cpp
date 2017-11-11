@@ -252,7 +252,7 @@ bool Engine::_frame()
 	}
 
 	float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
-	if(m_fAccumulatedTime <= fCurTime + m_fTargetTime)
+	if(m_fAccumulatedTime <= fCurTime + m_fTargetTime * 2.0f)
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 #ifdef _DEBUG
