@@ -252,7 +252,7 @@ bool Engine::_frame()
 	}
 
 	float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
-	if(m_fAccumulatedTime <= fCurTime)
+	if(m_fAccumulatedTime <= fCurTime + (m_fTargetTime * 2.0f))
 	{
 		m_fAccumulatedTime += m_fTargetTime;
 #ifdef _DEBUG
@@ -265,11 +265,12 @@ bool Engine::_frame()
 #ifdef _DEBUG
 		}
 #endif
-		_render();
 	}
 
-	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
-		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
+	_render();	//Render at uncapped FPS
+
+//	if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)	//We've gotten far too behind; we could have a huge FPS jump if the load lessens
+//		m_fAccumulatedTime = fCurTime;	 //Drop any frames past this
 	return m_bQuitting;
 }
 
