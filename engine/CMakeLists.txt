@@ -95,9 +95,10 @@ managers/SoundManager.cpp
 set(engine_actions_src
 actions/Action.h
 actions/ActionBind.h
-actions/NoAction.h
 actions/AxisAction.h
 actions/AxisAction.cpp
+actions/CombinedAction.h
+actions/CombinedAction.cpp
 actions/JoyButtonAction.h
 actions/JoyButtonAction.cpp
 actions/KeyboardAction.h
@@ -106,6 +107,7 @@ actions/MouseButtonAction.h
 actions/MouseButtonAction.cpp
 actions/Movement.h
 actions/MovementBind.h
+actions/NoAction.h
 actions/NoMovement.h
 actions/JoystickMovement.h
 actions/JoystickMovement.cpp

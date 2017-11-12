@@ -441,15 +441,15 @@ luaFunc(obj_getProperty)	//string obj_getProperty(Object* o, string sProp)
 	luaReturnString(s);
 }
 
-luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int seg = 1)
+luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int seg = 0)
 {
 	Object *o = getObj<Object>(L);
 	if(o)
 	{
-		lua_Integer seg = 1;
+		lua_Integer seg = 0;
 		if(lua_isinteger(L, 3))
 			seg = lua_tointeger(L, 3);
-		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg - 1);	//Lua remains 1-indexed, C++ side 0-indexed
+		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg);	//Lua remains 1-indexed, C++ side 0-indexed
 	}
 	luaReturnNil();
 }
@@ -1021,6 +1021,10 @@ static const struct
 	luaConstant(SHIP_THRUST),
 	luaConstant(EXAMINE),
 	luaConstant(ATTACK),
+	luaConstant(NOTE_UP),
+	luaConstant(NOTE_DOWN),
+	luaConstant(NOTE_LEFT),
+	luaConstant(NOTE_RIGHT),
 
 	//Movement actions
 	luaConstant(MOVE),
