@@ -51,8 +51,8 @@ function notereceiver:update(dt)
 	local cur_y = self.SIZE_Y
 	
 	if action_digital(self.DIR) then
-		cur_x = cur_x / 2.0
-		cur_y = cur_y / 2.0
+		cur_x = cur_x / 1.1
+		cur_y = cur_y / 1.1
 	end
 	
 	--Set size for this frame

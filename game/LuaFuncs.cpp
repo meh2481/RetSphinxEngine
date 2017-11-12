@@ -371,6 +371,7 @@ luaFunc(obj_create) //Object* obj_create(string className, float xpos, float ypo
 		ptVel.x = (float)lua_tonumber(L, 4);
 	if(lua_isnumber(L, 5))
 		ptVel.y = (float)lua_tonumber(L, 5);
+	//TODO: Seems to ignore vel
 	Object* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
 	if(o)
 	{
