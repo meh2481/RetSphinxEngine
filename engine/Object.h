@@ -62,6 +62,7 @@ public:
 	float depth;
 	Image* img;
 	bool active;
+	bool alive;
 	Color col;
     
     Object();

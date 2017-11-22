@@ -455,6 +455,17 @@ luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int se
 	luaReturnNil();
 }
 
+luaFunc(obj_destroy)	//void obj_destroy(Object* o)
+{
+	Object *o = getObj<Object>(L);
+	if(o)
+	{
+		o->active = false;
+		o->alive = false;
+	}
+	luaReturnNil();
+}
+
 
 //-----------------------------------------------------------------------------------------------------------
 // Object segment functions
@@ -984,6 +995,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_isActive),
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
+	luaRegister(obj_destroy),
 	//particle fx
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),

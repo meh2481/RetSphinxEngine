@@ -22,6 +22,7 @@ Object::Object()
   depth = 0; 
   img = NULL; 
   active = true;
+  alive = true;
   segments.reserve(1);	//don't expect very many segments
 }
 
