@@ -661,6 +661,7 @@ luaFunc(node_get)	//Node* node_get(string nodeName)
 	luaReturnNil();
 }
 
+//TODO: Doesn't work?
 luaFunc(node_isInside) //bool node_isInside(Node* n, float x, float y)
 {
 	bool bInside = false;

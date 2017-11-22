@@ -44,11 +44,20 @@ function node_notereceiver:collide(object)
 				print "miss"
 			end
 		elseif self.DIRECTION == "down" then
-		
+			if objy > self.Y then
+				obj_destroy(object)
+				print "miss"
+			end
 		elseif self.DIRECTION == "left" then
-		
+			if objx > self.X then
+				obj_destroy(object)
+				print "miss"
+			end
 		elseif self.DIRECTION == "right" then
-		
+			if objx < self.X then
+				obj_destroy(object)
+				print "miss"
+			end
 		end
 	end
 end
