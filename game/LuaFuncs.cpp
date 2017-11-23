@@ -196,7 +196,7 @@ public:
 		g_pGlobalEngine->getSoundManager()->getSpectrumR(ch, data, num);
 	}
 
-	static int getMusicChannel()
+	static int getMusicChannelIndex()
 	{
 		Channel* ch = g_pGlobalEngine->getSoundManager()->getMusicChannel();
 		if(ch)
@@ -208,6 +208,11 @@ public:
 		return -1;
 	}
 
+	static Channel* getMusicChannel()
+	{
+		return g_pGlobalEngine->getSoundManager()->getMusicChannel();
+	}
+
 	static int playSound(const std::string& soundFilename, SoundGroup group = GROUP_SFX)
 	{
 		SoundHandle* sound = g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
@@ -215,6 +220,11 @@ public:
 		int channelIdx = 0;
 		channel->getIndex(&channelIdx);
 		return channelIdx;
+	}
+
+	static void preloadSound(const std::string& soundFilename)
+	{
+		g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
 	}
 
 	static Vec3 getHeadMovement()
@@ -846,7 +856,7 @@ luaFunc(music_play)	//int music_play(string songPath, int soundGroup)
 
 luaFunc(music_getChannel)	//int music_getChannel(void)
 {
-	int channel = GameEngineLua::getMusicChannel();
+	int channel = GameEngineLua::getMusicChannelIndex();
 	if(channel > 0)
 		luaReturnInt(channel);
 	luaReturnNil();
@@ -912,6 +922,23 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 	luaReturnNil();
 }
 
+luaFunc(music_getPos)	//double music_getPos()		//Return music pos in seconds
+{
+	Channel* ch = GameEngineLua::getMusicChannel();
+	if(ch) 
+	{
+		unsigned int positionMs;
+		FMOD_RESULT result = ch->getPosition(&positionMs, FMOD_TIMEUNIT_MS);
+		if(result == FMOD_OK)
+		{
+			double seconds = positionMs;
+			seconds = seconds / 1000.0;
+			luaReturnNum(seconds);
+		}
+	}
+	luaReturnNil();
+}
+
 luaFunc(sound_play)	//int sound_play(string soundPath, int soundGroup)
 {
 	SoundGroup group = GROUP_SFX;
@@ -919,6 +946,13 @@ luaFunc(sound_play)	//int sound_play(string soundPath, int soundGroup)
 		group = (SoundGroup)lua_tointeger(L, 2);
 	if(lua_isstring(L, 1))
 		luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1), group));
+	luaReturnNil();
+}
+
+luaFunc(sound_preload)	//void sound_preload(string soundPath)
+{
+	if(lua_isstring(L, 1))
+		GameEngineLua::preloadSound(lua_tostring(L, 1));
 	luaReturnNil();
 }
 
@@ -972,6 +1006,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(music_spectrumL),
 	luaRegister(music_spectrumR),
 	luaRegister(music_spectrum),
+	luaRegister(music_getPos),
 	//Nodes
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
@@ -1013,6 +1048,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(seg_setRot),
 	//Sound functions
 	luaRegister(sound_play),
+	luaRegister(sound_preload),
 	//Steelseries events
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),

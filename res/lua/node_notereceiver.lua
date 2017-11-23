@@ -36,27 +36,27 @@ function node_notereceiver:collide(object)
 		
 	if inside and self.PRESS then
 		obj_destroy(object)
-		print "hit"
+		--print "hit"
 	elseif not inside then	
 		if self.DIRECTION == "up" then
 			if objy < self.Y then
 				obj_destroy(object)
-				print "miss"
+				--print "miss"
 			end
 		elseif self.DIRECTION == "down" then
 			if objy > self.Y then
 				obj_destroy(object)
-				print "miss"
+				--print "miss"
 			end
 		elseif self.DIRECTION == "left" then
 			if objx > self.X then
 				obj_destroy(object)
-				print "miss"
+				--print "miss"
 			end
 		elseif self.DIRECTION == "right" then
 			if objx < self.X then
 				obj_destroy(object)
-				print "miss"
+				--print "miss"
 			end
 		end
 	end
@@ -69,6 +69,8 @@ function node_notereceiver:update(dt)
     if action_digital(self.ACTION_DIR) then
 		if self.KEYDOWN == false then
 			self.PRESS = true
+			sound_play('res/sfx/laser.wav')
+			--print (self.DIRECTION.." pos: "..music_getPos())
 		else
 			self.PRESS = false
 		end
