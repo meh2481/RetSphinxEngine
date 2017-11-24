@@ -854,6 +854,14 @@ luaFunc(music_play)	//int music_play(string songPath, int soundGroup)
 	luaReturnNil();
 }
 
+luaFunc(music_rewind)	//void music_rewind()
+{
+	Channel* ch = GameEngineLua::getMusicChannel();
+	if(ch)
+		ch->setPosition(0, FMOD_TIMEUNIT_MS);
+	luaReturnNil();
+}
+
 luaFunc(music_getChannel)	//int music_getChannel(void)
 {
 	int channel = GameEngineLua::getMusicChannelIndex();
@@ -1003,6 +1011,7 @@ static LuaFunctions s_functab[] =
 	//Music
 	luaRegister(music_getChannel),
 	luaRegister(music_play),
+	luaRegister(music_rewind),
 	luaRegister(music_spectrumL),
 	luaRegister(music_spectrumR),
 	luaRegister(music_spectrum),
