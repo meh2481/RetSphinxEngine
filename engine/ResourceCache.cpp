@@ -19,6 +19,7 @@ void* ResourceCache::find(uint64_t id)
 		return NULL;
 	return i->second;
 }
+
 void ResourceCache::clear()
 {
 	for(std::map<uint64_t, void*>::iterator i = map.begin(); i != map.end(); i++)

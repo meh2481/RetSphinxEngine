@@ -20,6 +20,7 @@ Object3D::Object3D(unsigned char* data, Image* tex)
 Object3D::~Object3D()
 {
 	glDeleteBuffers(1, &vertBuf);
+	free(bufferData);
 }
 
 void Object3D::_fromData(unsigned char* data, Image* tex)
@@ -28,8 +29,8 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	num = header->numVertices;
 
 	//Copy all data, since we'll be modifying UVs on the fly
-	unsigned int len = sizeof(float) * 2 * num + sizeof(float) * 3 * num + sizeof(float) * 3 * num;
-	float* bufferData = (float*)malloc(len);
+	len = sizeof(float) * 2 * num + sizeof(float) * 3 * num + sizeof(float) * 3 * num;
+	bufferData = (float*)malloc(len);
 	memcpy(bufferData, (void*)((size_t)data + sizeof(MeshHeader)), len);
 
 	//Assign pointers to vertex/texture/normal data
@@ -67,7 +68,7 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	glBindVertexArray(0);
 
 	//Free buffer data
-	free(bufferData);
+	//free(bufferData);
 }
 
 void Object3D::render()
@@ -80,5 +81,27 @@ void Object3D::render()
 	//Set pointers
 	glBindVertexArray(vertArray);
 	glDrawArrays(GL_TRIANGLES, 0, num);	//Render
+	glBindVertexArray(0);
+}
+
+void Object3D::_contextChange()
+{
+	//Assign pointers to vertex/texture/normal data
+	unsigned long vertexPtr = 0;
+	unsigned long texCoordPtr = vertexPtr + sizeof(float) * 3 * num;
+	unsigned long normalPtr = texCoordPtr + sizeof(float) * 2 * num;
+	
+	glGenVertexArrays(1, &vertArray);
+	glBindVertexArray(vertArray);
+	//glGenBuffers(1, &vertBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
+	glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 0, (void*)vertexPtr);
+	glEnableClientState(GL_VERTEX_ARRAY);	//TODO: Shaders and glEnableVertexAttribArray() instead
+	glTexCoordPointer(2, GL_FLOAT, 0, (void*)texCoordPtr);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, (void*)normalPtr);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }

@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "ResourceLoader.h"
 #include <SDL_syswm.h>
 #include "easylogging++.h"
 
@@ -78,8 +79,11 @@ void Engine::changeScreenResolution(int w, int h)
 	}
 #else
 	//TODO See what can be done on Linux/Mac about this
-	#warning need to research OpenGL context sharing for Linux/Mac
+	#warning need to research OpenGL context sharing for Linux / Mac
 #endif
+
+	//Rebind VAOs
+	getResourceLoader()->_refreshVAOs();
 }
 
 void Engine::setFullscreen(bool bFullscreen)
