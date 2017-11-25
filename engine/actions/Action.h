@@ -8,6 +8,10 @@ typedef enum
 	SHIP_THRUST,
 	EXAMINE,
 	ATTACK,
+	NOTE_UP,
+	NOTE_DOWN,
+	NOTE_LEFT,
+	NOTE_RIGHT,
 
 	NUM_ACTIONS	//Not an action, an array size
 } Action;

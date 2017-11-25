@@ -196,7 +196,7 @@ public:
 		g_pGlobalEngine->getSoundManager()->getSpectrumR(ch, data, num);
 	}
 
-	static int getMusicChannel()
+	static int getMusicChannelIndex()
 	{
 		Channel* ch = g_pGlobalEngine->getSoundManager()->getMusicChannel();
 		if(ch)
@@ -208,6 +208,11 @@ public:
 		return -1;
 	}
 
+	static Channel* getMusicChannel()
+	{
+		return g_pGlobalEngine->getSoundManager()->getMusicChannel();
+	}
+
 	static int playSound(const std::string& soundFilename, SoundGroup group = GROUP_SFX)
 	{
 		SoundHandle* sound = g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
@@ -215,6 +220,11 @@ public:
 		int channelIdx = 0;
 		channel->getIndex(&channelIdx);
 		return channelIdx;
+	}
+
+	static void preloadSound(const std::string& soundFilename)
+	{
+		g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
 	}
 
 	static Vec3 getHeadMovement()
@@ -371,6 +381,7 @@ luaFunc(obj_create) //Object* obj_create(string className, float xpos, float ypo
 		ptVel.x = (float)lua_tonumber(L, 4);
 	if(lua_isnumber(L, 5))
 		ptVel.y = (float)lua_tonumber(L, 5);
+	//TODO: Seems to ignore vel
 	Object* o = GameEngineLua::xmlParseObj(lua_tostring(L, 1), ptPos, ptVel);
 	if(o)
 	{
@@ -441,15 +452,26 @@ luaFunc(obj_getProperty)	//string obj_getProperty(Object* o, string sProp)
 	luaReturnString(s);
 }
 
-luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int seg = 1)
+luaFunc(obj_setImage)	//void obj_setImage(Object* o, string sImgFilename, int seg = 0)
 {
 	Object *o = getObj<Object>(L);
 	if(o)
 	{
-		lua_Integer seg = 1;
+		lua_Integer seg = 0;
 		if(lua_isinteger(L, 3))
 			seg = lua_tointeger(L, 3);
-		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg - 1);	//Lua remains 1-indexed, C++ side 0-indexed
+		o->setImage(g_pGlobalEngine->getResourceLoader()->getImage(lua_tostring(L, 2)), (unsigned int)seg);	//Lua remains 1-indexed, C++ side 0-indexed
+	}
+	luaReturnNil();
+}
+
+luaFunc(obj_destroy)	//void obj_destroy(Object* o)
+{
+	Object *o = getObj<Object>(L);
+	if(o)
+	{
+		o->active = false;
+		o->alive = false;
 	}
 	luaReturnNil();
 }
@@ -649,6 +671,7 @@ luaFunc(node_get)	//Node* node_get(string nodeName)
 	luaReturnNil();
 }
 
+//TODO: Doesn't work?
 luaFunc(node_isInside) //bool node_isInside(Node* n, float x, float y)
 {
 	bool bInside = false;
@@ -831,9 +854,17 @@ luaFunc(music_play)	//int music_play(string songPath, int soundGroup)
 	luaReturnNil();
 }
 
+luaFunc(music_rewind)	//void music_rewind()
+{
+	Channel* ch = GameEngineLua::getMusicChannel();
+	if(ch)
+		ch->setPosition(0, FMOD_TIMEUNIT_MS);
+	luaReturnNil();
+}
+
 luaFunc(music_getChannel)	//int music_getChannel(void)
 {
-	int channel = GameEngineLua::getMusicChannel();
+	int channel = GameEngineLua::getMusicChannelIndex();
 	if(channel > 0)
 		luaReturnInt(channel);
 	luaReturnNil();
@@ -899,6 +930,23 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 	luaReturnNil();
 }
 
+luaFunc(music_getPos)	//double music_getPos()		//Return music pos in seconds
+{
+	Channel* ch = GameEngineLua::getMusicChannel();
+	if(ch) 
+	{
+		unsigned int positionMs;
+		FMOD_RESULT result = ch->getPosition(&positionMs, FMOD_TIMEUNIT_MS);
+		if(result == FMOD_OK)
+		{
+			double seconds = positionMs;
+			seconds = seconds / 1000.0;
+			luaReturnNum(seconds);
+		}
+	}
+	luaReturnNil();
+}
+
 luaFunc(sound_play)	//int sound_play(string soundPath, int soundGroup)
 {
 	SoundGroup group = GROUP_SFX;
@@ -906,6 +954,13 @@ luaFunc(sound_play)	//int sound_play(string soundPath, int soundGroup)
 		group = (SoundGroup)lua_tointeger(L, 2);
 	if(lua_isstring(L, 1))
 		luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1), group));
+	luaReturnNil();
+}
+
+luaFunc(sound_preload)	//void sound_preload(string soundPath)
+{
+	if(lua_isstring(L, 1))
+		GameEngineLua::preloadSound(lua_tostring(L, 1));
 	luaReturnNil();
 }
 
@@ -956,9 +1011,11 @@ static LuaFunctions s_functab[] =
 	//Music
 	luaRegister(music_getChannel),
 	luaRegister(music_play),
+	luaRegister(music_rewind),
 	luaRegister(music_spectrumL),
 	luaRegister(music_spectrumR),
 	luaRegister(music_spectrum),
+	luaRegister(music_getPos),
 	//Nodes
 	luaRegister(node_getProperty),
 	luaRegister(node_getVec2Property),
@@ -983,6 +1040,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(obj_isActive),
 	luaRegister(obj_getProperty),
 	luaRegister(obj_setImage),
+	luaRegister(obj_destroy),
 	//particle fx
 	luaRegister(particles_create),
 	luaRegister(particles_setFiring),
@@ -999,6 +1057,7 @@ static LuaFunctions s_functab[] =
 	luaRegister(seg_setRot),
 	//Sound functions
 	luaRegister(sound_play),
+	luaRegister(sound_preload),
 	//Steelseries events
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),
@@ -1021,6 +1080,10 @@ static const struct
 	luaConstant(SHIP_THRUST),
 	luaConstant(EXAMINE),
 	luaConstant(ATTACK),
+	luaConstant(NOTE_UP),
+	luaConstant(NOTE_DOWN),
+	luaConstant(NOTE_LEFT),
+	luaConstant(NOTE_RIGHT),
 
 	//Movement actions
 	luaConstant(MOVE),

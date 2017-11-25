@@ -870,6 +870,13 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
 	}
 	//else TODO add other fixture types
 
+	unsigned int categoryBits = 0x0001;
+	unsigned int maskBits = 0xFFFF;
+	fixture->QueryUnsignedAttribute("collisioncategory", &categoryBits);
+	fixture->QueryUnsignedAttribute("collisionmask", &maskBits);
+	fixtureDef.filter.categoryBits = categoryBits;
+	fixtureDef.filter.maskBits = maskBits;
+
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.isSensor = false;

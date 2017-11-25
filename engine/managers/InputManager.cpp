@@ -13,6 +13,7 @@
 #include "KeyboardMovement.h"
 #include "NoMovement.h"
 #include "HeadTracker.h"
+#include "CombinedAction.h"
 
 #define MOUSE_KB 0
 #define CONTROLLER 1
@@ -169,6 +170,10 @@ void InputManager::bindMouseKbActions()
 	actions[MOUSE_KB][SHIP_THRUST] = new KeyboardAction(SDL_SCANCODE_SPACE);
 	actions[MOUSE_KB][EXAMINE] = new KeyboardAction(SDL_SCANCODE_W);
 	actions[MOUSE_KB][ATTACK] = new MouseButtonAction(SDL_BUTTON_LEFT);
+	actions[MOUSE_KB][NOTE_UP] = new CombinedAction(new KeyboardAction(SDL_SCANCODE_W), new KeyboardAction(SDL_SCANCODE_UP));
+	actions[MOUSE_KB][NOTE_DOWN] = new CombinedAction(new KeyboardAction(SDL_SCANCODE_S), new KeyboardAction(SDL_SCANCODE_DOWN));
+	actions[MOUSE_KB][NOTE_LEFT] = new CombinedAction(new KeyboardAction(SDL_SCANCODE_A), new KeyboardAction(SDL_SCANCODE_LEFT));
+	actions[MOUSE_KB][NOTE_RIGHT] = new CombinedAction(new KeyboardAction(SDL_SCANCODE_D), new KeyboardAction(SDL_SCANCODE_RIGHT));
 
 	movements[MOUSE_KB][MOVE] = new KeyboardMovement(SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S);
 	movements[MOUSE_KB][AIM] = new KeyboardMovement(SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN);
@@ -183,6 +188,10 @@ void InputManager::bindControllerActions()
 	actions[CONTROLLER][SHIP_THRUST] = new AxisAction(SDL_CONTROLLER_AXIS_TRIGGERLEFT, JOY_AXIS_TRIP / 10);
 	actions[CONTROLLER][EXAMINE] = new JoyButtonAction(SDL_CONTROLLER_BUTTON_A);
 	actions[CONTROLLER][ATTACK] = new JoyButtonAction(SDL_CONTROLLER_BUTTON_A);
+	actions[CONTROLLER][NOTE_UP] = new CombinedAction(new JoyButtonAction(SDL_CONTROLLER_BUTTON_Y), new JoyButtonAction(SDL_CONTROLLER_BUTTON_DPAD_UP));
+	actions[CONTROLLER][NOTE_DOWN] = new CombinedAction(new JoyButtonAction(SDL_CONTROLLER_BUTTON_A), new JoyButtonAction(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+	actions[CONTROLLER][NOTE_LEFT] = new CombinedAction(new JoyButtonAction(SDL_CONTROLLER_BUTTON_X), new JoyButtonAction(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+	actions[CONTROLLER][NOTE_RIGHT] = new CombinedAction(new JoyButtonAction(SDL_CONTROLLER_BUTTON_B), new JoyButtonAction(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
 
 	movements[CONTROLLER][MOVE] = new JoystickMovement(SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, JOY_AXIS_TRIP);
 	movements[CONTROLLER][AIM] = new JoystickMovement(SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY, JOY_AXIS_TRIP);

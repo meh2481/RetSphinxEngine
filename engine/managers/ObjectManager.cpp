@@ -53,11 +53,20 @@ void ObjectManager::cleanup()
 
 void ObjectManager::update(float dt)
 {
-	//TODO Have way for objects to die
-	updating = true;
+	//Update
+	updating = true;	//TODO: Remember what this mutex is for
 	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
+	{
 		(*i)->update(dt);
+		if(!(*i)->alive)
+		{
+			delete *i;
+			i = m_lObjects.erase(i);
+			i--;
+		}
+	}
 	updating = false;
+	//Add update objects
 	for(std::list<Object*>::iterator i = m_lUpdateObjects.begin(); i != m_lUpdateObjects.end(); i++)
 		m_lObjects.push_back(*i);
 	m_lUpdateObjects.clear();

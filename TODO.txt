@@ -7,6 +7,8 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
+- 3D models die on context change/resolution change (can cause crashes)
+- Slowing down via key doesn't seem to change lua dt
 
 Bugs:
 - Crashes sometimes on load
@@ -78,6 +80,12 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 	-- Paged in with memory mapping if intelligent enough for performance gains
 - XML vs. Lua - when to use one over the other? Can XML be removed intelligently?
 - Optimization and data-driven programming/design where applicable
+- I had a look at Unity; it sucks all the joy out of game development
+	- Low-level code (the fun part) is replaced with high-level APIs to learn. Learning APIs is not fun, and never will be.
+	- Actual learning as a whole is removed; you won't learn anything practical from learning Unity
+	- No programming experience is required in Unity; any old artist can throw something together that will look better. Lack of art skill will become the major limiting factor.
+	- Unity uses C#. C# is a terrible language made by novices, for novices
+	- The "portability" aspect is thrown out the window when optimization is difficult. New Unity projects can't be ported to Vita. Old ones could, but were incredibly impossible to optimize (because C#). In essence, using a "more portable" platform prevents actual portability, and optimizing per-system is nigh on impossible. A render method that's fast on one system may be impossibly slow on another, and Unity can't take this into account as well as a well-designed, lower-level engine can (because C#).
 
 
 
