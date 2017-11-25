@@ -818,7 +818,7 @@ function node_burgermakingcontroller:update(dt)
 		
 		if curMusicPos >= targetLaunchNoteTime then
 			--Launch this note
-			print("launch "..notes[self.CUR_NOTE].dir)
+			--print("launch "..notes[self.CUR_NOTE].dir)
 			
 			local launchfrom
 			local receiveto
@@ -863,7 +863,7 @@ function node_burgermakingcontroller:update(dt)
 		end
 		
 	else
-		print("End of note list: "..#notes..", "..self.CUR_NOTE)
+		--print("End of note list: "..#notes..", "..self.CUR_NOTE)
 	end
 end
 
