@@ -66,9 +66,6 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	//Free buffer data
-	//free(bufferData);
 }
 
 void Object3D::render()
@@ -93,11 +90,11 @@ void Object3D::_contextChange()
 	
 	glGenVertexArrays(1, &vertArray);
 	glBindVertexArray(vertArray);
-	//glGenBuffers(1, &vertBuf);
+	//Don't need to regen VBOs; they're fine
 	glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
 	glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
 	glVertexPointer(3, GL_FLOAT, 0, (void*)vertexPtr);
-	glEnableClientState(GL_VERTEX_ARRAY);	//TODO: Shaders and glEnableVertexAttribArray() instead
+	glEnableClientState(GL_VERTEX_ARRAY);
 	glTexCoordPointer(2, GL_FLOAT, 0, (void*)texCoordPtr);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (void*)normalPtr);

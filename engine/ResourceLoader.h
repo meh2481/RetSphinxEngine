@@ -48,7 +48,7 @@ public:
 
 	//Meshes
 	Object3D* get3dObject(const std::string& sID);
-	void _refreshVAOs();
+	void _refreshVAOs();	//Should call on context change, since VAOs aren't shared between contexts
 
 	//Particles
 	ParticleSystem* getParticleSystem(const std::string& sID);
