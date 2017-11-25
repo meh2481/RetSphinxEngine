@@ -7,8 +7,8 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
-- 3D models die on context change/resolution change (can cause crashes)
 - Slowing down via key doesn't seem to change lua dt
+- glViewport() & whatever else small bit to change res without context change
 
 Bugs:
 - Crashes sometimes on load
