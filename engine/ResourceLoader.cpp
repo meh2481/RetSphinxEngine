@@ -36,7 +36,6 @@ void ResourceLoader::clearCache()
 	m_cache->clear();
 	m_pakLoader->clear();
 	m_pakLoader->loadFromDir(m_sPakDir);	//re-parse
-	m_vaoCache.clear();
 }
 
 Image* ResourceLoader::getImage(uint64_t hashID)
@@ -119,14 +118,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
 	}
 	else
 		LOG(TRACE) << "Cache hit " << sID;
-	m_vaoCache[hashVal] = object3d;
 	return object3d;
-}
-
-void ResourceLoader::_refreshVAOs()
-{
-	for(std::map<uint64_t, Object3D*>::iterator i = m_vaoCache.begin(); i != m_vaoCache.end(); i++)
-		i->second->_contextChange();
 }
 
 //Particle system

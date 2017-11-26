@@ -25,7 +25,6 @@ class ResourceLoader
 	ResourceCache* m_cache;
 	PakLoader* m_pakLoader;
 	std::string m_sPakDir;
-	std::map<uint64_t, Object3D*> m_vaoCache;
 
 	std::string readTextFile(const std::string& filename);
 	Image* loadImageFromFile(std::string filename); 
@@ -48,7 +47,6 @@ public:
 
 	//Meshes
 	Object3D* get3dObject(const std::string& sID);
-	void _refreshVAOs();	//Should call on context change, since VAOs aren't shared between contexts
 
 	//Particles
 	ParticleSystem* getParticleSystem(const std::string& sID);

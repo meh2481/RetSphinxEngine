@@ -14,8 +14,6 @@ protected:
 	unsigned int m_tex;
 	unsigned int vertBuf;
 	unsigned int vertArray;
-	unsigned int len;
-	float* bufferData;
 	
 	void _fromData(unsigned char* data, Image* tex);
 
@@ -26,8 +24,6 @@ public:
     ~Object3D();
 
     void render();
-
-	void _contextChange();
 };
 
 

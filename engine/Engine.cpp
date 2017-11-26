@@ -290,8 +290,6 @@ void Engine::_render()
 	if(drawDebugUI())
 		ImGui::Render();
 
-	glPopMatrix();
-
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
 }
