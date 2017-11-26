@@ -1,7 +1,5 @@
 #include "Engine.h"
-#include "ResourceLoader.h"
 #include "easylogging++.h"
-#include "opengl-api.h"
 
 void Engine::changeScreenResolution(int w, int h)
 {
@@ -24,7 +22,7 @@ void Engine::setFullscreen(bool bFullscreen)
 	if(m_bFullscreen == bFullscreen) 
 		return;
 	m_bFullscreen = !m_bFullscreen;
-	//TODO: Restore previous window size
+	//TODO: Restore previous window size/maximized when exiting from fullscreen
 	SDL_SetWindowFullscreen(m_Window, (m_bFullscreen) ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }
 
