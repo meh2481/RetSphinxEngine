@@ -26,8 +26,6 @@ class ParticleSystem
 {
 	friend class ResourceLoader;
 
-	GLuint program;
-
 	//Drawing helper arrays
 	float* m_vertexPtr;
 	float* m_colorPtr;

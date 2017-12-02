@@ -70,6 +70,9 @@ private:
 	bool m_bSteppingPhysics;
 #endif
 
+	//OpenGL stuff
+	unsigned int m_shaderProgram;
+
 	//Managers
 	ResourceLoader* m_resourceLoader;
 	EntityManager* m_entityManager;

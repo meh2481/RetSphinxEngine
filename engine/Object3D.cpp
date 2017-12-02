@@ -75,10 +75,17 @@ void Object3D::render()
 	assert(m_tex);
 	assert(num > 0);
 
+	//FIXME: glGet()
+	GLint id;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &id);
+	glUseProgram(0);
+
 	glBindTexture(GL_TEXTURE_2D, m_tex);	//Bind texture
 
 	//Set pointers
 	glBindVertexArray(vertArray);
 	glDrawArrays(GL_TRIANGLES, 0, num);	//Render
 	glBindVertexArray(0);
+
+	glUseProgram(id);
 }

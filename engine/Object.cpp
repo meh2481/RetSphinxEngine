@@ -208,10 +208,8 @@ void ObjSegment::draw(bool bDebugInfo)
 		{
 			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care
 			glEnable(GL_CULL_FACE);
-			glEnable(GL_LIGHTING);
 			obj3D->render();
 			glDisable(GL_CULL_FACE);
-			glDisable(GL_LIGHTING);
 		}
 		else if(img != NULL)
 		{
@@ -245,10 +243,8 @@ void ObjSegment::draw(bool bDebugInfo)
 		{
 			glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
-			glEnable(GL_LIGHTING);
 			obj3D->render();
 			glDisable(GL_CULL_FACE);
-			glDisable(GL_LIGHTING);
 		}
 		else if(img != NULL)
 		{

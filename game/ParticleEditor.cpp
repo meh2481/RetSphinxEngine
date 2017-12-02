@@ -105,7 +105,8 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
 
 	particles = new ParticleSystem();
 	//Set some reasonable defaults
-	particles->img = _ge->getResourceLoader()->getImage("res/particles/particlesheet1.png");
+	curImageFilename = "res/particles/particlesheet1.png";
+	particles->img = _ge->getResourceLoader()->getImage(curImageFilename);
 	Rect rc(0, 0, 128, 128);
 	particles->imgRect.push_back(rc);
 	particles->emissionAngleVar = 180.0f;
@@ -167,7 +168,7 @@ void ParticleEditor::draw(int windowFlags)
 
 		if(ImGui::CollapsingHeader("Images"))
 		{
-			//ImGui::TextDisabled(particles->img->getFilename().c_str());
+			ImGui::TextDisabled(curImageFilename.c_str());
 			ImGui::SameLine();
 			if(ImGui::Button("Load"))
 			{
@@ -448,7 +449,10 @@ void ParticleEditor::draw(int windowFlags)
 			loadParticleImage = false;
 			//Error check before loading file
 			if(availableParticleSystemImages.size() > curSelectedLoadImage)
-				particles->img = _ge->getResourceLoader()->getImage(PARTICLE_SYSTEM_PATH + availableParticleSystemImages.at(curSelectedLoadImage));
+			{
+				curImageFilename = PARTICLE_SYSTEM_PATH + availableParticleSystemImages.at(curSelectedLoadImage);
+				particles->img = _ge->getResourceLoader()->getImage(curImageFilename);
+			}
 			curSelectedLoadImage = -1;
 		}
 		ImGui::SameLine();
@@ -540,7 +544,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 	//root->SetAttribute("decayvar")	//TODO Figure out how to add this without desyncing
 
 	tinyxml2::XMLElement* img = doc->NewElement("img");
-	//img->SetAttribute("path", particles->img->getFilename().c_str());	//TODO
+	img->SetAttribute("path", curImageFilename.c_str());
 	for(std::vector<Rect>::iterator i = particles->imgRect.begin(); i != particles->imgRect.end(); i++)
 	{
 		tinyxml2::XMLElement* rc = doc->NewElement("rect");

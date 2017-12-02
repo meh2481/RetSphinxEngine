@@ -188,4 +188,7 @@ void Engine::setup_opengl()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+
+	//TODO: Replace with shaders
+	glEnable(GL_LIGHTING);
 }

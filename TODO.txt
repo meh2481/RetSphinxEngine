@@ -1,5 +1,4 @@
 Current higher pri:
-- Burgermaking minigame time!
 - Ship stops suddenly when moving joystick slowly towards center position
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
@@ -8,7 +7,6 @@ Current higher pri:
 - Fix tamerisk board
 - Test bg sfx
 - Slowing down via key doesn't seem to change lua dt
-- glViewport() & whatever else small bit to change res without context change
 
 Bugs:
 - Crashes sometimes on load

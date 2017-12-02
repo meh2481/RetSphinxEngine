@@ -49,6 +49,8 @@ private:
 	bool loadParticleImage;
 	int curSelectedLoadImage;
 
+	std::string curImageFilename;
+
 	//Helper functions
 	void updateHelperVars();	//Keep the above up-to-date with the particle system
 	void saveParticleSystemXML(std::string filename);	//Save the current particle system to XML

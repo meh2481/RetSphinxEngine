@@ -97,7 +97,6 @@ void GameEngine::draw()
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
-	glDisable(GL_LIGHTING);
 	//fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -120,8 +119,6 @@ void GameEngine::draw()
 	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
-	glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 
@@ -160,23 +157,19 @@ void GameEngine::draw()
 	}
 	glLoadIdentity();
 	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
-	//Tilted view stuff
-	//glLoadIdentity();
-	//gluLookAt(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z, -cameraPos.x, -cameraPos.y, 0.0f, 0, 0, 1);
-    //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
-    //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
-    //Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
-    //glm::mat4 look = glm::lookAt(eye, center, up);
-    //glLoadMatrixf(glm::value_ptr(look));
-
 	
-	glDisable(GL_LIGHTING);
+	//Tilted view stuff
+	const float CAMERA_ANGLE_RAD = 1.0472;
+    Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
+    Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
+    Vec3 up(0.0f, 0.0f, 1.0f); // working as intended
+    glm::mat4 look = glm::lookAt(eye, center, up);
+    glLoadMatrixf(glm::value_ptr(look));
+	
 	glm::mat4 mat;	//TODO Use real mat
 	getEntityManager()->render(mat);
 
 #ifdef _DEBUG
-
-	drawDebug();
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
 		glLoadIdentity();

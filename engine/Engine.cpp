@@ -17,6 +17,7 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "InterpolationManager.h"
+#include "OpenGLShader.h"
 
 #define GUID_STR_SZ	256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -99,6 +100,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
 
+	m_shaderProgram = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
 }
 
 Engine::~Engine()
@@ -112,6 +114,8 @@ Engine::~Engine()
 
 	//Clean up ImGui
 	ImGui_Impl_GL2_Shutdown();
+
+	glDeleteProgram(m_shaderProgram);
 
 	//Clean up SDL
 	SDL_DestroyWindow(m_Window);
@@ -281,14 +285,25 @@ void Engine::_render()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT);	//TODO: Determine if we should do this every frame, or what default color should be
 
+	glUseProgram(m_shaderProgram);
+
 	// Game-specific drawing
 	draw();
+
+	glUseProgram(0);
+
+#ifdef _DEBUG
+	glDisable(GL_LIGHTING);
+	drawDebug();
 
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if(drawDebugUI())
 		ImGui::Render();
+
+	glEnable(GL_LIGHTING);
+#endif
 
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);

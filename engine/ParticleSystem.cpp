@@ -44,8 +44,6 @@ ParticleSystem::ParticleSystem()
 	curTime = 0;
 	spawnCounter = 0;
 	curRate = 1.0f;
-
-	program = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
 }
 
 ParticleSystem::~ParticleSystem()
@@ -123,8 +121,6 @@ void ParticleSystem::_deleteAll()
 	m_vertexPtr = NULL;
 	m_colorPtr = NULL;
 	m_texCoordPtr = NULL;
-
-	glDeleteProgram(program);
 }
 
 void ParticleSystem::_newParticle()
@@ -517,9 +513,6 @@ void ParticleSystem::draw()
 			break;
 	}
 
-	//Use this OpenGL program
-	glUseProgram(program);
-
 	//Render everything in one pass
 	glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
 
@@ -534,8 +527,6 @@ void ParticleSystem::draw()
 	//Reset OpenGL stuff
 	glDisableClientState(GL_COLOR_ARRAY);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glUseProgram(0);
 }
 
 void ParticleSystem::init()
