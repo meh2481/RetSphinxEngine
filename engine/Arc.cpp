@@ -29,36 +29,37 @@ Arc::~Arc()
 	free(segmentPos);
 }
 
-void Arc::draw()
+void Arc::draw(glm::mat4 mat)
 {
-	if(!active) return;
-	glColor4f(col.r,col.g,col.b,col.a);
-	glPushMatrix();
-	
-	//Calculate angle between two points and offset accordingly
-	float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));
-	float fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
-		
-	//Offset according to depth
-	glTranslatef(p1.x, -p1.y, depth);
-	glRotatef(glm::degrees(fAngle),0.0f,0.0f,1.0f);
-	//Center on this point
-	glTranslatef(0, -height * 0.5f, 0);
-	float fSegWidth = fDistance / (float)(numSegments-1);
-    for(int i = 0; i < int(numSegments)-1; i++)
-    {
-      Vec2 ul, ur, bl, br;
-      ul.x = bl.x = (float)i*fSegWidth;
-      ur.x = br.x = bl.x + fSegWidth;
-      ul.y = segmentPos[i];
-      bl.y = ul.y + height;
-      ur.y = segmentPos[i+1];
-      br.y = ur.y + height;
-	  //img->render4V(ul, ur, bl, br);
-    }
-	
-	glPopMatrix();
-	glColor4f(1.0,1.0,1.0,1.0);
+	assert(false);	//TODO
+	//if(!active) return;
+	//glColor4f(col.r,col.g,col.b,col.a);
+	//glPushMatrix();
+	//
+	////Calculate angle between two points and offset accordingly
+	//float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));
+	//float fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
+	//	
+	////Offset according to depth
+	//glTranslatef(p1.x, -p1.y, depth);
+	//glRotatef(glm::degrees(fAngle),0.0f,0.0f,1.0f);
+	////Center on this point
+	//glTranslatef(0, -height * 0.5f, 0);
+	//float fSegWidth = fDistance / (float)(numSegments-1);
+ //   for(int i = 0; i < int(numSegments)-1; i++)
+ //   {
+ //     Vec2 ul, ur, bl, br;
+ //     ul.x = bl.x = (float)i*fSegWidth;
+ //     ur.x = br.x = bl.x + fSegWidth;
+ //     ul.y = segmentPos[i];
+ //     bl.y = ul.y + height;
+ //     ur.y = segmentPos[i+1];
+ //     br.y = ur.y + height;
+	//  img->render4V(ul, ur, bl, br);
+ //   }
+	//
+	//glPopMatrix();
+	//glColor4f(1.0,1.0,1.0,1.0);
 }
 
 void Arc::update(float dt)
@@ -110,11 +111,6 @@ void Arc::average()
 	//Copy back over
 	memcpy(segmentPos, temp, sizeof(float)*numSegments);
 	free(temp);
-}
-
-const std::string& Arc::getImageFilename()
-{
-	return "";// img->getFilename();
 }
 
 

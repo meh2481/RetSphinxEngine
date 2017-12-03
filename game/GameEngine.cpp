@@ -97,10 +97,7 @@ void GameEngine::draw()
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
-	//fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 
 	m_debugUI->draw();
 	

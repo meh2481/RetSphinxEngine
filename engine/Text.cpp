@@ -69,36 +69,36 @@ Text::~Text()
 
 void Text::render(const std::string& s, float x, float y, float pt)
 {
-	if(m_imgFont == NULL)
-		return;
-	std::string sText = s;
-	x = -x;
-	y = -y;
-	glColor4f(col.r, col.g, col.b, col.a);
-	float width = size(sText, pt);
-	x += width / 2.0f;
-	for(std::string::iterator i = sText.begin(); i != sText.end(); i++)
-	{
-		unsigned char c = *i;
-		if(c == '\0')
-			break;
+	assert(false);	//TODO
+	//if(m_imgFont == NULL)
+	//	return;
+	//std::string sText = s;
+	//x = -x;
+	//y = -y;
+	//glColor4f(col.r, col.g, col.b, col.a);
+	//float width = size(sText, pt);
+	//x += width / 2.0f;
+	//for(std::string::iterator i = sText.begin(); i != sText.end(); i++)
+	//{
+	//	unsigned char c = *i;
+	//	if(c == '\0')
+	//		break;
 
-		std::map<unsigned char, Rect>::iterator iRect = m_mRectangles.find(c);
-		if(iRect == m_mRectangles.end())
-			continue;   //Skip over chars we can't draw
+	//	std::map<unsigned char, Rect>::iterator iRect = m_mRectangles.find(c);
+	//	if(iRect == m_mRectangles.end())
+	//		continue;   //Skip over chars we can't draw
 
-		Rect rc = iRect->second;
+	//	Rect rc = iRect->second;
 
-		glPushMatrix();
-		x -= rc.width() * (pt / rc.height())/2.0f;	//Add half the width to get the center (whyyy are we drawing from the center plz dood I fan)
-		glTranslatef(-x, -y, 0.0);
-		Vec2 sz(rc.width() * (pt / rc.height()), pt);	//Ignore kerning when drawing; we only care about that when computing position
-		//m_imgFont->render(sz, rc);
-		assert(false);	//TODO
-		glPopMatrix();
-		x -= (rc.width() - m_mKerning[c]*2.0f) * (pt / rc.height())/2.0f;	//Add second half of the width, plus kerning (times 2 because divided by 2... it all works out)
-	}
-	glColor4f(1.0f,1.0f,1.0f,1.0f);
+	//	glPushMatrix();
+	//	x -= rc.width() * (pt / rc.height())/2.0f;	//Add half the width to get the center (whyyy are we drawing from the center plz dood I fan)
+	//	glTranslatef(-x, -y, 0.0);
+	//	Vec2 sz(rc.width() * (pt / rc.height()), pt);	//Ignore kerning when drawing; we only care about that when computing position
+	//	m_imgFont->render(sz, rc);
+	//	glPopMatrix();
+	//	x -= (rc.width() - m_mKerning[c]*2.0f) * (pt / rc.height())/2.0f;	//Add second half of the width, plus kerning (times 2 because divided by 2... it all works out)
+	//}
+	//glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
 float Text::size(const std::string& s, float pt)

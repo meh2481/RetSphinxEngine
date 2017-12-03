@@ -206,9 +206,9 @@ void ObjSegment::draw(glm::mat4 mat)
 		glTranslatef(pos.x, pos.y, depth);
 		if(obj3D)
 		{
-			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care
+			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care	//What the actual? Why not?
 			glEnable(GL_CULL_FACE);
-			obj3D->render();
+			obj3D->render(mat);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)
@@ -228,7 +228,6 @@ void ObjSegment::draw(glm::mat4 mat)
 			q.pos[7] = size.y / 2.0f; // lower left
 
 			Draw::drawQuad(&q);
-			//img->render(size, tile.x, tile.y);
 		}
 	}
 	else
@@ -243,7 +242,7 @@ void ObjSegment::draw(glm::mat4 mat)
 		{
 			glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
-			obj3D->render();
+			obj3D->render(mat);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)

@@ -34,11 +34,10 @@ public:
 	~Arc();
 	
 	void init();
-	void draw();
+	void draw(glm::mat4 mat);
 	void update(float dt);
 	
 	//Accessor methods
-	const std::string& getImageFilename();
 	unsigned getNumber()	{return numSegments;};
 	
 

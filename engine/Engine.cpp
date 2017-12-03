@@ -323,25 +323,8 @@ void Engine::drawDebug()
 
 void Engine::fillScreen(Color col)
 {
-	//Fill whole screen with rect (Example taken from http://yuhasapoint.blogspot.com/2012/07/draw-quad-that-fills-entire-opengl.html on 11/20/13)
-	glColor4f(col.r, col.g, col.b, col.a);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glBegin(GL_QUADS);
-	glVertex3i(-1, -1, -1);
-	glVertex3i(1, -1, -1);
-	glVertex3i(1, 1, -1);
-	glVertex3i(-1, 1, -1);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+	glClearColor(col.r, col.g, col.b, col.a);
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Engine::setFramerate(float fFramerate)
