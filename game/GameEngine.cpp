@@ -166,7 +166,7 @@ void GameEngine::draw()
     glm::mat4 look = glm::lookAt(eye, center, up);
     glLoadMatrixf(glm::value_ptr(look));
 	
-	glm::mat4 mat;	//TODO Use real mat
+	glm::mat4 mat = glm::mat4(1.0f);	//Identity matrix
 	getEntityManager()->render(mat);
 
 #ifdef _DEBUG
@@ -181,17 +181,17 @@ void GameEngine::draw()
 	}
 #endif
 
-	if(isControllerDisconnected())
-	{
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
-		//TODO
+	//TODO
+	//if(isControllerDisconnected())
+	//{
+		//glLoadIdentity();
+		//glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
+		//glClear(GL_DEPTH_BUFFER_BIT);
+		//glEnable(GL_BLEND);
+		//Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
 		//if(disconnectedImage)
 		//	disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
-	}
+	//}
 	
 }
 
