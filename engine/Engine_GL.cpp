@@ -189,6 +189,14 @@ void Engine::setup_opengl()
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
-	//TODO: Replace with shaders
+	//TODO: Replace lighting with shaders
 	glEnable(GL_LIGHTING);
+
+	float materialShininess = 0.0f;
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+
+	float globalAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };	//Remove existing global OpenGL lighting
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+	glEnable(GL_NORMALIZE);
 }

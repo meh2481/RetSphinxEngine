@@ -99,27 +99,8 @@ void GameEngine::draw()
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	//Draw debug UI
 	m_debugUI->draw();
-	
-	glColor4f(1,1,1,1);
-	
-	//-------------------------------------------------------------
-	// Set up OpenGL lighting
-	//-------------------------------------------------------------
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
-
-	float materialShininess = 0.0f;
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-		
-	//Set up global OpenGL lighting
-	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
-
-	//-------------------------------------------------------------
 	
 	//Keep camera within camera bounds
 	if(rcSceneBounds.area())	//If it's not unset
@@ -152,10 +133,12 @@ void GameEngine::draw()
 		if(rcCam.top > rcSceneBounds.top)
 			cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
 	}
-	glLoadIdentity();
-	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
+
+	//Set flat camera
+	//glLoadIdentity();
+	//glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 	
-	//Tilted view stuff
+	//Set tilted view camera
 	const float CAMERA_ANGLE_RAD = glm::radians(60.0);
     Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
     Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
