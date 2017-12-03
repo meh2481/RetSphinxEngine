@@ -493,7 +493,7 @@ void ParticleSystem::update(float dt)
 	}
 }
 
-void ParticleSystem::draw()
+void ParticleSystem::draw(glm::mat4 mat)
 {
 	assert(img);
 	

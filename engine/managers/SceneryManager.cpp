@@ -17,13 +17,13 @@ void SceneryManager::update(float dt)
 void SceneryManager::renderForeground(glm::mat4 mat)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
-		(*i)->draw();	//TODO Use mat
+		(*i)->draw(mat);
 }
 
 void SceneryManager::renderBackground(glm::mat4 mat)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
-		(*i)->draw();	//TODO Use mat
+		(*i)->draw(mat);
 }
 
 void SceneryManager::add(ObjSegment * seg)

@@ -159,7 +159,7 @@ void GameEngine::draw()
 	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 	
 	//Tilted view stuff
-	const float CAMERA_ANGLE_RAD = 1.0472;
+	const float CAMERA_ANGLE_RAD = glm::radians(60.0);
     Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
     Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
     Vec3 up(0.0f, 0.0f, 1.0f); // working as intended
@@ -177,7 +177,7 @@ void GameEngine::draw()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		fillScreen(m_debugUI->particleEditor->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		m_debugUI->particleEditor->particles->draw();
+		m_debugUI->particleEditor->particles->draw(mat);
 	}
 #endif
 

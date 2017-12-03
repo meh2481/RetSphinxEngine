@@ -43,7 +43,7 @@ public:
     ObjSegment();
     ~ObjSegment();
 	
-	void draw(bool bDebugInfo = false);
+	void draw(glm::mat4 mat);
 };
 
 //Collections of the above all stuffed into one object for ease of use.
@@ -68,7 +68,7 @@ public:
     Object();
     ~Object();
 
-    void draw(bool bDebugInfo = false);
+    void draw(glm::mat4 mat);
     void addSegment(ObjSegment* seg);
 	ObjSegment* getSegment(unsigned int idx);
 	void update(float dt);

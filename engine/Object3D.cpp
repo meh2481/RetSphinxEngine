@@ -75,7 +75,7 @@ void Object3D::render()
 	assert(m_tex);
 	assert(num > 0);
 
-	//FIXME: glGet()
+	//FIXME: glGet
 	GLint id;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &id);
 	glUseProgram(0);

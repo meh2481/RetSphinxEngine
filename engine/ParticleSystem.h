@@ -121,7 +121,7 @@ public:
 	bool				velAdd;				//True to add emitter vel to new particles
 	
 	void update(float dt);
-	void draw();
+	void draw(glm::mat4 mat);
 	void init();
 	unsigned count()		{return m_num;};				//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};						//Kill all active particles

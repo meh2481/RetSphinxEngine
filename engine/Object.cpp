@@ -40,7 +40,7 @@ Object::~Object()
         delete (*i);
 }
 
-void Object::draw(bool bDebugInfo)
+void Object::draw(glm::mat4 mat)
 {
 	if(!active)
 		return;
@@ -49,7 +49,7 @@ void Object::draw(bool bDebugInfo)
     for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
 		if((*i)->active)	//Skip frames that shouldn't be drawn up front
-			(*i)->draw();
+			(*i)->draw(mat);
 	}
 	if(img)
 	{
@@ -195,7 +195,7 @@ ObjSegment::~ObjSegment()
 		body->GetWorld()->DestroyBody(body);
 }
 
-void ObjSegment::draw(bool bDebugInfo)
+void ObjSegment::draw(glm::mat4 mat)
 {
 	if(!active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
@@ -263,7 +263,6 @@ void ObjSegment::draw(bool bDebugInfo)
 			q.pos[7] = size.y / 2.0f; // lower left
 
 			Draw::drawQuad(&q);
-			//img->render(size, tile.x, tile.y);
 		}
 	}
 	glPopMatrix();
