@@ -493,7 +493,7 @@ void ParticleSystem::update(float dt)
 	}
 }
 
-void ParticleSystem::draw(glm::mat4 mat)
+void ParticleSystem::draw(RenderState renderState)
 {
 	assert(img);
 	
@@ -512,6 +512,8 @@ void ParticleSystem::draw(glm::mat4 mat)
 			glBlendFunc(GL_DST_COLOR, GL_ONE); 
 			break;
 	}
+
+	renderState.apply();
 
 	//Render everything in one pass
 	glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture

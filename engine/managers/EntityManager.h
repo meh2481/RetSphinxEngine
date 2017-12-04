@@ -2,6 +2,7 @@
 #include "glmx.h"
 #include <string>
 #include "Rect.h"
+#include "RenderState.h"
 
 class ParticleSystemManager;
 class ResourceLoader;
@@ -26,7 +27,7 @@ public:
 	~EntityManager();
 
 	void update(float dt);
-	void render(glm::mat4 mat);
+	void render(RenderState renderState);
 
 	void cleanup();
 

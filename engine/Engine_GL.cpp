@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "opengl-api.h"
+#include "OpenGLShader.h"
 #include "easylogging++.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
@@ -199,4 +200,9 @@ void Engine::setup_opengl()
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_NORMALIZE);
+
+
+	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
+	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");
+	m_renderState.projection = persp;
 }

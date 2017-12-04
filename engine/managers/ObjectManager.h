@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include "Rect.h"
-#include "glmx.h"
+#include "RenderState.h"
 
 class Object;
 class b2World;
@@ -17,7 +17,7 @@ public:
 	ObjectManager(b2World* world);
 	~ObjectManager();
 
-	void render(glm::mat4 mat);
+	void render(RenderState renderState);
 	void add(Object* o);
 	void cleanup();
 	void update(float dt);

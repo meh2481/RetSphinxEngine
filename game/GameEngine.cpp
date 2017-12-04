@@ -93,7 +93,8 @@ void GameEngine::frame(float dt)
 	}
 }
 
-void GameEngine::draw()
+const float CAMERA_ANGLE_RAD = glm::radians(60.0);
+void GameEngine::draw(RenderState renderState)
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
@@ -139,15 +140,15 @@ void GameEngine::draw()
 	//glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 	
 	//Set tilted view camera
-	const float CAMERA_ANGLE_RAD = glm::radians(60.0);
     Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
     Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
-    Vec3 up(0.0f, 0.0f, 1.0f); // working as intended
-    glm::mat4 look = glm::lookAt(eye, center, up);
-    glLoadMatrixf(glm::value_ptr(look));
+    Vec3 up(0.0f, 0.0f, 1.0f);
+    glm::mat4 view = glm::lookAt(eye, center, up);
+	renderState.view = view;
 	
-	glm::mat4 mat = glm::mat4(1.0f);	//Identity matrix
-	getEntityManager()->render(mat);
+	glm::mat4 model = glm::mat4(1.0f);	//Identity matrix
+	renderState.model = model;
+	getEntityManager()->render(renderState);
 
 #ifdef _DEBUG
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
@@ -157,7 +158,7 @@ void GameEngine::draw()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		fillScreen(m_debugUI->particleEditor->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		m_debugUI->particleEditor->particles->draw(mat);
+		m_debugUI->particleEditor->particles->draw(renderState);
 	}
 #endif
 

@@ -70,7 +70,7 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	free(bufferData);
 }
 
-void Object3D::render(glm::mat4 mat)
+void Object3D::render(RenderState renderState)
 {
 	assert(m_tex);
 	assert(num > 0);

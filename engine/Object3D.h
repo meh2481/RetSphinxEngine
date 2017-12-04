@@ -4,7 +4,7 @@
 */
 #pragma once
 #include <string>
-#include "glm/glm.hpp"
+#include "RenderState.h"
 
 class Image;
 
@@ -24,7 +24,7 @@ public:
 	Object3D(unsigned char* data, Image* tex);
     ~Object3D();
 
-    void render(glm::mat4 mat);
+    void render(RenderState renderState);
 };
 
 

@@ -11,6 +11,7 @@
 #include "Subject.h"
 #include "Rect.h"
 #include "Color.h"
+#include "RenderState.h"
 #include <vector>
 
 class Image;
@@ -121,7 +122,7 @@ public:
 	bool				velAdd;				//True to add emitter vel to new particles
 	
 	void update(float dt);
-	void draw(glm::mat4 mat);
+	void draw(RenderState renderState);
 	void init();
 	unsigned count()		{return m_num;};				//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};						//Kill all active particles

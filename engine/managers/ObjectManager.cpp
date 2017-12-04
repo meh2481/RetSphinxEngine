@@ -18,10 +18,10 @@ ObjectManager::~ObjectManager()
 	cleanup();
 }
 
-void ObjectManager::render(glm::mat4 mat)
+void ObjectManager::render(RenderState renderState)
 {
 	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
-		(*i)->draw(mat);
+		(*i)->draw(renderState);
 }
 
 void ObjectManager::add(Object * o)

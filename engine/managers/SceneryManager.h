@@ -3,6 +3,7 @@
 #include "glmx.h"
 #include <set>
 #include "Object.h"
+#include "RenderState.h"
 
 //TODO: Use SceneryLayer rather than ObjSegment
 class SceneryManager
@@ -23,8 +24,8 @@ public:
 	~SceneryManager();
 
 	void update(float dt);
-	void renderForeground(glm::mat4 mat);
-	void renderBackground(glm::mat4 mat);
+	void renderForeground(RenderState renderState);
+	void renderBackground(RenderState renderState);
 	void add(ObjSegment* seg);
 	void cleanup();
 };

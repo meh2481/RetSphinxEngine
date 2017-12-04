@@ -40,7 +40,7 @@ Object::~Object()
         delete (*i);
 }
 
-void Object::draw(glm::mat4 mat)
+void Object::draw(RenderState renderState)
 {
 	if(!active)
 		return;
@@ -49,7 +49,7 @@ void Object::draw(glm::mat4 mat)
     for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
 		if((*i)->active)	//Skip frames that shouldn't be drawn up front
-			(*i)->draw(mat);
+			(*i)->draw(renderState);
 	}
 	if(img)
 	{
@@ -195,7 +195,7 @@ ObjSegment::~ObjSegment()
 		body->GetWorld()->DestroyBody(body);
 }
 
-void ObjSegment::draw(glm::mat4 mat)
+void ObjSegment::draw(RenderState renderState)
 {
 	if(!active) return;
 	glColor4f(col.r,col.g,col.b,col.a);
@@ -208,7 +208,7 @@ void ObjSegment::draw(glm::mat4 mat)
 		{
 			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care	//What the actual? Why not?
 			glEnable(GL_CULL_FACE);
-			obj3D->render(mat);
+			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)
@@ -242,7 +242,7 @@ void ObjSegment::draw(glm::mat4 mat)
 		{
 			glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
-			obj3D->render(mat);
+			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)

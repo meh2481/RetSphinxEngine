@@ -14,16 +14,16 @@ void SceneryManager::update(float dt)
 	//	(*i)->update(dt);
 }
 
-void SceneryManager::renderForeground(glm::mat4 mat)
+void SceneryManager::renderForeground(RenderState renderState)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
-		(*i)->draw(mat);
+		(*i)->draw(renderState);
 }
 
-void SceneryManager::renderBackground(glm::mat4 mat)
+void SceneryManager::renderBackground(RenderState renderState)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
-		(*i)->draw(mat);
+		(*i)->draw(renderState);
 }
 
 void SceneryManager::add(ObjSegment * seg)

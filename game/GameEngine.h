@@ -60,7 +60,7 @@ private:
 
 protected:
 	void frame(float dt);
-	void draw();
+	void draw(RenderState renderState);
 	void init(std::list<commandlineArg> sArgs);
 	void pause();
 	void resume();
