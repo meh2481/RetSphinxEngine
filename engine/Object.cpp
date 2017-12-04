@@ -54,6 +54,7 @@ void Object::draw(RenderState renderState)
 	if(img)
 	{
 		//TODO Clarify need for object mesh image rather than ObjSegment image
+		//assert(false);
 		std::vector<ObjSegment*>::iterator i = segments.begin();
 		if(i != segments.end())	//Not a for loop!
 		{
@@ -62,8 +63,11 @@ void Object::draw(RenderState renderState)
 			{
 				b2Vec2 pos = seg->body->GetPosition();
 				//float fAngle = seg->body->GetAngle();
-				glPushMatrix();
-				glTranslatef(pos.x, pos.y, depth);
+				//glPushMatrix();
+				//glTranslatef(pos.x, pos.y, depth);
+
+				renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
+				renderState.apply();
 
 				Quad q;
 				q.tex = *img;
@@ -81,7 +85,7 @@ void Object::draw(RenderState renderState)
 
 				Draw::drawQuad(&q);
 				
-				glPopMatrix();
+				//glPopMatrix();
 			}
 		}
 	}
@@ -197,22 +201,27 @@ ObjSegment::~ObjSegment()
 
 void ObjSegment::draw(RenderState renderState)
 {
-	if(!active) return;
-	glColor4f(col.r,col.g,col.b,col.a);
-	glPushMatrix();
+	if(!active) 
+		return;
+
 	if(body == NULL)
 	{
-		glRotatef(glm::degrees(rot), 0.0f, 0.0f, 1.0f);
-		glTranslatef(pos.x, pos.y, depth);
+		renderState.model = glm::rotate(renderState.model, glm::degrees(rot), glm::vec3(0.0f, 0.0f, 1.0f));
+		renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
 		if(obj3D)
 		{
-			glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care	//What the actual? Why not?
+			renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
+			renderState.apply();
+
+			//glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care	//What the actual? Why not?
 			glEnable(GL_CULL_FACE);
 			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)
 		{
+			renderState.apply();
+
 			Quad q;
 			q.tex = *img;
 			q.pos[0] = -size.x / 2.0f;
@@ -234,19 +243,25 @@ void ObjSegment::draw(RenderState renderState)
 	{
 		b2Vec2 objpos = body->GetWorldCenter();
 		float objrot = body->GetAngle();
-		glTranslatef(objpos.x, objpos.y, 0.0f);
-		glRotatef(glm::degrees(objrot), 0.0f, 0.0f, 1.0f);
-		glTranslatef(pos.x, pos.y, depth);
-		glRotatef(glm::degrees(rot), 0.0f, 0.0f, 1.0f);
+		renderState.model = glm::translate(renderState.model, glm::vec3(objpos.x, objpos.y, 0.0f));
+		renderState.model = glm::rotate(renderState.model, objrot, glm::vec3(0.0f, 0.0f, 1.0f));
+		renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
+		renderState.model = glm::rotate(renderState.model, glm::degrees(rot), glm::vec3(0.0f, 0.0f, 1.0f));
 		if(obj3D)
 		{
-			glScalef(size.x, size.y, size.x);
+			//renderState.model = glm::mat4(1.0f);
+			renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
+			renderState.apply();
+
+			//glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
 			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);
 		}
 		else if(img != NULL)
 		{
+			renderState.apply();
+
 			Quad q;
 			q.tex = *img;
 			q.pos[0] = -size.x / 2.0f;
@@ -264,8 +279,6 @@ void ObjSegment::draw(RenderState renderState)
 			Draw::drawQuad(&q);
 		}
 	}
-	glPopMatrix();
-	glColor4f(1.0f,1.0f,1.0f,1.0f);
 }
 
 

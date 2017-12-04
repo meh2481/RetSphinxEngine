@@ -169,17 +169,6 @@ void Engine::setup_opengl()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Set the camera projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
-    glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth/(float)m_iHeight, 0.1f);
-    glLoadMatrixf(glm::value_ptr(persp));
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glPushMatrix();
-	
 	//Set up lighting
 	glShadeModel(GL_SMOOTH);
     glEnable(GL_COLOR_MATERIAL);
@@ -201,6 +190,10 @@ void Engine::setup_opengl()
 
 	glEnable(GL_NORMALIZE);
 
+
+	// Set the rendering program
+	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
+	glLoadMatrixf(glm::value_ptr(persp));
 
 	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
 	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");
