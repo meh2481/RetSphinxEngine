@@ -54,7 +54,6 @@ void Object::draw(RenderState renderState)
 	if(img)
 	{
 		//TODO Clarify need for object mesh image rather than ObjSegment image
-		//assert(false);
 		std::vector<ObjSegment*>::iterator i = segments.begin();
 		if(i != segments.end())	//Not a for loop!
 		{
@@ -62,9 +61,6 @@ void Object::draw(RenderState renderState)
 			if(seg != NULL && seg->body != NULL)
 			{
 				b2Vec2 pos = seg->body->GetPosition();
-				//float fAngle = seg->body->GetAngle();
-				//glPushMatrix();
-				//glTranslatef(pos.x, pos.y, depth);
 
 				renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
 				renderState.apply();
@@ -84,8 +80,6 @@ void Object::draw(RenderState renderState)
 				q.pos[7] = meshSize.y / 2.0f; // lower left
 
 				Draw::drawQuad(&q);
-				
-				//glPopMatrix();
 			}
 		}
 	}

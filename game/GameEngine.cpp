@@ -151,10 +151,16 @@ void GameEngine::draw(RenderState renderState)
 	getEntityManager()->render(renderState);
 
 #ifdef _DEBUG
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f);
+	glLoadMatrixf(glm::value_ptr(persp));
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixf(glm::value_ptr(view));
+	renderState.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, m_fDefCameraZ));
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		fillScreen(m_debugUI->particleEditor->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
