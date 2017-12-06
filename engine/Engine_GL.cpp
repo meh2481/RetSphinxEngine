@@ -159,8 +159,6 @@ void Engine::setup_opengl()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	glEnable(GL_TEXTURE_2D);
-
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	//Enable image transparency
@@ -169,16 +167,12 @@ void Engine::setup_opengl()
 
 	//Set up lighting
 	glShadeModel(GL_SMOOTH);
-    glEnable(GL_COLOR_MATERIAL);
 	
 	setMSAA(m_iMSAA);
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-
-	glEnable(GL_NORMALIZE);
-
 
 	// Set the rendering program
 	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
