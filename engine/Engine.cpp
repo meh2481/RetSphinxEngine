@@ -97,7 +97,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
-	ImGui_Impl_GL2_CreateDeviceObjects();
+
+	void *glctx = SDL_GL_GetCurrentContext();
+	ImGui_Impl_GL3_SwitchContext(glctx);
+	ImGui_Impl_GL3_CreateDeviceObjects();
 }
 
 Engine::~Engine()
@@ -110,7 +113,7 @@ Engine::~Engine()
 	delete m_interpolationManager;
 
 	//Clean up ImGui
-	ImGui_Impl_GL2_Shutdown();
+	ImGui_Impl_GL3_Shutdown();
 
 	glDeleteProgram(m_renderState.programId);
 

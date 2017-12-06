@@ -18,8 +18,8 @@ HeadTracker.cpp
 HeadTracker.h
 ImgFont.cpp
 ImgFont.h
-imgui_impl_opengl2.cpp
-#imgui_impl_opengl3.cpp
+#imgui_impl_opengl2.cpp
+imgui_impl_opengl3.cpp
 imgui_impl_sdl.cpp
 imgui_impl_sdl.h
 InputDevice.cpp

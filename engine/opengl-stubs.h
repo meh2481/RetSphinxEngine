@@ -75,6 +75,7 @@ GL_FUNC(void, glNormalPointer, (GLenum type, GLsizei stride, const GLvoid *point
 GL_FUNC(void,glDrawArrays,(GLenum mode, GLint first, GLsizei count),(mode,first,count),)
 GL_FUNC(void,glDrawElements,(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices),(mode,count,type,indices),)
 GL_FUNC(void, glColorPointer, (GLint size, GLenum type, GLsizei stride, const GLvoid *ptr), (size, type, stride, ptr), )
+GL_FUNC(void, glBlendEquationSeparate, (GLenum modeRGB, GLenum modeAlpha), (modeRGB, modeAlpha), )
 
 //Shader stuff
 GL_PTR(PFNGLUNIFORM1IPROC, glUniform1i)
