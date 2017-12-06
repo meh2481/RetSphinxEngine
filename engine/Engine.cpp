@@ -98,7 +98,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 	ImGui_Impl_GL2_CreateDeviceObjects();
-
 }
 
 Engine::~Engine()
@@ -112,6 +111,8 @@ Engine::~Engine()
 
 	//Clean up ImGui
 	ImGui_Impl_GL2_Shutdown();
+
+	glDeleteProgram(m_renderState.programId);
 
 	//Clean up SDL
 	SDL_DestroyWindow(m_Window);
@@ -281,8 +282,16 @@ void Engine::_render()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT);	//TODO: Determine if we should do this every frame, or what default color should be
 
+	glUseProgram(m_renderState.programId);
+
 	// Game-specific drawing
-	draw();
+	draw(m_renderState);
+
+	glUseProgram(0);
+
+#ifdef _DEBUG
+	glDisable(GL_LIGHTING);
+	drawDebug();
 
 	//Reset blend func
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -290,7 +299,8 @@ void Engine::_render()
 	if(drawDebugUI())
 		ImGui::Render();
 
-	glPopMatrix();
+	glEnable(GL_LIGHTING);
+#endif
 
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
@@ -310,25 +320,8 @@ void Engine::drawDebug()
 
 void Engine::fillScreen(Color col)
 {
-	//Fill whole screen with rect (Example taken from http://yuhasapoint.blogspot.com/2012/07/draw-quad-that-fills-entire-opengl.html on 11/20/13)
-	glColor4f(col.r, col.g, col.b, col.a);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glBegin(GL_QUADS);
-	glVertex3i(-1, -1, -1);
-	glVertex3i(1, -1, -1);
-	glVertex3i(1, 1, -1);
-	glVertex3i(-1, 1, -1);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+	glClearColor(col.r, col.g, col.b, col.a);
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Engine::setFramerate(float fFramerate)

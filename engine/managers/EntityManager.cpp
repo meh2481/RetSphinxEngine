@@ -31,12 +31,12 @@ void EntityManager::update(float dt)
 	sceneryManager->update(dt);
 }
 
-void EntityManager::render(glm::mat4 mat)
+void EntityManager::render(const RenderState& renderState)
 {
-	sceneryManager->renderBackground(mat);
-	objectManager->render(mat);
-	particleSystemManager->render(mat);
-	sceneryManager->renderForeground(mat);
+	sceneryManager->renderBackground(renderState);
+	objectManager->render(renderState);
+	particleSystemManager->render(renderState);
+	sceneryManager->renderForeground(renderState);
 }
 
 void EntityManager::cleanup()

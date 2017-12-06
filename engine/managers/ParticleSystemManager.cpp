@@ -37,11 +37,10 @@ void ParticleSystemManager::cleanup()
 	m_updateParticles.clear();
 }
 
-void ParticleSystemManager::render(glm::mat4 mat)
+void ParticleSystemManager::render(const RenderState& renderState)
 {
-	//TODO Use mat
 	for(std::list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
-		(*i)->draw();
+		(*i)->draw(renderState);
 }
 
 void ParticleSystemManager::update(float dt)

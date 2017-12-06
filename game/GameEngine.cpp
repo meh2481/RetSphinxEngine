@@ -93,39 +93,15 @@ void GameEngine::frame(float dt)
 	}
 }
 
-void GameEngine::draw()
+const float CAMERA_ANGLE_RAD = glm::radians(60.0);
+void GameEngine::draw(RenderState renderState)
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
-	glDisable(GL_LIGHTING);
-	//fillScreen(Color(0,0,0,1));
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
 
+	//Draw debug UI
 	m_debugUI->draw();
-	
-	glColor4f(1,1,1,1);
-	
-	//-------------------------------------------------------------
-	// Set up OpenGL lighting
-	//-------------------------------------------------------------
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
-
-	float materialShininess = 0.0f;
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-		
-	//Set up global OpenGL lighting
-	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
-
-	glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
-
-	//-------------------------------------------------------------
 	
 	//Keep camera within camera bounds
 	if(rcSceneBounds.area())	//If it's not unset
@@ -158,47 +134,50 @@ void GameEngine::draw()
 		if(rcCam.top > rcSceneBounds.top)
 			cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
 	}
-	glLoadIdentity();
-	glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
-	//Tilted view stuff
-	//glLoadIdentity();
-	//gluLookAt(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z, -cameraPos.x, -cameraPos.y, 0.0f, 0, 0, 1);
+
+	//Set flat camera
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
+	
+	//Set tilted view camera
     //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
     //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
-    //Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
-    //glm::mat4 look = glm::lookAt(eye, center, up);
-    //glLoadMatrixf(glm::value_ptr(look));
-
+    //Vec3 up(0.0f, 0.0f, 1.0f);
+    //glm::mat4 view = glm::lookAt(eye, center, up);
+	renderState.view = view;
 	
-	glDisable(GL_LIGHTING);
-	glm::mat4 mat;	//TODO Use real mat
-	getEntityManager()->render(mat);
+	glm::mat4 model = glm::mat4(1.0f);	//Identity matrix
+	renderState.model = model;
+	getEntityManager()->render(renderState);
 
 #ifdef _DEBUG
-
-	drawDebug();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f);
+	glLoadMatrixf(glm::value_ptr(persp));
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixf(glm::value_ptr(view));
+	renderState.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, m_fDefCameraZ));
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		fillScreen(m_debugUI->particleEditor->particleBgColor);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		m_debugUI->particleEditor->particles->draw();
+		m_debugUI->particleEditor->particles->draw(renderState);
 	}
 #endif
 
-	if(isControllerDisconnected())
-	{
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
-		//TODO
+	//TODO
+	//if(isControllerDisconnected())
+	//{
+		//glLoadIdentity();
+		//glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
+		//glClear(GL_DEPTH_BUFFER_BIT);
+		//glEnable(GL_BLEND);
+		//Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
 		//if(disconnectedImage)
 		//	disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
-	}
+	//}
 	
 }
 

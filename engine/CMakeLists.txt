@@ -51,6 +51,8 @@ Random.cpp
 Random.h
 Rect.cpp
 Rect.h
+RenderState.h
+RenderState.cpp
 ResourceLoader.cpp
 ResourceLoader.h
 ResourceCache.h

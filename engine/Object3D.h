@@ -4,6 +4,7 @@
 */
 #pragma once
 #include <string>
+#include "RenderState.h"
 
 class Image;
 
@@ -23,7 +24,7 @@ public:
 	Object3D(unsigned char* data, Image* tex);
     ~Object3D();
 
-    void render();
+    void render(RenderState renderState);
 };
 
 

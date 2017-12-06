@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "opengl-api.h"
+#include "OpenGLShader.h"
 #include "easylogging++.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
@@ -168,17 +169,6 @@ void Engine::setup_opengl()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Set the camera projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
-    glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth/(float)m_iHeight, 0.1f);
-    glLoadMatrixf(glm::value_ptr(persp));
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glPushMatrix();
-	
 	//Set up lighting
 	glShadeModel(GL_SMOOTH);
     glEnable(GL_COLOR_MATERIAL);
@@ -188,4 +178,24 @@ void Engine::setup_opengl()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+
+	//TODO: Replace lighting with shaders
+	glEnable(GL_LIGHTING);
+
+	float materialShininess = 0.0f;
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
+
+	float globalAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };	//Remove existing global OpenGL lighting
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+	glEnable(GL_NORMALIZE);
+
+
+	// Set the rendering program
+	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
+	glLoadMatrixf(glm::value_ptr(persp));
+
+	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
+	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");
+	m_renderState.projection = persp;
 }

@@ -70,10 +70,12 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 	free(bufferData);
 }
 
-void Object3D::render()
+void Object3D::render(RenderState renderState)
 {
 	assert(m_tex);
 	assert(num > 0);
+
+	//glUseProgram(0);
 
 	glBindTexture(GL_TEXTURE_2D, m_tex);	//Bind texture
 
@@ -81,4 +83,6 @@ void Object3D::render()
 	glBindVertexArray(vertArray);
 	glDrawArrays(GL_TRIANGLES, 0, num);	//Render
 	glBindVertexArray(0);
+
+	//glUseProgram(id);
 }

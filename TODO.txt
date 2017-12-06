@@ -1,18 +1,16 @@
 Current higher pri:
-- Burgermaking minigame time!
 - Ship stops suddenly when moving joystick slowly towards center position
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
-- Along the same vein, particles are affected by framerate
+- Along the same vein, particles/lua are affected by framerate
+	- Test at 144Hz and see what breaks
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
-- 3D models die on context change/resolution change (can cause crashes)
 - Slowing down via key doesn't seem to change lua dt
 
 Bugs:
 - Crashes sometimes on load
-- Framerate spikes
 - Particle editor breaks after F5
 
 - Game pauses slightly when loading sound; why?
@@ -37,36 +35,31 @@ Overall TODO list:
 - Sound filters
 - Sound pitch
 - Fix math for softbody lattice anim so it actually works properly
-- Use GLM for math stuff instead of glPushMatrix() and friends
-- Implement newer OpenGL shaders
 - Use shaders rather than lattice animations where possible
-- rip out displaylists for 3D objects and use vertex buffers instead
 - Revisit class predeclaration and add more where possible
 - Ortho for HUD and text drawing
 - Create allocator / choose one to use rather than mixing malloc & new
 - Particle systems, objects, etc should be loaded by template, not from XML each time
+	- Also XML->PAK binary formats to simplify this
 - Move object self-creation into resource loaders where applicable
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
 
 Particle System Editing:
-- Fix image rect preview
 - UI should save/load window booleans as config
 - Re - add death spawn types (tho prolly on a per-system basis?)
 - Add particle support for emitter acceleration
-- Fix other TODO items in particle UI and saving
 - Add support for seeing particle death spawns
 - Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
 
 
 Refactoring thoughts:
-- Image class is bloated with too much junk; once shaders are implemented see what can be cropped out
 - lots of classes are in files for other classes; move to own files
 
 
 Lower priority:
 - Test sound pitch shifting; current implementation seems to not work for all sound effects as intended
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
-- UTF code point lookup should use array of direct values rather than binary search?
+- UTF code point lookup should use array of direct values rather than binary search? Or hashmap of some sort?
 - Use SDL_GetPowerInfo() for laptop battery reminders
 - Move all resource loading stuff to IO?
 - Stream areas as needed vs. load maps?
@@ -88,14 +81,9 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 	- The "portability" aspect is thrown out the window when optimization is difficult. New Unity projects can't be ported to Vita. Old ones could, but were incredibly impossible to optimize (because C#). In essence, using a "more portable" platform prevents actual portability, and optimizing per-system is nigh on impossible. A render method that's fast on one system may be impossibly slow on another, and Unity can't take this into account as well as a well-designed, lower-level engine can (because C#).
 
 
-
 Other misc unordered TODO:
 - Scene editor / XML exporter
 - Intelligently split things into subclasses
-
-
-
-
 
 
 
@@ -105,7 +93,8 @@ OPENGL STUFF
 https://www.opengl.org/wiki/Nomenclature/Direct_State_Access
 https://dl.dropboxusercontent.com/u/22111385/crap/renderer.cpp
 - glUniformX() functions for sending stuff to shaders
-- Load from pakfile only if actual file doesn't exist
+- Load from pakfile only if actual file doesn't exist?
+	- Better to remove file loading entirely and ONLY load from pakfile
 https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.vert
 https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.frag
 https://dl.dropboxusercontent.com/u/22111385/crap/gpubase.7z

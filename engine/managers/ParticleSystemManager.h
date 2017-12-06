@@ -3,7 +3,7 @@
 #include "Observer.h"
 #include "Subject.h"
 #include "ResourceLoader.h"
-#include "glmx.h"
+#include "RenderState.h"
 
 class ParticleSystem;
 
@@ -23,7 +23,7 @@ public:
 
 	void add(ParticleSystem* sys);
 	void cleanup();
-	void render(glm::mat4 mat);
+	void render(const RenderState& renderState);
 	void update(float dt);
 
 	virtual void onNotify(const std::string& sParticleFilename, Vec2 pos);

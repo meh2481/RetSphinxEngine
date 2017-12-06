@@ -26,7 +26,7 @@
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	glColor3f(color.r, color.g, color.b);
+	glColor4f(color.r, color.g, color.b, 1.0f);
 	glBegin(GL_LINE_LOOP);
 	for (int32 i = 0; i < vertexCount; ++i)
 		glVertex2f(vertices[i].x, vertices[i].y);
@@ -55,7 +55,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 	const float k_segments = 16.0f;
 	const float k_increment = 2.0f * b2_pi / k_segments;
 	float theta = 0.0f;
-	glColor3f(color.r, color.g, color.b);
+	glColor4f(color.r, color.g, color.b, 1.0f);
 	glBegin(GL_LINE_LOOP);
 	for (int32 i = 0; i < k_segments; ++i)
 	{
@@ -103,7 +103,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	glColor3f(color.r, color.g, color.b);
+	glColor4f(color.r, color.g, color.b, 1.0);
 	glBegin(GL_LINES);
 	glVertex2f(p1.x, p1.y);
 	glVertex2f(p2.x, p2.y);
@@ -116,12 +116,12 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 	const float k_axisScale = 0.4f;
 	glBegin(GL_LINES);
 	
-	glColor3f(1.0f, 0.0f, 0.0f);
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glVertex2f(p1.x, p1.y);
 	p2 = p1 + k_axisScale * xf.q.GetXAxis();
 	glVertex2f(p2.x, p2.y);
 
-	glColor3f(0.0f, 1.0f, 0.0f);
+	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 	glVertex2f(p1.x, p1.y);
 	p2 = p1 + k_axisScale * xf.q.GetYAxis();
 	glVertex2f(p2.x, p2.y);
@@ -133,7 +133,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
 	glPointSize(size);
 	glBegin(GL_POINTS);
-	glColor3f(color.r, color.g, color.b);
+	glColor4f(color.r, color.g, color.b, 1.0f);
 	glVertex2f(p.x, p.y);
 	glEnd();
 	glPointSize(1.0f);

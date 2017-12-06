@@ -11,6 +11,7 @@
 #include "Subject.h"
 #include "Rect.h"
 #include "Color.h"
+#include "RenderState.h"
 #include <vector>
 
 class Image;
@@ -25,8 +26,6 @@ typedef enum
 class ParticleSystem
 {
 	friend class ResourceLoader;
-
-	GLuint program;
 
 	//Drawing helper arrays
 	float* m_vertexPtr;
@@ -123,7 +122,7 @@ public:
 	bool				velAdd;				//True to add emitter vel to new particles
 	
 	void update(float dt);
-	void draw();
+	void draw(const RenderState& renderState);
 	void init();
 	unsigned count()		{return m_num;};				//How many particles are currently alive (read-only because reasons)
 	void killParticles()	{m_num=0;};						//Kill all active particles

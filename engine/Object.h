@@ -10,6 +10,7 @@
 #include "LuaFuncs.h"
 #include "Rect.h"
 #include "Color.h"
+#include "RenderState.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -43,7 +44,7 @@ public:
     ObjSegment();
     ~ObjSegment();
 	
-	void draw(bool bDebugInfo = false);
+	void draw(RenderState renderState);
 };
 
 //Collections of the above all stuffed into one object for ease of use.
@@ -68,7 +69,7 @@ public:
     Object();
     ~Object();
 
-    void draw(bool bDebugInfo = false);
+    void draw(RenderState renderState);
     void addSegment(ObjSegment* seg);
 	ObjSegment* getSegment(unsigned int idx);
 	void update(float dt);
