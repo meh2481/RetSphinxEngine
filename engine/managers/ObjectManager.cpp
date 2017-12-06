@@ -18,7 +18,7 @@ ObjectManager::~ObjectManager()
 	cleanup();
 }
 
-void ObjectManager::render(RenderState renderState)
+void ObjectManager::render(const RenderState& renderState)
 {
 	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
 		(*i)->draw(renderState);

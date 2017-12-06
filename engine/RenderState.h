@@ -10,5 +10,5 @@ public:
 	glm::mat4 projection;
 	unsigned int uniformId;
 
-	void apply();
+	void apply() const;
 };

@@ -1,5 +1,4 @@
 Current higher pri:
-- Prolly shouldn't pass render state by value everywhere
 - Ship stops suddenly when moving joystick slowly towards center position
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied

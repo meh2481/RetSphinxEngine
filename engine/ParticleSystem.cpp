@@ -493,7 +493,7 @@ void ParticleSystem::update(float dt)
 	}
 }
 
-void ParticleSystem::draw(RenderState renderState)
+void ParticleSystem::draw(const RenderState& renderState)
 {
 	assert(img);
 	

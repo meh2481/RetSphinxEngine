@@ -24,8 +24,8 @@ public:
 	~SceneryManager();
 
 	void update(float dt);
-	void renderForeground(RenderState renderState);
-	void renderBackground(RenderState renderState);
+	void renderForeground(const RenderState& renderState);
+	void renderBackground(const RenderState& renderState);
 	void add(ObjSegment* seg);
 	void cleanup();
 };

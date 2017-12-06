@@ -14,13 +14,13 @@ void SceneryManager::update(float dt)
 	//	(*i)->update(dt);
 }
 
-void SceneryManager::renderForeground(RenderState renderState)
+void SceneryManager::renderForeground(const RenderState& renderState)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryFg.begin(); i != m_lSceneryFg.end(); i++)
 		(*i)->draw(renderState);
 }
 
-void SceneryManager::renderBackground(RenderState renderState)
+void SceneryManager::renderBackground(const RenderState& renderState)
 {
 	for(std::multiset<ObjSegment*>::iterator i = m_lSceneryBg.begin(); i != m_lSceneryBg.end(); i++)
 		(*i)->draw(renderState);

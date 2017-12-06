@@ -31,7 +31,7 @@ void EntityManager::update(float dt)
 	sceneryManager->update(dt);
 }
 
-void EntityManager::render(RenderState renderState)
+void EntityManager::render(const RenderState& renderState)
 {
 	sceneryManager->renderBackground(renderState);
 	objectManager->render(renderState);

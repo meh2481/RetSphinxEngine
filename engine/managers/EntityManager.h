@@ -27,7 +27,7 @@ public:
 	~EntityManager();
 
 	void update(float dt);
-	void render(RenderState renderState);
+	void render(const RenderState& renderState);
 
 	void cleanup();
 

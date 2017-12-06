@@ -17,7 +17,7 @@ public:
 	ObjectManager(b2World* world);
 	~ObjectManager();
 
-	void render(RenderState renderState);
+	void render(const RenderState& renderState);
 	void add(Object* o);
 	void cleanup();
 	void update(float dt);

@@ -37,7 +37,7 @@ void ParticleSystemManager::cleanup()
 	m_updateParticles.clear();
 }
 
-void ParticleSystemManager::render(RenderState renderState)
+void ParticleSystemManager::render(const RenderState& renderState)
 {
 	for(std::list<ParticleSystem*>::iterator i = m_particles.begin(); i != m_particles.end(); i++)
 		(*i)->draw(renderState);

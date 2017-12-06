@@ -23,7 +23,7 @@ public:
 
 	void add(ParticleSystem* sys);
 	void cleanup();
-	void render(RenderState renderState);
+	void render(const RenderState& renderState);
 	void update(float dt);
 
 	virtual void onNotify(const std::string& sParticleFilename, Vec2 pos);
