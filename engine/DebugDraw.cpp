@@ -26,117 +26,117 @@
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	glColor4f(color.r, color.g, color.b, 1.0f);
-	glBegin(GL_LINE_LOOP);
-	for (int32 i = 0; i < vertexCount; ++i)
-		glVertex2f(vertices[i].x, vertices[i].y);
-	glEnd();
+	//glColor4f(color.r, color.g, color.b, 1.0f);
+	//glBegin(GL_LINE_LOOP);
+	//for (int32 i = 0; i < vertexCount; ++i)
+	//	glVertex2f(vertices[i].x, vertices[i].y);
+	//glEnd();
 }
 
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
-	glBegin(GL_TRIANGLE_FAN);
-	for (int32 i = 0; i < vertexCount; ++i)
-		glVertex2f(vertices[i].x, vertices[i].y);
-	glEnd();
-	glDisable(GL_BLEND);
+	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
+	//glBegin(GL_TRIANGLE_FAN);
+	//for (int32 i = 0; i < vertexCount; ++i)
+	//	glVertex2f(vertices[i].x, vertices[i].y);
+	//glEnd();
+	//glDisable(GL_BLEND);
 
-	glColor4f(color.r, color.g, color.b, 1.0f);
-	glBegin(GL_LINE_LOOP);
-	for (int32 i = 0; i < vertexCount; ++i)
-		glVertex2f(vertices[i].x, vertices[i].y);
-	glEnd();
-	glEnable(GL_BLEND);
+	//glColor4f(color.r, color.g, color.b, 1.0f);
+	//glBegin(GL_LINE_LOOP);
+	//for (int32 i = 0; i < vertexCount; ++i)
+	//	glVertex2f(vertices[i].x, vertices[i].y);
+	//glEnd();
+	//glEnable(GL_BLEND);
 }
 
 void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
-	const float k_segments = 16.0f;
-	const float k_increment = 2.0f * b2_pi / k_segments;
-	float theta = 0.0f;
-	glColor4f(color.r, color.g, color.b, 1.0f);
-	glBegin(GL_LINE_LOOP);
-	for (int32 i = 0; i < k_segments; ++i)
-	{
-		b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-		glVertex2f(v.x, v.y);
-		theta += k_increment;
-	}
-	glEnd();
+	//const float k_segments = 16.0f;
+	//const float k_increment = 2.0f * b2_pi / k_segments;
+	//float theta = 0.0f;
+	//glColor4f(color.r, color.g, color.b, 1.0f);
+	//glBegin(GL_LINE_LOOP);
+	//for (int32 i = 0; i < k_segments; ++i)
+	//{
+	//	b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
+	//	glVertex2f(v.x, v.y);
+	//	theta += k_increment;
+	//}
+	//glEnd();
 }
 
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
-	const float k_segments = 16.0f;
-	const float k_increment = 2.0f * b2_pi / k_segments;
-	float theta = 0.0f;
-	glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
-	glBegin(GL_TRIANGLE_FAN);
-	for (int32 i = 0; i < k_segments; ++i)
-	{
-		b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-		glVertex2f(v.x, v.y);
-		theta += k_increment;
-	}
-	glEnd();
-	glDisable(GL_BLEND);
+	//const float k_segments = 16.0f;
+	//const float k_increment = 2.0f * b2_pi / k_segments;
+	//float theta = 0.0f;
+	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
+	//glBegin(GL_TRIANGLE_FAN);
+	//for (int32 i = 0; i < k_segments; ++i)
+	//{
+	//	b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
+	//	glVertex2f(v.x, v.y);
+	//	theta += k_increment;
+	//}
+	//glEnd();
+	//glDisable(GL_BLEND);
 
-	theta = 0.0f;
-	glColor4f(color.r, color.g, color.b, 1.0f);
-	glBegin(GL_LINE_LOOP);
-	for (int32 i = 0; i < k_segments; ++i)
-	{
-		b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
-		glVertex2f(v.x, v.y);
-		theta += k_increment;
-	}
-	glEnd();
+	//theta = 0.0f;
+	//glColor4f(color.r, color.g, color.b, 1.0f);
+	//glBegin(GL_LINE_LOOP);
+	//for (int32 i = 0; i < k_segments; ++i)
+	//{
+	//	b2Vec2 v = center + radius * b2Vec2(cosf(theta), sinf(theta));
+	//	glVertex2f(v.x, v.y);
+	//	theta += k_increment;
+	//}
+	//glEnd();
 
-	b2Vec2 p = center + radius * axis;
-	glBegin(GL_LINES);
-	glVertex2f(center.x, center.y);
-	glVertex2f(p.x, p.y);
-	glEnd();
-	glEnable(GL_BLEND);
+	//b2Vec2 p = center + radius * axis;
+	//glBegin(GL_LINES);
+	//glVertex2f(center.x, center.y);
+	//glVertex2f(p.x, p.y);
+	//glEnd();
+	//glEnable(GL_BLEND);
 }
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	glColor4f(color.r, color.g, color.b, 1.0);
-	glBegin(GL_LINES);
-	glVertex2f(p1.x, p1.y);
-	glVertex2f(p2.x, p2.y);
-	glEnd();
+	//glColor4f(color.r, color.g, color.b, 1.0);
+	//glBegin(GL_LINES);
+	//glVertex2f(p1.x, p1.y);
+	//glVertex2f(p2.x, p2.y);
+	//glEnd();
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
 {
-	b2Vec2 p1 = xf.p, p2;
-	const float k_axisScale = 0.4f;
-	glBegin(GL_LINES);
-	
-	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-	glVertex2f(p1.x, p1.y);
-	p2 = p1 + k_axisScale * xf.q.GetXAxis();
-	glVertex2f(p2.x, p2.y);
+	//b2Vec2 p1 = xf.p, p2;
+	//const float k_axisScale = 0.4f;
+	//glBegin(GL_LINES);
+	//
+	//glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	//glVertex2f(p1.x, p1.y);
+	//p2 = p1 + k_axisScale * xf.q.GetXAxis();
+	//glVertex2f(p2.x, p2.y);
 
-	glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-	glVertex2f(p1.x, p1.y);
-	p2 = p1 + k_axisScale * xf.q.GetYAxis();
-	glVertex2f(p2.x, p2.y);
+	//glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+	//glVertex2f(p1.x, p1.y);
+	//p2 = p1 + k_axisScale * xf.q.GetYAxis();
+	//glVertex2f(p2.x, p2.y);
 
-	glEnd();
+	//glEnd();
 }
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-	glPointSize(size);
-	glBegin(GL_POINTS);
-	glColor4f(color.r, color.g, color.b, 1.0f);
-	glVertex2f(p.x, p.y);
-	glEnd();
-	glPointSize(1.0f);
+	//glPointSize(size);
+	//glBegin(GL_POINTS);
+	//glColor4f(color.r, color.g, color.b, 1.0f);
+	//glVertex2f(p.x, p.y);
+	//glEnd();
+	//glPointSize(1.0f);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)

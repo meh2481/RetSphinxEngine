@@ -292,17 +292,10 @@ void Engine::_render()
 
 #ifdef _DEBUG
 	glUseProgram(0);
-	glDisable(GL_LIGHTING);
 	drawDebug();
-
-	//glUseProgram(m_renderState.programId);
-	//Reset blend func
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if(drawDebugUI())
 		ImGui::Render();
-
-	glEnable(GL_LIGHTING);
 #endif
 
 	//End rendering and update the screen
@@ -317,7 +310,7 @@ void Engine::drawDebug()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_physicsWorld->DrawDebugData();
-		glColor4f(1, 1, 1, 1);
+		//glColor4f(1, 1, 1, 1);
 	}
 }
 

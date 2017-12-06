@@ -84,9 +84,7 @@ void Engine::setup_sdl()
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3) == 0);
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0) == 0);
 
-	//TODO: Switch to core instead of compat once all drawing uses VBOs/shaders
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY) == 0);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) == 0);
 #ifdef _DEBUG
 	//TODO: Add back forward compatibility flag once all drawing uses VBOs/shaders
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG) == 0);
@@ -178,15 +176,6 @@ void Engine::setup_opengl()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-
-	//TODO: Replace lighting with shaders
-	glEnable(GL_LIGHTING);
-
-	float materialShininess = 0.0f;
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-
-	float globalAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };	//Remove existing global OpenGL lighting
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
 
 	glEnable(GL_NORMALIZE);
 

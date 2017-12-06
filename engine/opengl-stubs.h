@@ -63,11 +63,6 @@ GL_FUNC(void, glClearDepth, (GLdouble depth), (depth), )
 GL_FUNC(void, glDepthFunc, (GLenum func), (func), )
 GL_FUNC(void, glHint, (GLenum target, GLenum mode), (target, mode), )
 GL_FUNC(void, glShadeModel, (GLenum  mode), (mode), )
-GL_FUNC(void, glLightfv, (GLenum light, GLenum pname, const GLfloat *params), (light, pname, params), )
-GL_FUNC(void, glGetLightfv, (GLenum light, GLenum pname, GLfloat *params), (light, pname, params), )
-GL_FUNC(void, glLightModelfv, (GLenum pname, const GLfloat *params), (pname, params), )
-GL_FUNC(void, glMaterialfv, (GLenum face, GLenum pname, const GLfloat *params), (face, pname, params), )
-GL_FUNC(void, glMaterialf, (GLenum face, GLenum pname, const GLfloat param), (face, pname, param), )
 
 // drawing
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)

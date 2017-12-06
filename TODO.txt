@@ -1,4 +1,16 @@
 Current higher pri:
+- Remove OpenGL deprecated things and re-enable forward compat flag
+	GL[37190]: Using glEnable in a Core context with parameter <cap> and enum '0xb50' which was removed from Core OpenGL (GL_INVALID_ENUM)
+	GL[37190]: Using glEnable in a Core context with parameter <cap> and enum '0x4001' which was removed from Core OpenGL (GL_INVALID_ENUM)
+	GL[37190]: glLightfv has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: Using glDrawArrays in a Core context with parameter <mode> and enum '0x7' which was removed from Core OpenGL (GL_INVALID_ENUM)
+	GL[37190]: glEnableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glColorPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: Using glDisable in a Core context with parameter <cap> and enum '0xb50' which was removed from Core OpenGL (GL_INVALID_ENUM)
+
 - Ship stops suddenly when moving joystick slowly towards center position
 - Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied

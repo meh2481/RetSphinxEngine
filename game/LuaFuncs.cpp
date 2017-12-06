@@ -965,24 +965,6 @@ luaFunc(sound_preload)	//void sound_preload(string soundPath)
 }
 
 //-----------------------------------------------------------------------------------------------------------
-// Random testing lua funcs
-//-----------------------------------------------------------------------------------------------------------
-luaFunc(opengl_light)	//void opengl_light(int light, int type, float f1, float f2, float f3, float f4)
-{
-	float fs[] = { lua_tonumber(L, 3), lua_tofloat(L, 4), lua_tofloat(L, 5), lua_tofloat(L, 6) };
-	glEnable(lua_tointeger(L, 1));
-	glLightfv(lua_tointeger(L, 1), lua_tointeger(L, 2), fs);
-	luaReturnNil();
-}
-
-luaFunc(opengl_mat)	//void opengl_mat(int light, int type, float f1, float f2, float f3, float f4)
-{
-	float fs[] = { lua_tonumber(L, 3), lua_tofloat(L, 4), lua_tofloat(L, 5), lua_tofloat(L, 6) };
-	glMaterialfv(lua_tointeger(L, 1), lua_tointeger(L, 2), fs);
-	luaReturnNil();
-}
-
-//-----------------------------------------------------------------------------------------------------------
 // Lua constants & functions registerer
 //-----------------------------------------------------------------------------------------------------------
 static LuaFunctions s_functab[] =
@@ -1061,9 +1043,6 @@ static LuaFunctions s_functab[] =
 	//Steelseries events
 	luaRegister(ss_bindEvent),
 	luaRegister(ss_sendEvent),
-	//Random testing stuff
-	luaRegister(opengl_light),
-	luaRegister(opengl_mat),
 
 	{NULL, NULL}
 };
