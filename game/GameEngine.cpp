@@ -136,14 +136,13 @@ void GameEngine::draw(RenderState renderState)
 	}
 
 	//Set flat camera
-	//glLoadIdentity();
-	//glTranslatef(cameraPos.x, cameraPos.y, cameraPos.z);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
 	
 	//Set tilted view camera
-    Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
-    Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
-    Vec3 up(0.0f, 0.0f, 1.0f);
-    glm::mat4 view = glm::lookAt(eye, center, up);
+    //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
+    //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
+    //Vec3 up(0.0f, 0.0f, 1.0f);
+    //glm::mat4 view = glm::lookAt(eye, center, up);
 	renderState.view = view;
 	
 	glm::mat4 model = glm::mat4(1.0f);	//Identity matrix
