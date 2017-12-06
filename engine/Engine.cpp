@@ -290,14 +290,14 @@ void Engine::_render()
 	// Game-specific drawing
 	draw(m_renderState);
 
-	glUseProgram(0);
-
 #ifdef _DEBUG
+	glUseProgram(0);
 	glDisable(GL_LIGHTING);
 	drawDebug();
 
+	//glUseProgram(m_renderState.programId);
 	//Reset blend func
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if(drawDebugUI())
 		ImGui::Render();

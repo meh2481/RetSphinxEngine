@@ -60,10 +60,10 @@ void ImGui_Impl_GL3_RenderDrawLists(ImDrawData* draw_data)
     GLint last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb);
     GLint last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha);
     GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
-	GLboolean last_enable_blend = true;// glIsEnabled(GL_BLEND);
-	GLboolean last_enable_cull_face = true;// glIsEnabled(GL_CULL_FACE);
-    GLboolean last_enable_depth_test = true;// glIsEnabled(GL_DEPTH_TEST);
-    GLboolean last_enable_scissor_test = true;// glIsEnabled(GL_SCISSOR_TEST);
+	GLboolean last_enable_blend = true; glGetBooleanv(GL_BLEND, &last_enable_blend);
+	GLboolean last_enable_cull_face = true; glGetBooleanv(GL_CULL_FACE, &last_enable_cull_face);
+    GLboolean last_enable_depth_test = true; glGetBooleanv(GL_DEPTH_TEST, &last_enable_depth_test);
+    GLboolean last_enable_scissor_test = true; glGetBooleanv(GL_SCISSOR_TEST, &last_enable_scissor_test);
 
     // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled
     glEnable(GL_BLEND);
@@ -72,7 +72,7 @@ void ImGui_Impl_GL3_RenderDrawLists(ImDrawData* draw_data)
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
-    //glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
     ImGuiIO& io = ImGui::GetIO();
