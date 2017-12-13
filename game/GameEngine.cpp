@@ -93,7 +93,7 @@ void GameEngine::frame(float dt)
 	}
 }
 
-const float CAMERA_ANGLE_RAD = glm::radians(60.0);
+const double CAMERA_ANGLE_RAD = glm::radians(60.0);
 void GameEngine::draw(RenderState renderState)
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)

@@ -22,7 +22,7 @@ const char* particleBlendTypes[] = {
 static std::vector<std::string> availableParticleSystems;
 bool getParticleSystem(void* data, int cur, const char** toSet)
 {
-	if(cur < availableParticleSystems.size())
+	if(cur >= 0 && (size_t)cur < availableParticleSystems.size())
 	{
 		*toSet = availableParticleSystems.at(cur).c_str();
 		return true;
@@ -55,7 +55,7 @@ void readAvailableParticleSystemImages(std::string filePath)
 
 bool getParticleSystemImage(void* data, int cur, const char** toSet)
 {
-	if(cur < availableParticleSystemImages.size())
+	if(cur >= 0 && (size_t)cur < availableParticleSystemImages.size())
 	{
 		*toSet = availableParticleSystemImages.at(cur).c_str();
 		return true;
@@ -66,7 +66,7 @@ bool getParticleSystemImage(void* data, int cur, const char** toSet)
 bool spawnParticleList(void* data, int cur, const char** toSet)
 {
 	ParticleSystem* particles = (ParticleSystem*)data;
-	if(cur >= 0 && cur < particles->spawnOnDeath.size())
+	if(cur >= 0 && (size_t)cur < particles->spawnOnDeath.size())
 	{
 		*toSet = particles->spawnOnDeath.at(cur).c_str();
 		return true;
@@ -78,7 +78,7 @@ static std::string imgRectBuffer;	//So we don't run into scoping issues with the
 bool imgRectList(void* data, int cur, const char** toSet)
 {
 	ParticleSystem* particles = (ParticleSystem*)data;
-	if(cur >= 0 && cur < particles->imgRect.size())
+	if(cur >= 0 && (size_t)cur < particles->imgRect.size())
 	{
 		imgRectBuffer = particles->imgRect.at(cur).toString();
 		*toSet = imgRectBuffer.c_str();
@@ -144,7 +144,7 @@ void ParticleEditor::draw(int windowFlags)
 					saveParticles = true;
 					//Reload available particle systems
 					readAvailableParticleSystems(PARTICLE_SYSTEM_PATH);
-					if(!strlen(saveFilenameBuf) && availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+					if(!strlen(saveFilenameBuf) && curSelectedLoadSaveItem >= 0 && availableParticleSystems.size() > (size_t)curSelectedLoadSaveItem)
 					{
 						std::string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
 						if(sFilename.size() < SAVE_BUF_SZ)
@@ -184,20 +184,20 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::SameLine();
 			if(ImGui::Button("Remove Rect"))
 			{
-				if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size() && particles->imgRect.size() > 1)
+				if(curSelectedImgRect >= 0 && (size_t)curSelectedImgRect < particles->imgRect.size() && particles->imgRect.size() > 1)
 				{
 					particles->imgRect.erase(particles->imgRect.begin() + curSelectedImgRect);
-					if(curSelectedImgRect >= particles->imgRect.size())
+					if((size_t)curSelectedImgRect >= particles->imgRect.size())
 						curSelectedImgRect = particles->imgRect.size() - 1;
 				}
 			}
-			if(curSelectedImgRect >= 0 && curSelectedImgRect < particles->imgRect.size())
+			if(curSelectedImgRect >= 0 && (size_t)curSelectedImgRect < particles->imgRect.size())
 			{
 				ImGui::Text("Current Rect:");
-				ImGui::SliderFloat("Left", &particles->imgRect.at(curSelectedImgRect).left, 0, particles->img->tex.width - 1, "%.0f");
-				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0, particles->img->tex.height - 1, "%.0f");
-				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0, particles->img->tex.width - 1, "%.0f");
-				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0, particles->img->tex.height - 1, "%.0f");
+				ImGui::SliderFloat("Left", &particles->imgRect.at(curSelectedImgRect).left, 0.0f, particles->img->tex.width - 1.0f, "%.0f");
+				ImGui::SliderFloat("Top", &particles->imgRect.at(curSelectedImgRect).top, 0.0f, particles->img->tex.height - 1.0f, "%.0f");
+				ImGui::SliderFloat("Right", &particles->imgRect.at(curSelectedImgRect).right, 0.0f, particles->img->tex.width - 1.0f, "%.0f");
+				ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0.0f, particles->img->tex.height - 1.0f, "%.0f");
 				ImGui::Text("Preview:");
 				//Crop image
 				ImGui::Image(
@@ -210,7 +210,7 @@ void ParticleEditor::draw(int windowFlags)
 
 		if(ImGui::CollapsingHeader("Emission"))
 		{
-			if(ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000.0f))
+			if(ImGui::SliderInt("Max #", (int*)&particles->max, 1, 10000))
 				particles->init();	//Gotta reset when we change this
 			ImGui::SliderFloat("Rate", &particles->rate, 0.0f, 1000.0f);
 			ImGui::SliderFloat("Rate Scale", &particles->curRate, 0.0f, 10.0f);
@@ -326,7 +326,7 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::SameLine();
 			if(ImGui::Button("Remove"))
 			{
-				if(curSelectedSpawn >= 0 && curSelectedSpawn < particles->spawnOnDeath.size())
+				if(curSelectedSpawn >= 0 && (size_t)curSelectedSpawn < particles->spawnOnDeath.size())
 				{
 					particles->spawnOnDeath.erase(particles->spawnOnDeath.begin() + curSelectedSpawn);
 					curSelectedSpawn = -1;
@@ -357,7 +357,7 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::CloseCurrentPopup();
 			loadParticles = false;
 			//Error check before loading file
-			if(availableParticleSystems.size() > curSelectedLoadSaveItem)
+			if(availableParticleSystems.size() > (size_t)curSelectedLoadSaveItem)
 			{
 				std::string sFileToLoad = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFileToLoad.size())
@@ -392,7 +392,7 @@ void ParticleEditor::draw(int windowFlags)
 		ImGui::Text("Select a Particle System to save:");
 		if(ImGui::ListBox("Current", &curSelectedLoadSaveItem, getParticleSystem, NULL, availableParticleSystems.size(), 5))
 		{
-			if(availableParticleSystems.size() > curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
+			if(availableParticleSystems.size() > (size_t)curSelectedLoadSaveItem && curSelectedLoadSaveItem >= 0)
 			{
 				std::string sFilename = availableParticleSystems.at(curSelectedLoadSaveItem);
 				if(sFilename.size() < SAVE_BUF_SZ)
@@ -424,7 +424,7 @@ void ParticleEditor::draw(int windowFlags)
 		{
 			ImGui::CloseCurrentPopup();
 			spawnParticleSelect = false;
-			if(curSelectedSpawnSystem < availableParticleSystems.size())
+			if((size_t)curSelectedSpawnSystem < availableParticleSystems.size())
 			{
 				particles->spawnOnDeath.push_back(availableParticleSystems.at(curSelectedSpawnSystem));
 				curSelectedSpawnSystem = -1;
@@ -448,7 +448,7 @@ void ParticleEditor::draw(int windowFlags)
 			ImGui::CloseCurrentPopup();
 			loadParticleImage = false;
 			//Error check before loading file
-			if(availableParticleSystemImages.size() > curSelectedLoadImage)
+			if(availableParticleSystemImages.size() > (size_t)curSelectedLoadImage)
 			{
 				curImageFilename = PARTICLE_SYSTEM_PATH + availableParticleSystemImages.at(curSelectedLoadImage);
 				particles->img = _ge->getResourceLoader()->getImage(curImageFilename);

@@ -17,7 +17,7 @@ SteelSeriesEditor::SteelSeriesEditor(GameEngine* ge)
 	eventType = steelSeriesTactileEvents[selectedSSMouseRumble];
 	selectedEventIcon = 0;
 	rumbleCount = 5;
-	rumbleFreq = 0.65;
+	rumbleFreq = 0.65f;
 	rumbleLen = 100;
 	percentHealth = 100;
 	mouse0Color[0] = 1.0f;
