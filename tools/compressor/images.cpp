@@ -115,9 +115,9 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 			rc->coordinates[1] = bottom;
 			rc->coordinates[2] = right;
 			rc->coordinates[3] = bottom;
-			rc->coordinates[4] = right;
+			rc->coordinates[4] = left;
 			rc->coordinates[5] = top;
-			rc->coordinates[6] = left;
+			rc->coordinates[6] = right;
 			rc->coordinates[7] = top;
 
 			//Add texture to pak

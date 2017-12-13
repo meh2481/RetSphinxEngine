@@ -909,8 +909,8 @@ static const float default_uvs[] =
 {
 	0.0f, 1.0f, // lower left
 	1.0f, 1.0f, // lower right
-	1.0f, 0.0f, // upper right
 	0.0f, 0.0f, // upper left
+	1.0f, 0.0f, // upper right
 };
 
 Image* ResourceLoader::loadImageFromFile(const std::string& filename)

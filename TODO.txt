@@ -1,4 +1,5 @@
 Current higher pri:
+- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
 - Remove OpenGL deprecated things and re-enable forward compat flag
 	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
