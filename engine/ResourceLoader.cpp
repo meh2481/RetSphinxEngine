@@ -408,7 +408,7 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
 
 	SDL_Surface* img = getSDLImage(cImgPath);
 	assert(img != NULL);
-	cur = SDL_CreateColorCursor(img, hotSpot.x, hotSpot.y);
+	cur = SDL_CreateColorCursor(img, (int)hotSpot.x, (int)hotSpot.y);
 
 
 	delete doc;

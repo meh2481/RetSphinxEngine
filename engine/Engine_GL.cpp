@@ -173,6 +173,8 @@ void Engine::setup_opengl()
 	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
 
 	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
-	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");
+	m_renderState.modelId = glGetUniformLocation(m_renderState.programId, "model");
+	m_renderState.viewId = glGetUniformLocation(m_renderState.programId, "view");
+	m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
 	m_renderState.projection = persp;
 }

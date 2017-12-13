@@ -3,6 +3,7 @@
 
 void RenderState::apply() const
 {
-	glm::mat4 mvp = projection * view * model;
-	glUniformMatrix4fv(uniformId, 1, false, &mvp[0][0]);
+	glUniformMatrix4fv(modelId, 1, false, &model[0][0]);
+	glUniformMatrix4fv(viewId, 1, false, &view[0][0]);
+	glUniformMatrix4fv(projectionId, 1, false, &projection[0][0]);
 }
