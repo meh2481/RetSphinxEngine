@@ -174,10 +174,10 @@ void GameEngine::draw(RenderState renderState)
 	
 }
 
-void GameEngine::init(std::list<commandlineArg> sArgs)
+void GameEngine::init(std::vector<commandlineArg> sArgs)
 {
 	//Run through list for arguments we recognize
-	for (std::list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+	for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
 		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such

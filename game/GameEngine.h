@@ -43,7 +43,7 @@ private:
 	Vec3 cameraPos;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
-	std::list<ColorPhase> m_ColorsChanging;
+	std::vector<ColorPhase> m_ColorsChanging;
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
@@ -61,7 +61,7 @@ private:
 protected:
 	void frame(float dt);
 	void draw(RenderState renderState);
-	void init(std::list<commandlineArg> sArgs);
+	void init(std::vector<commandlineArg> sArgs);
 	void pause();
 	void resume();
 	bool drawDebugUI();

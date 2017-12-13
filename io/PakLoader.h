@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <map>
 #include <string>
-#include <list>
+#include <vector>
 #include "ResourceTypes.h"
 
 #define PAK_FILE_TYPE "pak"
@@ -17,7 +17,7 @@ class PakLoader
 	} PakPtr;
 
 	std::map<uint64_t, PakPtr> m_pakFiles;	//Maps resource IDs to particular pak files
-	std::list<FILE*> openedFiles;			//Keeps track of all opened file handles so we can close them easily
+	std::vector<FILE*> openedFiles;			//Keeps track of all opened file handles so we can close them easily
 
 	void parseFile(const std::string& sFileName);
 

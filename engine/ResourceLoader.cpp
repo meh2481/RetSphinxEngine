@@ -913,7 +913,7 @@ static const float default_uvs[] =
 	0.0f, 0.0f, // upper left
 };
 
-Image* ResourceLoader::loadImageFromFile(std::string filename)
+Image* ResourceLoader::loadImageFromFile(const std::string& filename)
 {
 	int comp = 0;
 	int width = 0;

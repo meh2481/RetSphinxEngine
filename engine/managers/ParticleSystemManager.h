@@ -11,8 +11,8 @@ class ParticleSystemManager : public Observer
 {
 	ParticleSystemManager() {};
 
-	std::list<ParticleSystem*> m_particles;
-	std::list<ParticleSystem*> m_updateParticles;
+	std::vector<ParticleSystem*> m_particles;
+	std::vector<ParticleSystem*> m_updateParticles;
 	Subject* m_notifySubject;
 	ResourceLoader* m_loader;
 	bool updating;

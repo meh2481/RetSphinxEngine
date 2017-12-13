@@ -27,7 +27,7 @@ class ResourceLoader
 	std::string m_sPakDir;
 
 	std::string readTextFile(const std::string& filename);
-	Image* loadImageFromFile(std::string filename); 
+	Image* loadImageFromFile(const std::string& filename); 
 	Image* loadImageFromData(unsigned char* data, unsigned int len);
 	Texture* bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode);
 	Texture* getAtlas(uint64_t atlasId);

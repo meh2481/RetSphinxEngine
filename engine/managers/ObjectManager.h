@@ -1,7 +1,7 @@
 #pragma once
-#include <list>
 #include "Rect.h"
 #include "RenderState.h"
+#include <vector>
 
 class Object;
 class b2World;
@@ -9,8 +9,8 @@ class b2World;
 class ObjectManager
 {
 	bool updating;
-	std::list<Object*> m_lObjects;	//Object list
-	std::list<Object*> m_lUpdateObjects;	//Temp holder for objects added while iterating over the object list
+	std::vector<Object*> m_lObjects;	//Object list
+	std::vector<Object*> m_lUpdateObjects;	//Temp holder for objects added while iterating over the object list
 	b2World* m_physicsWorld;
 
 public:

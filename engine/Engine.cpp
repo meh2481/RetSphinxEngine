@@ -376,13 +376,13 @@ void Engine::_loadicon()	//Load icon into SDL window
 
 bool Engine::getCursorDown(int iButtonCode)
 {
-	return (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
+	return (!!SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
 }
 
-void Engine::commandline(std::list<std::string> argv)
+void Engine::commandline(std::vector<std::string> argv)
 {
 	//Step through intelligently
-	for(std::list<std::string>::iterator i = argv.begin(); i != argv.end(); i++)
+	for(std::vector<std::string>::iterator i = argv.begin(); i != argv.end(); i++)
 	{
 		commandlineArg cla;
 		std::string sSwitch = *i;
@@ -393,7 +393,7 @@ void Engine::commandline(std::list<std::string> argv)
 			sSwitch.erase(0, 1);
 
 			cla.sSwitch = sSwitch;
-			std::list<std::string>::iterator sw = i;
+			std::vector<std::string>::iterator sw = i;
 			if(++sw != argv.end())	//Switch with a value
 			{
 				cla.sValue = *sw;
@@ -515,7 +515,7 @@ bool Engine::getDoubleBuffered()
 {
 	int val = 1;
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
-	return val;
+	return !!val;
 }
 
 void Engine::setVsync(int iVsync)
@@ -546,7 +546,7 @@ void Engine::setGravity(float x, float y)
 
 bool Engine::isMouseGrabbed()
 {
-	return SDL_GetWindowGrab(m_Window);
+	return !!SDL_GetWindowGrab(m_Window);
 }
 
 void Engine::grabMouse(bool bGrab)

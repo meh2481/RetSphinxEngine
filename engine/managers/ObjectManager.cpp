@@ -20,7 +20,7 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::render(const RenderState& renderState)
 {
-	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
+	for(std::vector<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)	//Add objects
 		(*i)->draw(renderState);
 }
 
@@ -38,16 +38,16 @@ void ObjectManager::add(Object * o)
 
 void ObjectManager::cleanup()
 {
-	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
+	for(std::vector<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
 		delete (*i);
 	m_lObjects.clear();
 
 	//Wipe Box2D physics data that's left over
-	std::list<b2Body*> bodies;
+	std::vector<b2Body*> bodies;
 	for(b2Body* bod = m_physicsWorld->GetBodyList(); bod != NULL; bod = bod->GetNext())
 		bodies.push_back(bod);
 
-	for(std::list<b2Body*>::iterator i = bodies.begin(); i != bodies.end(); i++)
+	for(std::vector<b2Body*>::iterator i = bodies.begin(); i != bodies.end(); i++)
 		m_physicsWorld->DestroyBody(*i);
 }
 
@@ -55,7 +55,7 @@ void ObjectManager::update(float dt)
 {
 	//Update
 	updating = true;	//TODO: Remember what this mutex is for
-	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
+	for(std::vector<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
 	{
 		(*i)->update(dt);
 		if(!(*i)->alive)
@@ -67,7 +67,7 @@ void ObjectManager::update(float dt)
 	}
 	updating = false;
 	//Add update objects
-	for(std::list<Object*>::iterator i = m_lUpdateObjects.begin(); i != m_lUpdateObjects.end(); i++)
+	for(std::vector<Object*>::iterator i = m_lUpdateObjects.begin(); i != m_lUpdateObjects.end(); i++)
 		m_lObjects.push_back(*i);
 	m_lUpdateObjects.clear();
 }
@@ -81,7 +81,7 @@ Object* ObjectManager::getAt(Vec2 p)
 	m_physicsWorld->QueryAABB(&pqc, aabb);
 
 	//This returns a list of possible bodies; loop through and check for actual containment
-	for(std::list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+	for(std::vector<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
 	{
 		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
 		{
@@ -105,7 +105,7 @@ Object* ObjectManager::getClosest(Vec2 p)
 {
 	Object* closest = NULL;
 	float len2 = FLT_MAX;
-	for(std::list<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
+	for(std::vector<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
 	{
 		Vec2 offset = (*i)->getPos() - p;
 		float dist = glmx::lensqr(offset);

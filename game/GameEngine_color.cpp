@@ -11,7 +11,7 @@
 void GameEngine::updateColors(float dt)
 {
 	//Update our colors that are phasing into one another
-	for(std::list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
+	for(std::vector<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
 	{
 		if(i->dir)
 		{
@@ -82,7 +82,7 @@ void GameEngine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
 	cp.amtg = (dest.g - src->g) / time;
 	cp.amtb = (dest.b - src->b) / time;
 	bool bSet = false;
-	for(std::list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
+	for(std::vector<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
 	{
 		if(i->colorToChange == src)
 		{
@@ -97,7 +97,7 @@ void GameEngine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
 
 void GameEngine::clearColors()
 {
-	for(std::list<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
+	for(std::vector<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
 	{
 		i->colorToChange->r = i->srcr;
 		i->colorToChange->g = i->srcg;

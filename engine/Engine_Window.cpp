@@ -28,7 +28,7 @@ void Engine::setFullscreen(bool bFullscreen)
 
 bool Engine::isMaximized()
 {
-	return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);
+	return (!!SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MAXIMIZED);
 }
 
 Vec2 Engine::getWindowPos()

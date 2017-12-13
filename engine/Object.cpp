@@ -19,7 +19,7 @@ Object::Object()
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
-  depth = 0; 
+  depth = 0;
   img = NULL; 
   active = true;
   alive = true;
@@ -207,7 +207,6 @@ void ObjSegment::draw(RenderState renderState)
 			renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
 			renderState.apply();
 
-			//glScalef(size.x, size.y, size.x);	//Can't really scale along z, don't care	//What the actual? Why not?
 			glEnable(GL_CULL_FACE);
 			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);
@@ -243,11 +242,9 @@ void ObjSegment::draw(RenderState renderState)
 		renderState.model = glm::rotate(renderState.model, glm::degrees(rot), glm::vec3(0.0f, 0.0f, 1.0f));
 		if(obj3D)
 		{
-			//renderState.model = glm::mat4(1.0f);
 			renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
 			renderState.apply();
 
-			//glScalef(size.x, size.y, size.x);
 			glEnable(GL_CULL_FACE);
 			obj3D->render(renderState);
 			glDisable(GL_CULL_FACE);

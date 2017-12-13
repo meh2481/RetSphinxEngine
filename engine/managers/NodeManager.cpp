@@ -54,7 +54,7 @@ Node* NodeManager::getNodeUnder(Vec2 p)
 	physicsWorld->QueryAABB(&pqc, aabb);
 	
 	//This returns a list of possible bodies; loop through and check for actual containment
-	for(std::list<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
+	for(std::vector<b2Body*>::iterator i = pqc.foundBodies.begin(); i != pqc.foundBodies.end(); i++)
 	{
 		for(b2Fixture* fix = (*i)->GetFixtureList(); fix != NULL; fix = fix->GetNext())
 		{

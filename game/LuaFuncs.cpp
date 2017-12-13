@@ -252,11 +252,11 @@ template<typename T> T *getObj(lua_State *L, unsigned pos = 1)
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(controller_rumbleLR) //void controller_rumbleLR(uint msec, float forceLarge, float forceSmall)
 {
-	int msec = lua_tointeger(L, 1);
+	int msec = (int)lua_tointeger(L, 1);
 	float forceLarge = (float)lua_tonumber(L, 2);
 	float forceSmall = (float)lua_tonumber(L, 3);
 
-	GameEngineLua::rumbleLR(msec, forceLarge * USHRT_MAX, forceSmall * USHRT_MAX);
+	GameEngineLua::rumbleLR(msec, (uint16_t)(forceLarge * USHRT_MAX), (uint16_t)(forceSmall * USHRT_MAX));
 	luaReturnNil();
 }
 
@@ -485,7 +485,7 @@ luaFunc(seg_getSize)	//float x, float y seg_getSize(Object* o, int idx)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
 			luaReturnVec2(seg->size.x, seg->size.y);
 	}
@@ -497,11 +497,11 @@ luaFunc(seg_setSize)	//void seg_setSize(Object* o, int idx, float x, float y)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
 		{
-			seg->size.x = lua_tonumber(L, 3);
-			seg->size.y = lua_tonumber(L, 4);
+			seg->size.x = (float)lua_tonumber(L, 3);
+			seg->size.y = (float)lua_tonumber(L, 4);
 		}
 	}
 	luaReturnNil();
@@ -512,7 +512,7 @@ luaFunc(seg_getPos)	//float x, float y seg_getPos(Object* o, int idx)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
 			luaReturnVec2(seg->pos.x, seg->pos.y);
 	}
@@ -524,11 +524,11 @@ luaFunc(seg_setPos)	//void seg_setPos(Object* o, int idx, float x, float y)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
 		{
-			seg->pos.x = lua_tonumber(L, 3);
-			seg->pos.y = lua_tonumber(L, 4);
+			seg->pos.x = (float)lua_tonumber(L, 3);
+			seg->pos.y = (float)lua_tonumber(L, 4);
 		}
 	}
 	luaReturnNil();
@@ -539,7 +539,7 @@ luaFunc(seg_getRot)	//float seg_getRot(Object* o, int idx)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
 			luaReturnNum(seg->rot);
 	}
@@ -551,9 +551,9 @@ luaFunc(seg_setRot)	//void seg_setRot(Object* o, int idx, float angle)
 	Object *o = getObj<Object>(L);
 	if(o && lua_isinteger(L, 2) && lua_isnumber(L, 3))
 	{
-		ObjSegment* seg = o->getSegment(lua_tointeger(L, 2));
+		ObjSegment* seg = o->getSegment((unsigned int)lua_tointeger(L, 2));
 		if(seg)
-			seg->rot = lua_tonumber(L, 2);
+			seg->rot = (float)lua_tonumber(L, 2);
 	}
 	luaReturnNil();
 }
@@ -579,9 +579,9 @@ luaFunc(camera_setPos)	//void camera_setPos(x,y,z)
 {
 	if(lua_isnumber(L, 1) && lua_isnumber(L, 2) && lua_isnumber(L, 3))
 	{
-		float x = lua_tonumber(L, 1);
-		float y = lua_tonumber(L, 2);
-		float z = lua_tonumber(L, 3);
+		float x = (float)lua_tonumber(L, 1);
+		float y = (float)lua_tonumber(L, 2);
+		float z = (float)lua_tonumber(L, 3);
 		GameEngineLua::camera_setPos(x, y, z);
 	}
 	luaReturnNil();
@@ -790,7 +790,7 @@ luaFunc(ss_sendEvent)	//void ss_sendEvent(string eventId, int value)
 {
 	if(lua_isstring(L, 1) && lua_isinteger(L, 2))
 	{
-		GameEngineLua::sendSSEvent(lua_tostring(L, 1), lua_tointeger(L, 2));
+		GameEngineLua::sendSSEvent(lua_tostring(L, 1), (int)lua_tointeger(L, 2));
 	}
 	luaReturnNil();
 }
@@ -874,8 +874,8 @@ luaFunc(music_spectrum) //float[] music_spectrum(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
-		int channel = lua_tointeger(L, 1);
-		int num = lua_tointeger(L, 2);
+		int channel = (int)lua_tointeger(L, 1);
+		int num = (int)lua_tointeger(L, 2);
 		int actualNum = num;
 		if(actualNum < 64)	//FMOD minimum
 			actualNum = 64;
@@ -894,8 +894,8 @@ luaFunc(music_spectrumR) //float[] music_spectrumR(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
-		int channel = lua_tointeger(L, 1);
-		int num = lua_tointeger(L, 2);
+		int channel = (int)lua_tointeger(L, 1);
+		int num = (int)lua_tointeger(L, 2);
 		int actualNum = num;
 		if(actualNum < 64)	//FMOD minimum
 			actualNum = 64;
@@ -914,8 +914,8 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 {
 	if(lua_isinteger(L, 1) && lua_isinteger(L, 2))
 	{
-		int channel = lua_tointeger(L, 1);
-		int num = lua_tointeger(L, 2);
+		int channel = (int)lua_tointeger(L, 1);
+		int num = (int)lua_tointeger(L, 2);
 		int actualNum = num;
 		if(actualNum < 64)	//FMOD minimum
 			actualNum = 64;

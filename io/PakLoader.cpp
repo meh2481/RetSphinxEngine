@@ -28,7 +28,7 @@ PakLoader::~PakLoader()
 
 void PakLoader::clear()
 {
-	for(std::list<FILE*>::iterator i = openedFiles.begin(); i != openedFiles.end(); i++)
+	for(std::vector<FILE*>::iterator i = openedFiles.begin(); i != openedFiles.end(); i++)
 		fclose(*i);	//Close all our opened files
 
 	openedFiles.clear();
