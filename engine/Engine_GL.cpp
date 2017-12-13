@@ -87,7 +87,7 @@ void Engine::setup_sdl()
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) == 0);
 #ifdef _DEBUG
 	//TODO: Add back forward compatibility flag once all drawing uses VBOs/shaders
-	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | SDL_GL_CONTEXT_DEBUG_FLAG) == 0);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG) == 0);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 #endif
@@ -158,15 +158,10 @@ void Engine::setup_opengl()
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	//Enable image transparency
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//Set up lighting
-	glShadeModel(GL_SMOOTH);
 	
 	setMSAA(m_iMSAA);
 	
@@ -176,7 +171,6 @@ void Engine::setup_opengl()
 
 	// Set the rendering program
 	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
-	glLoadMatrixf(glm::value_ptr(persp));
 
 	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
 	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");

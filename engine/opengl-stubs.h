@@ -54,7 +54,6 @@ GL_FUNC(void,glPushMatrix,(void),(),)
 GL_FUNC(void,glRotatef,(GLfloat angle, GLfloat x, GLfloat y, GLfloat z),(angle,x,y,z),)
 GL_FUNC(void,glScalef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
 GL_FUNC(void,glTranslatef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
-GL_FUNC(void,glLoadMatrixf,(const GLfloat *m),(m),)
 GL_FUNC(void, glVertex2f, (GLfloat x, GLfloat y), (x, y), )
 GL_FUNC(void, glPointSize, (GLfloat size), (size), )
 GL_FUNC(void, glTexCoord2f, (GLfloat u, GLfloat v), (u, v), )
@@ -62,7 +61,6 @@ GL_FUNC(void, glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alph
 GL_FUNC(void, glClearDepth, (GLdouble depth), (depth), )
 GL_FUNC(void, glDepthFunc, (GLenum func), (func), )
 GL_FUNC(void, glHint, (GLenum target, GLenum mode), (target, mode), )
-GL_FUNC(void, glShadeModel, (GLenum  mode), (mode), )
 
 // drawing
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)

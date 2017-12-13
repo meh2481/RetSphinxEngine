@@ -396,8 +396,8 @@ unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 		{
 			i->left, i->top, // upper left
 			i->right, i->top, // upper right
-			i->right, i->bottom, // lower right
 			i->left, i->bottom, // lower left
+			i->right, i->bottom // lower right
 		};
 
 		memcpy(&fontBuf[pos], texCoords, sizeof(float) * 8);
