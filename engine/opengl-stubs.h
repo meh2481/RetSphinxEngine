@@ -38,6 +38,7 @@ GL_FUNC(void,glTexImage2D,(GLenum target, GLint level, GLenum internalFormat, GL
 #else
 GL_FUNC(void,glTexImage2D,(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels),(target,level,internalFormat,width,height,border,format,type,pixels),)
 #endif
+GL_FUNC(void,glCompressedTexImage2D,(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data),(target,level,internalformat,width,height,border,imageSize,data),)
 GL_FUNC(void,glBindTexture,(GLenum target,GLuint name),(target,name),)
 GL_FUNC(void,glDeleteTextures,(GLsizei n, const GLuint *textures),(n,textures),)
 GL_FUNC(void,glTexParameterf,(GLenum target, GLenum pname, GLfloat param),(target,pname,param),)

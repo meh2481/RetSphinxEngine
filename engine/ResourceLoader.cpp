@@ -930,7 +930,7 @@ Image* ResourceLoader::loadImageFromFile(const std::string& filename)
 		return NULL;
 	}
 	
-	Texture* tex = bindTexture(cBuf, width, height, mode);
+	Texture* tex = bindTexture(cBuf, width, height, mode, width*height*comp);
 	stbi_image_free(cBuf);
 
 	Image* img = new Image();
@@ -965,7 +965,7 @@ Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 	return img;
 }
 
-Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode)
+Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, unsigned int height, int mode, int len)
 {
 	Texture* tex = new Texture();
 	tex->width = width;
@@ -976,7 +976,10 @@ Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, un
 	//bind to the new texture ID
 	glBindTexture(GL_TEXTURE_2D, tex->tex);
 	//store the texture data for OpenGL use
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, mode, GL_UNSIGNED_BYTE, data);
+	if(mode == GL_RGB || mode == GL_RGBA)
+		glTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, mode, GL_UNSIGNED_BYTE, data);
+	else	//Compressed image data
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, len, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -1000,7 +1003,7 @@ Texture* ResourceLoader::getAtlas(uint64_t atlasId)
 		}
 
 		AtlasHeader* header = (AtlasHeader*)buf;
-		atlas = bindTexture(buf + sizeof(AtlasHeader), 1 << header->width, 1 << header->height, header->mode);
+		atlas = bindTexture(buf + sizeof(AtlasHeader), 1 << header->width, 1 << header->height, header->mode, len - sizeof(AtlasHeader));
 
 		free(buf);
 

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 
 #define DEFAULT_SZ 11	//2048*2048
 #define BYTES_PER_PIXEL_RGBA 4
