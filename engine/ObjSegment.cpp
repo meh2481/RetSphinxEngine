@@ -46,21 +46,30 @@ void ObjSegment::draw(RenderState renderState)
 		{
 			renderState.apply();
 
+			//TODO: This needs to be constant, only updating when size/tex/tile changes
 			Quad q;
 			q.tex = *img;
-			q.pos[0] = -size.x / 2.0f;
-			q.pos[1] = -size.y / 2.0f; // upper left
+			float sizex = size.x / tile.x;
+			float sizey = size.y / tile.y;
+			for(float y = 0; y < tile.y; y++)
+			{
+				for(float x = 0; x < tile.x; x++)	//TODO: Partial quad at end
+				{
+					q.pos[0] = -size.x / 2.0f + sizex * x;
+					q.pos[1] = -size.y / 2.0f + sizey * y; // upper left
 
-			q.pos[2] = size.x / 2.0f;
-			q.pos[3] = -size.y / 2.0f; // upper right
+					q.pos[2] = q.pos[0] + sizex;
+					q.pos[3] = q.pos[1]; // upper right
 
-			q.pos[4] = -size.x / 2.0f;
-			q.pos[5] = size.y / 2.0f; // lower left
+					q.pos[4] = q.pos[0];
+					q.pos[5] = q.pos[1] + sizey; // lower left
 
-			q.pos[6] = size.x / 2.0f;
-			q.pos[7] = size.y / 2.0f; // lower right
+					q.pos[6] = q.pos[2];
+					q.pos[7] = q.pos[5]; // lower right
 
-			Draw::drawQuad(&q);
+					Draw::drawQuad(&q);
+				}
+			}
 		}
 	}
 	else
@@ -84,6 +93,7 @@ void ObjSegment::draw(RenderState renderState)
 		{
 			renderState.apply();
 
+			//TODO: This needs to be constant, only updating when size/tex/tile changes
 			Quad q;
 			q.tex = *img;
 			q.pos[0] = -size.x / 2.0f;

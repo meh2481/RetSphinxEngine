@@ -66,6 +66,7 @@ void Object::draw(RenderState renderState)
 				renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
 				renderState.apply();
 
+				//TODO: This needs to be constant, only updating when size/tex changes
 				Quad q;
 				q.tex = *img;
 				q.pos[0] = -meshSize.x / 2.0f;
