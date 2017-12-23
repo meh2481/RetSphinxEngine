@@ -8,15 +8,15 @@
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-	//glColor4f(color.r, color.g, color.b, 1.0f);
-	//glBegin(GL_LINE_LOOP);
-	//for (int32 i = 0; i < vertexCount; ++i)
-	//	glVertex2f(vertices[i].x, vertices[i].y);
-	//glEnd();
+	for(int i = 0; i < vertexCount - 1; i++)
+		DrawSegment(vertices[i], vertices[i + 1], color);
+	//Last side also
+	DrawSegment(vertices[0], vertices[vertexCount - 1], color);
 }
 
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
+	//Draw filled center
 	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
 	//glBegin(GL_TRIANGLE_FAN);
 	//for (int32 i = 0; i < vertexCount; ++i)
@@ -24,30 +24,14 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 	//glEnd();
 	//glDisable(GL_BLEND);
 
-	//glColor4f(color.r, color.g, color.b, 1.0f);
-	//glBegin(GL_LINE_LOOP);
-	//for (int32 i = 0; i < vertexCount; ++i)
-	//	glVertex2f(vertices[i].x, vertices[i].y);
-	//glEnd();
-	//glEnable(GL_BLEND);
+	//Fill in outside
+	DrawPolygon(vertices, vertexCount, color);
 }
 
 const int NUM_SEGMENTS = 16;
 const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)NUM_SEGMENTS;
 void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
-	//const float NUM_SEGMENTS = 16.0f;
-	//const float ANGLE_INCREMENT = 2.0f * b2_pi / NUM_SEGMENTS;
-	//float angle = 0.0f;
-	//glColor4f(color.r, color.g, color.b, 1.0f);
-	//glBegin(GL_LINE_LOOP);
-	//for (int32 i = 0; i < NUM_SEGMENTS; ++i)
-	//{
-	//	b2Vec2 v = center + radius * b2Vec2(cosf(angle), sinf(angle));
-	//	glVertex2f(v.x, v.y);
-	//	angle += ANGLE_INCREMENT;
-	//}
-	//glEnd();
 	float angle = 0.0f;
 	for(int i = 0; i < NUM_SEGMENTS; ++i)
 	{
@@ -60,7 +44,8 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
-	float angle = 0.0f;
+	//Draw filled circle in center
+	//float angle = 0.0f;
 	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
 	//glBegin(GL_TRIANGLE_FAN);
 	//for (int32 i = 0; i < NUM_SEGMENTS; ++i)
@@ -75,12 +60,9 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
 	//Draw circle
 	DrawCircle(center, radius, color);
 
-	//b2Vec2 p = center + radius * axis;
-	//glBegin(GL_LINES);
-	//glVertex2f(center.x, center.y);
-	//glVertex2f(p.x, p.y);
-	//glEnd();
-	//glEnable(GL_BLEND);
+	//Draw axis
+	b2Vec2 p = center + radius * axis;
+	DrawSegment(center, p, color);
 }
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -110,26 +92,13 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
 {
-	//b2Vec2 p1 = xf.p, p2;
-	//const float k_axisScale = 0.4f;
-	//glBegin(GL_LINES);
-	//
-	//glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-	//glVertex2f(p1.x, p1.y);
-	//p2 = p1 + k_axisScale * xf.q.GetXAxis();
-	//glVertex2f(p2.x, p2.y);
-
-	//glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-	//glVertex2f(p1.x, p1.y);
-	//p2 = p1 + k_axisScale * xf.q.GetYAxis();
-	//glVertex2f(p2.x, p2.y);
-
-	//glEnd();
+	//Don't know what this is, don't really care
 }
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-	DrawCircle(p, size, color);
+	//For some reason this looks weird
+	//DrawCircle(p, size, color);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
