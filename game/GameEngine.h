@@ -10,7 +10,7 @@
 #include <set>
 #include "LuaInterface.h"
 
-#include "Object3D.h"
+#include "RenderState.h"
 #include "tinyxml2.h"
 
 class DebugUI;

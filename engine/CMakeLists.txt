@@ -39,6 +39,8 @@ Object.cpp
 Object.h
 Object3D.cpp
 Object3D.h
+ObjSegment.h
+ObjSegment.cpp
 opengl-api.cpp
 opengl-api.h
 opengl-stubs.h

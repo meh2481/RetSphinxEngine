@@ -12,6 +12,7 @@
 #include "Stringbank.h"
 #include "ResourceTypes.h"
 #include "Quad.h"
+#include "ObjSegment.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"

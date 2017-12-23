@@ -2,7 +2,6 @@
     GameEngine header - Object.h
     Copyright (c) 2014 Mark Hutcheson
 */
-
 #pragma once
 
 #include "Object3D.h"
@@ -15,37 +14,9 @@
 #include <string>
 #include <map>
 
-class Object;
 class ObjSegment;
 class b2Body;
 class Image;
-struct b2BodyDef;
-
-//Physical segments of objects - be they actual physics bodies or just images
-//TODO Make SceneryLayer class that this can contain
-class ObjSegment
-{
-public:
-	enum { TYPE = OT_SEGMENT };
-
-    b2Body*         body;		//Physics body associated with this segment
-	Object* 		parent;		//Parent object
-	Object3D*		obj3D;		//3D object
-	
-	Vec2 pos;		//Offset (after rotation)
-	Vec2 tile;		//tile image in x and y
-	float rot;
-	Vec2 size;	//Actual texel size; not pixels
-	float depth;
-	Image* img;
-	bool active;
-	Color col;
-
-    ObjSegment();
-    ~ObjSegment();
-	
-	void draw(RenderState renderState);
-};
 
 //Collections of the above all stuffed into one object for ease of use.
 class Object

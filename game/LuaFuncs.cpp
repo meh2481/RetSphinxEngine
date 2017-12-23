@@ -11,6 +11,7 @@
 #include "Action.h"
 #include "Movement.h"
 #include "SoundManager.h"
+#include "ObjSegment.h"
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768

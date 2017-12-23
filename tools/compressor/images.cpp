@@ -82,6 +82,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	int atlasSzPixels = 1 << atlasSz;
 
 	//Create destination buffer for atlas
+	//TODO: Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1. Should go back to using bytesPerPixel when re-adding raw compression
 	size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
 	unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
 	memset(uncompressedBuf, 0, bufferSize);	//Clear dest buf

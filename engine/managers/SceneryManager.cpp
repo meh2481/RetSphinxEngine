@@ -1,5 +1,5 @@
 #include "SceneryManager.h"
-#include "Object.h"
+#include "ObjSegment.h"
 
 SceneryManager::~SceneryManager()
 {
