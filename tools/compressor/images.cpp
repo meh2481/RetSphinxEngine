@@ -14,7 +14,7 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
-#define DEFAULT_SZ 11	//2048*2048
+#define DEFAULT_SZ 9	//512*512
 #define BYTES_PER_PIXEL_RGBA 4
 #define BYTES_PER_PIXEL_RGB  3
 
@@ -82,7 +82,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	int atlasSzPixels = 1 << atlasSz;
 
 	//Create destination buffer for atlas
-	size_t bufferSize = atlasSzPixels * atlasSzPixels * bytesPerPixel;
+	size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
 	unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
 	memset(uncompressedBuf, 0, bufferSize);	//Clear dest buf
 	
@@ -100,7 +100,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
+			copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, BYTES_PER_PIXEL_RGBA);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
 			TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
@@ -140,7 +140,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		std::ostringstream oss2;
 		oss2 << filename << " - atlas " << curAtlas << ".png";
 		std::cout << "Save " << oss2.str() << std::endl;
-		if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
+		if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
 			std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 	}
 
@@ -150,6 +150,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		flags = squish::kDxt1;
 	int compressedSize = squish::GetStorageRequirements(atlasSzPixels, atlasSzPixels, flags) + sizeof(AtlasHeader);
 	unsigned char* compressedBuf = (unsigned char*)malloc(compressedSize);
+	std::cout << "squishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
 	squish::CompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
 	free(uncompressedBuf);
 
@@ -209,11 +210,11 @@ void packImages(const std::string& filename)
 		startImages.push_back(img);
 
 		//Scale up atlas size as necessary
-		while(img.width > 1 << atlasSz)
-			atlasSz <<= 1;
+		while(img.width+2 > 1 << atlasSz)
+			atlasSz++;
 
-		while(img.height > 1 << atlasSz)
-			atlasSz <<= 1;
+		while(img.height+2 > 1 << atlasSz)
+			atlasSz++;
 	}
 
 	stbrp_context context;
