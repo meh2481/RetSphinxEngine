@@ -18,15 +18,26 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	//Draw filled center
-	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
-	//glBegin(GL_TRIANGLE_FAN);
-	//for (int32 i = 0; i < vertexCount; ++i)
-	//	glVertex2f(vertices[i].x, vertices[i].y);
-	//glEnd();
-	//glDisable(GL_BLEND);
+	float* data = new float[vertexCount*2];
+	const float col[] = {
+		color.r * 0.5,
+		color.g * 0.5,
+		color.b * 0.5,
+		color.a * 0.5
+	};
+	for(int i = 0; i < vertexCount; i++)
+	{
+		data[i * 2] = vertices[i].x;
+		data[i * 2 + 1] = vertices[i].y;
+	}
+	glUniform4fv(uniformId, 1, col);
+	glVertexPointer(2, GL_FLOAT, 0, data);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 
 	//Fill in outside
 	DrawPolygon(vertices, vertexCount, color);
+
+	delete[] data;
 }
 
 const int NUM_SEGMENTS = 16;
@@ -46,17 +57,24 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
 	//Draw filled circle in center
-	//float angle = 0.0f;
-	//glColor4f(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
-	//glBegin(GL_TRIANGLE_FAN);
-	//for (int32 i = 0; i < NUM_SEGMENTS; ++i)
-	//{
-	//	b2Vec2 v = center + radius * b2Vec2(cosf(angle), sinf(angle));
-	//	glVertex2f(v.x, v.y);
-	//	angle += ANGLE_INCREMENT;
-	//}
-	//glEnd();
-	//glDisable(GL_BLEND);
+	float data[NUM_SEGMENTS * 2];
+	const float col[] = {
+		color.r * 0.5,
+		color.g * 0.5,
+		color.b * 0.5,
+		color.a * 0.5
+	};
+	float angle = 0.0f;
+	for(int i = 0; i < NUM_SEGMENTS; i++)
+	{
+		b2Vec2 v = center + radius * b2Vec2(cosf(angle), sinf(angle));
+		data[i * 2] = v.x;
+		data[i * 2 + 1] = v.y;
+		angle += ANGLE_INCREMENT;
+	}
+	glUniform4fv(uniformId, 1, col);
+	glVertexPointer(2, GL_FLOAT, 0, data);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_SEGMENTS);
 
 	//Draw circle
 	DrawCircle(center, radius, color);
