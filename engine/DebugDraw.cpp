@@ -110,8 +110,8 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-	//For some reason this looks weird
-	//DrawCircle(p, size, color);
+	//For some reason this is the wrong size
+	DrawCircle(p, size * 0.025, color);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
