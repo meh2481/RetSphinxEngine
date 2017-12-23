@@ -180,11 +180,11 @@ void Engine::setup_opengl()
 	m_renderState.projection = persp;
 
 #ifdef _DEBUG
-	m_debugRenderState.programId = OpenGLShader::loadShaders("res/shaders/colored.vert", "res/shaders/colored.frag");
+	m_debugRenderState.programId = OpenGLShader::loadShaders("res/shaders/debugdraw.vert", "res/shaders/debugdraw.frag");
 	m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
 	m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
 	m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
-	//m_debugRenderStateColorId = glGetUniformLocation(m_debugRenderState.programId, "incol");
+	//m_debugDraw.uniformId = glGetUniformLocation(m_debugRenderState.programId, "col");
 	m_debugRenderState.projection = persp;
 #endif
 }

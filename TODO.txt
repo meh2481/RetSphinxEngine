@@ -16,6 +16,7 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
+- m_clContactListener and m_debugDraw should be allocated, not created on the stack (Engine.h)
 
 Bugs:
 - Particle editor breaks after F5

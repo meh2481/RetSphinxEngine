@@ -79,8 +79,10 @@ GL_PTR(PFNGLUNIFORM3IPROC, glUniform3i)
 GL_PTR(PFNGLUNIFORM3UIPROC, glUniform3ui)
 GL_PTR(PFNGLUNIFORM1FPROC, glUniform1f)
 GL_PTR(PFNGLUNIFORM3FPROC, glUniform3f)
-GL_PTR(PFNGLUNIFORM4FPROC, glUniform4f)
-GL_PTR(PFNGLUNIFORM4FPROC, glUniform4fv)
+//NOTE: SDL is non-compliant with OpenGL spec here, so we'll define our own API entries for uniforms
+typedef void (APIENTRYP PFNGLUNIFORM4FPROC_FIXED) (GLint location, GLsizei count, const GLfloat * value);
+GL_PTR(PFNGLUNIFORM4FPROC_FIXED, glUniform4f)
+GL_PTR(PFNGLUNIFORM4FPROC_FIXED, glUniform4fv)
 GL_PTR(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv)
 GL_PTR(PFNGLUSEPROGRAMPROC,glUseProgram)
 GL_PTR(PFNGLBINDVERTEXARRAYPROC,glBindVertexArray)

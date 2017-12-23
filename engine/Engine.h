@@ -74,7 +74,6 @@ private:
 	RenderState m_renderState;
 #ifdef _DEBUG
 	RenderState m_debugRenderState;
-	unsigned int m_debugRenderStateColorId;
 #endif
 
 	//Managers
