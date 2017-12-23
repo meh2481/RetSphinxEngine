@@ -1,5 +1,4 @@
 Current higher pri:
-- Fix objsegment tiling
 - Write a better logger - easylogging++ is too bloated
 - "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
 - Remove OpenGL deprecated things and re-enable forward compat flag
@@ -20,6 +19,7 @@ Current higher pri:
 
 Bugs:
 - Particle editor breaks after F5
+- Fix objsegment partial tiling? Or do I not care?
 
 - Game pauses slightly when loading sound; why?
 	- Has to hit pak; but already loaded

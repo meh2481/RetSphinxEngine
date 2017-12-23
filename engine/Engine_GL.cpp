@@ -172,9 +172,19 @@ void Engine::setup_opengl()
 	// Set the rendering program
 	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
 
-	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
+	//TODO: Load from resources
+	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/default.vert", "res/shaders/default.frag");
 	m_renderState.modelId = glGetUniformLocation(m_renderState.programId, "model");
 	m_renderState.viewId = glGetUniformLocation(m_renderState.programId, "view");
 	m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
 	m_renderState.projection = persp;
+
+#ifdef _DEBUG
+	m_debugRenderState.programId = OpenGLShader::loadShaders("res/shaders/colored.vert", "res/shaders/colored.frag");
+	m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
+	m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
+	m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
+	//m_debugRenderStateColorId = glGetUniformLocation(m_debugRenderState.programId, "incol");
+	m_debugRenderState.projection = persp;
+#endif
 }

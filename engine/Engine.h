@@ -72,6 +72,10 @@ private:
 
 	//OpenGL stuff
 	RenderState m_renderState;
+#ifdef _DEBUG
+	RenderState m_debugRenderState;
+	unsigned int m_debugRenderStateColorId;
+#endif
 
 	//Managers
 	ResourceLoader* m_resourceLoader;
@@ -97,7 +101,7 @@ protected:
 
 	//Functions to override in your own class definition
 	virtual void frame(float dt) = 0;   //Function that's called every frame
-	virtual void draw(RenderState renderState) = 0;	//Actual function that draws stuff
+	virtual void draw(RenderState& renderState) = 0;	//Actual function that draws stuff
 	virtual void init(std::vector<commandlineArg> sArgs) = 0;	//So we can load all our images and such
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated

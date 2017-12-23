@@ -62,8 +62,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	setFramerate(60);	 //60 fps default
 	m_bFullscreen = true;
 
-	setup_sdl();
-	setup_opengl();
 	m_fGamma = 1.0f;
 	m_bPaused = m_bControllerDisconnected = false;
 	m_bPauseOnKeyboardFocus = true;
@@ -95,6 +93,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
 	static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
+
+	//Init renderer
+	setup_sdl();
+	setup_opengl();
+
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 
@@ -116,6 +119,7 @@ Engine::~Engine()
 	ImGui_Impl_GL3_Shutdown();
 
 	glDeleteProgram(m_renderState.programId);
+	glDeleteProgram(m_debugRenderState.programId);
 
 	//Clean up SDL
 	SDL_DestroyWindow(m_Window);
@@ -291,7 +295,6 @@ void Engine::_render()
 	draw(m_renderState);
 
 #ifdef _DEBUG
-	glUseProgram(0);
 	drawDebug();
 
 	if(drawDebugUI())
@@ -302,16 +305,23 @@ void Engine::_render()
 	SDL_GL_SwapWindow(m_Window);
 }
 
+
 void Engine::drawDebug()
 {
+#ifdef _DEBUG
 	// Draw physics debug stuff
 	if(m_bDebugDraw)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
+		m_debugRenderState.projection = m_renderState.projection;
+		m_debugRenderState.view = m_renderState.view;
+		m_debugRenderState.model = glm::mat4(1.0f);
+		glUseProgram(m_debugRenderState.programId);
+		m_debugRenderState.apply();
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_physicsWorld->DrawDebugData();
-		//glColor4f(1, 1, 1, 1);
 	}
+#endif // _DEBUG
 }
 
 void Engine::fillScreen(Color col)

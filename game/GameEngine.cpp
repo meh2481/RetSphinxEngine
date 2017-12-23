@@ -94,7 +94,7 @@ void GameEngine::frame(float dt)
 }
 
 const double CAMERA_ANGLE_RAD = glm::radians(60.0);
-void GameEngine::draw(RenderState renderState)
+void GameEngine::draw(RenderState& renderState)
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
@@ -158,6 +158,7 @@ void GameEngine::draw(RenderState renderState)
 		glClear(GL_DEPTH_BUFFER_BIT);
 		m_debugUI->particleEditor->particles->draw(renderState);
 	}
+	renderState.view = view;
 #endif
 
 	//TODO

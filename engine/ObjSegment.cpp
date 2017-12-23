@@ -1,3 +1,7 @@
+/*
+	RetSphinxEngine source - ObjSegment.cpp
+	Copyright (c) 2017 Mark Hutcheson
+*/
 #include "ObjSegment.h"
 #include "opengl-api.h"
 #include "Quad.h"
