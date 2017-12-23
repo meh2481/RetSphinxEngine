@@ -34,6 +34,7 @@ include_directories("${SDL2_INCLUDE_DIR}")
 include_directories("${FMOD_INCLUDE_DIRS}")
 include_directories(dep/lua)
 include_directories(dep/imgui)
+include_directories(dep/squish)
 
 add_subdirectory(net)
 

@@ -5,6 +5,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "stb_image.h"
+#include "squish.h"
 #include <vector>
 #include <string>
 #include <assert.h>
@@ -81,9 +82,9 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 	int atlasSzPixels = 1 << atlasSz;
 
 	//Create destination buffer for atlas
-	size_t bufferSize = atlasSzPixels * atlasSzPixels * bytesPerPixel + sizeof(AtlasHeader);
-	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
-	memset(destBuf, 0, bufferSize);	//Clear dest buf
+	size_t bufferSize = atlasSzPixels * atlasSzPixels * bytesPerPixel;
+	unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
+	memset(uncompressedBuf, 0, bufferSize);	//Clear dest buf
 	
 	//Create compression helper for atlas
 	std::ostringstream oss;
@@ -99,7 +100,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(destBuf + sizeof(AtlasHeader), &img, r.x, r.y, atlasSzPixels, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
+			copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
 			TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
@@ -133,27 +134,36 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		}
 	}
 
-	//Create header for atlas
-	AtlasHeader* header = (AtlasHeader*)destBuf;
-	header->height = atlasSz;
-	header->width = atlasSz;
-	if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-		header->mode = GL_RGB;
-	else
-		header->mode = GL_RGBA;
-
 	//Output PNG if in testing mode
 	if(g_bImageOut)
 	{
 		std::ostringstream oss2;
 		oss2 << filename << " - atlas " << curAtlas << ".png";
 		std::cout << "Save " << oss2.str() << std::endl;
-		if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, destBuf + sizeof(AtlasHeader), atlasSzPixels * bytesPerPixel))
+		if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
 			std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 	}
 
+	//Compress with libsquish
+	int flags = squish::kDxt5;
+	if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+		flags = squish::kDxt1;
+	int compressedSize = squish::GetStorageRequirements(atlasSzPixels, atlasSzPixels, flags) + sizeof(AtlasHeader);
+	unsigned char* compressedBuf = (unsigned char*)malloc(compressedSize);
+	squish::CompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
+	free(uncompressedBuf);
+
+	//Create header for atlas
+	AtlasHeader* header = (AtlasHeader*)compressedBuf;
+	header->height = atlasSz;
+	header->width = atlasSz;
+	if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+		header->mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+	else
+		header->mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
 	//Add atlas to .pak
-	createCompressionHelper(&atlasHelper, destBuf, bufferSize);
+	createCompressionHelper(&atlasHelper, compressedBuf, compressedSize);
 	addHelper(atlasHelper);
 }
 
