@@ -268,40 +268,6 @@ uint32_t getCodepoint(const char* str)
 	return codepoint;
 }
 
-unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
-{
-	int comp = 0;
-	int width = 0;
-	int height = 0;
-	unsigned char* imageBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
-
-	if(!imageBuf || width < 1 || height < 1)
-	{
-		std::cout << "Unable to load image " << filename << std::endl;
-		return NULL;
-	}
-
-	AtlasHeader textureHeader;
-	textureHeader.width = width;
-	textureHeader.height = height;
-	textureHeader.bpp = TEXTURE_BPP_RGBA;
-	if(comp == STBI_rgb)
-		textureHeader.bpp = TEXTURE_BPP_RGB;
-
-	int size = sizeof(AtlasHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
-
-	if(fileSize)
-		*fileSize = size;
-
-	unsigned char* finalBuf = (unsigned char*)malloc(size);
-
-	memcpy(finalBuf, &textureHeader, sizeof(AtlasHeader));
-	memcpy(&finalBuf[sizeof(AtlasHeader)], imageBuf, size - sizeof(AtlasHeader));
-
-	stbi_image_free(imageBuf);
-	return finalBuf;
-}
-
 unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 {
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();

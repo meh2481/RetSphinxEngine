@@ -1000,10 +1000,7 @@ Texture* ResourceLoader::getAtlas(uint64_t atlasId)
 		}
 
 		AtlasHeader* header = (AtlasHeader*)buf;
-		int mode = GL_RGBA;
-		if(header->bpp == TEXTURE_BPP_RGB)
-			mode = GL_RGB;
-		atlas = bindTexture(buf + sizeof(AtlasHeader), header->width, header->height, mode);
+		atlas = bindTexture(buf + sizeof(AtlasHeader), 1 << header->width, 1 << header->height, header->mode);
 
 		free(buf);
 

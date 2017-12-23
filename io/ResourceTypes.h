@@ -64,22 +64,11 @@ typedef struct
 //--------------------------------------------------------------
 // Textures
 //--------------------------------------------------------------
-#define TEXTURE_BPP_RGB		24
-#define TEXTURE_BPP_RGBA	32
-
-#define TEXTURE_FORMAT_RAW	0	//Image is just plain RGB or RGBA values
-#define TEXTURE_FORMAT_ETC1	1
-#define TEXTURE_FORMAT_ETC2	2
-#define TEXTURE_FORMAT_DXT1	3
-#define TEXTURE_FORMAT_DXT3 4
-#define TEXTURE_FORMAT_DXT5 5
-
 typedef struct //Structure for texture data
 {
-	uint32_t bpp;		//One of the texture BPPs above
-	uint32_t width;		//Width of image
-	uint32_t height;	//Height of image
-	uint32_t format;	//One of the texture formats above
+	uint16_t mode;		//One of the OpenGL texture modes
+	uint8_t width;		//Width of image in power of 2
+	uint8_t height;		//Height of image in power of 2
 	//Followed by image data
 } AtlasHeader;
 

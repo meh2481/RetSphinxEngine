@@ -10,8 +10,9 @@
 #include <assert.h>
 #include <iostream>
 #include <sstream>
+#include <SDL_opengl.h>
 
-#define DEFAULT_SZ 2048
+#define DEFAULT_SZ 11	//2048*2048
 #define BYTES_PER_PIXEL_RGBA 4
 #define BYTES_PER_PIXEL_RGB  3
 
@@ -57,7 +58,7 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 	}
 }
 
-void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasW, int atlasH, const std::string& filename)
+void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
 {
 	//First pass: See if RGB or RGBA
 	//TODO: Probably want to pack only RGB->RGB and RGBA->RGBA unless there's some kind of space saving we can do?
@@ -76,8 +77,10 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		}
 	}
 
+	int atlasSzPixels = 1 << atlasSz;
+
 	//Create destination buffer for atlas
-	size_t bufferSize = atlasW * atlasH * bytesPerPixel + sizeof(AtlasHeader);
+	size_t bufferSize = atlasSzPixels * atlasSzPixels * bytesPerPixel + sizeof(AtlasHeader);
 	unsigned char* destBuf = (unsigned char*)malloc(bufferSize);
 	memset(destBuf, 0, bufferSize);	//Clear dest buf
 	
@@ -95,20 +98,20 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		if(r.was_packed)
 		{
 			ImageHelper img = images->at(r.id);
-			copyImage(destBuf + sizeof(AtlasHeader), &img, r.x, r.y, atlasW, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
+			copyImage(destBuf + sizeof(AtlasHeader), &img, r.x, r.y, atlasSzPixels, bytesPerPixel);	//Copy image data over to dest buf, in the proper location
 
 			//Store coords
 			TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
 			rc->atlasId = atlasHelper.id;
 			
-			float actualX = r.x + 1;	// +1 offset here for UVs
-			float actualY = r.y + 1;
+			float actualX = r.x + 1.0f;	// +1 offset here for UVs
+			float actualY = r.y + 1.0f;
 
 			//Get UV coordinates
-			float top = actualY / (float)atlasH;
-			float left = actualX / (float)atlasW;
-			float right = (actualX + (float)img.width) / (float)atlasW;
-			float bottom = (actualY + (float)img.height) / (float)atlasH;
+			float top = actualY / (float)atlasSzPixels;
+			float left = actualX / (float)atlasSzPixels;
+			float right = (actualX + (float)img.width) / (float)atlasSzPixels;
+			float bottom = (actualY + (float)img.height) / (float)atlasSzPixels;
 
 			//CCW winding from lower left, x/y format
 			rc->coordinates[0] = left;
@@ -131,11 +134,12 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 
 	//Create header for atlas
 	AtlasHeader* header = (AtlasHeader*)destBuf;
-	assert(atlasH == atlasW);
-	header->height = atlasH;
-	header->width = atlasW;
-	header->bpp = bytesPerPixel * 8;
-	header->format = TEXTURE_FORMAT_RAW;	//TODO Support different texture formats
+	header->height = atlasSz;
+	header->width = atlasSz;
+	if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+		header->mode = GL_RGB;
+	else
+		header->mode = GL_RGBA;
 
 	//Output PNG if in testing mode
 	if(g_bImageOut)
@@ -143,7 +147,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 		std::ostringstream oss2;
 		oss2 << filename << " - atlas " << curAtlas << ".png";
 		std::cout << "Save " << oss2.str() << std::endl;
-		if(!stbi_write_png(oss2.str().c_str(), atlasW, atlasH, bytesPerPixel, destBuf + sizeof(AtlasHeader), atlasW * bytesPerPixel))
+		if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, destBuf + sizeof(AtlasHeader), atlasSzPixels * bytesPerPixel))
 			std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 	}
 
@@ -194,19 +198,19 @@ void packImages(const std::string& filename)
 		startImages.push_back(img);
 
 		//Scale up atlas size as necessary
-		while(img.width > atlasSz)
+		while(img.width > 1 << atlasSz)
 			atlasSz <<= 1;
 
-		while(img.height > atlasSz)
+		while(img.height > 1 << atlasSz)
 			atlasSz <<= 1;
 	}
 
 	stbrp_context context;
-	int numNodes = atlasSz;
+	int atlasSzPixels = 1 << atlasSz;
 
 	//TODO: Take texture bpp's into account when determining which atlas to pack them into
 
-	stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * numNodes);
+	stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * atlasSzPixels);
 	stbrp_rect *rects = (stbrp_rect*) malloc(sizeof(stbrp_rect) * startImages.size());
 	int rectsLeft = startImages.size();
 	//Init rects
@@ -223,14 +227,14 @@ void packImages(const std::string& filename)
 	int curAtlas = 0;
 	do
 	{
-		stbrp_init_target(&context, atlasSz, atlasSz, nodes, numNodes);
+		stbrp_init_target(&context, atlasSzPixels, atlasSzPixels, nodes, atlasSzPixels);
 		
 		packed = stbrp_pack_rects(&context, rects, rectsLeft);
 
 		//TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
 
 		//Pack into image
-		packImage(rects, rectsLeft, &startImages, curAtlas++, atlasSz, atlasSz, filename);
+		packImage(rects, rectsLeft, &startImages, curAtlas++, atlasSz, filename);
 
 		//Pull out done rects and update rectsLeft. If list is empty, packed will be 1 and we'll break out anyway. Probably. It'll be fine.
 		if(!packed)	//Only worry about removing done rects if we're not done yet
