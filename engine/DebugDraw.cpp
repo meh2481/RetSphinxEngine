@@ -74,22 +74,15 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
 		p2.x,
 		p2.y
 	};
-	//TODO: Replace with uniform
-	const GLfloat colors[] = {
-		color.r,
-		color.g,
-		color.b,
-		color.a,
+	const float col[] = {
 		color.r,
 		color.g,
 		color.b,
 		color.a
 	};
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(4, GL_FLOAT, 0, colors);
+	glUniform4fv(uniformId, 1, col);
 	glVertexPointer(2, GL_FLOAT, 0, data);
 	glDrawArrays(GL_LINES, 0, 2);
-	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
