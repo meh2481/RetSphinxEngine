@@ -45,10 +45,10 @@ void Color::fromString(const std::string& input)
 std::string Color::toString()
 {
 	std::ostringstream oss;
-	int ir = r * 255;
-	int ig = g * 255;
-	int ib = b * 255;
-	int ia = a * 255;
+	int ir = (int)(r * 255);
+	int ig = (int)(g * 255);
+	int ib = (int)(b * 255);
+	int ia = (int)(a * 255);
 	oss << ir << ", " << ig << ", " << ib << ", " << ia;
 	return oss.str();
 }

@@ -99,7 +99,7 @@ void SteelSeriesHaptic::rumble(float strength, uint32_t duration, float curTime)
 	static int eventVal = 0;	//Need some sort of value for this event, but we don't actually care about value, so increment each time
 	static float fLastRumble = 0.0f;
 
-	float sec = (float)duration / 1000.0;
+	float sec = (float)duration / 1000.0f;
 
 	//Last rumble is still going or 0-msec duration
 	if(curTime < fLastRumble || duration < 1)

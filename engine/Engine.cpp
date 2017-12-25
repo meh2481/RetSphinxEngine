@@ -17,6 +17,8 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "InterpolationManager.h"
+#include "EngineContactListener.h"
+#include "DebugDraw.h"
 
 #define GUID_STR_SZ	256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -42,9 +44,11 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	b2Vec2 gravity(0.0f, -9.8f);	//Vector for our world's gravity
 	m_physicsWorld = new b2World(gravity);
 	m_physicsWorld->SetAllowSleeping(true);
-	m_physicsWorld->SetDebugDraw(&m_debugDraw);
-	m_physicsWorld->SetContactListener(&m_clContactListener);
-	m_debugDraw.SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
+	m_debugDraw = new DebugDraw();
+	m_physicsWorld->SetDebugDraw(m_debugDraw);
+	m_clContactListener = new EngineContactListener();
+	m_physicsWorld->SetContactListener(m_clContactListener);
+	m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
 	m_bObjDebugDraw = false;
 	LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
 #ifdef _DEBUG
@@ -114,6 +118,8 @@ Engine::~Engine()
 	delete m_inputManager;
 	delete m_soundManager;
 	delete m_interpolationManager;
+	delete m_debugDraw;
+	delete m_clContactListener;
 
 	//Clean up ImGui
 	ImGui_Impl_GL3_Shutdown();
@@ -324,12 +330,6 @@ void Engine::drawDebug()
 #endif // _DEBUG
 }
 
-void Engine::fillScreen(Color col)
-{
-	glClearColor(col.r, col.g, col.b, col.a);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
-
 void Engine::setFramerate(float fFramerate)
 {
 	LOG(TRACE) << "Setting framerate to " << fFramerate;
@@ -475,15 +475,15 @@ void Engine::stepPhysics(float dt)
 	m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
 
 	//Update collisions
-	std::set<b2Contact*> contacts = m_clContactListener.currentContacts;	//Grab all the currently-active contacts
+	std::set<b2Contact*> contacts = m_clContactListener->currentContacts;	//Grab all the currently-active contacts
 	//Set join the short contacts that fired and also quit this frame
-	for(std::set<b2Contact*>::iterator i = m_clContactListener.frameContacts.begin(); i != m_clContactListener.frameContacts.end(); i++)
+	for(std::set<b2Contact*>::iterator i = m_clContactListener->frameContacts.begin(); i != m_clContactListener->frameContacts.end(); i++)
 		contacts.insert(*i);
 
 	//Iterate over all these
 	for(std::set<b2Contact*>::iterator i = contacts.begin(); i != contacts.end(); i++)
 	{
-		Collision c = m_clContactListener.getCollision(*i);
+		Collision c = m_clContactListener->getCollision(*i);
 		b2WorldManifold worldManifold;
 		(*i)->GetWorldManifold(&worldManifold);
 		if(c.objA && c.objB)
@@ -513,7 +513,7 @@ void Engine::stepPhysics(float dt)
 			c.nodeB->collided(c.objA);
 		}
 	}
-	m_clContactListener.clearFrameContacts();	//Erase all these now that we've handled them
+	m_clContactListener->clearFrameContacts();	//Erase all these now that we've handled them
 }
 
 void Engine::setDoubleBuffered(bool bDoubleBuffered)
@@ -537,11 +537,6 @@ void Engine::setVsync(int iVsync)
 int Engine::getVsync()
 {
 	return SDL_GL_GetSwapInterval();
-}
-
-b2Body* Engine::createBody(b2BodyDef* bdef)
-{
-	return m_physicsWorld->CreateBody(bdef);
 }
 
 void Engine::setGravity(Vec2 ptGravity)

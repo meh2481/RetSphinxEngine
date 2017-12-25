@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 #include "Node.h"
 #include "EntityManager.h"
+#include "Box2D/Box2D.h"
 
 LevelEditor::LevelEditor(GameEngine * _g)
 {

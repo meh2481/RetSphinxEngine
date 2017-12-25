@@ -4,13 +4,9 @@
 */
 #pragma once
 
-#include "Object.h"
-#include "Text.h"
-#include "EngineContactListener.h"
-#include "Node.h"
-#include "DebugDraw.h"
 #include "SDL.h"
 #include "RenderState.h"
+#include "Rect.h"
 #include <vector>
 
 class b2World;
@@ -22,6 +18,8 @@ class InputManager;
 class SoundManager;
 class InterpolationManager;
 class HeadTracker;
+class EngineContactListener;
+class DebugDraw;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -42,8 +40,8 @@ private:
 	SDL_Window* m_Window;
 	std::vector<commandlineArg> lCommandLine;
 	b2World* m_physicsWorld;
-	EngineContactListener m_clContactListener;
-	DebugDraw m_debugDraw;
+	EngineContactListener* m_clContactListener;
+	DebugDraw* m_debugDraw;
 	bool m_bDebugDraw;
 	bool m_bObjDebugDraw;
 	Vec2 m_ptCursorPos;
@@ -126,7 +124,6 @@ public:
 	//Drawing functions
 	Rect getScreenRect() { Rect rc(0, 0, getWidth(), getHeight()); return rc; };
 	void drawDebug();
-	void fillScreen(Color col);
 
 	//Window functions - engine_window.cpp
 	void changeScreenResolution(int w, int h);  //Change resolution mid-game and reload OpenGL textures as needed
@@ -144,7 +141,6 @@ public:
 	uint16_t getHeight() { return m_iHeight; };
 
 	//Physics functions
-	b2Body* createBody(b2BodyDef* bdef);
 	void setGravity(Vec2 ptGravity);
 	void setGravity(float x, float y);
 	void stepPhysics(float dt);	//Update our physics world and handle collisions

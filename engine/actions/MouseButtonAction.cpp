@@ -8,7 +8,7 @@ MouseButtonAction::MouseButtonAction(int b)
 
 bool MouseButtonAction::getDigitalAction(InputDevice* d)
 {
-	return (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(button));
+	return !!(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(button));
 }
 
 float MouseButtonAction::getAnalogAction(InputDevice* d)

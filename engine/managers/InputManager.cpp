@@ -47,7 +47,7 @@ InputManager::~InputManager()
 
 InputDevice* InputManager::getCurController()
 {
-	if(m_curActiveController < 0 || m_curActiveController > m_controllers.size() - 1)
+	if(m_curActiveController < 0 || (size_t)m_curActiveController > m_controllers.size() - 1)
 		return NULL;
 	return m_controllers[m_curActiveController];
 }
@@ -76,7 +76,7 @@ void InputManager::addHeadTracker(SDL_Joystick * joy)
 
 bool InputManager::removeController(int deviceIndex)
 {
-	for(int i = 0; i < m_controllers.size(); i++)
+	for(size_t i = 0; i < m_controllers.size(); i++)
 	{
 		if(deviceIndex == m_controllers[i]->getDeviceIndex())
 		{
@@ -87,7 +87,7 @@ bool InputManager::removeController(int deviceIndex)
 			{
 				return true;	//This was active controller
 			}
-			if(i <= m_curActiveController)
+			if(i <= (size_t)m_curActiveController)
 			{
 				m_curActiveController--;
 				if(m_curActiveController < 0)	//Was first in the list
@@ -101,11 +101,11 @@ bool InputManager::removeController(int deviceIndex)
 
 void InputManager::activateController(int deviceIndex)
 {
-	if(deviceIndex < 0 || deviceIndex >= m_controllers.size())
+	if(deviceIndex < 0 || (size_t)deviceIndex >= m_controllers.size())
 		m_curActiveController = 0;
 	else
 	{
-		for(int i = 0; i < m_controllers.size(); i++)
+		for(size_t i = 0; i < m_controllers.size(); i++)
 		{
 			if(deviceIndex == m_controllers[i]->getDeviceIndex())
 				m_curActiveController = i;
@@ -122,7 +122,7 @@ bool InputManager::keyDown(int32_t keyCode)
 	if(keyCode == SDL_SCANCODE_GUI) return (keyDown(SDL_SCANCODE_LGUI) || keyDown(SDL_SCANCODE_RGUI));
 
 	//Otherwise, just use our pre-polled list we got from SDL
-	return(m_iKeystates[keyCode]);
+	return !!(m_iKeystates[keyCode]);
 }
 
 bool InputManager::getDigitalAction(Action a)

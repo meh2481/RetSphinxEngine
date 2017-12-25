@@ -3,8 +3,9 @@
 	Copyright (c) 2017 Mark Hutcheson
 */
 
-#include "Engine.h"
+#include "DebugDraw.h"
 #include "opengl-api.h"
+#include "Box2D/Box2D.h"
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
@@ -20,10 +21,10 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 	//Draw filled center
 	float* data = new float[vertexCount*2];
 	const float col[] = {
-		color.r * 0.5,
-		color.g * 0.5,
-		color.b * 0.5,
-		color.a * 0.5
+		color.r * 0.5f,
+		color.g * 0.5f,
+		color.b * 0.5f,
+		color.a * 0.5f
 	};
 	for(int i = 0; i < vertexCount; i++)
 	{
@@ -59,10 +60,10 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
 	//Draw filled circle in center
 	float data[NUM_SEGMENTS * 2];
 	const float col[] = {
-		color.r * 0.5,
-		color.g * 0.5,
-		color.b * 0.5,
-		color.a * 0.5
+		color.r * 0.5f,
+		color.g * 0.5f,
+		color.b * 0.5f,
+		color.a * 0.5f
 	};
 	float angle = 0.0f;
 	for(int i = 0; i < NUM_SEGMENTS; i++)
@@ -111,7 +112,7 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
 	//For some reason this is the wrong size
-	DrawCircle(p, size * 0.025, color);
+	DrawCircle(p, size * 0.025f, color);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)

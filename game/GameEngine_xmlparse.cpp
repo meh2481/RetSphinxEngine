@@ -8,6 +8,8 @@
 #include "EntityManager.h"
 #include "StringUtils.h"
 #include "SoundManager.h"
+#include "Object.h"
+#include "Node.h"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML

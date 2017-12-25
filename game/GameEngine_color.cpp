@@ -5,6 +5,7 @@
 
 #include "GameEngine.h"
 #include "tinyxml2.h"
+#include "Color.h"
 #include <float.h>
 #include <sstream>
 
@@ -66,7 +67,7 @@ void GameEngine::updateColors(float dt)
 	}
 }
 	
-void GameEngine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
+void GameEngine::phaseColor(Color* src, Color* dest, float time, bool bPingPong)
 {
 	ColorPhase cp;
 	cp.pingpong = bPingPong;
@@ -75,12 +76,12 @@ void GameEngine::phaseColor(Color* src, Color dest, float time, bool bPingPong)
 	cp.srcb = src->b;
 	cp.dir = true;
 	cp.colorToChange = src;
-	cp.destr = dest.r;
-	cp.destg = dest.g;
-	cp.destb = dest.b;
-	cp.amtr = (dest.r - src->r) / time;
-	cp.amtg = (dest.g - src->g) / time;
-	cp.amtb = (dest.b - src->b) / time;
+	cp.destr = dest->r;
+	cp.destg = dest->g;
+	cp.destb = dest->b;
+	cp.amtr = (dest->r - src->r) / time;
+	cp.amtg = (dest->g - src->g) / time;
+	cp.amtb = (dest->b - src->b) / time;
 	bool bSet = false;
 	for(std::vector<ColorPhase>::iterator i = m_ColorsChanging.begin(); i != m_ColorsChanging.end(); i++)
 	{

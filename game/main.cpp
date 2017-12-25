@@ -5,6 +5,7 @@
 
 #include "GameEngine.h"
 #include "easylogging++.h"
+#include "LuaInterface.h"
 
 //Define constants for logger
 INITIALIZE_EASYLOGGINGPP

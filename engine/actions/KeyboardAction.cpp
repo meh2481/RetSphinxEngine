@@ -9,7 +9,7 @@ KeyboardAction::KeyboardAction(int keyToUse)
 
 bool KeyboardAction::getDigitalAction(InputDevice* d)
 {
-	return(keystates[key]);
+	return !!(keystates[key]);
 }
 
 float KeyboardAction::getAnalogAction(InputDevice* d)

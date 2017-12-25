@@ -12,6 +12,9 @@
 #include "Movement.h"
 #include "SoundManager.h"
 #include "ObjSegment.h"
+#include "Object.h"
+#include "Node.h"
+#include "EngineContactListener.h"
 
 //Defined by SDL
 #define JOY_AXIS_MIN	-32768

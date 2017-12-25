@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "opengl-api.h"
 #include "OpenGLShader.h"
+#include "DebugDraw.h"
 #include "easylogging++.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
@@ -184,7 +185,7 @@ void Engine::setup_opengl()
 	m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
 	m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
 	m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
-	m_debugDraw.uniformId = glGetUniformLocation(m_debugRenderState.programId, "col");
+	m_debugDraw->uniformId = glGetUniformLocation(m_debugRenderState.programId, "col");
 	m_debugRenderState.projection = persp;
 #endif
 }

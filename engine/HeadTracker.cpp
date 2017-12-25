@@ -1,7 +1,7 @@
 #include "HeadTracker.h"
 #include "easylogging++.h"
 
-#define AXIS_MAX 32767.0
+#define AXIS_MAX 32767.0f
 
 HeadTracker::HeadTracker(SDL_Joystick* joy)
 {

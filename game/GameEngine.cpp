@@ -7,7 +7,6 @@
 #include <float.h>
 #include <sstream>
 #include "opengl-api.h"
-#include "easylogging++.h"
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
@@ -21,6 +20,9 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "InterpolationManager.h"
+#include "Object.h"
+#include "Node.h"
+#include "easylogging++.h"
 
 //#define DEBUG_INPUT
 #define CONFIG_FILE "config.xml"
@@ -154,7 +156,9 @@ void GameEngine::draw(RenderState& renderState)
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
-		fillScreen(m_debugUI->particleEditor->particleBgColor);
+		Color col = m_debugUI->particleEditor->particleBgColor;
+		glClearColor(col.r, col.g, col.b, col.a);
+		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		m_debugUI->particleEditor->particles->draw(renderState);
 	}

@@ -5,17 +5,16 @@
 #pragma once
 
 #include "Engine.h"
-
 #include <vector>
 #include <set>
-#include "LuaInterface.h"
-
-#include "RenderState.h"
-#include "tinyxml2.h"
 
 class DebugUI;
 class SteelSeriesClient;
 class InputDevice;
+class Object;
+class Node;
+class LuaInterface;
+class Color;
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -90,7 +89,7 @@ public:
 	
 	//GameEngine_color.cpp functions
 	void updateColors(float dt);
-	void phaseColor(Color* src, Color dest, float time, bool bPingPong = false);
+	void phaseColor(Color* src, Color* dest, float time, bool bPingPong = false);
 	void clearColors();
 };
 

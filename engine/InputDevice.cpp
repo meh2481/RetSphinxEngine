@@ -148,7 +148,7 @@ void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float
 	if(curTime < fLastRumble)
 		return;
 	
-	fLastRumble = curTime + (float)duration / 1000.0;
+	fLastRumble = curTime + (float)duration / 1000.0f;
 
 	strength = max(strength, 0.0f);
 	strength = min(strength, 1.0f);
@@ -158,7 +158,7 @@ void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float
 
 void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smallMotor, float curTime)
 {
-	float strength = largeMotor + smallMotor;
+	float strength = (float)(largeMotor + smallMotor);
 	strength /= (float)USHRT_MAX * 2.0f;
 	if(m_haptic == NULL)
 	{
@@ -175,7 +175,7 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
 	}
 
 	static float fLastRumble = 0.0f;
-	float sec = (float)duration / 1000.0;
+	float sec = (float)duration / 1000.0f;
 
 	//Last rumble is still going or 0-msec duration
 	if(curTime < fLastRumble || duration < 1)
