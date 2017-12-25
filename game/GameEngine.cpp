@@ -93,8 +93,8 @@ void GameEngine::frame(float dt)
 	}
 }
 
-const float CAMERA_ANGLE_RAD = glm::radians(60.0);
-void GameEngine::draw(RenderState renderState)
+const double CAMERA_ANGLE_RAD = glm::radians(60.0);
+void GameEngine::draw(RenderState& renderState)
 {
 	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
 	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
@@ -150,13 +150,6 @@ void GameEngine::draw(RenderState renderState)
 	getEntityManager()->render(renderState);
 
 #ifdef _DEBUG
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f);
-	glLoadMatrixf(glm::value_ptr(persp));
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixf(glm::value_ptr(view));
 	renderState.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, m_fDefCameraZ));
 	if(m_debugUI->particleEditor->open && m_debugUI->visible)
 	{
@@ -165,6 +158,7 @@ void GameEngine::draw(RenderState renderState)
 		glClear(GL_DEPTH_BUFFER_BIT);
 		m_debugUI->particleEditor->particles->draw(renderState);
 	}
+	renderState.view = view;
 #endif
 
 	//TODO
@@ -181,10 +175,10 @@ void GameEngine::draw(RenderState renderState)
 	
 }
 
-void GameEngine::init(std::list<commandlineArg> sArgs)
+void GameEngine::init(std::vector<commandlineArg> sArgs)
 {
 	//Run through list for arguments we recognize
-	for (std::list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+	for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
 		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 		
 	//Load our last screen position and such

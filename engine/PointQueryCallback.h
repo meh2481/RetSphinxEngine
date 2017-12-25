@@ -9,7 +9,7 @@
 class PointQueryCallback : public b2QueryCallback
 {
 public:
-	std::list<b2Body*> foundBodies;
+	std::vector<b2Body*> foundBodies;
 
 	bool ReportFixture(b2Fixture* fixture)
 	{

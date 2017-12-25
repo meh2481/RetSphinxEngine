@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	if (!Lua.Init()) return 1;
 	eng->setLua(&Lua);
 
-	std::list<std::string> lCommandLine;
+	std::vector<std::string> lCommandLine;
 	
 	for(int i = 1; i < argc; i++)
 		lCommandLine.push_back(argv[i]);

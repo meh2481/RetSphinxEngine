@@ -1,10 +1,10 @@
 #pragma once
 #include "Observer.h"
-#include <list>
+#include <vector>
 
 class Subject
 {
-	std::list<Observer*> observers;
+	std::vector<Observer*> observers;
 	int numObservers;
 
 public:

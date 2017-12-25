@@ -84,9 +84,7 @@ void Engine::setup_sdl()
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3) == 0);
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0) == 0);
 
-	//TODO: Switch to core instead of compat once all drawing uses VBOs/shaders
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY) == 0);
+	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) == 0);
 #ifdef _DEBUG
 	//TODO: Add back forward compatibility flag once all drawing uses VBOs/shaders
 	assert(SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, /*SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG |*/ SDL_GL_CONTEXT_DEBUG_FLAG) == 0);
@@ -160,18 +158,10 @@ void Engine::setup_opengl()
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-
-	glEnable(GL_TEXTURE_2D);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	//Enable image transparency
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//Set up lighting
-	glShadeModel(GL_SMOOTH);
-    glEnable(GL_COLOR_MATERIAL);
 	
 	setMSAA(m_iMSAA);
 	
@@ -179,23 +169,22 @@ void Engine::setup_opengl()
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
-	//TODO: Replace lighting with shaders
-	glEnable(GL_LIGHTING);
-
-	float materialShininess = 0.0f;
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-
-	float globalAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };	//Remove existing global OpenGL lighting
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
-
-	glEnable(GL_NORMALIZE);
-
-
 	// Set the rendering program
 	glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
-	glLoadMatrixf(glm::value_ptr(persp));
 
-	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/test.vertex", "res/shaders/test.fragment");
-	m_renderState.uniformId = glGetUniformLocation(m_renderState.programId, "mvp");
+	//TODO: Load from resources
+	m_renderState.programId = OpenGLShader::loadShaders("res/shaders/default.vert", "res/shaders/default.frag");
+	m_renderState.modelId = glGetUniformLocation(m_renderState.programId, "model");
+	m_renderState.viewId = glGetUniformLocation(m_renderState.programId, "view");
+	m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
 	m_renderState.projection = persp;
+
+#ifdef _DEBUG
+	m_debugRenderState.programId = OpenGLShader::loadShaders("res/shaders/debugdraw.vert", "res/shaders/debugdraw.frag");
+	m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
+	m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
+	m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
+	m_debugDraw.uniformId = glGetUniformLocation(m_debugRenderState.programId, "col");
+	m_debugRenderState.projection = persp;
+#endif
 }

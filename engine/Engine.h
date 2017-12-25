@@ -12,7 +12,6 @@
 #include "SDL.h"
 #include "RenderState.h"
 #include <vector>
-#include <list>
 
 class b2World;
 class Image;
@@ -41,7 +40,7 @@ private:
 	std::string m_sCompanyName;
 	std::string m_sIcon;
 	SDL_Window* m_Window;
-	std::list<commandlineArg> lCommandLine;
+	std::vector<commandlineArg> lCommandLine;
 	b2World* m_physicsWorld;
 	EngineContactListener m_clContactListener;
 	DebugDraw m_debugDraw;
@@ -73,6 +72,9 @@ private:
 
 	//OpenGL stuff
 	RenderState m_renderState;
+#ifdef _DEBUG
+	RenderState m_debugRenderState;
+#endif
 
 	//Managers
 	ResourceLoader* m_resourceLoader;
@@ -98,8 +100,8 @@ protected:
 
 	//Functions to override in your own class definition
 	virtual void frame(float dt) = 0;   //Function that's called every frame
-	virtual void draw(RenderState renderState) = 0;	//Actual function that draws stuff
-	virtual void init(std::list<commandlineArg> sArgs) = 0;	//So we can load all our images and such
+	virtual void draw(RenderState& renderState) = 0;	//Actual function that draws stuff
+	virtual void init(std::vector<commandlineArg> sArgs) = 0;	//So we can load all our images and such
 	virtual void handleEvent(SDL_Event event) = 0;  //Function that's called for each SDL input event
 	virtual void pause() = 0;	//Called when the window is deactivated
 	virtual void resume() = 0;	//Called when the window is activated again
@@ -111,7 +113,7 @@ public:
 	~Engine();
 
 	//Misc. methods
-	void commandline(std::list<std::string> argv);	//Pass along commandline arguments for the engine to use
+	void commandline(std::vector<std::string> argv);	//Pass along commandline arguments for the engine to use
 	void start();   //Runs engine and doesn't exit until the engine ends
 	void quit() { m_bQuitting = true; };  //Stop the engine and quit nicely
 	std::string getSaveLocation();		//Get good location to save config files/save files
@@ -162,7 +164,7 @@ public:
 
 	//Mouse functions
 	Vec2 getCursorPos() { int x, y; SDL_GetMouseState(&x, &y); return(Vec2(x, y)); };
-	void setCursorPos(Vec2 pos) { SDL_WarpMouseInWindow(m_Window, pos.x, pos.y); };
+	void setCursorPos(Vec2 pos) { SDL_WarpMouseInWindow(m_Window, (int)pos.x, (int)pos.y); };
 	bool getCursorDown(int iButtonCode);
 	void showCursor() { SDL_ShowCursor(1); };
 	void hideCursor() { SDL_ShowCursor(0); };

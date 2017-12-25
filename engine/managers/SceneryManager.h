@@ -2,8 +2,8 @@
 
 #include "glmx.h"
 #include <set>
-#include "Object.h"
 #include "RenderState.h"
+#include "ObjSegment.h"
 
 //TODO: Use SceneryLayer rather than ObjSegment
 class SceneryManager

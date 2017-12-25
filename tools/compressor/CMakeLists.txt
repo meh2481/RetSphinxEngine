@@ -6,4 +6,4 @@ main.h
 )
 
 add_executable(compressor ${compressor_src})
-target_link_libraries(compressor io)
+target_link_libraries(compressor io squish)

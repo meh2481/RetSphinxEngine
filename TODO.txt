@@ -1,17 +1,26 @@
 Current higher pri:
+- Write a better logger - easylogging++ is too bloated
+- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
+- Remove OpenGL deprecated things and re-enable forward compat flag
+	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: Using glDrawArrays in a Core context with parameter <mode> and enum '0x7' which was removed from Core OpenGL (GL_INVALID_ENUM)
+	GL[37190]: glEnableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glColorPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+
 - Ship stops suddenly when moving joystick slowly towards center position
-- Look into ETC1/DXT compression for images
 - Particles follow ship with acceleration applied
-- Along the same vein, particles/lua are affected by framerate
+- Slowing down via key doesn't seem to change lua dt; particles/lua are affected by framerate
 	- Test at 144Hz and see what breaks
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
-- Slowing down via key doesn't seem to change lua dt
+- m_clContactListener and m_debugDraw should be allocated, not created on the stack (Engine.h)
 
 Bugs:
-- Crashes sometimes on load
 - Particle editor breaks after F5
+- Fix objsegment partial tiling? Or do I not care?
 
 - Game pauses slightly when loading sound; why?
 	- Has to hit pak; but already loaded
@@ -46,7 +55,7 @@ Overall TODO list:
 
 Particle System Editing:
 - UI should save/load window booleans as config
-- Re - add death spawn types (tho prolly on a per-system basis?)
+- Re-add death spawn types (tho prolly on a per-system basis?)
 - Add particle support for emitter acceleration
 - Add support for seeing particle death spawns
 - Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
@@ -136,7 +145,6 @@ notes from talk with fg:
 - if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
 	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
 	-- gontext)forward_compatible_flag | sdl_gl_context debug_flag
-	--SDL_GL_SHARE_WITH_CURRENT_CONTEXT
 	
 -GLM for math
 	- mat4 for transformations

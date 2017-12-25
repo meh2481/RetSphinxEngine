@@ -4,7 +4,6 @@
 */
 #pragma once
 
-//#include "Image.h"
 #include "SDL_opengl.h"
 #include "LuaFuncs.h"
 #include "LuaInterface.h"

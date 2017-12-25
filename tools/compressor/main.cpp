@@ -62,7 +62,7 @@ uint32_t parseTime(const char* cStr)	//Parse time in the form mm:ss.sss
 	uint32_t m = atoi(minutes.c_str());
 	double sec = atof(seconds.c_str());
 
-	uint32_t ret = sec * 1000;
+	uint32_t ret = (uint32_t)(sec * 1000.0);
 	ret += m * 60 * 1000;
 
 	std::cout << "Converting " << s << " to " << ret << " msec" << std::endl;
@@ -98,7 +98,7 @@ unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fil
 	}
 
 	//Read in languages and offsets
-	std::list<LanguageOffset> offsets;
+	std::vector<LanguageOffset> offsets;
 	uint32_t off = 0;
 	for(tinyxml2::XMLElement* language = languages->FirstChildElement("language"); language != NULL; language = language->NextSiblingElement())
 	{
@@ -158,7 +158,7 @@ unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fil
 	uint64_t offset = sizeof(StringBankHeader);
 
 	//Write LanguageOffsets
-	for(std::list<LanguageOffset>::iterator i = offsets.begin(); i != offsets.end(); i++)
+	for(std::vector<LanguageOffset>::iterator i = offsets.begin(); i != offsets.end(); i++)
 	{
 		memcpy(&buf[offset], &(*i), sizeof(LanguageOffset));
 		offset += sizeof(LanguageOffset);
@@ -268,40 +268,6 @@ uint32_t getCodepoint(const char* str)
 	return codepoint;
 }
 
-unsigned char* extractImage(const std::string& filename, unsigned int* fileSize)
-{
-	int comp = 0;
-	int width = 0;
-	int height = 0;
-	unsigned char* imageBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
-
-	if(!imageBuf || width < 1 || height < 1)
-	{
-		std::cout << "Unable to load image " << filename << std::endl;
-		return NULL;
-	}
-
-	AtlasHeader textureHeader;
-	textureHeader.width = width;
-	textureHeader.height = height;
-	textureHeader.bpp = TEXTURE_BPP_RGBA;
-	if(comp == STBI_rgb)
-		textureHeader.bpp = TEXTURE_BPP_RGB;
-
-	int size = sizeof(AtlasHeader) + textureHeader.width*textureHeader.height*textureHeader.bpp / 8;
-
-	if(fileSize)
-		*fileSize = size;
-
-	unsigned char* finalBuf = (unsigned char*)malloc(size);
-
-	memcpy(finalBuf, &textureHeader, sizeof(AtlasHeader));
-	memcpy(&finalBuf[sizeof(AtlasHeader)], imageBuf, size - sizeof(AtlasHeader));
-
-	stbi_image_free(imageBuf);
-	return finalBuf;
-}
-
 unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 {
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
@@ -396,8 +362,8 @@ unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 		{
 			i->left, i->top, // upper left
 			i->right, i->top, // upper right
-			i->right, i->bottom, // lower right
 			i->left, i->bottom, // lower left
+			i->right, i->bottom // lower right
 		};
 
 		memcpy(&fontBuf[pos], texCoords, sizeof(float) * 8);
@@ -408,9 +374,9 @@ unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 	return fontBuf;
 }
 
-std::list<std::string> readFilenames(const std::string& filelistFile)
+std::vector<std::string> readFilenames(const std::string& filelistFile)
 {
-	std::list<std::string> lFilenames;
+	std::vector<std::string> lFilenames;
 	std::ifstream infile(filelistFile.c_str());
 	if(infile.fail())
 	{
@@ -472,13 +438,13 @@ void createCompressionHelper(CompressionHelper* helper, unsigned char* decompres
 	//helper->id = Hash::hash(filename.c_str());
 }
 
-static std::list<CompressionHelper> compressedFiles;
+static std::vector<CompressionHelper> compressedFiles;
 void addHelper(const CompressionHelper& helper)
 {
 	compressedFiles.push_back(helper);
 }
 
-void compress(std::list<std::string> filesToPak, const std::string& in)
+void compress(std::vector<std::string> filesToPak, const std::string& in)
 {
 	compressedFiles.clear();
 
@@ -486,7 +452,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	pakFilename += ".pak";
 	std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
 
-	for(std::list<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
+	for(std::vector<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
 	{
 		std::cout << "Compressing \"" << *i << "\"..." << std::endl;
 		unsigned int size = 0;
@@ -576,7 +542,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	uint64_t curOffset = (uint64_t)sizeof(PakFileHeader) + (uint64_t)compressedFiles.size() * (uint64_t)sizeof(ResourcePtr);	//Start after both these
 
 	//Write resource pointers
-	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::vector<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		ResourcePtr resPtr;
 		resPtr.id = i->id;
@@ -587,7 +553,7 @@ void compress(std::list<std::string> filesToPak, const std::string& in)
 	}
 
 	//Write resource data
-	for(std::list<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
+	for(std::vector<CompressionHelper>::iterator i = compressedFiles.begin(); i != compressedFiles.end(); i++)
 	{
 		fwrite(&i->header, 1, sizeof(CompressionHeader), fOut);
 		fwrite(i->data, 1, i->size, fOut);
@@ -603,7 +569,7 @@ int main(int argc, char** argv)
 {
 	g_bImageOut = false;
 	workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
-	std::list<std::string> sFilelistNames;
+	std::vector<std::string> sFilelistNames;
 
 	//Parse commandline
 	for(int i = 1; i < argc; i++)
@@ -616,7 +582,7 @@ int main(int argc, char** argv)
 	}
 
 	//Compress files
-	for(std::list<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
+	for(std::vector<std::string>::iterator i = sFilelistNames.begin(); i != sFilelistNames.end(); i++)
 		compress(readFilenames(*i), *i);
 
 	//Free our WFLZ working memory

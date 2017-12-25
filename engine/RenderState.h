@@ -8,7 +8,9 @@ public:
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
-	unsigned int uniformId;
+	unsigned int modelId;
+	unsigned int viewId;
+	unsigned int projectionId;
 
 	void apply() const;
 };

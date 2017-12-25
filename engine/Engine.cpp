@@ -62,8 +62,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 	setFramerate(60);	 //60 fps default
 	m_bFullscreen = true;
 
-	setup_sdl();
-	setup_opengl();
 	m_fGamma = 1.0f;
 	m_bPaused = m_bControllerDisconnected = false;
 	m_bPauseOnKeyboardFocus = true;
@@ -95,9 +93,17 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
 	//This needs to be in memory when ImGUI goes to load/save INI settings, so it's static
 	static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
+
+	//Init renderer
+	setup_sdl();
+	setup_opengl();
+
 	//Init ImGUI
 	ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
-	ImGui_Impl_GL2_CreateDeviceObjects();
+
+	void *glctx = SDL_GL_GetCurrentContext();
+	ImGui_Impl_GL3_SwitchContext(glctx);
+	ImGui_Impl_GL3_CreateDeviceObjects();
 }
 
 Engine::~Engine()
@@ -110,9 +116,10 @@ Engine::~Engine()
 	delete m_interpolationManager;
 
 	//Clean up ImGui
-	ImGui_Impl_GL2_Shutdown();
+	ImGui_Impl_GL3_Shutdown();
 
 	glDeleteProgram(m_renderState.programId);
+	glDeleteProgram(m_debugRenderState.programId);
 
 	//Clean up SDL
 	SDL_DestroyWindow(m_Window);
@@ -287,35 +294,34 @@ void Engine::_render()
 	// Game-specific drawing
 	draw(m_renderState);
 
-	glUseProgram(0);
-
 #ifdef _DEBUG
-	glDisable(GL_LIGHTING);
 	drawDebug();
-
-	//Reset blend func
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if(drawDebugUI())
 		ImGui::Render();
-
-	glEnable(GL_LIGHTING);
 #endif
 
 	//End rendering and update the screen
 	SDL_GL_SwapWindow(m_Window);
 }
 
+
 void Engine::drawDebug()
 {
+#ifdef _DEBUG
 	// Draw physics debug stuff
 	if(m_bDebugDraw)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
+		m_debugRenderState.projection = m_renderState.projection;
+		m_debugRenderState.view = m_renderState.view;
+		m_debugRenderState.model = glm::mat4(1.0f);
+		glUseProgram(m_debugRenderState.programId);
+		m_debugRenderState.apply();
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_physicsWorld->DrawDebugData();
-		glColor4f(1, 1, 1, 1);
 	}
+#endif // _DEBUG
 }
 
 void Engine::fillScreen(Color col)
@@ -380,13 +386,13 @@ void Engine::_loadicon()	//Load icon into SDL window
 
 bool Engine::getCursorDown(int iButtonCode)
 {
-	return (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
+	return (!!SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(iButtonCode));
 }
 
-void Engine::commandline(std::list<std::string> argv)
+void Engine::commandline(std::vector<std::string> argv)
 {
 	//Step through intelligently
-	for(std::list<std::string>::iterator i = argv.begin(); i != argv.end(); i++)
+	for(std::vector<std::string>::iterator i = argv.begin(); i != argv.end(); i++)
 	{
 		commandlineArg cla;
 		std::string sSwitch = *i;
@@ -397,7 +403,7 @@ void Engine::commandline(std::list<std::string> argv)
 			sSwitch.erase(0, 1);
 
 			cla.sSwitch = sSwitch;
-			std::list<std::string>::iterator sw = i;
+			std::vector<std::string>::iterator sw = i;
 			if(++sw != argv.end())	//Switch with a value
 			{
 				cla.sValue = *sw;
@@ -519,7 +525,7 @@ bool Engine::getDoubleBuffered()
 {
 	int val = 1;
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
-	return val;
+	return !!val;
 }
 
 void Engine::setVsync(int iVsync)
@@ -550,7 +556,7 @@ void Engine::setGravity(float x, float y)
 
 bool Engine::isMouseGrabbed()
 {
-	return SDL_GetWindowGrab(m_Window);
+	return !!SDL_GetWindowGrab(m_Window);
 }
 
 void Engine::grabMouse(bool bGrab)

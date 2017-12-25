@@ -104,7 +104,7 @@ void DebugUI::_draw()
 			ImGui::Text("Controllers connected:");
 			std::vector<InputDevice*> controllerList = _ge->getInputManager()->getControllerList();
 			InputDevice* currentController = _ge->getInputManager()->getCurController();
-			for(int i = 0; i < controllerList.size(); i++)
+			for(size_t i = 0; i < controllerList.size(); i++)
 			{
 				InputDevice* id = controllerList[i];
 				ImGui::Text("%s%s#%d %s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getDeviceIndex(), id->getControllerName().c_str(), id->getJoystickName().c_str());

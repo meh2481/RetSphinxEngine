@@ -91,7 +91,7 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFile)
     io.KeyMap[ImGuiKey_Z] = SDLK_z;
 	
     // FIXME: use GL2 if GL3 fails (on OSX?)
-    io.RenderDrawListsFn = ImGui_Impl_GL2_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
+    io.RenderDrawListsFn = ImGui_Impl_GL3_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplSdl_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplSdl_GetClipboardText;
 
@@ -109,11 +109,11 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFile)
 
 void ImGui_ImplSdl_NewFrame(SDL_Window *window)
 {
-    //void *glctx = SDL_GL_GetCurrentContext();
-    //ImGui_Impl_GL3_SwitchContext(glctx);
+    void *glctx = SDL_GL_GetCurrentContext();
+    ImGui_Impl_GL3_SwitchContext(glctx);
 
     if (!g_imgui_FontTexture)
-        ImGui_Impl_GL2_CreateDeviceObjects();
+        ImGui_Impl_GL3_CreateDeviceObjects();
 
     ImGuiIO& io = ImGui::GetIO();
 

@@ -12,18 +12,18 @@ IMGUI_API bool        ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFil
 IMGUI_API void        ImGui_ImplSdl_NewFrame(SDL_Window *window);
 IMGUI_API bool        ImGui_ImplSdl_ProcessEvent(SDL_Event* event);
 
-IMGUI_API void        ImGui_Impl_GL2_Shutdown();
+/*IMGUI_API void        ImGui_Impl_GL2_Shutdown();
 IMGUI_API void        ImGui_Impl_GL2_InvalidateDeviceObjects();
 IMGUI_API bool        ImGui_Impl_GL2_CreateDeviceObjects();
-IMGUI_API void        ImGui_Impl_GL2_RenderDrawLists(ImDrawData*);
+IMGUI_API void        ImGui_Impl_GL2_RenderDrawLists(ImDrawData*);*/
 
-/*IMGUI_API void        ImGui_Impl_GL3_Shutdown();
+IMGUI_API void        ImGui_Impl_GL3_Shutdown();
 IMGUI_API void        ImGui_Impl_GL3_InvalidateDeviceObjects();
 IMGUI_API bool        ImGui_Impl_GL3_CreateDeviceObjects();
 IMGUI_API void        ImGui_Impl_GL3_RenderDrawLists(ImDrawData*);
 
 IMGUI_API void        ImGui_Impl_GL3_DeleteContext(const void *ctx);
-IMGUI_API void        ImGui_Impl_GL3_SwitchContext(const void *ctx);*/
+IMGUI_API void        ImGui_Impl_GL3_SwitchContext(const void *ctx);
 
 
 extern unsigned g_imgui_FontTexture;

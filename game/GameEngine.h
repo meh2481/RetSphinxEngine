@@ -10,7 +10,7 @@
 #include <set>
 #include "LuaInterface.h"
 
-#include "Object3D.h"
+#include "RenderState.h"
 #include "tinyxml2.h"
 
 class DebugUI;
@@ -43,7 +43,7 @@ private:
 	Vec3 cameraPos;
 	bool m_bMouseGrabOnWindowRegain;
 	float m_fDefCameraZ;	//Default position of camera on z axis
-	std::list<ColorPhase> m_ColorsChanging;
+	std::vector<ColorPhase> m_ColorsChanging;
 	
 	//Game-specific stuff!
 	LuaInterface* Lua;
@@ -60,8 +60,8 @@ private:
 
 protected:
 	void frame(float dt);
-	void draw(RenderState renderState);
-	void init(std::list<commandlineArg> sArgs);
+	void draw(RenderState& renderState);
+	void init(std::vector<commandlineArg> sArgs);
 	void pause();
 	void resume();
 	bool drawDebugUI();

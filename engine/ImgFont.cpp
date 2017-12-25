@@ -59,13 +59,13 @@ void ImgFont::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 	{
 		rc.left, rc.top, // upper left
 		rc.right, rc.top, // upper right
-		rc.right, rc.bottom, // lower right
-		rc.left, rc.bottom // lower left
+		rc.left, rc.bottom, // lower left
+		rc.right, rc.bottom // lower right
 	};
 
 	glVertexPointer(2, GL_FLOAT, 0, &vertexData);
 	glTexCoordPointer(2, GL_FLOAT, 0, rect);
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 }
 
