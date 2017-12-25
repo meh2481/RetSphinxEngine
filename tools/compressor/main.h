@@ -6,11 +6,11 @@
 //Helper struct for compression
 typedef struct
 {
-	CompressionHeader header;
-	uint8_t* data;
-	unsigned int size;
-	uint64_t id;
-	uint32_t type;	//One of the CompressionHeader types
+    CompressionHeader header;
+    uint8_t* data;
+    unsigned int size;
+    uint64_t id;
+    uint32_t type;    //One of the CompressionHeader types
 } CompressionHelper;
 
 //main.cpp

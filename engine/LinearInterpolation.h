@@ -4,9 +4,9 @@
 class LinearInterpolation : public Interpolation
 {
 
-	LinearInterpolation() {};
+    LinearInterpolation() {};
 public:
-	LinearInterpolation(float* v, float d, float t);
+    LinearInterpolation(float* v, float d, float t);
 
-	bool update(float dt);
+    bool update(float dt);
 };

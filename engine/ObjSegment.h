@@ -1,6 +1,6 @@
 /*
-	RetSphinxEngine header - ObjSegment.h
-	Copyright (c) 2017 Mark Hutcheson
+    RetSphinxEngine header - ObjSegment.h
+    Copyright (c) 2017 Mark Hutcheson
 */
 #pragma once
 
@@ -18,23 +18,23 @@ class Object3D;
 class ObjSegment
 {
 public:
-	enum { TYPE = OT_SEGMENT };
+    enum { TYPE = OT_SEGMENT };
 
-	b2Body*         body;		//Physics body associated with this segment
-	Object* 		parent;		//Parent object
-	Object3D*		obj3D;		//3D object
+    b2Body*         body;        //Physics body associated with this segment
+    Object*         parent;        //Parent object
+    Object3D*        obj3D;        //3D object
 
-	Vec2 pos;		//Offset (after rotation)
-	Vec2 tile;		//tile image in x and y
-	float rot;
-	Vec2 size;	//Actual texel size; not pixels
-	float depth;
-	Image* img;
-	bool active;
-	Color col;	//TODO: Implement or remove
+    Vec2 pos;        //Offset (after rotation)
+    Vec2 tile;        //tile image in x and y
+    float rot;
+    Vec2 size;    //Actual texel size; not pixels
+    float depth;
+    Image* img;
+    bool active;
+    Color col;    //TODO: Implement or remove
 
-	ObjSegment();
-	~ObjSegment();
+    ObjSegment();
+    ~ObjSegment();
 
-	void draw(RenderState renderState);
+    void draw(RenderState renderState);
 };

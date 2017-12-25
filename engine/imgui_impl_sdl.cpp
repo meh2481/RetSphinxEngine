@@ -19,7 +19,7 @@ unsigned g_imgui_FontTexture = 0;
 
 static const char* ImGui_ImplSdl_GetClipboardText()
 {
-	return SDL_GetClipboardText();
+    return SDL_GetClipboardText();
 }
 
 static void ImGui_ImplSdl_SetClipboardText(const char* text)
@@ -89,18 +89,18 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFile)
     io.KeyMap[ImGuiKey_X] = SDLK_x;
     io.KeyMap[ImGuiKey_Y] = SDLK_y;
     io.KeyMap[ImGuiKey_Z] = SDLK_z;
-	
+    
     // FIXME: use GL2 if GL3 fails (on OSX?)
     io.RenderDrawListsFn = ImGui_Impl_GL3_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplSdl_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplSdl_GetClipboardText;
 
-	io.IniFilename = cIniFile;
-	
+    io.IniFilename = cIniFile;
+    
 #ifdef _WIN32
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(window, &wmInfo);
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(window, &wmInfo);
     io.ImeWindowHandle = wmInfo.info.win.window;
 #endif
 
@@ -119,12 +119,12 @@ void ImGui_ImplSdl_NewFrame(SDL_Window *window)
 
     // Setup display size (every frame to accommodate for window resizing)
     int w, h;
-	SDL_GetWindowSize(window, &w, &h);
+    SDL_GetWindowSize(window, &w, &h);
     io.DisplaySize = ImVec2((float)w, (float)h);
 
     // Setup time step
-	Uint32	time = SDL_GetTicks();
-	double current_time = time / 1000.0;
+    Uint32    time = SDL_GetTicks();
+    double current_time = time / 1000.0;
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
     g_Time = current_time;
 
@@ -133,13 +133,13 @@ void ImGui_ImplSdl_NewFrame(SDL_Window *window)
     int mx, my;
     Uint32 mouseMask = SDL_GetMouseState(&mx, &my);
     if (SDL_GetWindowFlags(window) & SDL_WINDOW_MOUSE_FOCUS)
-    	io.MousePos = ImVec2((float)mx, (float)my);   // Mouse position, in pixels (set to -1,-1 if no mouse / on another screen, etc.)
+        io.MousePos = ImVec2((float)mx, (float)my);   // Mouse position, in pixels (set to -1,-1 if no mouse / on another screen, etc.)
     else
-    	io.MousePos = ImVec2(-1,-1);
+        io.MousePos = ImVec2(-1,-1);
    
-	io.MouseDown[0] = g_MousePressed[0] || (mouseMask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;		// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-	io.MouseDown[1] = g_MousePressed[1] || (mouseMask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
-	io.MouseDown[2] = g_MousePressed[2] || (mouseMask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
+    io.MouseDown[0] = g_MousePressed[0] || (mouseMask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;        // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+    io.MouseDown[1] = g_MousePressed[1] || (mouseMask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    io.MouseDown[2] = g_MousePressed[2] || (mouseMask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
     g_MousePressed[0] = g_MousePressed[1] = g_MousePressed[2] = false;
 
     io.MouseWheel = g_MouseWheel;

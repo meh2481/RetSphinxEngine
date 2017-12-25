@@ -5,13 +5,13 @@
 class JoyButtonAction : public ActionBind
 {
 private:
-	int button;
+    int button;
 
-	JoyButtonAction() {};
+    JoyButtonAction() {};
 
 public:
-	JoyButtonAction(int buttonIndex);
+    JoyButtonAction(int buttonIndex);
 
-	bool getDigitalAction(InputDevice* d);
-	float getAnalogAction(InputDevice* d);
+    bool getDigitalAction(InputDevice* d);
+    float getAnalogAction(InputDevice* d);
 };

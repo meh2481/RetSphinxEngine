@@ -60,8 +60,8 @@ void ImGui_Impl_GL3_RenderDrawLists(ImDrawData* draw_data)
     GLint last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, &last_blend_equation_rgb);
     GLint last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &last_blend_equation_alpha);
     GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
-	GLboolean last_enable_blend = true; glGetBooleanv(GL_BLEND, &last_enable_blend);
-	GLboolean last_enable_cull_face = true; glGetBooleanv(GL_CULL_FACE, &last_enable_cull_face);
+    GLboolean last_enable_blend = true; glGetBooleanv(GL_BLEND, &last_enable_blend);
+    GLboolean last_enable_cull_face = true; glGetBooleanv(GL_CULL_FACE, &last_enable_cull_face);
     GLboolean last_enable_depth_test = true; glGetBooleanv(GL_DEPTH_TEST, &last_enable_depth_test);
     GLboolean last_enable_scissor_test = true; glGetBooleanv(GL_SCISSOR_TEST, &last_enable_scissor_test);
 
@@ -177,9 +177,9 @@ bool ImGui_Impl_GL3_CreateDeviceObjects()
         "out vec4 Frag_Color;\n"
         "void main()\n"
         "{\n"
-        "	Frag_UV = UV;\n"
-        "	Frag_Color = Color;\n"
-        "	gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
         "}\n";
 
     const GLchar* fragment_shader =
@@ -190,7 +190,7 @@ bool ImGui_Impl_GL3_CreateDeviceObjects()
         "out vec4 Out_Color;\n"
         "void main()\n"
         "{\n"
-        "	Out_Color = Frag_Color * texture( Texture, Frag_UV.st);\n"
+        "    Out_Color = Frag_Color * texture( Texture, Frag_UV.st);\n"
         "}\n";
 
     g_ShaderHandle = glCreateProgram();

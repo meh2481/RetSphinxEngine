@@ -6,5 +6,5 @@
 class Observer
 {
 public:
-	virtual void onNotify(const std::string& sMsg, Vec2 pos) = 0;
+    virtual void onNotify(const std::string& sMsg, Vec2 pos) = 0;
 };

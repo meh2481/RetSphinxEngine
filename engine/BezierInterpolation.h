@@ -4,9 +4,9 @@
 
 class BezierInterpolation : public Interpolation
 {
-	BezierInterpolation() {};
+    BezierInterpolation() {};
 public:
-	BezierInterpolation(float* v, float d, float t);
+    BezierInterpolation(float* v, float d, float t);
 
-	bool update(float dt);
+    bool update(float dt);
 };

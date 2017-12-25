@@ -9,11 +9,11 @@
 class PointQueryCallback : public b2QueryCallback
 {
 public:
-	std::vector<b2Body*> foundBodies;
+    std::vector<b2Body*> foundBodies;
 
-	bool ReportFixture(b2Fixture* fixture)
-	{
-		foundBodies.push_back(fixture->GetBody());
-		return true;
-	}
+    bool ReportFixture(b2Fixture* fixture)
+    {
+        foundBodies.push_back(fixture->GetBody());
+        return true;
+    }
 };

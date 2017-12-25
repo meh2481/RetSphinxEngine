@@ -3,16 +3,16 @@
 
 class SoundVol
 {
-	float dest;
-	float cur;
-	FMOD::Channel* sfx;
+    float dest;
+    float cur;
+    FMOD::Channel* sfx;
 
-	SoundVol() {};
+    SoundVol() {};
 public:
 
-	SoundVol(FMOD::Channel* s, float d);	//Fade sound to d volume
+    SoundVol(FMOD::Channel* s, float d);    //Fade sound to d volume
 
-	bool update();
+    bool update();
 
-	float* getCur() { return &cur; }
+    float* getCur() { return &cur; }
 };

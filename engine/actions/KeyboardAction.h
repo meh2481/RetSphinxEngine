@@ -5,13 +5,13 @@
 class KeyboardAction : public ActionBind
 {
 private:
-	int key;
-	const Uint8* keystates;
-	KeyboardAction() {};
+    int key;
+    const Uint8* keystates;
+    KeyboardAction() {};
 
 public:
-	KeyboardAction(int keyToUse);
+    KeyboardAction(int keyToUse);
 
-	bool getDigitalAction(InputDevice* d);
-	float getAnalogAction(InputDevice* d);
+    bool getDigitalAction(InputDevice* d);
+    float getAnalogAction(InputDevice* d);
 };

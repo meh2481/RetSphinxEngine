@@ -6,13 +6,13 @@ class InputDevice;
 class AxisAction : public ActionBind
 {
 private:
-	int joyAxisTrip;
-	int axis;
+    int joyAxisTrip;
+    int axis;
 
-	AxisAction() {};
+    AxisAction() {};
 public:
-	AxisAction(int axisToUse, int trip);
+    AxisAction(int axisToUse, int trip);
 
-	bool getDigitalAction(InputDevice* d);
-	float getAnalogAction(InputDevice* d);
+    bool getDigitalAction(InputDevice* d);
+    float getAnalogAction(InputDevice* d);
 };

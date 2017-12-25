@@ -6,11 +6,11 @@
 
 #define luaFunc(func)       static int l_##func(lua_State *L)
 #define luaFn(func)         static int func(lua_State *L)
-#define luaRegister(func)	{#func, l_##func}
+#define luaRegister(func)    {#func, l_##func}
 #define luaClassMethod(name, func) {"" name, l_##func}
 
 #define luaConstant(x) {#x, x}
-#define luaConstantFromClass(name,class)	{#name, class::name}
+#define luaConstantFromClass(name,class)    {#name, class::name}
 #define luaSetGlobal(x) {lua_pushinteger(L, x); lua_setglobal(L, #x); }
 
 #define luaReturnNil() { return 0; }
@@ -33,10 +33,10 @@
 
 inline void luaPushPointer(lua_State *L, void *x)
 {
-	if(x)
-		lua_pushlightuserdata(L, x);
-	else
-		lua_pushnil(L);
+    if(x)
+        lua_pushlightuserdata(L, x);
+    else
+        lua_pushnil(L);
 }
 
 inline const char *getCStrSafe(lua_State *L, int idx = 1)

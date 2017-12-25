@@ -6,5 +6,5 @@ class InputDevice;
 class MovementBind
 {
 public:
-	virtual Vec2 getMovement(InputDevice* d) = 0;
+    virtual Vec2 getMovement(InputDevice* d) = 0;
 };

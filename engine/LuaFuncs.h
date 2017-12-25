@@ -5,21 +5,21 @@ struct lua_State;
 
 enum ObjMainType
 {
-	OT_IMAGE,
-	OT_OBJECT,
-	OT_B2BODY,
-	OT_ARC,
-	OT_BG,
-	OT_CURSOR,
-	OT_ENGINE,
-	OT_GAMEENGINE,
-	OT_LATTICE,
-	OT_NODE,
-	OT_PARTICLESYSTEM,
-	OT_TEXT,
-	OT_TINYXML2,
-	OT_SEGMENT,
-	//TODO: Figure out what we should have, and add moar / remove some
+    OT_IMAGE,
+    OT_OBJECT,
+    OT_B2BODY,
+    OT_ARC,
+    OT_BG,
+    OT_CURSOR,
+    OT_ENGINE,
+    OT_GAMEENGINE,
+    OT_LATTICE,
+    OT_NODE,
+    OT_PARTICLESYSTEM,
+    OT_TEXT,
+    OT_TINYXML2,
+    OT_SEGMENT,
+    //TODO: Figure out what we should have, and add moar / remove some
 };
 
 struct LuaFunctions

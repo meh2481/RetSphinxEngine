@@ -12,34 +12,34 @@
 class Arc
 {
 protected:
-	float* segmentPos;
-	//Image* arcSegImg;
-	unsigned numSegments;
-	
-	Arc(){};
-	void average();	//Helper function to average the values for a less jittery arc
-	
+    float* segmentPos;
+    //Image* arcSegImg;
+    unsigned numSegments;
+    
+    Arc(){};
+    void average();    //Helper function to average the values for a less jittery arc
+    
 public:
-	Vec2 p1, p2;
-	float add;
-	float max;
-	float height;
-	unsigned avg;
-	float depth;
-	//Image* img;
-	bool active;
-	Color col;
-	
-	Arc(unsigned number);
-	~Arc();
-	
-	void init();
-	void draw(glm::mat4 mat);
-	void update(float dt);
-	
-	//Accessor methods
-	unsigned getNumber()	{return numSegments;};
-	
+    Vec2 p1, p2;
+    float add;
+    float max;
+    float height;
+    unsigned avg;
+    float depth;
+    //Image* img;
+    bool active;
+    Color col;
+    
+    Arc(unsigned number);
+    ~Arc();
+    
+    void init();
+    void draw(glm::mat4 mat);
+    void update(float dt);
+    
+    //Accessor methods
+    unsigned getNumber()    {return numSegments;};
+    
 
 };
 

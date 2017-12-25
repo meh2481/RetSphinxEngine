@@ -3,10 +3,10 @@
 
 class MutexLock
 {
-	SDL_mutex *mutex;
+    SDL_mutex *mutex;
 
-	MutexLock() {};
+    MutexLock() {};
 public:
-	MutexLock(SDL_mutex *m);
-	~MutexLock();
+    MutexLock(SDL_mutex *m);
+    ~MutexLock();
 };

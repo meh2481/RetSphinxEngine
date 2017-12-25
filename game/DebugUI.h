@@ -12,32 +12,32 @@ class LevelEditor;
 class DebugUI
 {
 public:
-	DebugUI(GameEngine*);
-	~DebugUI();
-	void draw();
-	bool hasFocus();
+    DebugUI(GameEngine*);
+    ~DebugUI();
+    void draw();
+    bool hasFocus();
 
-	bool visible;
-	bool hadFocus;
+    bool visible;
+    bool hadFocus;
 
-	//Steel Series editor
-	SteelSeriesEditor* steelSeriesEditor;
+    //Steel Series editor
+    SteelSeriesEditor* steelSeriesEditor;
 
-	//Particle system editor
-	ParticleEditor* particleEditor;
+    //Particle system editor
+    ParticleEditor* particleEditor;
 
 private:
-	void _draw();
+    void _draw();
 
-	MemoryEditor memEdit;
-	LevelEditor* levelEditor;
-	GameEngine *_ge;
+    MemoryEditor memEdit;
+    LevelEditor* levelEditor;
+    GameEngine *_ge;
 
-	bool rumbleMenu;
-	int windowFlags;
+    bool rumbleMenu;
+    int windowFlags;
 
-	//Rumble testing helper vars
-	int largeMotorStrength;
-	int smallMotorStrength;
-	int motorDuration;
+    //Rumble testing helper vars
+    int largeMotorStrength;
+    int smallMotorStrength;
+    int motorDuration;
 };

@@ -5,11 +5,11 @@
 class KeyboardMovement : public MovementBind
 {
 private:
-	int left, right, up, down;
-	const Uint8* keystates;
+    int left, right, up, down;
+    const Uint8* keystates;
 
 public:
-	KeyboardMovement(int left, int right, int up, int down);
+    KeyboardMovement(int left, int right, int up, int down);
 
-	Vec2 getMovement(InputDevice* d);
+    Vec2 getMovement(InputDevice* d);
 };

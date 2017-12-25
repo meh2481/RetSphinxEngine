@@ -4,13 +4,13 @@
 class DpadMovement : public MovementBind
 {
 private:
-	int up, down, left, right;
+    int up, down, left, right;
 
-	DpadMovement() {};
+    DpadMovement() {};
 
 public:
-	DpadMovement(int left, int right, int up, int down);
+    DpadMovement(int left, int right, int up, int down);
 
-	Vec2 getMovement(InputDevice* d);
+    Vec2 getMovement(InputDevice* d);
 
 };

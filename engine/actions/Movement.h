@@ -2,8 +2,8 @@
 
 typedef enum
 {
-	MOVE,
-	AIM,
-	PAN,
-	NUM_MOVEMENTS	
+    MOVE,
+    AIM,
+    PAN,
+    NUM_MOVEMENTS    
 } Movement;

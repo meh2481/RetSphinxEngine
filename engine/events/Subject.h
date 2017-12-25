@@ -4,14 +4,14 @@
 
 class Subject
 {
-	std::vector<Observer*> observers;
-	int numObservers;
+    std::vector<Observer*> observers;
+    int numObservers;
 
 public:
 
-	void addObserver(Observer* o);
-	void removeObserver(Observer* o);
+    void addObserver(Observer* o);
+    void removeObserver(Observer* o);
 
-	void notify(const std::string& sMsg, Vec2 pos);
+    void notify(const std::string& sMsg, Vec2 pos);
 
 };

@@ -4,12 +4,12 @@
 class MouseButtonAction : public ActionBind
 {
 private:
-	int button;
-	MouseButtonAction() {};
+    int button;
+    MouseButtonAction() {};
 
 public:
-	MouseButtonAction(int button);
+    MouseButtonAction(int button);
 
-	bool getDigitalAction(InputDevice* d);
-	float getAnalogAction(InputDevice* d);
+    bool getDigitalAction(InputDevice* d);
+    float getAnalogAction(InputDevice* d);
 };

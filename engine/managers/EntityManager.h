@@ -17,34 +17,34 @@ class SceneryManager;
 
 class EntityManager
 {
-	ParticleSystemManager* particleSystemManager;
-	NodeManager* nodeManager;
-	ObjectManager* objectManager;
-	SceneryManager* sceneryManager;
+    ParticleSystemManager* particleSystemManager;
+    NodeManager* nodeManager;
+    ObjectManager* objectManager;
+    SceneryManager* sceneryManager;
 
 public:
-	EntityManager(ResourceLoader* resourceLoader, b2World* world);
-	~EntityManager();
+    EntityManager(ResourceLoader* resourceLoader, b2World* world);
+    ~EntityManager();
 
-	void update(float dt);
-	void render(const RenderState& renderState);
+    void update(float dt);
+    void render(const RenderState& renderState);
 
-	void cleanup();
+    void cleanup();
 
-	//Particle system functions
-	void add(ParticleSystem* pSys);
+    //Particle system functions
+    void add(ParticleSystem* pSys);
 
-	//Node functions
-	void add(Node* n);
-	Node* getNode(Vec2 pos);	//Get closest node to a location TODO rename
-	Node* getNodeUnder(Vec2 pos);	//Get Node under a location, or NULL
-	Node* getNode(const std::string& sNodeName);
+    //Node functions
+    void add(Node* n);
+    Node* getNode(Vec2 pos);    //Get closest node to a location TODO rename
+    Node* getNodeUnder(Vec2 pos);    //Get Node under a location, or NULL
+    Node* getNode(const std::string& sNodeName);
 
-	//Object funtions
-	void add(Object* o);
-	Object* getObject(Vec2 p);
-	Object* getClosestObject(Vec2 p);
+    //Object funtions
+    void add(Object* o);
+    Object* getObject(Vec2 p);
+    Object* getClosestObject(Vec2 p);
 
-	//Scenery functions
-	void add(ObjSegment* o);
+    //Scenery functions
+    void add(ObjSegment* o);
 };
