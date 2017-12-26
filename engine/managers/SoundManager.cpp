@@ -7,7 +7,7 @@
 #include "SoundVol.h"
 #include <cstring>
 
-#define ERRCHECK(x) //{ LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
+#define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
 
 #define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
 #define LOOP_FOREVER -1
@@ -33,7 +33,7 @@ int SoundManager::init()
     ERRCHECK(result);
     if(version < FMOD_VERSION)
     {
-        LOG(ERROR) << "Error! You are using an old version of FMOD " << version << ". This program requires " << FMOD_VERSION;
+        LOG(ERR) << "Error! You are using an old version of FMOD " << version << ". This program requires " << FMOD_VERSION;
         return 1;
     }
     result = system->getNumDrivers(&numdrivers);
@@ -42,7 +42,7 @@ int SoundManager::init()
     {
         result = system->setOutput(FMOD_OUTPUTTYPE_NOSOUND);
         ERRCHECK(result);
-        LOG(WARNING) << "No sound driver";
+        LOG(WARN) << "No sound driver";
     }
     else
     {
@@ -59,7 +59,7 @@ int SoundManager::init()
             The user has the 'Acceleration' slider set to off! This is really bad
             for latency! You might want to warn the user about this.
             */
-            LOG(WARNING) << "Sound acceleration disabled. May cause sound latency problems";
+            LOG(WARN) << "Sound acceleration disabled. May cause sound latency problems";
             result = system->setDSPBufferSize(1024, 10);
             ERRCHECK(result);
 
@@ -160,7 +160,7 @@ SoundManager::~SoundManager()
     //TODO: Save/load song location on app exit?
     FMOD_RESULT result = system->release();
     if(result)
-        LOG(WARNING) << "Unable to close FMOD: " << result;
+        LOG(WARN) << "Unable to close FMOD: " << result;
     for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
         free(*i);
     for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
@@ -206,7 +206,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             //In pak; load from memory
             FMOD_RESULT result = system->createSound((const char*)data, FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
             if(result)
-                LOG(WARNING) << "Unable to create sound resource " << filename << "from pak, error " << result;
+                LOG(WARN) << "Unable to create sound resource " << filename << "from pak, error " << result;
             soundResources.push_back(data);    //Free this later
         }
         else
@@ -214,7 +214,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             //Not in pak; load from file
             FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
             if(result)
-                LOG(WARNING) << "Unable to create sound resource " << filename << " from file, error " << result;
+                LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
         }
         sounds[filename] = handle;
         return handle;
@@ -234,7 +234,7 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
         if(result)
         {
-            LOG(WARNING) << "Unable to create music resource " << filename << ", error " << result;
+            LOG(WARN) << "Unable to create music resource " << filename << ", error " << result;
             return NULL;
         }
 

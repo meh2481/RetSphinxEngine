@@ -38,7 +38,7 @@ static int saveScreenshot(void *ptr)
 
     LOG(INFO) << "Saving screenshot " << ps->filename;
     if(!stbi_write_png(ps->filename.c_str(), ps->w, ps->h, 3, ps->pixels, ps->w * 3))
-        LOG(WARNING) << "stbi_write_png error while saving screenshot";
+        LOG(WARN) << "stbi_write_png error while saving screenshot";
     delete[] ps->pixels;
     delete[] line_tmp;
     delete ps;
@@ -100,7 +100,7 @@ void GameEngine::handleEvent(SDL_Event event)
                     dat->pixels = pixels;
                     dat->filename = ssfile.str();
                     if(!SDL_CreateThread(saveScreenshot, "saveScreenshot", (void *)dat))
-                        LOG(WARNING) << "Could not create thread to save screenshot.";
+                        LOG(WARN) << "Could not create thread to save screenshot.";
 
                     break;
                 }

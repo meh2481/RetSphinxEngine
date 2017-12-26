@@ -21,11 +21,11 @@ static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity
     case GL_DEBUG_SEVERITY_MEDIUM:
     case GL_DEBUG_SEVERITY_LOW:
         printf("GL[%u]: %s\n", severity, message);
-        LOG(WARNING) << "GL[" << severity << "]: " << message;
+        LOG(WARN) << "GL[" << severity << "]: " << message;
         break;
     case GL_DEBUG_SEVERITY_HIGH:
         printf("GL[%u]: %s\n", severity, message);
-        LOG(ERROR) << "GL[" << severity << "]: " << message;
+        LOG(ERR) << "GL[" << severity << "]: " << message;
         break;
     default:
         assert(false);
@@ -38,18 +38,18 @@ void Engine::setup_sdl()
 
     if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
-        LOG(ERROR) << "SDL_InitSubSystem Error: " << SDL_GetError();
+        LOG(ERR) << "SDL_InitSubSystem Error: " << SDL_GetError();
         exit(1);
     }
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
-        LOG(ERROR) << "Unable to init SDL2 gamepad subsystem.";
+        LOG(ERR) << "Unable to init SDL2 gamepad subsystem.";
 
     LOG(INFO) << "Loading OpenGL...";
 
     if (SDL_GL_LoadLibrary(NULL) == -1)
     {
-        LOG(ERROR) << "SDL_GL_LoadLibrary Error: " << SDL_GetError();
+        LOG(ERR) << "SDL_GL_LoadLibrary Error: " << SDL_GetError();
         exit(1);
     }
 
@@ -78,7 +78,7 @@ void Engine::setup_sdl()
 
     if(m_Window == NULL)
     {
-        LOG(ERROR) << "Couldn't set video mode: " << SDL_GetError();
+        LOG(ERR) << "Couldn't set video mode: " << SDL_GetError();
         exit(1);
     }
     assert(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == 0);
@@ -96,7 +96,7 @@ void Engine::setup_sdl()
     assert(SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1) == 0); //Share objects between OpenGL contexts
         if(SDL_GL_CreateContext(m_Window) == NULL)
         {
-            LOG(ERROR) << "Error creating OpenGL context: " << SDL_GetError();
+            LOG(ERR) << "Error creating OpenGL context: " << SDL_GetError();
             exit(1);
         }
     SDL_GL_SetSwapInterval(1);    //Default to vsync on
@@ -134,17 +134,17 @@ void Engine::setup_sdl()
 #ifdef _DEBUG
     if(glDebugMessageCallback)
     {
-        LOG(DEBUG) << "Using GL debug callbacks";
+        LOG(DBG) << "Using GL debug callbacks";
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(debugCallback, NULL);
     }
     else
-        LOG(DEBUG) << "glDebugMessageCallback() not supported";
+        LOG(DBG) << "glDebugMessageCallback() not supported";
 #endif
 
     LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;
     if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
-        LOG(WARNING) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
+        LOG(WARN) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
 
 }
 

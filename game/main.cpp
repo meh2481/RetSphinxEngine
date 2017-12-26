@@ -38,5 +38,6 @@ int main(int argc, char** argv)
     LOG(INFO) << "Deleting engine";
     delete eng;
     LOG(INFO) << "Ending program happily";
+    logger_quit();
     return 0;
 }

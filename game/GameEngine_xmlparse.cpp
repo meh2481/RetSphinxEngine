@@ -22,7 +22,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
     int iErr = doc->LoadFile(sFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERROR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
+        LOG(ERR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
@@ -33,7 +33,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERROR) << "Error: Root element NULL in XML file. Ignoring...";
+        LOG(ERR) << "Error: Root element NULL in XML file. Ignoring...";
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
@@ -157,7 +157,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERROR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
+        LOG(ERR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
         delete doc;
         return;
     }
@@ -166,7 +166,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename;
+        LOG(ERR) << "Error: Root element NULL in XML file " << sXMLFilename;
         delete doc;
         return;
     }

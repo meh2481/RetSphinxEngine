@@ -50,7 +50,7 @@ InputDevice::InputDevice(int deviceIndex)
         SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
         if(!joy)
         {
-            LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
+            LOG(ERR) << "Unable to get joystick from game controller: " << SDL_GetError();
         }
         else
         {
@@ -80,7 +80,7 @@ InputDevice::InputDevice(int deviceIndex)
         }
     }
     else
-        LOG(WARNING) << "Couldn't open controller " << (int)deviceIndex;
+        LOG(WARN) << "Couldn't open controller " << (int)deviceIndex;
 }
 
 
@@ -203,13 +203,13 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
     if(curEffect < 0)
     {
         //Shouldn't ever happen, since we check for LR support on device init
-        LOG(WARNING) << "Unable to create LR effect: " << SDL_GetError();
+        LOG(WARN) << "Unable to create LR effect: " << SDL_GetError();
         return;
     }
 
     if(SDL_HapticRunEffect(m_haptic, curEffect, 1) < 0)
     {
-        LOG(WARNING) << "Unable to run LR effect: " << SDL_GetError();
+        LOG(WARN) << "Unable to run LR effect: " << SDL_GetError();
     }
 }
 

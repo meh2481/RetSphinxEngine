@@ -26,7 +26,7 @@ namespace OpenGLShader
         }
         else
         {
-            LOG(WARNING) << "Unable to open vertex shader " << vertex_file_path;
+            LOG(WARN) << "Unable to open vertex shader " << vertex_file_path;
             return 0;
         }
 
@@ -58,7 +58,7 @@ namespace OpenGLShader
         {
             std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
             glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-            LOG(ERROR) << "Error: " << &VertexShaderErrorMessage[0];
+            LOG(ERR) << "Error: " << &VertexShaderErrorMessage[0];
         }
 
 
@@ -76,7 +76,7 @@ namespace OpenGLShader
         {
             std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
             glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-            LOG(ERROR) << "Error: " << &FragmentShaderErrorMessage[0];
+            LOG(ERR) << "Error: " << &FragmentShaderErrorMessage[0];
         }
 
 
@@ -95,7 +95,7 @@ namespace OpenGLShader
         {
             std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
             glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-            LOG(ERROR) << "Error: " << &ProgramErrorMessage[0];
+            LOG(ERR) << "Error: " << &ProgramErrorMessage[0];
         }
 
 

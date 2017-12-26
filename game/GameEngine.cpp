@@ -183,7 +183,7 @@ void GameEngine::init(std::vector<commandlineArg> sArgs)
 {
     //Run through list for arguments we recognize
     for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
-        LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
+        LOG(DBG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 
     //Load our last screen position and such
     loadConfig(getSaveLocation() + CONFIG_FILE);
@@ -204,13 +204,13 @@ void GameEngine::init(std::vector<commandlineArg> sArgs)
     {
         //NOTE: If we have other networking stuff later, this shouldn't depend on SS engine
         if(!NetworkThread::start())
-            LOG(ERROR) << "Unable to start networking thread";
+            LOG(ERR) << "Unable to start networking thread";
 
         //Open communication to SteelSeries drivers
         if(steelSeriesClient->init(getAppName()))
             LOG(INFO) << "Initialized with SteelSeries drivers";
         else
-            LOG(WARNING) << "Unable to communicate with SteelSeries drivers";
+            LOG(WARN) << "Unable to communicate with SteelSeries drivers";
     }
 
     //Add kb+mouse controller

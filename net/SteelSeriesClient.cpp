@@ -92,17 +92,17 @@ std::string SteelSeriesClient::getSSURL()
             }
             else
             {
-                LOG(ERROR) << "Unable to parse JSON " << oss.str();
+                LOG(ERR) << "Unable to parse JSON " << oss.str();
             }
         }
         else
         {
-            LOG(ERROR) << "Unable to open file " << oss.str();
+            LOG(ERR) << "Unable to open file " << oss.str();
         }
     }
     else
     {
-        LOG(ERROR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
+        LOG(ERR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
     }
     return std::string();
 #else
