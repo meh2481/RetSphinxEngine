@@ -1,6 +1,6 @@
 #include "Gradient.h"
 #include "tinyxml2.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 Gradient::Gradient(const std::string& sXMLFilename)
 {
@@ -24,13 +24,13 @@ Color Gradient::getVal(float fVal)
     {
         if(fVal <= i->first)
             return i->second;    //Before beginning, or exactly on one point - return this color
-        
+
         //Get next color point
         std::map<float, Color>::iterator next = i;
         next++;
         if(next == m_colorMap.end())
             return i->second;    //Past end - return last color in list
-        
+
         if(fVal >= i->first && fVal <= next->first)    //Between these two points
         {
             float rDiff = next->second.r - i->second.r;
@@ -39,7 +39,7 @@ Color Gradient::getVal(float fVal)
             float aDiff = next->second.a - i->second.a;
             float diff = next->first - i->first;
             float diffFac = (fVal - i->first) / diff;
-            
+
             Color c = i->second;
             c.r += rDiff * diffFac;
             c.g += gDiff * diffFac;
@@ -48,7 +48,7 @@ Color Gradient::getVal(float fVal)
             return c;
         }
     }
-    
+
     Color c;
     return c;    //No points or something; return rgba(1,1,1,1)
 }
@@ -56,34 +56,34 @@ Color Gradient::getVal(float fVal)
 bool Gradient::load(const std::string& sXMLFilename)
 {
     m_colorMap.clear();
-    
+
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERROR) << "Error opening gradient XML file: " << sXMLFilename << "- Error " << iErr;
+        LOG(ERR) << "Error opening gradient XML file: " << sXMLFilename << "- Error " << iErr;
         delete doc;
         return false;
     }
-    
+
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring...";
+        LOG(ERR) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring...";
         delete doc;
         return false;
     }
-    
+
     for(tinyxml2::XMLElement* val = root->FirstChildElement("val"); val != NULL; val = val->NextSiblingElement("val"))
     {
         float pos = 0.0f;
-        
+
         val->QueryFloatAttribute("pos", &pos);
         const char* cCol = val->Attribute("col");
         if(cCol != NULL)
             m_colorMap[pos].fromString(cCol);
     }
-    
+
     delete doc;
     return true;
 }

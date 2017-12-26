@@ -2,7 +2,7 @@
 #include "ResourceLoader.h"
 #include "FileOperations.h"
 #include "imgui/imgui.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "ParticleSystem.h"
 #include "GameEngine.h"
 #include "tinyxml2.h"

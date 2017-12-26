@@ -6,7 +6,7 @@
 #include "Engine.h"
 #include "Box2D/Box2D.h"
 #include "opengl-api.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "Random.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
@@ -34,10 +34,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_sCompanyName = sCompanyName;
 
     //Start logger
-    el::Configurations conf(LOGGING_CONF);
-    if(!conf.hasConfiguration(el::ConfigurationType::Filename))
-        conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + LOGFILE_NAME).c_str());
-    el::Loggers::reconfigureAllLoggers(conf);
+    logger_init((getSaveLocation() + LOGFILE_NAME).c_str(), DBG);
 
     m_sIcon = sIcon;
     m_bResizable = bResizable;
@@ -177,7 +174,7 @@ bool Engine::_processEvent(SDL_Event& e)
                 if(m_bResizable)
                     changeScreenResolution(e.window.data1, e.window.data2);
                 else
-                    LOG(ERROR) << "Resize event generated, but resizable flag not set.";
+                    LOG(ERR) << "Resize event generated, but resizable flag not set.";
             }
             else if(e.window.event == SDL_WINDOWEVENT_ENTER)
                 m_bCursorOutOfWindow = false;
@@ -281,7 +278,7 @@ bool Engine::_frame()
 #endif
 
             frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
-            
+
 #ifdef _DEBUG
         }
 #endif
@@ -381,7 +378,7 @@ void Engine::_loadicon()    //Load icon into SDL window
 
     SDL_Surface *surface = getResourceLoader()->getSDLImage(m_sIcon);
     if(surface == NULL)
-        LOG(ERROR) << "NULL surface for icon " << m_sIcon;
+        LOG(ERR) << "NULL surface for icon " << m_sIcon;
     else
     {
         SDL_SetWindowIcon(m_Window, surface);

@@ -21,8 +21,8 @@ namespace StringUtils
         std::string s = sTrim;
         for(size_t i = 0; i < s.length(); i++)
         {
-            if(s.at(i) == ' ' || 
-                s.at(i) == '\n' || 
+            if(s.at(i) == ' ' ||
+                s.at(i) == '\n' ||
                 s.at(i) == '\t' ||
                 s.at(i) == '\r')
             {
@@ -67,7 +67,23 @@ namespace StringUtils
                 idx = len - 1;
         }
 
-        return filename.substr(idx+1);    //Since substr() returns empty string if idx == len
+        return filename.substr(idx + 1);    //Since substr() returns empty string if idx == len
+    }
+
+    std::string getFilename(const std::string& path)
+    {
+        size_t len = path.length();
+        size_t idx = 0;
+        for(size_t i = len-1; i > 0; i--)
+        {
+            if(path.at(i) == '\\' || path.at(i) == '/')
+            {
+                idx = i;
+                break;
+            }
+        }
+
+        return path.substr(idx + 1);    //Since substr() returns empty string if idx == len
     }
 
     std::string normalize(const std::string& s)

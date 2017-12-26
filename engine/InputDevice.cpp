@@ -1,8 +1,9 @@
 #include "InputDevice.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "SteelSeriesClient.h"
 #include "SteelSeriesHaptic.h"
 #include "StringUtils.h"
+#include <algorithm>
 
 #define GUID_STR_SZ    256
 #define MOUSE_JOYSTICK_NAME "Mouse"
@@ -49,7 +50,7 @@ InputDevice::InputDevice(int deviceIndex)
         SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
         if(!joy)
         {
-            LOG(ERROR) << "Unable to get joystick from game controller: " << SDL_GetError();
+            LOG(ERR) << "Unable to get joystick from game controller: " << SDL_GetError();
         }
         else
         {
@@ -79,7 +80,7 @@ InputDevice::InputDevice(int deviceIndex)
         }
     }
     else
-        LOG(WARNING) << "Couldn't open controller " << (int)deviceIndex;
+        LOG(WARN) << "Couldn't open controller " << (int)deviceIndex;
 }
 
 
@@ -147,11 +148,11 @@ void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float
     //Last rumble still going
     if(curTime < fLastRumble)
         return;
-    
+
     fLastRumble = curTime + (float)duration / 1000.0f;
 
-    strength = max(strength, 0.0f);
-    strength = min(strength, 1.0f);
+    strength = std::max(strength, 0.0f);
+    strength = std::min(strength, 1.0f);
     if(m_haptic != NULL)
         SDL_HapticRumblePlay(m_haptic, strength, duration);
 }
@@ -202,13 +203,13 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
     if(curEffect < 0)
     {
         //Shouldn't ever happen, since we check for LR support on device init
-        LOG(WARNING) << "Unable to create LR effect: " << SDL_GetError();
+        LOG(WARN) << "Unable to create LR effect: " << SDL_GetError();
         return;
     }
 
     if(SDL_HapticRunEffect(m_haptic, curEffect, 1) < 0)
     {
-        LOG(WARNING) << "Unable to run LR effect: " << SDL_GetError();
+        LOG(WARN) << "Unable to run LR effect: " << SDL_GetError();
     }
 }
 

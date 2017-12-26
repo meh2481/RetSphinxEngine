@@ -6,7 +6,7 @@
 #include "ParticleSystem.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "Random.h"
 #include "OpenGLShader.h"
 #include "Quad.h"
@@ -38,9 +38,9 @@ ParticleSystem::ParticleSystem()
     m_vertexPtr = NULL;
     m_colorPtr = NULL;
     m_texCoordPtr = NULL;
-    
+
     _initValues();
-    
+
     curTime = 0;
     spawnCounter = 0;
     curRate = 1.0f;
@@ -98,7 +98,7 @@ void ParticleSystem::_deleteAll()
         delete [] m_colorPtr;
     if(m_texCoordPtr != NULL)
         delete [] m_texCoordPtr;
-    
+
     m_imgRect = NULL;
     m_pos = NULL;
     m_sizeStart = NULL;
@@ -127,7 +127,7 @@ void ParticleSystem::_newParticle()
 {
     if(m_num == m_totalAmt) return;    //Don't create more particles than we can!
     if(!firing) return;
-    
+
     assert(imgRect.size());
     assert(img != NULL);
     m_imgRect[m_num] = imgRect[Random::random(imgRect.size()-1)];
@@ -216,13 +216,13 @@ void ParticleSystem::_newParticle()
     m_rotAxis[m_num].x = rotAxis.x + Random::randomFloat(-rotAxisVar.x,rotAxisVar.x);
     m_rotAxis[m_num].y = rotAxis.y + Random::randomFloat(-rotAxisVar.y,rotAxisVar.y);
     m_rotAxis[m_num].z = rotAxis.z + Random::randomFloat(-rotAxisVar.z,rotAxisVar.z);
-    
+
     m_num++;
 }
 
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
-    float* particleTexCoord = &m_texCoordPtr[idx * 8]; 
+    float* particleTexCoord = &m_texCoordPtr[idx * 8];
     float left = m_imgRect[m_num - 1].left / (float)img->tex.width;
     float right = m_imgRect[m_num - 1].right / (float)img->tex.width;
     float top = m_imgRect[m_num - 1].top / (float)img->tex.height;
@@ -250,7 +250,7 @@ void ParticleSystem::_rmParticle(const unsigned idx)
     m_created[idx] = m_created[m_num-1];
     m_lifePreFade[idx] = m_lifePreFade[m_num-1];
     m_rotAxis[idx] = m_rotAxis[m_num-1];
-    
+
     m_num--;
 }
 
@@ -281,7 +281,7 @@ void ParticleSystem::_initValues()
     decay = FLT_MAX;
     startedFiring = 0.0f;
     rotAxis = Vec3(0.0f, 0.0f, 1.0f);
-    
+
     img = NULL;
     max = 100;
     rate = 25;
@@ -312,7 +312,7 @@ void ParticleSystem::update(float dt)
     }
     else if(firing)
         startedFiring = curTime;
-    
+
     spawnCounter += dt * rate * curRate;
 
     int iSpawnAmt = (int)floor(spawnCounter);
@@ -324,7 +324,7 @@ void ParticleSystem::update(float dt)
         emitFrom.offset(emissionVel.x * ((float)1.0f/(float)iSpawnAmt) * dt, emissionVel.y * ((float)1.0f/(float)iSpawnAmt) * dt);    //Move our emission point for each particle
         _newParticle();
     }
-    
+
     //Update particle fields (In separate for loops to cut down on cache thrashing)
     Vec2* ptPos = m_pos;
     Vec2* ptVel = m_vel;
@@ -333,7 +333,7 @@ void ParticleSystem::update(float dt)
         ptPos->x += ptVel->x * dt;
         ptPos->y += ptVel->y * dt;
     }
-    
+
     ptVel = m_vel;
     Vec2* ptAccel = m_accel;
     float* normAccel = m_normalAccel;
@@ -342,7 +342,7 @@ void ParticleSystem::update(float dt)
     {
         ptVel->x += ptAccel->x * dt;
         ptVel->y += ptAccel->y * dt;
-        
+
         if(*normAccel)
         {
             Vec2 ptNorm = glm::normalize(m_pos[i] - emitFrom.center());
@@ -357,17 +357,17 @@ void ParticleSystem::update(float dt)
             *ptVel += ptTan;
         }
     }
-    
+
     float* fRot = m_rot;
     float* fRotVel = m_rotVel;
     for(unsigned int i = 0; i < m_num; i++, fRot++, fRotVel++)
         *fRot += *fRotVel * dt;
-    
+
     fRotVel = m_rotVel;
     float* fRotAccel = m_rotAccel;
     for(unsigned int i = 0; i < m_num; i++, fRotAccel++, fRotVel++)
         *fRotVel += *fRotAccel * dt;
-    
+
     float* created = m_created;
     float* life = m_lifetime;
     for(unsigned int i = 0; i < m_num; i++, created++, life++)
@@ -378,7 +378,7 @@ void ParticleSystem::update(float dt)
             i--;    //Go back a particle so we don't skip anything
             created--;
             life--;
-        } 
+        }
         else
         {
 
@@ -496,20 +496,20 @@ void ParticleSystem::update(float dt)
 void ParticleSystem::draw(const RenderState& renderState)
 {
     assert(img);
-    
+
     switch(blend)
     {
         case ADDITIVE:
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             break;
-            
+
         case NORMAL:
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             break;
-            
+
         case SUBTRACTIVE:
             //TODO This is incorrect
-            glBlendFunc(GL_DST_COLOR, GL_ONE); 
+            glBlendFunc(GL_DST_COLOR, GL_ONE);
             break;
     }
 
@@ -525,7 +525,7 @@ void ParticleSystem::draw(const RenderState& renderState)
     glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
 
     glDrawArrays(GL_QUADS, 0, m_num*4);
-    
+
     //Reset OpenGL stuff
     glDisableClientState(GL_COLOR_ARRAY);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -535,11 +535,11 @@ void ParticleSystem::init()
 {
     if(m_num)
         _deleteAll();
-    
+
     m_totalAmt = max;
-    
+
     if(!m_totalAmt) return;
-    
+
     m_imgRect = new Rect[m_totalAmt];
     m_pos = new Vec2[m_totalAmt];
     m_sizeStart = new Vec2[m_totalAmt];

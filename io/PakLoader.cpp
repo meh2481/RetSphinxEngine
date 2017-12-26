@@ -1,6 +1,6 @@
 #include "PakLoader.h"
 #include "wfLZ.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "StringUtils.h"
 #include "FileOperations.h"
 #include <sstream>
@@ -93,7 +93,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
     //Load resource
     if(fseek(it->second.fp, (long)it->second.ptr.offset, SEEK_SET))
     {
-        LOG(WARNING) << "Unable to seek to proper location in resource file for resource ID " << id;
+        LOG(WARN) << "Unable to seek to proper location in resource file for resource ID " << id;
         return NULL;
     }
 
@@ -115,7 +115,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
                 LOG(TRACE) << "compressed size 0";
                 return NULL;
             }
-            
+
             compHeader.decompressedSize = compHeader.compressedSize;
         }
 
@@ -169,6 +169,6 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
         return decompressedData;
     }
 
-    LOG(WARNING) << "Unknown compression header type " << compHeader.compressionType;
+    LOG(WARN) << "Unknown compression header type " << compHeader.compressionType;
     return NULL;
 }

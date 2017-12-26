@@ -2,10 +2,11 @@
 #include <ctime>
 #include <climits>
 #include <iomanip>
-#include "easylogging++.h"
+#include "Logger.h"
 #include <SDL_opengl.h>
 #include "stb_image_write.h"
 #include <SDL_thread.h>
+#include <sstream>
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "ResourceCache.h"
@@ -37,7 +38,7 @@ static int saveScreenshot(void *ptr)
 
     LOG(INFO) << "Saving screenshot " << ps->filename;
     if(!stbi_write_png(ps->filename.c_str(), ps->w, ps->h, 3, ps->pixels, ps->w * 3))
-        LOG(WARNING) << "stbi_write_png error while saving screenshot";
+        LOG(WARN) << "stbi_write_png error while saving screenshot";
     delete[] ps->pixels;
     delete[] line_tmp;
     delete ps;
@@ -60,7 +61,7 @@ void GameEngine::handleEvent(SDL_Event event)
                     getResourceLoader()->clearCache();
                     Lua->call("loadLua", m_sLastScene.c_str());    //Restart Lua with our last map
                     break;
-                    
+
                 case SDL_SCANCODE_F6:
                     Lua->call("clearClasses"); //Reload Lua classes
                     getResourceLoader()->clearCache();
@@ -77,16 +78,16 @@ void GameEngine::handleEvent(SDL_Event event)
                     //Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
                     time_t t = time(0);   // get time now
                     struct tm * now = localtime(&t);
-                
+
                     //Create filename that we'll save this as
                     std::ostringstream ssfile;
-                    ssfile << getSaveLocation() << "Screenshot " 
+                    ssfile << getSaveLocation() << "Screenshot "
                            << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
                            << now->tm_hour << '.' << std::setw(2) << std::setfill('0') << now->tm_min << '.' << std::setw(2) << std::setfill('0') << now->tm_sec << ',' << SDL_GetTicks() << ".png";
-                
+
                     uint16_t w = getWidth();
                     uint16_t h = getHeight();
-                    
+
                     //Copied whatever this guy did: https://github.com/ocornut/imgui/wiki/screenshot_tool
                     unsigned char* pixels = new unsigned char[3 * w * h];
                     glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -99,8 +100,8 @@ void GameEngine::handleEvent(SDL_Event event)
                     dat->pixels = pixels;
                     dat->filename = ssfile.str();
                     if(!SDL_CreateThread(saveScreenshot, "saveScreenshot", (void *)dat))
-                        LOG(WARNING) << "Could not create thread to save screenshot.";
-                    
+                        LOG(WARN) << "Could not create thread to save screenshot.";
+
                     break;
                 }
 
@@ -123,13 +124,13 @@ void GameEngine::handleEvent(SDL_Event event)
                     m_bMouseGrabOnWindowRegain = isMouseGrabbed();
                     grabMouse(false);    //Ungrab mouse cursor if alt-tabbing out or such
                     break;
-                
+
                 case SDL_WINDOWEVENT_FOCUS_GAINED:
                     grabMouse(m_bMouseGrabOnWindowRegain);    //Grab mouse on input regain, if we should
                     break;
             }
             break;
-            
+
         case SDL_CONTROLLERBUTTONDOWN:
             LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
             getInputManager()->activateController(event.cbutton.which);
@@ -140,11 +141,11 @@ void GameEngine::handleEvent(SDL_Event event)
                     break;
             }
             break;
-            
+
         case SDL_CONTROLLERBUTTONUP:
             LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button << std::endl;
             break;
-            
+
         case SDL_CONTROLLERAXISMOTION:
             if(abs(event.caxis.value) > JOY_AXIS_TRIP)
                 LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value << std::endl;
@@ -164,11 +165,11 @@ void GameEngine::handleEvent(SDL_Event event)
                 case SDL_SCANCODE_V:
                     toggleDebugDraw();
                     break;
-                    
+
                 case SDL_SCANCODE_P:
                     playPausePhysics();
                     break;
-                    
+
                 case SDL_SCANCODE_O:
                     pausePhysics();
                     stepPhysics();
@@ -176,14 +177,14 @@ void GameEngine::handleEvent(SDL_Event event)
             }
 #endif
             break;
-        
+
         //Key released
         case SDL_KEYUP:
             //switch(event.key.keysym.scancode)
             //{
             //}
             break;
-        
+
         case SDL_MOUSEBUTTONDOWN:
 #ifdef _DEBUG
             if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleEditor->open && m_debugUI->visible)
@@ -191,7 +192,7 @@ void GameEngine::handleEvent(SDL_Event event)
 #endif
             LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
             break;
-            
+
         case SDL_MOUSEWHEEL:
             if(!m_debugUI->visible)
             {
@@ -206,15 +207,15 @@ void GameEngine::handleEvent(SDL_Event event)
             LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
             if(event.button.button == SDL_BUTTON_LEFT)
             {
-                
+
             }
             else if(event.button.button == SDL_BUTTON_RIGHT)
             {
-            
+
             }
             else if(event.button.button == SDL_BUTTON_MIDDLE)
             {
-                
+
             }
             break;
 
@@ -251,5 +252,7 @@ void GameEngine::handleKeys()
 
 #endif
 }
+
+
 
 

@@ -29,6 +29,8 @@ namespace StringUtils
     // For example: if filename is "image.png", then getExtension(filename) will be "png"
     std::string getExtension(const std::string& filename);
 
+    std::string getFilename(const std::string& path);   //Get the filename from the given path
+
     std::string normalize(const std::string& input); //Normalizes this string to all uppercase, no punctuation
 
     std::string stringify(const rapidjson::Document& doc);    //Stringifies the passed-in JSON doc

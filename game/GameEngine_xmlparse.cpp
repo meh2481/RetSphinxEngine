@@ -1,5 +1,5 @@
 #include "GameEngine.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "tinyxml2.h"
 
 #include <Box2D/Box2D.h>
@@ -22,24 +22,24 @@ bool GameEngine::loadConfig(const std::string& sFilename)
     int iErr = doc->LoadFile(sFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERROR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
+        LOG(ERR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
         return false;    //No file; ignore
     }
-    
+
     //Grab root element
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERROR) << "Error: Root element NULL in XML file. Ignoring...";
+        LOG(ERR) << "Error: Root element NULL in XML file. Ignoring...";
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
         return false;
     }
-    
+
     tinyxml2::XMLElement* window = root->FirstChildElement("window");
     if(window != NULL)
     {
@@ -53,7 +53,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         int iVsync = getVsync();
         int iMSAA = getMSAA();
         float fGamma = getGamma();
-        
+
         window->QueryUnsignedAttribute("width", &width);
         window->QueryUnsignedAttribute("height", &height);
         window->QueryBoolAttribute("fullscreen", &bFullscreen);
@@ -84,7 +84,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         setGamma(fGamma);
         pauseOnKeyboard(bPausesOnFocus);
     }
-    
+
     tinyxml2::XMLElement* joystick = root->FirstChildElement("joystick");
     if(joystick != NULL)
     {
@@ -92,7 +92,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         //joystick->QueryUnsignedAttribute("backbutton", &JOY_BUTTON_BACK);
         //joystick->QueryUnsignedAttribute("rtaxis", &JOY_AXIS_RT);
     }
-    
+
     tinyxml2::XMLElement* keyboard = root->FirstChildElement("keyboard");
     if(keyboard != NULL)
     {
@@ -100,7 +100,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         //if(cEnter2)
         //    KEY_ENTER2 = SDL_GetScancodeFromName(cEnter2);
     }
-    
+
     delete doc;
     return true;
 }
@@ -113,7 +113,7 @@ void GameEngine::saveConfig(const std::string& sFilename)
     LOG(INFO) << "Saving config XML " << sFilename;
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     tinyxml2::XMLElement* root = doc->NewElement("config");
-    
+
     tinyxml2::XMLElement* window = doc->NewElement("window");
     window->SetAttribute("width", getWidth());
     window->SetAttribute("height", getHeight());
@@ -128,17 +128,17 @@ void GameEngine::saveConfig(const std::string& sFilename)
     window->SetAttribute("brightness", getGamma());
     window->SetAttribute("pauseminimized", pausesOnFocusLost());
     root->InsertEndChild(window);
-    
+
     tinyxml2::XMLElement* joystick = doc->NewElement("joystick");
     joystick->SetAttribute("axistripthreshold", JOY_AXIS_TRIP);
     //joystick->SetAttribute("backbutton", JOY_BUTTON_BACK);
     //joystick->SetAttribute("rtaxis", JOY_AXIS_RT);
     root->InsertEndChild(joystick);
-    
+
     tinyxml2::XMLElement* keyboard = doc->NewElement("keyboard");
     //keyboard->SetAttribute("upkey1", SDL_GetScancodeName(KEY_UP1));
     root->InsertEndChild(keyboard);
-    
+
     doc->InsertFirstChild(root);
     doc->SaveFile(sFilename.c_str());
     delete doc;
@@ -157,39 +157,39 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERROR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
+        LOG(ERR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
         delete doc;
         return;
     }
-    
+
     //Grab root element
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERROR) << "Error: Root element NULL in XML file " << sXMLFilename;
+        LOG(ERR) << "Error: Root element NULL in XML file " << sXMLFilename;
         delete doc;
         return;
     }
-    
+
     Vec2 pGravity(0, -9.8);
     const char* cGravity = root->Attribute("gravity");
     if(cGravity)
         pGravity = pointFromString(cGravity);
     setGravity(pGravity);
-    
+
     //Create ground body, for adding map geometry to
     b2BodyDef groundBodyDef;
     groundBodyDef.type = b2_staticBody;
     groundBodyDef.position.SetZero();
     b2Body* groundBody = getWorld()->CreateBody(&groundBodyDef);
-    
+
     //Scene boundaries
     const char* cCamBounds = root->Attribute("bounds");
     if(cCamBounds != NULL)
     {
         //Save bounds for camera
         rcSceneBounds.fromString(cCamBounds);
-        
+
         //Create boundary lines in physics
         b2FixtureDef fixtureDef;
         fixtureDef.density = 1.0f;
@@ -221,14 +221,14 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
             getSoundManager()->fadeOutChannel(musicChannel, MUSIC_FADE_TIME);
         //getSoundManager()->pauseMusic();    //Stop currently-playing music
     }
-    
+
     //Load layers for the scene
     for(tinyxml2::XMLElement* layer = root->FirstChildElement("layer"); layer != NULL; layer = layer->NextSiblingElement("layer"))
     {
         ObjSegment* seg = getResourceLoader()->getObjectSegment(layer);
         getEntityManager()->add(seg);
     }
-    
+
     //Load objects
     for(tinyxml2::XMLElement* object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object"))
     {
@@ -240,15 +240,15 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         {
             Vec2 pos(0,0);
             Vec2 vel(0,0);
-            
+
             if(cPos != NULL)
                 pos = pointFromString(cPos);
-            
+
             if(cVel != NULL)
                 vel = pointFromString(cVel);
-            
+
             Object* o = getResourceLoader()->getObject(cObjType, pos, vel);
-            
+
             if(o != NULL)
             {
                 o->lua = Lua;    //TODO better Lua handling
@@ -272,16 +272,16 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
                 //        }
                 //    }
                 //}
-                
+
                 //Populate this obj with ALL THE INFO in case Lua wants it
                 for(const tinyxml2::XMLAttribute* attrib = object->FirstAttribute(); attrib != NULL; attrib = attrib->Next())
                     o->setProperty(attrib->Name(), attrib->Value());
-                
+
                 getEntityManager()->add(o);
             }
         }
     }
-    
+
     //Load particles
     for(tinyxml2::XMLElement* particles = root->FirstChildElement("particles"); particles != NULL; particles = particles->NextSiblingElement("particles"))
     {
@@ -292,7 +292,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
             getEntityManager()->add(pSys);
         }
     }
-    
+
     //Load level geometry
     for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
     {
@@ -333,9 +333,9 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
             }
         }
     }
-    
+
     delete doc;
-    
+
     m_sLastScene = sXMLFilename;
 }
 
