@@ -1,7 +1,7 @@
 #include "DebugUI.h"
 #include "imgui/imgui.h"
 #include "GameEngine.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "SteelSeriesEditor.h"
 #include "ParticleEditor.h"
 #include "LevelEditor.h"
@@ -22,11 +22,11 @@ DebugUI::DebugUI(GameEngine *ge)
     largeMotorStrength = USHRT_MAX;
     smallMotorStrength = USHRT_MAX;
     motorDuration = 100;
-    
+
     ImGuiStyle& style = ImGui::GetStyle();
     style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
     style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
-    
+
     steelSeriesEditor = new SteelSeriesEditor(ge);
     particleEditor = new ParticleEditor(ge);
     levelEditor = new LevelEditor(ge);

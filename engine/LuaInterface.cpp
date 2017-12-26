@@ -1,7 +1,7 @@
 #include "LuaInterface.h"
 #include "LuaDefines.h"
 #include "LuaFuncs.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 #include <assert.h>
 #include <sstream>

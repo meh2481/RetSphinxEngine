@@ -22,7 +22,7 @@
 #include "InterpolationManager.h"
 #include "Object.h"
 #include "Node.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 //#define DEBUG_INPUT
 #define CONFIG_FILE "config.xml"
@@ -34,7 +34,7 @@ GameEngine* g_pGlobalEngine;
 GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
     g_pGlobalEngine = this;
-    
+
     //Set camera position for this game
     m_fDefCameraZ = -16;
     cameraPos = Vec3(0,0,m_fDefCameraZ);
@@ -44,9 +44,9 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTi
     m_bMouseGrabOnWindowRegain = true;
 #endif
     showCursor();
-    
+
     player = NULL;
-    
+
     //Keybinding stuff!
     JOY_AXIS_TRIP = 20000;
 
@@ -80,7 +80,7 @@ void GameEngine::frame(float dt)
     }
     steelSeriesClient->update(dt);
     getInterpolationManager()->update(dt);
-    
+
     //Load a new scene after updating if we've been told to
     if(m_sLoadScene.size())
     {
@@ -104,7 +104,7 @@ void GameEngine::draw(RenderState& renderState)
 
     //Draw debug UI
     m_debugUI->draw();
-    
+
     //Keep camera within camera bounds
     if(rcSceneBounds.area())    //If it's not unset
     {
@@ -139,14 +139,14 @@ void GameEngine::draw(RenderState& renderState)
 
     //Set flat camera
     glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
-    
+
     //Set tilted view camera
     //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
     //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
     //Vec3 up(0.0f, 0.0f, 1.0f);
     //glm::mat4 view = glm::lookAt(eye, center, up);
     renderState.view = view;
-    
+
     glm::mat4 model = glm::mat4(1.0f);    //Identity matrix
     renderState.model = model;
     getEntityManager()->render(renderState);
@@ -176,7 +176,7 @@ void GameEngine::draw(RenderState& renderState)
         //if(disconnectedImage)
         //    disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
     //}
-    
+
 }
 
 void GameEngine::init(std::vector<commandlineArg> sArgs)
@@ -184,12 +184,12 @@ void GameEngine::init(std::vector<commandlineArg> sArgs)
     //Run through list for arguments we recognize
     for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
         LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
-        
+
     //Load our last screen position and such
     loadConfig(getSaveLocation() + CONFIG_FILE);
-    
+
     lua_State* L = Lua->getState();
-    
+
     Lua->call("loadLua");
 
     std::string sLocale = SystemUtils::getCurLocale();

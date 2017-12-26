@@ -6,7 +6,7 @@
 #include "Text.h"
 #include "opengl-api.h"
 #include "tinyxml2.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 //TODO: This loading code should be moved to a resource loader. And probably not be XML, either
 Text::Text(const std::string& sXMLFilename)
@@ -110,7 +110,7 @@ float Text::size(const std::string& s, float pt)
         unsigned char c = *i;
         if(c == '\0')
             break;
-        
+
         if(m_mRectangles.count(c))
             len += (m_mRectangles[c].width() - m_mKerning[c]) * (pt / m_mRectangles[c].height());
     }

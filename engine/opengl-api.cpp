@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include "opengl-api.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 
 // Populate global namespace with static function pointers pFUNC,

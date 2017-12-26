@@ -1,5 +1,5 @@
 #include "SteelSeriesClient.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "NetworkThread.h"
 #include "StringUtils.h"
 #include <sstream>
@@ -125,7 +125,7 @@ bool SteelSeriesClient::init(const std::string& appName)
 
 void SteelSeriesClient::update(float dt)
 {
-    if(!valid) 
+    if(!valid)
         return;
 
     heartbeatTimer += dt;
@@ -153,7 +153,7 @@ bool SteelSeriesClient::registerApp(const std::string& ID, const std::string& di
 
 bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char * endpoint)
 {
-    if(!valid) 
+    if(!valid)
         return false;
 
     //Send message to SS

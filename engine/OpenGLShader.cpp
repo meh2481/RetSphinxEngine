@@ -1,11 +1,9 @@
 #include "OpenGLShader.h"
 #include "opengl-api.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include <string>
 #include <fstream>
-#ifdef _DEBUG
-#include <iostream>
-#endif
+#include <vector>
 
 
 namespace OpenGLShader

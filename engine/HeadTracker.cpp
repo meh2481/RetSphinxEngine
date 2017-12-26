@@ -1,5 +1,5 @@
 #include "HeadTracker.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 #define AXIS_MAX 32767.0f
 

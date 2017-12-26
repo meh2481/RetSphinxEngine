@@ -6,7 +6,7 @@
 #include "Engine.h"
 #include "Box2D/Box2D.h"
 #include "opengl-api.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "Random.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
@@ -34,10 +34,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_sCompanyName = sCompanyName;
 
     //Start logger
-    el::Configurations conf(LOGGING_CONF);
-    if(!conf.hasConfiguration(el::ConfigurationType::Filename))
-        conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + LOGFILE_NAME).c_str());
-    el::Loggers::reconfigureAllLoggers(conf);
+    //el::Configurations conf(LOGGING_CONF);
+    //if(!conf.hasConfiguration(el::ConfigurationType::Filename))
+    //    conf.setGlobally(el::ConfigurationType::Filename, (getSaveLocation() + LOGFILE_NAME).c_str());
+    //el::Loggers::reconfigureAllLoggers(conf);
 
     m_sIcon = sIcon;
     m_bResizable = bResizable;
@@ -281,7 +281,7 @@ bool Engine::_frame()
 #endif
 
             frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
-            
+
 #ifdef _DEBUG
         }
 #endif

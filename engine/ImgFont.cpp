@@ -1,5 +1,5 @@
 #include "ImgFont.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "Quad.h"
 #include "SDL_opengl.h"
 #include <cstring>

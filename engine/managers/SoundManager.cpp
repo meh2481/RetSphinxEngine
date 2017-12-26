@@ -1,5 +1,5 @@
 #include "SoundManager.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "ResourceLoader.h"
 #include "Hash.h"
 #include "ResourceTypes.h"
@@ -7,7 +7,7 @@
 #include "SoundVol.h"
 #include <cstring>
 
-#define ERRCHECK(x) { LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
+#define ERRCHECK(x) //{ LOG_IF(x != 0, WARNING) << "FMOD Error: " << x; }
 
 #define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
 #define LOOP_FOREVER -1
@@ -196,7 +196,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
 
         //Attempt to load from pak
         unsigned int length = 0;
-        
+
         unsigned char* data = loader->getSound(filename, &length);
         if(data)
         {
@@ -302,7 +302,7 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     //Set group
     setGroup(channel, group);
 
-    if(group == GROUP_MUSIC) 
+    if(group == GROUP_MUSIC)
     {
         //Start where we last stopped playing this song
         std::map<StreamHandle*, unsigned int>::iterator existing = musicPositions.find(stream);
@@ -315,7 +315,7 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
         musicChannel = channel;    //Save this as our new music channel
         fadeInChannel(musicChannel, MUSIC_FADE_TIME);
     }
-    
+
     //Start playing
     result = channel->setPaused(false);
     ERRCHECK(result);

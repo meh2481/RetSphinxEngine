@@ -2,7 +2,7 @@
 #include "opengl-api.h"
 #include "OpenGLShader.h"
 #include "DebugDraw.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
@@ -41,7 +41,7 @@ void Engine::setup_sdl()
         LOG(ERROR) << "SDL_InitSubSystem Error: " << SDL_GetError();
         exit(1);
     }
-    
+
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
         LOG(ERROR) << "Unable to init SDL2 gamepad subsystem.";
 
@@ -55,7 +55,7 @@ void Engine::setup_sdl()
 
     // Quit SDL properly on exit
     atexit(SDL_Quit);
-    
+
     // Set the minimum requirements for the OpenGL window
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -63,16 +63,16 @@ void Engine::setup_sdl()
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-    
+
     // Create SDL window
     Uint32 flags = SDL_WINDOW_OPENGL;
     if(m_bResizable)
         flags |= SDL_WINDOW_RESIZABLE;
-    
+
     m_Window = SDL_CreateWindow(m_sTitle.c_str(),
                              SDL_WINDOWPOS_UNDEFINED,
                              SDL_WINDOWPOS_UNDEFINED,
-                             m_iWidth, 
+                             m_iWidth,
                              m_iHeight,
                              flags);
 
@@ -94,7 +94,7 @@ void Engine::setup_sdl()
 #endif
 
     assert(SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1) == 0); //Share objects between OpenGL contexts
-        if(SDL_GL_CreateContext(m_Window) == NULL) 
+        if(SDL_GL_CreateContext(m_Window) == NULL)
         {
             LOG(ERROR) << "Error creating OpenGL context: " << SDL_GetError();
             exit(1);
@@ -106,7 +106,7 @@ void Engine::setup_sdl()
     if(!mode.refresh_rate)    //If 0, display doesn't care, so default to 60
         mode.refresh_rate = 60;
     setFramerate((float)mode.refresh_rate);
-    
+
     int numDisplays = SDL_GetNumVideoDisplays();
     LOG(INFO) << "Available displays: " << numDisplays;
     for(int display = 0; display < numDisplays; display++)
@@ -119,9 +119,9 @@ void Engine::setup_sdl()
             LOG(TRACE) << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz";
         }
     }
-    
+
     OpenGLAPI::LoadSymbols();    //Load our OpenGL symbols to use
-    
+
     const char *ver = (const char*)glGetString(GL_VERSION);
         if(ver)
             LOG(INFO) << "GL version: " << ver;
@@ -159,13 +159,13 @@ void Engine::setup_opengl()
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    
+
     //Enable image transparency
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     setMSAA(m_iMSAA);
-    
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);

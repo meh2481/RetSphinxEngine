@@ -1,6 +1,6 @@
 #include "PakLoader.h"
 #include "wfLZ.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "StringUtils.h"
 #include "FileOperations.h"
 #include <sstream>
@@ -115,7 +115,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
                 LOG(TRACE) << "compressed size 0";
                 return NULL;
             }
-            
+
             compHeader.decompressedSize = compHeader.compressedSize;
         }
 

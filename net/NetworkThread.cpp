@@ -7,7 +7,7 @@
 #include "MutexLock.h"
 #include "SDL_thread.h"
 #include "SDL_timer.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "minihttp.h"
 
 // Overloaded socket class that handles incoming data.
@@ -72,7 +72,7 @@ namespace NetworkThread
 		//Init networking
 		minihttp::InitNetwork();
 		atexit(minihttp::StopNetwork);
-				
+
 		//Start main loop
 		bool shouldStop = false;
 		while(!shouldStop)
@@ -116,7 +116,7 @@ namespace NetworkThread
 			MutexLock lock(stopMutex);
 			stopFlag = true;
 		}
-		
+
 		//Wait for thread to finish
 		int threadReturnValue;
 		SDL_WaitThread(thread, &threadReturnValue);

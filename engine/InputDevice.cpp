@@ -1,8 +1,9 @@
 #include "InputDevice.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "SteelSeriesClient.h"
 #include "SteelSeriesHaptic.h"
 #include "StringUtils.h"
+#include <algorithm>
 
 #define GUID_STR_SZ    256
 #define MOUSE_JOYSTICK_NAME "Mouse"
@@ -147,11 +148,11 @@ void InputDevice::rumbleControllerBasic(float strength, uint32_t duration, float
     //Last rumble still going
     if(curTime < fLastRumble)
         return;
-    
+
     fLastRumble = curTime + (float)duration / 1000.0f;
 
-    strength = max(strength, 0.0f);
-    strength = min(strength, 1.0f);
+    strength = std::max(strength, 0.0f);
+    strength = std::min(strength, 1.0f);
     if(m_haptic != NULL)
         SDL_HapticRumblePlay(m_haptic, strength, duration);
 }

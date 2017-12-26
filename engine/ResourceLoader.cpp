@@ -1,6 +1,6 @@
 #include "ResourceLoader.h"
 #include "ParticleSystem.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "tinyxml2.h"
 #include "Random.h"
 #include "Object.h"
@@ -17,6 +17,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <sstream>
 
 ResourceLoader::ResourceLoader(b2World* physicsWorld, const std::string& sPakDir)
 {
@@ -920,17 +921,17 @@ Image* ResourceLoader::loadImageFromFile(const std::string& filename)
     int width = 0;
     int height = 0;
     unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
-    
+
     int mode = GL_RGBA;     // RGBA 32bit
     if(comp == STBI_rgb) // RGB 24bit
         mode = GL_RGB;
-    
+
     if((cBuf == 0) || (width == 0) || (height == 0))
     {
         LOG(ERROR) << "Unable to load image " << filename;
         return NULL;
     }
-    
+
     Texture* tex = bindTexture(cBuf, width, height, mode, width*height*comp);
     stbi_image_free(cBuf);
 
@@ -952,7 +953,7 @@ Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
     {
         LOG(WARNING) << "Ignoring extra " << len - sizeof(TextureHeader) << " bytes for texture";
     }
-    
+
     //Read header
     TextureHeader header;
     memcpy(&header, data, sizeof(TextureHeader));
@@ -971,7 +972,7 @@ Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, un
     Texture* tex = new Texture();
     tex->width = width;
     tex->height = height;
-    
+
     //generate an OpenGL texture ID for this texture
     glGenTextures(1, &tex->tex);
     //bind to the new texture ID
