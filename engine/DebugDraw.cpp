@@ -111,8 +111,20 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-    //For some reason this is the wrong size
-    DrawCircle(p, size * 0.025f, color);
+    const float data[] = {
+        p.x,
+        p.y
+    };
+    const float col[] = {
+        color.r,
+        color.g,
+        color.b,
+        color.a
+    };
+    glPointSize(size);
+    glUniform4fv(uniformId, 1, col);
+    glVertexPointer(2, GL_FLOAT, 0, data);
+    glDrawArrays(GL_POINTS, 0, 1);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
