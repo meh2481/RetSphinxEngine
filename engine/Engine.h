@@ -41,9 +41,10 @@ private:
     std::vector<commandlineArg> lCommandLine;
     b2World* m_physicsWorld;
     EngineContactListener* m_clContactListener;
+#ifdef _DEBUG
     DebugDraw* m_debugDraw;
     bool m_bDebugDraw;
-    bool m_bObjDebugDraw;
+#endif
     Vec2 m_ptCursorPos;
     bool  m_bShowCursor;
     float m_fFramerate;
@@ -144,14 +145,11 @@ public:
     void setGravity(Vec2 ptGravity);
     void setGravity(float x, float y);
     void stepPhysics(float dt);    //Update our physics world and handle collisions
-    void setDebugDraw(bool b) { m_bDebugDraw = b; };
-    bool getDebugDraw() { return m_bDebugDraw; };
-    void setObjDebugDraw(bool b) { m_bObjDebugDraw = b; };
-    bool getObjDebugDraw() { return m_bObjDebugDraw; };
-    void toggleDebugDraw() { m_bDebugDraw = !m_bDebugDraw; };
-    void toggleObjDebugDraw() { m_bObjDebugDraw = !m_bObjDebugDraw; };
     b2World* getWorld() { return m_physicsWorld; };
 #ifdef _DEBUG
+    void setDebugDraw(bool b) { m_bDebugDraw = b; };
+    bool getDebugDraw() { return m_bDebugDraw; };
+    void toggleDebugDraw() { m_bDebugDraw = !m_bDebugDraw; };
     void playPausePhysics() { m_bSteppingPhysics = !m_bSteppingPhysics; };
     void pausePhysics() { m_bSteppingPhysics = true; };
     void playPhysics() { m_bSteppingPhysics = false; };

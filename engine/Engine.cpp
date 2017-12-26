@@ -44,22 +44,22 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
     m_physicsWorld = new b2World(gravity);
     m_physicsWorld->SetAllowSleeping(true);
+#ifdef _DEBUG
     m_debugDraw = new DebugDraw();
     m_debugDraw->outlineAlpha = 0.75f;
     m_debugDraw->fillAlpha = 0.5f;
     m_debugDraw->fillMul = m_debugDraw->fillAlpha;
+    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
     m_physicsWorld->SetDebugDraw(m_debugDraw);
+#endif
     m_clContactListener = new EngineContactListener();
     m_physicsWorld->SetContactListener(m_clContactListener);
-    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
-    m_bObjDebugDraw = false;
     LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
 #ifdef _DEBUG
     LOG(INFO) << "Debug build";
     m_bDebugDraw = true;
 #else
     LOG(INFO) << "Release build";
-    m_bDebugDraw = false;
 #endif
     m_iWidth = iWidth;
     m_iHeight = iHeight;
@@ -121,8 +121,10 @@ Engine::~Engine()
     delete m_inputManager;
     delete m_soundManager;
     delete m_interpolationManager;
-    delete m_debugDraw;
     delete m_clContactListener;
+#ifdef _DEBUG
+    delete m_debugDraw;
+#endif
 
     //Clean up ImGui
     ImGui_Impl_GL3_Shutdown();
