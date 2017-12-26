@@ -5,6 +5,7 @@ BezierInterpolation.h
 BezierInterpolation.cpp
 Color.cpp
 Color.h
+DebugDraw.h
 DebugDraw.cpp
 Engine.cpp
 Engine.h

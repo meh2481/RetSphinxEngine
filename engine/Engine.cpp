@@ -45,6 +45,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_physicsWorld = new b2World(gravity);
     m_physicsWorld->SetAllowSleeping(true);
     m_debugDraw = new DebugDraw();
+    m_debugDraw->outlineAlpha = 0.75f;
+    m_debugDraw->fillAlpha = 0.5f;
+    m_debugDraw->fillMul = m_debugDraw->fillAlpha;
     m_physicsWorld->SetDebugDraw(m_debugDraw);
     m_clContactListener = new EngineContactListener();
     m_physicsWorld->SetContactListener(m_clContactListener);

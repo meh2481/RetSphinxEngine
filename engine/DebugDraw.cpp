@@ -21,10 +21,10 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     //Draw filled center
     float* data = new float[vertexCount*2];
     const float col[] = {
-        color.r * 0.5f,
-        color.g * 0.5f,
-        color.b * 0.5f,
-        color.a * 0.5f
+        color.r * fillMul,
+        color.g * fillMul,
+        color.b * fillMul,
+        color.a * fillAlpha
     };
     for(int i = 0; i < vertexCount; i++)
     {
@@ -60,10 +60,10 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     //Draw filled circle in center
     float data[NUM_SEGMENTS * 2];
     const float col[] = {
-        color.r * 0.5f,
-        color.g * 0.5f,
-        color.b * 0.5f,
-        color.a * 0.5f
+        color.r * fillMul,
+        color.g * fillMul,
+        color.b * fillMul,
+        color.a * fillAlpha
     };
     float angle = 0.0f;
     for(int i = 0; i < NUM_SEGMENTS; i++)
@@ -97,7 +97,7 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
         color.r,
         color.g,
         color.b,
-        color.a
+        color.a * outlineAlpha
     };
     glUniform4fv(uniformId, 1, col);
     glVertexPointer(2, GL_FLOAT, 0, data);
@@ -119,7 +119,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
         color.r,
         color.g,
         color.b,
-        color.a
+        color.a * outlineAlpha
     };
     glPointSize(size);
     glUniform4fv(uniformId, 1, col);
