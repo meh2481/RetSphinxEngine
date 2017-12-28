@@ -15,8 +15,8 @@
 #include <SDL_opengl_glext.h>
 
 #define DEFAULT_SZ 9    //512*512
-#define BYTES_PER_PIXEL_RGBA 4
-#define BYTES_PER_PIXEL_RGB  3
+#define BYTES_PER_PIXEL_RGBA STBI_rgb_alpha
+#define BYTES_PER_PIXEL_RGB  STBI_rgb
 
 extern bool g_bImageOut;
 
@@ -103,27 +103,13 @@ void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, i
     }
 }
 
-int getBytesPerPixel(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images)
+unsigned char* compressImage()
 {
-    //TODO: Probably want to pack only RGB->RGB and RGBA->RGBA unless there's some kind of space saving we can do?
-    for(int i = 0; i < rectSz; i++)
-    {
-        stbrp_rect r = rects[i];
-        if(r.was_packed)
-        {
-            ImageHelper img = images->at(r.id);
-            if(img.comp == STBI_rgb_alpha)
-                return BYTES_PER_PIXEL_RGBA;
-        }
-    }
-    return BYTES_PER_PIXEL_RGB;
+
 }
 
-void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
+void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename, int bytesPerPixel)
 {
-    //First pass: See if RGB or RGBA
-    int bytesPerPixel = getBytesPerPixel(rects, rectSz, images);
-
     int atlasSzPixels = 1 << atlasSz;
 
     //Create destination buffer for atlas
@@ -154,6 +140,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     //Output PNG if in testing mode
     if(g_bImageOut)
     {
+        //Note that this image will be RGBA, even though alpha-less images will be DXT1-compressed
         std::cout << "unsquishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
         memset(uncompressedBuf, 0, bufferSize);
         squish::DecompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
@@ -194,7 +181,7 @@ void removeDone(stbrp_rect *rects, int* rectsz)
     }
 }
 
-void packImagesByBPP(std::vector<ImageHelper> startImages, const std::string& filename, int atlasSz, int* curAtlas)
+void packImagesByBPP(std::vector<ImageHelper> startImages, const std::string& filename, int atlasSz, int* curAtlas, int bytesPerPixel)
 {
     stbrp_context context;
     int atlasSzPixels = 1 << atlasSz;
@@ -224,7 +211,7 @@ void packImagesByBPP(std::vector<ImageHelper> startImages, const std::string& fi
         //TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
 
         //Pack into image
-        packImage(rects, rectsLeft, &startImages, (*curAtlas)++, atlasSz, filename);
+        packImage(rects, rectsLeft, &startImages, (*curAtlas)++, atlasSz, filename, bytesPerPixel);
 
         //Pull out done rects and update rectsLeft. If list is empty, packed will be 1 and we'll break out anyway. Probably. It'll be fine.
         if(!packed)    //Only worry about removing done rects if we're not done yet
@@ -282,12 +269,12 @@ void packImages(const std::string& filename)
     int atlasSz24 = DEFAULT_SZ;
     int atlasSz32 = DEFAULT_SZ;
 
-    std::vector<ImageHelper> images24 = getImages(images, &atlasSz24, STBI_rgb);
-    std::vector<ImageHelper> images32 = getImages(images, &atlasSz32, STBI_rgb_alpha);
+    std::vector<ImageHelper> images24 = getImages(images, &atlasSz24, BYTES_PER_PIXEL_RGB);
+    std::vector<ImageHelper> images32 = getImages(images, &atlasSz32, BYTES_PER_PIXEL_RGBA);
 
     int curAtlas = 0;
-    packImagesByBPP(images24, filename, atlasSz24, &curAtlas);
-    packImagesByBPP(images32, filename, atlasSz32, &curAtlas);
+    packImagesByBPP(images24, filename, atlasSz24, &curAtlas, BYTES_PER_PIXEL_RGB);
+    packImagesByBPP(images32, filename, atlasSz32, &curAtlas, BYTES_PER_PIXEL_RGBA);
 
     //Reset so we can call this again later for another .pak file
     images.clear();
