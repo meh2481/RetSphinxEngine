@@ -1,6 +1,11 @@
 Current higher pri:
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
 	- Memset to 0 (for compression?) or PADPADPADPAD before filling things out, rather than manually entering pad bytes?
+- Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
+	- Automatically walk dependency chain to get used assets per chunk / manually specify?
+	- Need some way of building out levels/chunks automatically, or more easy way to do it manually
+- Better organize Lua classes; nodes/objects should be in subfolders rather than prefixed
+- Better handling of raw vs. DXT images
 - Compressor should be multithreaded
 - Think about tree structure for asset dependencies, pros/cons
 - Refactor data compressor into something more extensible; map file extensions to classes or something

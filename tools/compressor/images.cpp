@@ -60,6 +60,49 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
     }
 }
 
+void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int atlasSzPixels, uint64_t atlasId, int bytesPerPixel)
+{
+    for(int i = 0; i < rectSz; i++)
+    {
+        stbrp_rect r = rects[i];
+        if(r.was_packed)
+        {
+            ImageHelper img = images->at(r.id);
+            copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, bytesPerPixel);    //Copy image data over to dest buf, in the proper location
+
+            //Store coords
+            TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
+            rc->atlasId = atlasId;
+
+            float actualX = r.x + 1.0f;    // +1 offset here for UVs
+            float actualY = r.y + 1.0f;
+
+            //Get UV coordinates
+            float top = actualY / (float)atlasSzPixels;
+            float left = actualX / (float)atlasSzPixels;
+            float right = (actualX + (float)img.width) / (float)atlasSzPixels;
+            float bottom = (actualY + (float)img.height) / (float)atlasSzPixels;
+
+            //CCW winding from lower left, x/y format
+            rc->coordinates[0] = left;
+            rc->coordinates[1] = bottom;
+            rc->coordinates[2] = right;
+            rc->coordinates[3] = bottom;
+            rc->coordinates[4] = left;
+            rc->coordinates[5] = top;
+            rc->coordinates[6] = right;
+            rc->coordinates[7] = top;
+
+            //Add texture to pak
+            CompressionHelper textureHelper;
+            textureHelper.header.type = RESOURCE_TYPE_IMAGE;
+            textureHelper.id = img.hash;
+            createCompressionHelper(&textureHelper, (unsigned char*)rc, sizeof(TextureHeader));
+            addHelper(textureHelper);
+        }
+    }
+}
+
 void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
 {
     //First pass: See if RGB or RGBA
@@ -95,45 +138,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     atlasHelper.id = Hash::hash(oss.str().c_str());
 
     //Create Textures that point to locations in this atlas
-    for(int i = 0; i < rectSz; i++)
-    {
-        stbrp_rect r = rects[i];
-        if(r.was_packed)
-        {
-            ImageHelper img = images->at(r.id);
-            copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, BYTES_PER_PIXEL_RGBA);    //Copy image data over to dest buf, in the proper location
-
-            //Store coords
-            TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
-            rc->atlasId = atlasHelper.id;
-
-            float actualX = r.x + 1.0f;    // +1 offset here for UVs
-            float actualY = r.y + 1.0f;
-
-            //Get UV coordinates
-            float top = actualY / (float)atlasSzPixels;
-            float left = actualX / (float)atlasSzPixels;
-            float right = (actualX + (float)img.width) / (float)atlasSzPixels;
-            float bottom = (actualY + (float)img.height) / (float)atlasSzPixels;
-
-            //CCW winding from lower left, x/y format
-            rc->coordinates[0] = left;
-            rc->coordinates[1] = bottom;
-            rc->coordinates[2] = right;
-            rc->coordinates[3] = bottom;
-            rc->coordinates[4] = left;
-            rc->coordinates[5] = top;
-            rc->coordinates[6] = right;
-            rc->coordinates[7] = top;
-
-            //Add texture to pak
-            CompressionHelper textureHelper;
-            textureHelper.header.type = RESOURCE_TYPE_IMAGE;
-            textureHelper.id = img.hash;
-            createCompressionHelper(&textureHelper, (unsigned char*)rc, sizeof(TextureHeader));
-            addHelper(textureHelper);
-        }
-    }
+    createTexturesForAtlas(uncompressedBuf, rects, rectSz, images, atlasSzPixels, atlasHelper.id, BYTES_PER_PIXEL_RGBA);
 
     //Compress with libsquish
     int flags = squish::kDxt5;
