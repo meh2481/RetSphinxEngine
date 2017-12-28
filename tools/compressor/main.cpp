@@ -20,6 +20,7 @@
 
 bool g_bImageOut;
 bool g_bClean;
+bool g_bRawImg;
 
 typedef struct
 {
@@ -597,8 +598,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 
 int main(int argc, char** argv)
 {
-    g_bImageOut = false;
-    g_bClean = false;
+    g_bImageOut = g_bClean = g_bRawImg = false;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
 
@@ -610,6 +610,8 @@ int main(int argc, char** argv)
             g_bImageOut = true;
         else if(s == "--force")
             g_bClean = true;
+        else if(s == "--raw")
+            g_bRawImg = true;
         else
             sFilelistNames.push_back(s);
     }

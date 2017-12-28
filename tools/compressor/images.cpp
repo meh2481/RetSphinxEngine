@@ -19,6 +19,7 @@
 #define BYTES_PER_PIXEL_RGB  STBI_rgb
 
 extern bool g_bImageOut;
+extern bool g_bRawImg;
 
 typedef struct
 {
@@ -52,7 +53,7 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 
             //Back up on first and last pixels of row
             if(x == 0 || x == img->width)
-                src -= img->comp;    //Slight hack assumes STB comp = bytes per pixel
+                src -= img->comp;
         }
         //Back up on first and last rows
         if(y == 0 || y == img->height)
@@ -105,6 +106,7 @@ void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, i
 
 unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas,stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
 {
+    //Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1.
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
         *mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     else
@@ -137,6 +139,46 @@ unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, Compress
     return compressedBuf;
 }
 
+unsigned char* compressImageRaw(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
+{
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+        *mode = GL_RGB;
+    else
+        *mode = GL_RGBA;
+
+    *compressedSize = atlasSzPixels * atlasSzPixels * bytesPerPixel + sizeof(AtlasHeader);
+    unsigned char* uncompressedBuf = (unsigned char*)malloc(*compressedSize);
+    memset(uncompressedBuf, 0, *compressedSize);    //Clear dest buf
+
+    //Create compression helper for atlas
+    std::ostringstream oss;
+    oss << filename << curAtlas << ".atlas";    //Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
+
+    atlasHelper->header.type = RESOURCE_TYPE_IMAGE_ATLAS;
+    atlasHelper->id = Hash::hash(oss.str().c_str());
+
+    //Create Textures that point to locations in this atlas
+    createTexturesForAtlas(uncompressedBuf+sizeof(AtlasHeader), rects, rectSz, images, atlasSzPixels, atlasHelper->id, bytesPerPixel);
+
+    return uncompressedBuf;
+}
+
+unsigned char* stripAlpha(unsigned char* buf, int bufSzPixels)
+{
+    unsigned char* ret = (unsigned char*)malloc(bufSzPixels*bufSzPixels*BYTES_PER_PIXEL_RGB);
+    unsigned char* ptr = ret;
+    for(int y = 0; y < bufSzPixels; y++)
+    {
+        for(int x = 0; x < bufSzPixels; x++)
+        {
+            for(int i = 0; i < BYTES_PER_PIXEL_RGB; i++)
+                *ptr++ = *buf++;
+            buf++;  //Skip alpha
+        }
+    }
+    return ret;
+}
+
 void writePNGDXT(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned char* compressedBuf, const std::string& filename)
 {
     //Note that this image will be RGBA, even though alpha-less images will be DXT1-compressed
@@ -146,32 +188,62 @@ void writePNGDXT(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned ch
     std::cout << "unsquishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
     size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
     unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
-    squish::DecompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
+    squish::DecompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf, flags);
     std::ostringstream oss2;
     oss2 << filename << " - atlas " << curAtlas << ".png";
     std::cout << "Save " << oss2.str() << std::endl;
-    if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
-        std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+    {
+        unsigned char* strippedAlpha = stripAlpha(uncompressedBuf, atlasSzPixels);
+        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGB, strippedAlpha, atlasSzPixels * BYTES_PER_PIXEL_RGB))
+            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+        free(strippedAlpha);
+    }
+    else
+    {
+        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
+            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+    }
     free(uncompressedBuf);
+}
+
+void writePNGRaw(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned char* uncompressedBuf, const std::string& filename)
+{
+    //Note that this image will be RGBA, even though alpha-less images will be DXT1-compressed
+    std::ostringstream oss2;
+    oss2 << filename << " - atlas " << curAtlas << ".png";
+    std::cout << "Save " << oss2.str() << std::endl;
+    if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
+        std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
 }
 
 void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename, int bytesPerPixel)
 {
     //Select compression/save method to use
-    unsigned char* (*compressFunc)(int, int*, CompressionHelper*, const std::string&, int, stbrp_rect*, int, std::vector<ImageHelper>*, int, uint16_t*) = &compressImageDXT;
-    void (*saveFunc)(int, int, int, unsigned char*, const std::string&) = &writePNGDXT;
+    unsigned char* (*compressFunc)(int, int*, CompressionHelper*, const std::string&, int, stbrp_rect*, int, std::vector<ImageHelper>*, int, uint16_t*);
+    void (*saveFunc)(int, int, int, unsigned char*, const std::string&);
+    if(g_bRawImg)
+    {
+        compressFunc = &compressImageRaw;
+        saveFunc = &writePNGRaw;
+    }
+    else
+    {
+        compressFunc = &compressImageDXT;
+        saveFunc = &writePNGDXT;
+    }
+
 
     int atlasSzPixels = 1 << atlasSz;
     CompressionHelper atlasHelper;
     //Create destination buffer for atlas
-    //TODO: Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1. Should go back to using bytesPerPixel when re-adding raw compression
     int compressedSize;
     uint16_t mode;
     unsigned char* compressedBuf = (*compressFunc)(atlasSzPixels, &compressedSize,&atlasHelper,filename,curAtlas, rects, rectSz, images, bytesPerPixel, &mode);
 
     //Output PNG if in testing mode
     if(g_bImageOut)
-        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf, filename);
+        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf+sizeof(AtlasHeader), filename);
 
     //Create header for atlas
     AtlasHeader* header = (AtlasHeader*)compressedBuf;
