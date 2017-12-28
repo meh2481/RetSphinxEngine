@@ -103,8 +103,13 @@ void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, i
     }
 }
 
-unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas,stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel)
+unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas,stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
 {
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+        *mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+    else
+        *mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
     size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
     unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
     memset(uncompressedBuf, 0, bufferSize);    //Clear dest buf
@@ -152,25 +157,27 @@ void writePNGDXT(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned ch
 
 void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename, int bytesPerPixel)
 {
+    //Select compression/save method to use
+    unsigned char* (*compressFunc)(int, int*, CompressionHelper*, const std::string&, int, stbrp_rect*, int, std::vector<ImageHelper>*, int, uint16_t*) = &compressImageDXT;
+    void (*saveFunc)(int, int, int, unsigned char*, const std::string&) = &writePNGDXT;
+
     int atlasSzPixels = 1 << atlasSz;
     CompressionHelper atlasHelper;
     //Create destination buffer for atlas
     //TODO: Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1. Should go back to using bytesPerPixel when re-adding raw compression
     int compressedSize;
-    unsigned char* compressedBuf = compressImageDXT(atlasSzPixels, &compressedSize,&atlasHelper,filename,curAtlas, rects, rectSz, images, bytesPerPixel);
+    uint16_t mode;
+    unsigned char* compressedBuf = (*compressFunc)(atlasSzPixels, &compressedSize,&atlasHelper,filename,curAtlas, rects, rectSz, images, bytesPerPixel, &mode);
 
     //Output PNG if in testing mode
     if(g_bImageOut)
-        writePNGDXT(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf, filename);
+        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf, filename);
 
     //Create header for atlas
     AtlasHeader* header = (AtlasHeader*)compressedBuf;
     header->height = atlasSz;
     header->width = atlasSz;
-    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-        header->mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-    else
-        header->mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    header->mode = mode;
 
     //Add atlas to .pak
     createCompressionHelper(&atlasHelper, compressedBuf, compressedSize);
