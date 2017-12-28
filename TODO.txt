@@ -22,12 +22,6 @@ Bugs:
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
 
-- Game pauses slightly when loading sound; why?
-	- Has to hit pak; but already loaded
-	- Loaded from memory
-	- ogg format slowing it down? Need some better stream?
-	- Load sfx up front?
-
 Possible sound channels:
 - BGM
 - SFX

@@ -13,6 +13,7 @@ function spaceship:init()
 	self.FIRE_RATE = 1.0/48.951004
 	self.lastFireSound = 0
 	self.curTime = 0
+	self.SOUND_LASER = 'res/sfx/laser.wav'
 	
 	self.particles = particles_create('res/particles/shiptrail.xml')
 	particles_setFireRate(self.particles, 0)
@@ -23,6 +24,7 @@ function spaceship:init()
 	particles_setFiring(self.fireParticles, true)
 	
 	obj_registerPlayer(self)
+	sound_preload(self.SOUND_LASER)
 	
 end
 
@@ -74,7 +76,7 @@ function spaceship:shoot(x, y, vx, vy, dt)
 		local angle = 1.0
 		particles_setFireRate(self.fireParticles, 1.0)	--firing
 		if self.curTime > self.lastFireSound + self.FIRE_RATE then
-			sound_play('res/sfx/laser.wav')
+			sound_play(self.SOUND_LASER)
 			self.lastFireSound = self.curTime
 		end
 		
