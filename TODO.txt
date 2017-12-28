@@ -1,6 +1,9 @@
 Current higher pri:
-- Write a better logger - easylogging++ is too bloated
-- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
+- Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
+	- Memset to 0 (for compression?) or PADPADPADPAD before filling things out, rather than manually entering pad bytes?
+- Compressor should be multithreaded
+- Think about tree structure for asset dependencies, pros/cons
+- Refactor data compressor into something more extensible; map file extensions to classes or something
 - Remove OpenGL deprecated things and re-enable forward compat flag
 	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
@@ -8,17 +11,18 @@ Current higher pri:
 	GL[37190]: glEnableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 	GL[37190]: glColorPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+- Small-block memory allocator for Lua
+	- Other memory allocators/uses?
 
-- Ship stops suddenly when moving joystick slowly towards center position
 - Particles follow ship with acceleration applied
-- Slowing down via key doesn't seem to change lua dt; particles/lua are affected by framerate
-	- Test at 144Hz and see what breaks
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Test bg sfx
-- m_clContactListener and m_debugDraw should be allocated, not created on the stack (Engine.h)
 
 Bugs:
+- Slowing down via key doesn't seem to change lua dt; particles/lua are affected by framerate
+	- Test at 144Hz and see what breaks
+- Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
 
@@ -145,6 +149,7 @@ notes from talk with fg:
 - if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
 	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
 	-- gontext)forward_compatible_flag | sdl_gl_context debug_flag
+- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
 	
 -GLM for math
 	- mat4 for transformations
