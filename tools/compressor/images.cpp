@@ -355,6 +355,9 @@ void addImage(const std::string& img)
 
 void packImages(const std::string& filename)
 {
+    if(images.empty())
+        return; //Nothing to do
+
     int atlasSz24 = DEFAULT_SZ;
     int atlasSz32 = DEFAULT_SZ;
 
