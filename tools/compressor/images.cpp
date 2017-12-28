@@ -103,11 +103,9 @@ void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, i
     }
 }
 
-void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
+int getBytesPerPixel(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images)
 {
-    //First pass: See if RGB or RGBA
     //TODO: Probably want to pack only RGB->RGB and RGBA->RGBA unless there's some kind of space saving we can do?
-    int bytesPerPixel = BYTES_PER_PIXEL_RGB;
     for(int i = 0; i < rectSz; i++)
     {
         stbrp_rect r = rects[i];
@@ -115,12 +113,16 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
         {
             ImageHelper img = images->at(r.id);
             if(img.comp == STBI_rgb_alpha)
-            {
-                bytesPerPixel = BYTES_PER_PIXEL_RGBA;
-                break;
-            }
+                return BYTES_PER_PIXEL_RGBA;
         }
     }
+    return BYTES_PER_PIXEL_RGB;
+}
+
+void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
+{
+    //First pass: See if RGB or RGBA
+    int bytesPerPixel = getBytesPerPixel(rects, rectSz, images);
 
     int atlasSzPixels = 1 << atlasSz;
 
