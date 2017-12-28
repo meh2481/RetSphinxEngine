@@ -194,41 +194,8 @@ void removeDone(stbrp_rect *rects, int* rectsz)
     }
 }
 
-//-----------------------------------------------------------------------------------------------
-// Public functions
-//-----------------------------------------------------------------------------------------------
-
-static std::vector<std::string> images;
-void addImage(const std::string& img)
+void packImagesByBPP(std::vector<ImageHelper> startImages, const std::string& filename, int atlasSz, int* curAtlas)
 {
-    images.push_back(img);
-}
-
-void packImages(const std::string& filename)
-{
-    int atlasSz = DEFAULT_SZ;
-
-    std::vector<ImageHelper> startImages;
-    for(std::vector<std::string>::iterator i = images.begin(); i != images.end(); i++)
-    {
-        ImageHelper img;
-
-        img.comp = 0;
-        img.width = 0;
-        img.height = 0;
-        img.buf = stbi_load(i->c_str(), &img.width, &img.height, &img.comp, 0);
-        img.hash = Hash::hash(i->c_str());
-
-        startImages.push_back(img);
-
-        //Scale up atlas size as necessary
-        while(img.width + 2 > 1 << atlasSz)
-            atlasSz++;
-
-        while(img.height + 2 > 1 << atlasSz)
-            atlasSz++;
-    }
-
     stbrp_context context;
     int atlasSzPixels = 1 << atlasSz;
 
@@ -248,7 +215,6 @@ void packImages(const std::string& filename)
 
     //Main packing loop
     int packed = 1;
-    int curAtlas = 0;
     do
     {
         stbrp_init_target(&context, atlasSzPixels, atlasSzPixels, nodes, atlasSzPixels);
@@ -258,7 +224,7 @@ void packImages(const std::string& filename)
         //TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
 
         //Pack into image
-        packImage(rects, rectsLeft, &startImages, curAtlas++, atlasSz, filename);
+        packImage(rects, rectsLeft, &startImages, (*curAtlas)++, atlasSz, filename);
 
         //Pull out done rects and update rectsLeft. If list is empty, packed will be 1 and we'll break out anyway. Probably. It'll be fine.
         if(!packed)    //Only worry about removing done rects if we're not done yet
@@ -266,12 +232,63 @@ void packImages(const std::string& filename)
 
     } while(!packed);
 
-    //Reset so we can call this again later for another .pak file
-    images.clear();
-
     //Clean up memory
     for(std::vector<ImageHelper>::iterator i = startImages.begin(); i != startImages.end(); i++)
         stbi_image_free(i->buf);
     free(nodes);
     free(rects);
+}
+
+std::vector<ImageHelper> getImages(std::vector<std::string> imgs, int* atlasSz, int comp)
+{
+    std::vector<ImageHelper> ret;
+    for(std::vector<std::string>::iterator i = imgs.begin(); i != imgs.end(); i++)
+    {
+        ImageHelper img;
+
+        img.comp = 0;
+        img.width = 0;
+        img.height = 0;
+        img.buf = stbi_load(i->c_str(), &img.width, &img.height, &img.comp, 0);
+        img.hash = Hash::hash(i->c_str());
+
+        if(img.comp == comp)
+        {
+            ret.push_back(img);
+
+            //Scale up atlas size as necessary
+            while(img.width + 2 > 1 << *atlasSz)
+                (*atlasSz)++;
+
+            while(img.height + 2 > 1 << *atlasSz)
+                (*atlasSz)++;
+        }
+    }
+    return ret;
+}
+
+//-----------------------------------------------------------------------------------------------
+// Public functions
+//-----------------------------------------------------------------------------------------------
+
+static std::vector<std::string> images;
+void addImage(const std::string& img)
+{
+    images.push_back(img);
+}
+
+void packImages(const std::string& filename)
+{
+    int atlasSz24 = DEFAULT_SZ;
+    int atlasSz32 = DEFAULT_SZ;
+
+    std::vector<ImageHelper> images24 = getImages(images, &atlasSz24, STBI_rgb);
+    std::vector<ImageHelper> images32 = getImages(images, &atlasSz32, STBI_rgb_alpha);
+
+    int curAtlas = 0;
+    packImagesByBPP(images24, filename, atlasSz24, &curAtlas);
+    packImagesByBPP(images32, filename, atlasSz32, &curAtlas);
+
+    //Reset so we can call this again later for another .pak file
+    images.clear();
 }
