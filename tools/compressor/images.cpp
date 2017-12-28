@@ -86,14 +86,14 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
     unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
     memset(uncompressedBuf, 0, bufferSize);    //Clear dest buf
-    
+
     //Create compression helper for atlas
     std::ostringstream oss;
     oss << filename << curAtlas << ".atlas";    //Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
     CompressionHelper atlasHelper;
     atlasHelper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
     atlasHelper.id = Hash::hash(oss.str().c_str());
-    
+
     //Create Textures that point to locations in this atlas
     for(int i = 0; i < rectSz; i++)
     {
@@ -106,7 +106,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
             //Store coords
             TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
             rc->atlasId = atlasHelper.id;
-            
+
             float actualX = r.x + 1.0f;    // +1 offset here for UVs
             float actualY = r.y + 1.0f;
 
@@ -135,16 +135,6 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
         }
     }
 
-    //Output PNG if in testing mode
-    if(g_bImageOut)
-    {
-        std::ostringstream oss2;
-        oss2 << filename << " - atlas " << curAtlas << ".png";
-        std::cout << "Save " << oss2.str() << std::endl;
-        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
-            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
-    }
-
     //Compress with libsquish
     int flags = squish::kDxt5;
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
@@ -153,6 +143,20 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     unsigned char* compressedBuf = (unsigned char*)malloc(compressedSize);
     std::cout << "squishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
     squish::CompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
+
+    //Output PNG if in testing mode
+    if(g_bImageOut)
+    {
+        std::cout << "unsquishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
+        memset(uncompressedBuf, 0, bufferSize);
+        squish::DecompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
+        std::ostringstream oss2;
+        oss2 << filename << " - atlas " << curAtlas << ".png";
+        std::cout << "Save " << oss2.str() << std::endl;
+        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
+            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+    }
+
     free(uncompressedBuf);
 
     //Create header for atlas
@@ -211,10 +215,10 @@ void packImages(const std::string& filename)
         startImages.push_back(img);
 
         //Scale up atlas size as necessary
-        while(img.width+2 > 1 << atlasSz)
+        while(img.width + 2 > 1 << atlasSz)
             atlasSz++;
 
-        while(img.height+2 > 1 << atlasSz)
+        while(img.height + 2 > 1 << atlasSz)
             atlasSz++;
     }
 
@@ -223,8 +227,8 @@ void packImages(const std::string& filename)
 
     //TODO: Take texture bpp's into account when determining which atlas to pack them into
 
-    stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * atlasSzPixels);
-    stbrp_rect *rects = (stbrp_rect*) malloc(sizeof(stbrp_rect) * startImages.size());
+    stbrp_node *nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * atlasSzPixels);
+    stbrp_rect *rects = (stbrp_rect*)malloc(sizeof(stbrp_rect) * startImages.size());
     int rectsLeft = startImages.size();
     //Init rects
     for(int i = 0; i < rectsLeft; i++)
@@ -241,7 +245,7 @@ void packImages(const std::string& filename)
     do
     {
         stbrp_init_target(&context, atlasSzPixels, atlasSzPixels, nodes, atlasSzPixels);
-        
+
         packed = stbrp_pack_rects(&context, rects, rectsLeft);
 
         //TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
