@@ -12,4 +12,6 @@ namespace FileOperations
     std::set<std::string> readFilesFromDir(const std::string& sDirPath, bool fullPath = true);  //Return a list of all files in the given folder
 
     time_t timeModified(const std::string& filename);   //Get the last modified time of the given file
+
+    bool fileExists(const std::string& filename);   //Return true if file exists, false if no
 }

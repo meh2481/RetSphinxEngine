@@ -19,6 +19,7 @@
 #include "stb_image.h"
 
 bool g_bImageOut;
+bool g_bClean;
 
 typedef struct
 {
@@ -172,7 +173,7 @@ unsigned char* extractStringbank(const std::string& sFilename, unsigned int* fil
     }
 
     //Write string pointers
-    uint64_t stringWriteOffset = offset;    //Offset we're writing the strings to 
+    uint64_t stringWriteOffset = offset;    //Offset we're writing the strings to
     uint64_t actualStringOffset = 0;        //Offset from start of string data to the pointer we're currently writing
     stringWriteOffset += sizeof(StringDataPointer)*header.numLanguages*header.numStrings;
     for(std::list<StringBankHelper>::iterator i = sbHelpers.begin(); i != sbHelpers.end(); i++)
@@ -444,6 +445,28 @@ void addHelper(const CompressionHelper& helper)
     compressedFiles.push_back(helper);
 }
 
+bool nothingToDo(std::vector<std::string> filesToPak, const std::string& in, const std::string& pakfile)
+{
+    //Obviously need to compress if not here
+    if(!FileOperations::fileExists(pakfile))
+        return false;
+
+    time_t pakModified = FileOperations::timeModified(pakfile);
+
+    //TODO: Check if "in" has been modified, check changes vs. what already exists in pakfile
+    for(std::vector<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
+    {
+        time_t fileModified = FileOperations::timeModified(*i);
+        double diff = difftime(fileModified, pakModified);
+        if(diff > 0.0)
+        {
+            std::cout << "diff: " << diff << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
 void compress(std::vector<std::string> filesToPak, const std::string& in)
 {
     compressedFiles.clear();
@@ -451,6 +474,13 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
     std::string pakFilename = remove_extension(in);
     pakFilename += ".pak";
     std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
+
+    //TODO: Something better than just check-everything
+    if(!g_bClean && nothingToDo(filesToPak, in, pakFilename))
+    {
+        std::cout << "Pakfile " << pakFilename << " already up-to-date" << std::endl;
+        return;
+    }
 
     for(std::vector<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
     {
@@ -568,6 +598,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 int main(int argc, char** argv)
 {
     g_bImageOut = false;
+    g_bClean = false;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
 
@@ -577,6 +608,8 @@ int main(int argc, char** argv)
         std::string s = argv[i];
         if(s == "--img")
             g_bImageOut = true;
+        else if(s == "--force")
+            g_bClean = true;
         else
             sFilelistNames.push_back(s);
     }

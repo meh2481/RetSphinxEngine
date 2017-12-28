@@ -75,4 +75,10 @@ namespace FileOperations
         return time(0); //Return current time if can't stat last modified time
     }
 
+    bool fileExists(const std::string& filename)
+    {
+        struct stat buffer;
+        return (stat(filename.c_str(), &buffer) == 0);
+    }
+
 }
