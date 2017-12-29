@@ -195,15 +195,11 @@ void writePNGDXT(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned ch
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
     {
         unsigned char* strippedAlpha = stripAlpha(uncompressedBuf, atlasSzPixels);
-        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGB, strippedAlpha, atlasSzPixels * BYTES_PER_PIXEL_RGB))
-            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
-        free(strippedAlpha);
+        free(uncompressedBuf);
+        uncompressedBuf = strippedAlpha;
     }
-    else
-    {
-        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
-            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
-    }
+    if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
+        std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
     free(uncompressedBuf);
 }
 

@@ -494,12 +494,13 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         helper.id = Hash::hash(i->c_str());
 
         //Package these file types properly if needed
-        if(i->find(".png") != std::string::npos)
+        std::string ext = StringUtils::getExtension(*i);
+        if(ext == "png")
         {
             addImage(*i);
             continue;        //Skip this, as we'll add the image/atlas later
         }
-        else if(i->find(".font") != std::string::npos)
+        else if(ext == "font")
         {
             decompressed = extractFont(*i, &size);
             helper.header.type = RESOURCE_TYPE_FONT;
@@ -509,32 +510,32 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
             decompressed = extractStringbank(*i, &size);
             helper.header.type = RESOURCE_TYPE_STRINGBANK;
         }
-        else if(i->find(".loop") != std::string::npos)
+        else if(ext == "loop")
         {
             decompressed = extractSoundLoop(*i, &size);
             helper.header.type = RESOURCE_TYPE_SOUND_LOOP;
         }
-        else if(i->find(".ogg") != std::string::npos)
+        else if(ext == "ogg")
         {
             decompressed = FileOperations::readFile(*i, &size);
             helper.header.type = RESOURCE_TYPE_SOUND;
         }
-        else if(i->find(".obj") != std::string::npos)
+        else if(ext == "obj")
         {
             helper.header.type = RESOURCE_TYPE_MESH;
             decompressed = extractMesh(*i, &size);
         }
-        else if(i->find(".json") != std::string::npos)
+        else if(ext == "json")
         {
             helper.header.type = RESOURCE_TYPE_JSON;
             decompressed = FileOperations::readFile(*i, &size);
         }
-        else if(i->find(".xml") != std::string::npos)
+        else if(ext == "xml")
         {
             helper.header.type = RESOURCE_TYPE_XML;
             decompressed = FileOperations::readFile(*i, &size);
         }
-        else if(i->find(".3d") != std::string::npos)
+        else if(ext == "3d")
         {
             helper.header.type = RESOURCE_TYPE_OBJ;
             decompressed = extract3dObject(*i, &size);
