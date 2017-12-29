@@ -58,6 +58,13 @@ void PakLoader::parseFile(const std::string& sFileName)
             return;
         }
 
+        if(header.version != VERSION_1_0)
+        {
+            LOG(ERR) << "Unexpected version " << header.version << " for pak; expected " << VERSION_1_0;
+            fclose(fp);
+            return;
+        }
+
         //Load ResourcePtrs
         for(unsigned int i = 0; i < header.numResources; i++)
         {
