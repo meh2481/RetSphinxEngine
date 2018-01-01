@@ -1,8 +1,8 @@
-local node_notereceiver = {}
-node_notereceiver.__index = node_notereceiver
+local notereceiver = {}
+notereceiver.__index = notereceiver
 
 --Called when this node is created
-function node_notereceiver:init()
+function notereceiver:init()
 	self.X, self.Y = node_getPos(self)
 	self.DIRECTION = node_getProperty(self, "direction")
 	self.RADIUS = tonumber(node_getProperty(self, "radius"))
@@ -21,7 +21,7 @@ function node_notereceiver:init()
 end
 
 --Test to see if a point is inside this node
-function node_notereceiver:isInside(x, y)
+function notereceiver:isInside(x, y)
 	local distance = vec2_length(x - self.X, y - self.Y)
 	if distance <= self.RADIUS then
 		return true
@@ -30,7 +30,7 @@ function node_notereceiver:isInside(x, y)
 end
 
 --Called when an object enters this node
-function node_notereceiver:collide(object)
+function notereceiver:collide(object)
 	local objx, objy = obj_getPos(object)
 	local inside = self:isInside(objx, objy)
 		
@@ -63,7 +63,7 @@ function node_notereceiver:collide(object)
 end
 
 --Called every timestep to update the node
-function node_notereceiver:update(dt)
+function notereceiver:update(dt)
 
 	--Update key-down state
     if action_digital(self.ACTION_DIR) then
@@ -83,7 +83,7 @@ function node_notereceiver:update(dt)
 end
 
 --Called when node is destroyed
-function node_notereceiver:destroy()
+function notereceiver:destroy()
 end
 
-return node_notereceiver
+return notereceiver

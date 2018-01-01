@@ -1,5 +1,5 @@
-local node_tammousecontroller = {}
-node_tammousecontroller.__index = node_tammousecontroller
+local tammousecontroller = {}
+tammousecontroller.__index = tammousecontroller
 
 local REDNONE = 1
 local REDGREEN = 2
@@ -39,7 +39,7 @@ local X3 = X2 + XOFF
 local DISTFAC = 2.0
 
 --Called when this node is created
-function node_tammousecontroller:init()
+function tammousecontroller:init()
 	--Create walls
 	self.walls = {}
 	local wall = obj_create(TAMWALL, 0, 3)
@@ -72,7 +72,7 @@ function node_tammousecontroller:init()
 end
 
 --Called when an object enters this node
-function node_tammousecontroller:collide(object)
+function tammousecontroller:collide(object)
 end
 
 --Return false if any objects are in the node of this name, true if none are
@@ -119,7 +119,7 @@ local function testIfWon()
 	return false
 end
 
-function node_tammousecontroller:updateWalls()
+function tammousecontroller:updateWalls()
 	--Set all walls to active
 	for i = 1,7 do
 		obj_setActive(self.walls[i], true)
@@ -160,7 +160,7 @@ function node_tammousecontroller:updateWalls()
 end
 
 --Called every timestep to update the node
-function node_tammousecontroller:update(dt)
+function tammousecontroller:update(dt)
     
     self:updateWalls()
 	
@@ -173,7 +173,7 @@ function node_tammousecontroller:update(dt)
 	
 end
 
-function node_tammousecontroller:mouseCheck()
+function tammousecontroller:mouseCheck()
     local x, y = mouse_getPos()
 	x, y = mouse_transformToWorld(x, y)
 	local marble = obj_getFromPoint(x, y)
@@ -213,7 +213,7 @@ function node_tammousecontroller:mouseCheck()
 	end
 end
 
-function node_tammousecontroller:getLocation(x, y)
+function tammousecontroller:getLocation(x, y)
 	local posX, posY
 	
 	if x < X1 then
@@ -241,7 +241,7 @@ function node_tammousecontroller:getLocation(x, y)
 	return posX, posY
 end
 
-function node_tammousecontroller:dropCheck(x, y)
+function tammousecontroller:dropCheck(x, y)
 	local xtile, ytile = self:getLocation(x, y)
 	local prevX, prevY = self:getLocation(self.GRABX, self.GRABY)
 	
@@ -261,7 +261,7 @@ function node_tammousecontroller:dropCheck(x, y)
 	end
 end
 
-function node_tammousecontroller:constrainVert(marble, x, y, wall, yMin, yMax, xPos)
+function tammousecontroller:constrainVert(marble, x, y, wall, yMin, yMax, xPos)
 	if obj_isActive(wall) then
 		if y <= yMin and y >= yMax then
 			if self.GRABX < xPos then  --to the left to the left
@@ -278,7 +278,7 @@ function node_tammousecontroller:constrainVert(marble, x, y, wall, yMin, yMax, x
 	return x, y
 end
 
-function node_tammousecontroller:constrainHoriz(marble, x, y, wall, xMin, xMax, yPos)
+function tammousecontroller:constrainHoriz(marble, x, y, wall, xMin, xMax, yPos)
 	if obj_isActive(wall) then
 		if x >= xMin and x <= xMax then
 			if self.GRABY > yPos then  --above
@@ -295,7 +295,7 @@ function node_tammousecontroller:constrainHoriz(marble, x, y, wall, xMin, xMax, 
 	return x, y
 end
     
-function node_tammousecontroller:constrain(marble, x, y)
+function tammousecontroller:constrain(marble, x, y)
 	
 	--x, y = obj_getPos(marble)
 
@@ -332,7 +332,7 @@ function node_tammousecontroller:constrain(marble, x, y)
 end
 
 --Called when node is destroyed
-function node_tammousecontroller:destroy()
+function tammousecontroller:destroy()
 end
 
-return node_tammousecontroller
+return tammousecontroller

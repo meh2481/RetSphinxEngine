@@ -1,8 +1,8 @@
-local node_heartbeat = {}
-node_heartbeat.__index = node_heartbeat
+local heartbeat = {}
+heartbeat.__index = heartbeat
 
 --Called when this node is created
-function node_heartbeat:init()
+function heartbeat:init()
 	self.curTime = 0
 	self.last = 0
 	self.dub = false
@@ -17,11 +17,11 @@ function node_heartbeat:init()
 end
 
 --Called when an object enters this node
-function node_heartbeat:collide(object)
+function heartbeat:collide(object)
 end
 
 --Called every timestep to update the node
-function node_heartbeat:update(dt)
+function heartbeat:update(dt)
 	self.curTime = self.curTime + dt
 	
 	if self.curTime - self.last >= self.offset then
@@ -47,7 +47,7 @@ function node_heartbeat:update(dt)
 end
 
 --Called when node is destroyed
-function node_heartbeat:destroy()
+function heartbeat:destroy()
 end
 
-return node_heartbeat
+return heartbeat

@@ -1,15 +1,15 @@
-local node_gravwell = {}
-node_gravwell.__index = node_gravwell
+local gravwell = {}
+gravwell.__index = gravwell
 
 --Called when this node is created
-function node_gravwell:init()
+function gravwell:init()
 	self.force = tonumber(node_getProperty(self, "force"))
 	--self.rad = tonumber(node_getProperty(self, "radius"))
 	self.posx, self.posy = node_getPos(self)
 end
 
 --Called when an object enters this node
-function node_gravwell:collide(object)
+function gravwell:collide(object)
 	local objx, objy = obj_getPos(object)
 	
 	--Get vector from object to me
@@ -36,11 +36,11 @@ function node_gravwell:collide(object)
 end
 
 --Called every timestep to update the node
-function node_gravwell:update(dt)
+function gravwell:update(dt)
 end
 
 --Called when node is destroyed
-function node_gravwell:destroy()
+function gravwell:destroy()
 end
 
-return node_gravwell
+return gravwell
