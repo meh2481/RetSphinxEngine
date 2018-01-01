@@ -247,11 +247,10 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
             if(cVel != NULL)
                 vel = pointFromString(cVel);
 
-            Object* o = getResourceLoader()->getObject(cObjType, pos, vel);
+            Object* o = getResourceLoader()->getObject(cObjType, pos, vel, Lua);
 
             if(o != NULL)
             {
-                o->lua = Lua;    //TODO better Lua handling
                 //if(cName != NULL)
                 //{
                 //    string s = cName;

@@ -13,6 +13,7 @@
 #include "ResourceTypes.h"
 #include "Quad.h"
 #include "ObjSegment.h"
+#include "LuaInterface.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
@@ -546,7 +547,7 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
     return seg;
 }
 
-Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel)
+Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel, LuaInterface* lua)
 {
     std::ostringstream oss;
     oss << "res/obj/" << sType << ".xml";
@@ -589,10 +590,13 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     }
 
     Object* o = new Object;
+    o->lua = lua;
 
     const char* cLuaClass = root->Attribute("luaclass");
     if(cLuaClass != NULL)
+    {
         o->luaClass = cLuaClass;
+    }
 
     std::map<std::string, b2Body*> mBodyNames;
 

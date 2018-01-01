@@ -52,9 +52,7 @@ public:
 
     static Object* xmlParseObj(const std::string& sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
     {
-        Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel);
-        if(o)
-            o->lua = g_pGlobalEngine->Lua;    //TODO Better way to load lua
+        Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel, g_pGlobalEngine->Lua);
         return o;
     }
 
@@ -937,7 +935,7 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 luaFunc(music_getPos)    //double music_getPos()        //Return music pos in seconds
 {
     Channel* ch = GameEngineLua::getMusicChannel();
-    if(ch) 
+    if(ch)
     {
         unsigned int positionMs;
         FMOD_RESULT result = ch->getPosition(&positionMs, FMOD_TIMEUNIT_MS);
