@@ -528,12 +528,17 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         else if(ext == "json")
         {
             helper.header.type = RESOURCE_TYPE_JSON;
-            decompressed = FileOperations::readFile(*i, &size);
+            decompressed = FileOperations::readFile(*i, &size); //TODO: minify
         }
         else if(ext == "xml")
         {
             helper.header.type = RESOURCE_TYPE_XML;
-            decompressed = FileOperations::readFile(*i, &size);
+            decompressed = FileOperations::readFile(*i, &size); //TODO: minify
+        }
+        else if(ext == "lua")
+        {
+            helper.header.type = RESOURCE_TYPE_LUA;
+            decompressed = FileOperations::readFile(*i, &size); //TODO: minify
         }
         else if(ext == "3d")
         {

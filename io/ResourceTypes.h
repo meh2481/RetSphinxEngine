@@ -57,6 +57,7 @@ typedef struct
 #define RESOURCE_TYPE_MESH           8    //3D mesh
 #define RESOURCE_TYPE_JSON           9
 #define RESOURCE_TYPE_XML            10   //Prolly wanna remove this at some point as we migrate away from xml formats
+#define RESOURCE_TYPE_LUA            11   //Lua script
 //#define RESOURCE_TYPE_
 //etc
 
