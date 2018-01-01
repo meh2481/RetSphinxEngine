@@ -1,14 +1,15 @@
 Current higher pri:
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
-	- Memset to 0 (for compression?) or PADPADPADPAD before filling things out, rather than manually entering pad bytes?
+- Memset to 0 (for compression?) or PADPADPADPAD before filling things out, rather than manually entering pad bytes?
 - Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
 	- Automatically walk dependency chain to get used assets per chunk / manually specify?
 	- Need some way of building out levels/chunks automatically, or more easy way to do it manually
+	- Potentially can export current resources via keypress or something like that; requires pak to have been hit for all tho
+		-If so, large errors like error textures etc. for when a miss happens (as described in talk). These will have to be stubbed out for final game
+	- Think about tree structure for asset dependencies, pros/cons
 - Better organize Lua classes; nodes/objects should be in subfolders rather than prefixed
 - Better handling of raw vs. DXT images
 - Compressor should be multithreaded
-- Think about tree structure for asset dependencies, pros/cons
-- Refactor data compressor into something more extensible; map file extensions to classes or something
 - Remove OpenGL deprecated things and re-enable forward compat flag
 	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
@@ -22,7 +23,6 @@ Current higher pri:
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Test bg sfx
 
 Bugs:
 - Slowing down via key doesn't seem to change lua dt; particles/lua are affected by framerate
@@ -30,12 +30,6 @@ Bugs:
 - Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
-
-- Game pauses slightly when loading sound; why?
-	- Has to hit pak; but already loaded
-	- Loaded from memory
-	- ogg format slowing it down? Need some better stream?
-	- Load sfx up front?
 
 Possible sound channels:
 - BGM
@@ -47,19 +41,16 @@ Possible sound channels:
 - Movie
 
 Overall TODO list:
-- Look up const declarations for variables and see if that helps optimize in C
-- Curve editor via ImGUI
-- Resources should be streamed from disk, not loaded upfront from .pak files
-- Sound filters
-- Sound pitch
-- Fix math for softbody lattice anim so it actually works properly
-- Use shaders rather than lattice animations where possible
+- Use const declarations for variables
 - Revisit class predeclaration and add more where possible
+- Curve editor via ImGUI
+- Resources should be streamed from disk?
+- Sound filters
+- Fix math for softbody lattice anim so it actually works properly
+	- Use shaders rather than lattice animations where possible
 - Ortho for HUD and text drawing
-- Create allocator / choose one to use rather than mixing malloc & new
 - Particle systems, objects, etc should be loaded by template, not from XML each time
 	- Also XML->PAK binary formats to simplify this
-- Move object self-creation into resource loaders where applicable
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
 
 Particle System Editing:
@@ -69,18 +60,12 @@ Particle System Editing:
 - Add support for seeing particle death spawns
 - Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
 
-
-Refactoring thoughts:
-- lots of classes are in files for other classes; move to own files
-
-
 Lower priority:
 - Test sound pitch shifting; current implementation seems to not work for all sound effects as intended
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 - UTF code point lookup should use array of direct values rather than binary search? Or hashmap of some sort?
 - Use SDL_GetPowerInfo() for laptop battery reminders
 - Move all resource loading stuff to IO?
-- Stream areas as needed vs. load maps?
 
 Reasoning behind the engine design (aka why not just use Unity or whatever):
 - Robust Lua scripting interface
