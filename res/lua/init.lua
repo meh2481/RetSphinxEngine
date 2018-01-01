@@ -13,31 +13,17 @@ setglobal("setglobal", setglobal)
 local classes = {}	--List of all loaded classes (so we know to reload them)
 
 --Load a class' lua file from class name
-local function loadclass(s, cls)
-		setglobal(s, cls)
+local function loadclass(s, prefix)
+	local name = prefix..s
+	if rawget(_G, name) == nil then
+		local cls = dofile("res/lua/" .. prefix .. "/" .. s .. ".lua")
+		setglobal(name, cls)
 		local reg = debug.getregistry()	--HACK
-		reg[s] = cls
-		classes[s] = true
+		reg[name] = cls
+		classes[name] = true
+	end
 end
 setglobal("loadclass", loadclass)
-
-local function loadobjclass(s)
-	local name = "obj"..s
-	if rawget(_G, name) == nil then
-		local cls = dofile("res/lua/obj/" .. s .. ".lua")
-		loadclass(name, cls)
-	end
-end
-setglobal("loadobjclass", loadobjclass)
-
-local function loadnodeclass(s)
-	local name = "node"..s
-	if rawget(_G, name) == nil then
-		local cls = dofile("res/lua/node/" .. s .. ".lua")
-		loadclass(name, cls)
-	end
-end
-setglobal("loadnodeclass", loadnodeclass)
 
 --Clear all loaded classes so we'll reload them when we call loadclass() again
 local function clearClasses()
