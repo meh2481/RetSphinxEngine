@@ -385,7 +385,7 @@ unsigned char* extractImage(const std::string& filename, unsigned int* size)
     stbi_image_free(cBuf);
 
     if(size)
-        *size = w*h*bpp;
+        *size = w*h*bpp + sizeof(IconHeader);
 
     return outBuf;
 }
