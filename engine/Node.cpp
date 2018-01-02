@@ -1,5 +1,5 @@
 #include "Node.h"
-#include "lua.hpp"
+#include "LuaInterface.h"
 
 Node::Node()
 {

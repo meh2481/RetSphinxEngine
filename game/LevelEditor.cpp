@@ -4,6 +4,7 @@
 #include "Node.h"
 #include "EntityManager.h"
 #include "Box2D/Box2D.h"
+#include "LuaInterface.h"
 
 LevelEditor::LevelEditor(GameEngine * _g)
 {
