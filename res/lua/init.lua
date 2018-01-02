@@ -25,6 +25,18 @@ local function loadclass(s, prefix)
 end
 setglobal("loadclass", loadclass)
 
+local function loadclassdef(s, def)
+	if rawget(_G, s) == nil then
+	    local thing = load(def)
+		local cls = thing()
+		setglobal(s, cls)
+		local reg = debug.getregistry()	--HACK
+		reg[s] = cls
+		classes[s] = true
+	end
+end
+setglobal("loadclassdef", loadclassdef)
+
 --Clear all loaded classes so we'll reload them when we call loadclass() again
 local function clearClasses()
 	for k, v in pairs(classes) do

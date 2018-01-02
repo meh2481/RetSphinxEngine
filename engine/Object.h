@@ -36,7 +36,7 @@ public:
     bool active;
     bool alive;
     Color col;
-    
+
     Object();
     ~Object();
 
@@ -48,13 +48,14 @@ public:
     Vec2 getPos();
     void collide(Object* other, float impulse);
     void collideWall(Vec2 ptNormal, float impulse);    //ptNormal will be a normal vector from the wall to this object
-    void initLua();    
+    void initLua();
+    void initLua(const std::string& luaDef);
     void setPosition(Vec2 p);    //Best to call this not on object creation, but only when needed (makes box2d unhappy if done too much)
-    
+
     void setProperty(const std::string& prop, const std::string& value)    {propertyValues[prop] = value;};
     void addProperty(const std::string& prop, const std::string& value) {setProperty(prop, value);};
     std::string getProperty(const std::string& prop)                {if(propertyValues.count(prop)) return propertyValues[prop]; return "";};
-    
+
     void setImage(Image* img, unsigned int seg = 0);    //Sets the image of the given physSegment
 };
 

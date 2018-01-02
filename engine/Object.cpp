@@ -144,8 +144,20 @@ void Object::initLua()
     if(lua && !glueObj)
     {
         lua->call("loadclass", luaClass.c_str(), "obj");    //Create this class if it hasn't been created already
+                                                            //Parse this lua object first
+        glueObj = lua->createObject(this, TYPE, ("obj" + luaClass).c_str());
 
-        //Parse this lua object first
+        //Call Lua init() function in file defined by luaFile
+        lua->callMethod(this, "init");
+    }
+}
+
+void Object::initLua(const std::string& luaDef)
+{
+    if(lua && !glueObj)
+    {
+        lua->call("loadclassdef", ("obj" + luaClass).c_str(), luaDef.c_str());    //Create this class if it hasn't been created already
+                                                            //Parse this lua object first
         glueObj = lua->createObject(this, TYPE, ("obj" + luaClass).c_str());
 
         //Call Lua init() function in file defined by luaFile

@@ -594,9 +594,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 
     const char* cLuaClass = root->Attribute("luaclass");
     if(cLuaClass != NULL)
-    {
         o->luaClass = cLuaClass;
-    }
 
     std::map<std::string, b2Body*> mBodyNames;
 
@@ -795,6 +793,14 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 
     //------------------------------------------------------------------------
     //Done
+
+    if(cLuaClass != NULL)
+    {
+        std::ostringstream objss;
+        objss << "res/lua/obj/" << cLuaClass << ".lua";
+        std::string luaClassDef = getTextFile(objss.str());
+        o->initLua(luaClassDef);
+    }
 
     delete doc;
     return o;
