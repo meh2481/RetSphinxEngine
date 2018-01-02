@@ -14,7 +14,7 @@ static int the_panic (lua_State *L) {
 }
 
 
-LuaInterface::LuaInterface(const char *script, int argc, const char * const *argv) : script(script), argc(argc), argv(argv), _lua(NULL)
+LuaInterface::LuaInterface(const char *script) : script(script), _lua(NULL)
 {
     LOG(INFO) << "LuaInterface: Using " << LUA_RELEASE;
 }
@@ -68,11 +68,7 @@ bool LuaInterface::Init()
         return false;
     }
 
-    // push args
-    for(int i = 0; i < argc; ++i)
-        lua_pushstring(_lua, argv[i]);
-
-    return doCall(argc);
+    return doCall(0);
 }
 
 static std::string luaFormatStackInfo(lua_State *L, int level = 1)
