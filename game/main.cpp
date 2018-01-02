@@ -21,11 +21,6 @@ int main(int argc, char** argv)
 {
     GameEngine* eng = new GameEngine(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Game Engine", "RetiredSphinxGameDev", "GameEngine", ICONNAME, true); //Create our engine
 
-    //Start Lua
-    LuaInterface Lua("res/lua/init.lua");
-    if (!Lua.Init()) return 1;
-    eng->setLua(&Lua);
-
     std::vector<std::string> lCommandLine;
 
     for(int i = 1; i < argc; i++)

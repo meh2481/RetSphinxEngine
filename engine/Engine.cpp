@@ -142,9 +142,8 @@ Engine::~Engine()
 void Engine::start()
 {
     // Load all that we need to
-    init(lCommandLine);
-    // Let's rock now!
-    while(!_frame());
+    if(init(lCommandLine))
+        while(!_frame());   // Let's rock now!
 }
 
 bool Engine::_processEvent(SDL_Event& e)

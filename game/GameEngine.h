@@ -43,12 +43,12 @@ private:
     bool m_bMouseGrabOnWindowRegain;
     float m_fDefCameraZ;    //Default position of camera on z axis
     std::vector<ColorPhase> m_ColorsChanging;
-    
+
     //Game-specific stuff!
     LuaInterface* Lua;
     Object* player;        //TODO Support multiple players, mapped to InputDevice
     Rect rcSceneBounds;
-    
+
     //Testing stuff that should eventually be finalized/fixed!
     std::string m_sLoadScene;    //If this is ever set, on the next frame we'll load this map
     std::string m_sLoadNode;        //If the above is set and this is also set, warp to this named node when loading the map
@@ -60,33 +60,31 @@ private:
 protected:
     void frame(float dt);
     void draw(RenderState& renderState);
-    void init(std::vector<commandlineArg> sArgs);
+    bool init(std::vector<commandlineArg> sArgs);
     void pause();
     void resume();
     bool drawDebugUI();
-    
+
     //Defined in GameEngine_events.cpp
     void handleEvent(SDL_Event event);
 
 public:
-    //GameEngine.cpp functions - fairly generic 
+    //GameEngine.cpp functions - fairly generic
     GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable = false);
     ~GameEngine();
-    
-    void setLua(LuaInterface* l)    {Lua = l;};
 
     //Functions dealing with input and user IO - GameEngine_events.cpp
     void handleKeys();                        //Poll the keyboard state and update the game accordingly
-    
+
     //Functions dealing with loading/saving from XML - defined in GameEngine_xmlparse.cpp
     bool loadConfig(const std::string& sFilename);
     void saveConfig(const std::string& sFilename);
     void loadScene(const std::string& sXMLFilename);    //Load scene from file
-    
+
     //Other stuff
     void warpObjectToNode(Object* o, Node* n);
     SteelSeriesClient* getSteelSeriesClient() { return steelSeriesClient; };
-    
+
     //GameEngine_color.cpp functions
     void updateColors(float dt);
     void phaseColor(Color* src, Color* dest, float time, bool bPingPong = false);
