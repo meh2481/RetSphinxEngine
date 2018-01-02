@@ -789,19 +789,17 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
         }
     }
 
-
-
-    //------------------------------------------------------------------------
-    //Done
-
+    //Load the lua class
+    std::ostringstream objss;
+    objss << "res/lua/obj/";
     if(cLuaClass != NULL)
-    {
-        std::ostringstream objss;
-        objss << "res/lua/obj/" << cLuaClass << ".lua";
-        std::string luaClassDef = getTextFile(objss.str());
-        o->initLua(luaClassDef);
-    }
+        objss << cLuaClass;
+    else
+        objss << o->getLuaClass();  //Use default lua class
+    objss << ".lua";
+    o->luaDef = getTextFile(objss.str());
 
+    //Done
     delete doc;
     return o;
 }
