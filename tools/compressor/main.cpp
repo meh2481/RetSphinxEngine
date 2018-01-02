@@ -503,7 +503,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         else if(ext == "img")
         {
             decompressed = extractImage(*i, &size);
-            helper.header.type = RESOURCE_TYPE_ICON;
+            helper.header.type = RESOURCE_TYPE_IMAGE_NO_ATLAS;
         }
         else if(ext == "font")
         {

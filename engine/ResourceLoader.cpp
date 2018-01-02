@@ -338,10 +338,10 @@ SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
     LOG(INFO) << "Load icon " << sID;
     uint64_t hashID = Hash::hash(sID.c_str());
     unsigned char* imgBuf = m_pakLoader->loadResource(hashID, NULL);
-    IconHeader* imgHeader = (IconHeader*)imgBuf;
+    ImageHeader* imgHeader = (ImageHeader*)imgBuf;
 
     SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
-        imgBuf + sizeof(IconHeader),
+        imgBuf + sizeof(ImageHeader),
         imgHeader->width,
         imgHeader->height,
         imgHeader->bpp * 8,

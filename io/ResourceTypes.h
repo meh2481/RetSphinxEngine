@@ -58,7 +58,7 @@ typedef struct
 #define RESOURCE_TYPE_JSON          9
 #define RESOURCE_TYPE_XML           10  //Prolly wanna remove this at some point as we migrate away from xml formats
 #define RESOURCE_TYPE_LUA           11  //Lua script
-#define RESOURCE_TYPE_ICON          12  //Icon image
+#define RESOURCE_TYPE_IMAGE_NO_ATLAS 12  //Icon image or other image without atlas
 //#define RESOURCE_TYPE_
 //etc
 
@@ -80,14 +80,14 @@ typedef struct //Structure for image indices into the atlas AtlasHeader
     f32_t coordinates[8];    //UV texture coordinates for the image in the atlas
 } TextureHeader;
 
-typedef struct //Structure for icon data
+typedef struct //Structure for (non-atlased) image data
 {
     uint16_t bpp;           //bytes per pixel
     uint16_t width;         //Width of image
     uint16_t height;        //Height of image
     uint16_t pad;
                            //Followed by image data
-} IconHeader;
+} ImageHeader;
 
 
 //--------------------------------------------------------------
