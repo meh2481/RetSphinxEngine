@@ -15,6 +15,7 @@ class Node {
 public:
     enum { TYPE = OT_NODE };
     std::string     luaClass;
+    std::string     luaDef;
     LuaInterface*     lua;
     Vec2             pos;
     std::string     name;

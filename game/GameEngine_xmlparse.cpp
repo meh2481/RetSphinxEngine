@@ -10,6 +10,7 @@
 #include "SoundManager.h"
 #include "Object.h"
 #include "Node.h"
+#include <sstream>
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -318,6 +319,9 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
                 n->lua = Lua;            //TODO: Better handling of node/object LuaInterfaces
                 n->pos = pos;
                 n->body = body;
+                std::ostringstream objss;
+                objss << "res/lua/node/" << cLua << ".lua";
+                n->luaDef = getResourceLoader()->getTextFile(objss.str());
 
                 const char* cName = geom->Attribute("name");
                 if(cName)

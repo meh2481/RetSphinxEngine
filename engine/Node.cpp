@@ -19,7 +19,8 @@ void Node::init()
     if(lua && luaClass.length())
     {
         lua_State* L = lua->getState();
-        lua->call("loadclass", luaClass.c_str(), "node");
+        //lua->call("loadclass", luaClass.c_str(), "node");
+        lua->call("loadclassdef", ("node" + luaClass).c_str(), luaDef.c_str());
         glueObj = lua->createObject(this, TYPE, ("node" + luaClass).c_str());
         lua->callMethod(this, "init");
     }
