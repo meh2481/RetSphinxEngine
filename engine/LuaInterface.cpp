@@ -60,7 +60,7 @@ bool LuaInterface::Init()
         lua_register_all(_lua);
     }
 
-    if(luaL_loadfile(_lua, script) != LUA_OK)
+    if(luaL_loadstring(_lua, script) != LUA_OK)
     {
         const char *err = lua_tostring(_lua, -1);
         if(err)

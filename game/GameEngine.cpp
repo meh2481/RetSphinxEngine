@@ -190,9 +190,13 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
     loadConfig(getSaveLocation() + CONFIG_FILE);
 
     //Init lua
-    Lua = new LuaInterface("res/lua/init.lua");
+    std::string s = getResourceLoader()->getTextFile("res/lua/init.lua");
+    Lua = new LuaInterface(s.c_str());
     if(!Lua->Init())
+    {
+        LOG(ERR) << "Failed to init lua";
         return false;
+    }
     lua_State* L = Lua->getState();
     Lua->call("loadLua");
 
