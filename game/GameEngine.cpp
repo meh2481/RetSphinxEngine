@@ -197,7 +197,6 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
         LOG(ERR) << "Failed to init lua";
         return false;
     }
-    lua_State* L = Lua->getState();
     Lua->call("loadLua");
 
     std::string sLocale = SystemUtils::getCurLocale();
