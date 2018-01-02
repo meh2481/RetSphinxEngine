@@ -143,7 +143,7 @@ void Object::initLua()
 {
     if(lua && !glueObj)
     {
-        lua->call("loadclassdef", ("obj" + luaClass).c_str(), luaDef.c_str());    //Create this class if it hasn't been created already
+        lua->call("loadclass", ("obj" + luaClass).c_str(), luaDef.c_str());    //Create this class if it hasn't been created already
 
         //Parse this lua object first
         glueObj = lua->createObject(this, TYPE, ("obj" + luaClass).c_str());

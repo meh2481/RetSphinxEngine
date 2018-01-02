@@ -12,30 +12,18 @@ setglobal("setglobal", setglobal)
 
 local classes = {}	--List of all loaded classes (so we know to reload them)
 
---Load a class' lua file from class name
-local function loadclass(s, prefix)
-	local name = prefix..s
-	if rawget(_G, name) == nil then
-		local cls = dofile("res/lua/" .. prefix .. "/" .. s .. ".lua")
-		setglobal(name, cls)
-		local reg = debug.getregistry()	--HACK
-		reg[name] = cls
-		classes[name] = true
-	end
-end
-setglobal("loadclass", loadclass)
-
-local function loadclassdef(s, def)
+--Load a class' lua definition from a string
+local function loadclass(s, def)
 	if rawget(_G, s) == nil then
-	    local thing = load(def)
-		local cls = thing()
+	    local classFunc = load(def)
+		local cls = classFunc()
 		setglobal(s, cls)
 		local reg = debug.getregistry()	--HACK
 		reg[s] = cls
 		classes[s] = true
 	end
 end
-setglobal("loadclassdef", loadclassdef)
+setglobal("loadclass", loadclass)
 
 --Clear all loaded classes so we'll reload them when we call loadclass() again
 local function clearClasses()
