@@ -146,6 +146,7 @@ void Engine::setup_sdl()
     if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
         LOG(WARN) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
 
+    _loadicon();    //Load our window icon
 }
 
 //Set up OpenGL

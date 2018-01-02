@@ -87,8 +87,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
     m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
 
-    _loadicon();    //Load our window icon
-
     m_inputManager = new InputManager();
     m_interpolationManager = new InterpolationManager();
 
