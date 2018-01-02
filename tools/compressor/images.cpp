@@ -367,3 +367,25 @@ void packImages(const std::string& filename)
     //Reset so we can call this again later for another .pak file
     images.clear();
 }
+
+unsigned char* extractImage(const std::string& filename, unsigned int* size)
+{
+    int w, h, bpp;
+    unsigned char* cBuf = stbi_load(filename.c_str(), &w, &h, &bpp, 0);
+
+    unsigned char* outBuf = (unsigned char*)malloc(sizeof(IconHeader) + w*h*bpp);
+
+    IconHeader* header = (IconHeader*) outBuf;
+    header->width = w;
+    header->height = h;
+    header->bpp = bpp;
+    header->pad = 0;
+
+    memcpy(outBuf + sizeof(IconHeader), cBuf, w*h*bpp);
+    stbi_image_free(cBuf);
+
+    if(size)
+        *size = w*h*bpp;
+
+    return outBuf;
+}

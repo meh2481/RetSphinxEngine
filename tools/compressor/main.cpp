@@ -500,6 +500,11 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
             addImage(*i);
             continue;        //Skip this, as we'll add the image/atlas later
         }
+        else if(ext == "img")
+        {
+            decompressed = extractImage(*i, &size);
+            helper.header.type = RESOURCE_TYPE_ICON;
+        }
         else if(ext == "font")
         {
             decompressed = extractFont(*i, &size);

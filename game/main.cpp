@@ -8,9 +8,9 @@
 #include "LuaInterface.h"
 
 #ifdef _WIN32
-#define ICONNAME "res/icons/icon_32.png"    //For some reason, Windoze (Or SDL2, or something) doesn't like large (256x256) icons for windows. Using a 32x32 icon instead.
+#define ICONNAME "res/icons/icon_32.img"    //For some reason, Windoze (Or SDL2, or something) doesn't like large (256x256) icons for windows. Using a 32x32 icon instead.
 #else
-#define ICONNAME "res/icons/icon_256.png"
+#define ICONNAME "res/icons/icon_256.img"
 #endif
 
 #ifdef _WIN32

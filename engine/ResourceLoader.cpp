@@ -335,22 +335,21 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 
 SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
 {
-    LOG(INFO) << "Load image " << sID;
+    LOG(INFO) << "Load icon " << sID;
+    uint64_t hashID = Hash::hash(sID.c_str());
+    unsigned char* imgBuf = m_pakLoader->loadResource(hashID, NULL);
+    IconHeader* imgHeader = (IconHeader*)imgBuf;
 
-    int comp = 0;
-    int width = 0;
-    int height = 0;
-    unsigned char* cBuf = stbi_load(sID.c_str(), &width, &height, &comp, 0);
-
-    if((cBuf == 0) || (width == 0) || (height == 0))
-    {
-        LOG(ERR) << "Unable to open image " << sID;
-        return NULL;
-    }
-
-    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(cBuf, width, height, 32, 4 * width, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-
-    //TODO stbi_image_free(cBuf); but SDL_Surface doesn't deep copy it...
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+        imgBuf + sizeof(IconHeader),
+        imgHeader->width,
+        imgHeader->height,
+        imgHeader->bpp * 8,
+        imgHeader->bpp * imgHeader->width,
+        0x000000ff,
+        0x0000ff00,
+        0x00ff0000,
+        0xff000000);
 
     return surface;
 }
