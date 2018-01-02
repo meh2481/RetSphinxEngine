@@ -45,4 +45,5 @@ end
 setglobal("loadLua", loadLua)
 
 --Load our math functions
-dofile("res/lua/math.lua")
+local mathfunc = load(resource_loadText("res/lua/math.lua"))
+mathfunc()

@@ -30,6 +30,7 @@ Bugs:
 - Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
+- Adding to a pak .txt doesn't check that the pak contains said files; just says up-to-date
 
 Possible sound channels:
 - BGM
