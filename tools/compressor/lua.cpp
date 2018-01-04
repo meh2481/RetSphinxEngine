@@ -2,11 +2,31 @@
 #include "LuaInterface.h"
 #include "Logger.h"
 #include "FileOperations.h"
+#include "lua.hpp"
 
-static LuaInterface* lua;
+static LuaInterface* lua = NULL;
 
 unsigned char* extractLua(const std::string& luaFilename, unsigned int* size)
 {
+    //Call main_minify in lua
+    lua_State* L = lua->getState();
+    lua_getglobal(L, "main_minify");
+    lua_pushstring(L, luaFilename.c_str());
+    lua_call(L, 1, 1);
+    const char* result = lua_tostring(L, -1);
+    lua_pop(L, 1);
+
+    if(result)
+    {
+        *size = strlen(result);
+        unsigned char* ret = (unsigned char*)malloc(*size);
+        memcpy(ret, result, *size);
+        return ret;
+    }
+    else
+    {
+        std::cout << "not string" << std::endl;
+    }
     return NULL;
 }
 
