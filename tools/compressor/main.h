@@ -25,3 +25,8 @@ unsigned char* extractImage(const std::string& filename, unsigned int* size);
 //mesh.cpp
 unsigned char* extractMesh(const std::string& objFilename, unsigned int* size);
 unsigned char* extract3dObject(const std::string& xmlFilename, unsigned int* size);
+
+//lua.cpp
+unsigned char* extractLua(const std::string& luaFilename, unsigned int* size);
+void initLua();
+void teardownLua();

@@ -543,7 +543,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         else if(ext == "lua")
         {
             helper.header.type = RESOURCE_TYPE_LUA;
-            decompressed = FileOperations::readFile(*i, &size); //TODO: minify
+            decompressed = extractLua(*i, &size);
         }
         else if(ext == "3d")
         {
@@ -614,6 +614,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 
 int main(int argc, char** argv)
 {
+    initLua();
     g_bImageOut = g_bClean = g_bRawImg = false;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
@@ -638,5 +639,6 @@ int main(int argc, char** argv)
 
     //Free our WFLZ working memory
     free(workMem);
+    teardownLua();
     return 0;
 }

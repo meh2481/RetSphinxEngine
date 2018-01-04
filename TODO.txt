@@ -160,3 +160,9 @@ Endianness testing:
 	
 	
 Note: On Linux, "xboxdrv" is the driver I had the most success with when it came to gamepad rumble (default driver said it rumbled, but didn't)
+
+@fgenesis | debug.traceback() in a xpcall() handler at least
+@fgenesis | so if stuff breaks you know why
+@fgenesis | i think my Lua C++ api already does this for C++->Lua calls
+
+Also add lua error stuff to log as well as cmdline, only cmdline if in debug mode
