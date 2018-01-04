@@ -59,6 +59,7 @@ typedef struct
 #define RESOURCE_TYPE_XML           10  //Prolly wanna remove this at some point as we migrate away from xml formats
 #define RESOURCE_TYPE_LUA           11  //Lua script
 #define RESOURCE_TYPE_IMAGE_NO_ATLAS 12  //Icon image or other image without atlas
+#define RESOURCE_TYPE_SHADER        13
 //#define RESOURCE_TYPE_
 //etc
 
