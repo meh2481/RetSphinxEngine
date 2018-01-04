@@ -533,12 +533,12 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         else if(ext == "json")
         {
             helper.header.type = RESOURCE_TYPE_JSON;
-            decompressed = FileOperations::readFile(*i, &size); //TODO: minify?
+            decompressed = FileOperations::readFile(*i, &size);
         }
         else if(ext == "xml")
         {
             helper.header.type = RESOURCE_TYPE_XML;
-            decompressed = FileOperations::readFile(*i, &size); //TODO: minify?
+            decompressed = FileOperations::readFile(*i, &size);
         }
         else if(ext == "lua")
         {
@@ -553,7 +553,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         else if(ext == "vert" || ext == "frag" || ext == "glsl")
         {
             helper.header.type = RESOURCE_TYPE_SHADER;
-            decompressed = FileOperations::readFile(*i, &size); //TODO: minify?
+            decompressed = FileOperations::readFile(*i, &size);
         }
         else
         {

@@ -11,7 +11,6 @@ Current higher pri:
 	- Potentially can export current resources via keypress or something like that; requires pak to have been hit for all tho
 		-If so, large errors like error textures etc. for when a miss happens (as described in talk). These will have to be stubbed out for final game
 	- Think about tree structure for asset dependencies, pros/cons
-- Better organize Lua classes; nodes/objects should be in subfolders rather than prefixed
 - Better handling of raw vs. DXT images
 - Compressor should be multithreaded
 - Remove OpenGL deprecated things and re-enable forward compat flag
