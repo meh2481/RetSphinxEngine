@@ -1,7 +1,6 @@
 #include "OpenGLShader.h"
 #include "opengl-api.h"
 #include "Logger.h"
-#include <string>
 #include <vector>
 
 

@@ -2,7 +2,6 @@ Current higher pri:
 - Remove rapidjson
 - Load Music from pak? Need to stream from disk
 - Double-check particle pak loading
-- Load shaders from pak (minified?)
 - Particle with x that tapers to points (anime-style)
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
 - Memset to 0 (for compression?) or PADPADPADPAD before filling things out, rather than manually entering pad bytes?
