@@ -4,6 +4,7 @@ build/*
 *.o
 *.res
 *.exe
+*.log
 _downloaded/*
 _gfxbase/*
 *.dll
