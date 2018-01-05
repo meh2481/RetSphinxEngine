@@ -125,7 +125,9 @@ Engine::~Engine()
     ImGui_Impl_GL3_Shutdown();
 
     glDeleteProgram(m_renderState.programId);
+#ifdef _DEBUG
     glDeleteProgram(m_debugRenderState.programId);
+#endif
 
     //Clean up SDL
     SDL_DestroyWindow(m_Window);

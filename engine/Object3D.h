@@ -5,6 +5,7 @@
 #pragma once
 #include <string>
 #include "RenderState.h"
+#include <stdint.h>
 
 class Image;
 
