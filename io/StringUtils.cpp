@@ -91,7 +91,13 @@ namespace StringUtils
         std::string input = s;
         input = replaceWith(input, ' ', '_');    //Replace spaces with underscores
         transform(input.begin(), input.end(), input.begin(), ::toupper);    //Convert to uppercase
-        input.erase(remove_if(input.begin(), input.end(), [](char c) { return (!isalnum(c) && c != '_'); }), input.end()); //Remove non alphanumeric chars
+        std::string output = "";
+        for(int i = 0; i < input.length(); i++)
+        {
+            char c = input.at(i);
+            if(isalnum(c) || c == '_')
+                output.append(&c, 1);
+        }
         return input;
     }
 
