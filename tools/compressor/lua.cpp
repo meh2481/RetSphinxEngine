@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "FileOperations.h"
 #include "lua.hpp"
+#include <cstring>
 
 static LuaInterface* lua = NULL;
 

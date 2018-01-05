@@ -81,11 +81,15 @@ void DebugUI::_draw()
 
     if(levelEditor->open)
     {
+#ifdef _DEBUG
         _ge->pausePhysics();
+#endif
         levelEditor->draw(windowFlags, hasFocus());
     }
+#ifdef _DEBUG
     else
         _ge->playPhysics();
+#endif
 
     if(rumbleMenu)
     {

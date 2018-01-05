@@ -111,8 +111,10 @@ void GameEngine::handleEvent(SDL_Event event)
                     break;
 
                 case SDL_SCANCODE_GRAVE: // Use the traditional quake key for debug console stuff
+#ifdef _DEBUG
                     if(m_debugUI->visible)
                         playPhysics();
+#endif
                     m_debugUI->visible = !m_debugUI->visible;
                     break;
             }

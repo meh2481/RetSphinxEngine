@@ -49,7 +49,10 @@ void LevelEditor::draw(int windowFlags, bool focus)
             draggingNode->body->SetTransform(b2Vec2(draggingNode->pos.x, draggingNode->pos.y), draggingNode->body->GetAngle());
         }
     }
+#ifdef _DEBUG
     else
         ge->playPhysics();
+#endif
     ImGui::End();
 }
+
