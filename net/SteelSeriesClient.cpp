@@ -107,7 +107,7 @@ std::string SteelSeriesClient::getSSURL()
     return std::string();
 #else
     #warning TODO Support other OSs for SteelSeries stuff...
-        return std::string();
+    return std::string();
     //On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
     //SS has no Linux support yet
 #endif	//_WIN32
