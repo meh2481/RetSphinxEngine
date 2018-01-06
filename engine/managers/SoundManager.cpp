@@ -447,8 +447,11 @@ void SoundManager::resumeAll()
 
 void SoundManager::setPlaybackRate(float rate)
 {
-    FMOD_RESULT result = musicChannel->setFrequency(DEFAULT_SOUND_FREQ * rate);
-    ERRCHECK(result);
+    if(musicChannel)
+    {
+        FMOD_RESULT result = musicChannel->setFrequency(DEFAULT_SOUND_FREQ * rate);
+        ERRCHECK(result);
+    }
 }
 
 void SoundManager::setVolume(float fvol)

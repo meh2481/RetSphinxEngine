@@ -13,6 +13,9 @@
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
 #include "InputManager.h"
+#ifdef _DEBUG
+    #include "InterpolationManager.h"
+#endif
 
 typedef struct
 {
@@ -231,26 +234,42 @@ void GameEngine::handleEvent(SDL_Event event)
     }
 }
 
+#ifdef _DEBUG
+static float curRate = 1.0f;
+#define MAX_SLOW 0.0625f
+#define SLOW 0.25f
+#define MAX_FAST 3.0f
+#define FAST 2.0f
+#define INTERP_TIME 0.25f
+#endif
 void GameEngine::handleKeys()
 {
 #ifdef _DEBUG
+    setTimeScale(curRate);
+    if(getInterpolationManager()->contains(&curRate))
+        return;
+
+    float interpRate = 1.0f;
     if (getInputManager()->keyDown(SDL_SCANCODE_G))
     {
         if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
-            setTimeScale(0.0625f);
+            interpRate = MAX_SLOW;
         else
-            setTimeScale(0.25f);
+            interpRate = SLOW;
     }
 
     else if (getInputManager()->keyDown(SDL_SCANCODE_H))
     {
         if (getInputManager()->keyDown(SDL_SCANCODE_CTRL))
-            setTimeScale(3.0f);
+            interpRate = MAX_FAST;
         else
-            setTimeScale(2.0f);
+            interpRate = FAST;
     }
-    else
-        setTimeScale(1.0f);
+
+    if(curRate != interpRate)
+    {
+        getInterpolationManager()->interpolate(&curRate, interpRate, INTERP_TIME);
+    }
 
 #endif
 }

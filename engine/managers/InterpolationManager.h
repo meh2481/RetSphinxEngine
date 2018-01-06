@@ -35,5 +35,7 @@ public:
     void update(float dt);
 
     void interpolate(float* val, float end, float time, InterpType type = BEZIER, int repeatCount = 0, InterpRepeat repeatType = REPEAT);
+    //TODO: O(n)
+    bool contains(float* val);
     void clear();
 };
