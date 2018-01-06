@@ -24,13 +24,11 @@ addons:
 before_install:
   - wget https://www.dropbox.com/s/61h7ziwo4fdk8xc/fmodstudioapi11002linux.tar.gz
   - tar -xzf fmodstudioapi11002linux.tar.gz
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl openal-soft; fi
 
 script:
-# ALL THE BUILD COMMANDS HERE
+  - ls /usr/include/SDL2/
   - export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH;/usr/lib/x86_64-linux-gnu/"
-  - CMAKE_OPTIONS='-DCMAKE_PREFIX_PATH='"$CMAKE_PREFIX_PATH"' -DCMAKE_BUILD_TYPE=RelWithDebInfo'
+  - CMAKE_OPTIONS='-DCMAKE_PREFIX_PATH='"$CMAKE_PREFIX_PATH"' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOX2D_INCLUDE_DIRS='"/usr/include/Box2D"' -DFMOD_INCLUDE_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_INCLUDE_SEARCH_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_LIBRARY='"../fmodstudioapi11002linux/api/lowlevel/lib/x86_64/libfmod.so"''
   - rm -rf cmake-build
   - mkdir cmake-build
   - cd cmake-build
