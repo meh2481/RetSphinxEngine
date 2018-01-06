@@ -14,6 +14,9 @@
 #define DEFAULT_SOUND_FREQ 44100.0f
 #define SONG_LOOP_FILE_EXT ".loop"
 
+#define FMOD_CHANNEL_L 0
+#define FMOD_CHANNEL_R 1
+
 int SoundManager::init()
 {
     LOG(INFO) << "Initializing FMOD...";
@@ -344,13 +347,13 @@ void SoundManager::getSpectrumL(Channel* channel, float* outSpec, int specLen)
     memset(outSpec, 0, specLen);    //Set output to 0
     FMOD_DSP_PARAMETER_FFT *fft;
     fftdsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
-    if(fft->numchannels > 0)
+    if(fft->numchannels > FMOD_CHANNEL_L)
     {
         for(int bin = 0; bin < fft->length; bin++)
         {
             //Normalize
             if(cur < specLen)
-                outSpec[cur++] = fft->spectrum[0][bin];
+                outSpec[cur++] = fft->spectrum[FMOD_CHANNEL_L][bin];
             else
                 break;
         }
@@ -363,13 +366,13 @@ void SoundManager::getSpectrumR(Channel* channel, float* outSpec, int specLen)
     memset(outSpec, 0, specLen);    //Set output to 0
     FMOD_DSP_PARAMETER_FFT *fft;
     fftdsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
-    if(fft->numchannels > 1)
+    if(fft->numchannels > FMOD_CHANNEL_R)
     {
         for(int bin = 0; bin < fft->length; bin++)
         {
             //Normalize
             if(cur < specLen)
-                outSpec[cur++] = fft->spectrum[1][bin];
+                outSpec[cur++] = fft->spectrum[FMOD_CHANNEL_R][bin];
             else
                 break;
         }
@@ -444,8 +447,8 @@ void SoundManager::resumeAll()
 
 void SoundManager::setPlaybackRate(float rate)
 {
-    //TODO
-    //masterChannelGroup->overrideFrequency(DEFAULT_SOUND_FREQ * rate);
+    FMOD_RESULT result = musicChannel->setFrequency(DEFAULT_SOUND_FREQ * rate);
+    ERRCHECK(result);
 }
 
 void SoundManager::setVolume(float fvol)

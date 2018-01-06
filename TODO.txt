@@ -1,4 +1,5 @@
 Current higher pri:
+- Tee log output to std::cout also in debug mode
 - Update FMOD
 - Load Music from pak? Need to stream from disk
 - Double-check particle pak loading
