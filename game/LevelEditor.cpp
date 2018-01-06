@@ -6,6 +6,8 @@
 #include "Box2D/Box2D.h"
 #include "LuaInterface.h"
 
+#define WINDOW_TITLE "Level Editor"
+
 LevelEditor::LevelEditor(GameEngine * _g)
 {
     open = false;

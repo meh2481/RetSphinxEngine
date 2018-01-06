@@ -141,16 +141,18 @@ class POST
 {
 public:
     void reserve(size_t res) { data.reserve(res); }
-	POST& add(const char *key, const char *value);
-	POST& setJsonData(const char *value);
+    POST& add(const char *key, const char *value);
+    POST& setJsonData(const char *value);
     const char *c_str() const { return data.c_str(); }
     const std::string& str() const { return data; }
     bool empty() const { return data.empty(); }
     size_t length() const { return data.length(); }
-	bool isJson() const { return json; }
+    bool isJson() const { return json; }
+
+    POST() { json = false; };
 private:
     std::string data;
-	bool json = false;
+    bool json;
 };
 
 struct Request
@@ -282,7 +284,7 @@ public:
         bool deleteWhenDone;
         // To be extended
     };
-    
+
     typedef std::map<TcpSocket*, SocketSetData> Store;
 
     Store _store;

@@ -81,7 +81,7 @@ void MemoryEditor::Draw(const char* title, unsigned char* mem_data, int mem_size
         for (int line_i = clipper.DisplayStart; line_i < clipper.DisplayEnd; line_i++) // display only visible items
         {
             int addr = line_i * Rows;
-            ImGui::Text("%0*X: ", addr_digits_count, base_display_addr+addr);
+            ImGui::Text("%0*X: ", addr_digits_count, (unsigned int)(base_display_addr+addr));
             ImGui::SameLine();
 
             // Draw Hexadecimal
@@ -110,7 +110,7 @@ void MemoryEditor::Draw(const char* title, unsigned char* mem_data, int mem_size
                     if (DataEditingTakeFocus)
                     {
                         ImGui::SetKeyboardFocusHere();
-                        sprintf(AddrInput, "%0*X", addr_digits_count, base_display_addr+addr);
+                        sprintf(AddrInput, "%0*X", addr_digits_count, (unsigned int)(base_display_addr+addr));
                         sprintf(DataInput, "%02X", mem_data[addr]);
                     }
                     ImGui::PushItemWidth(ImGui::CalcTextSize("FF").x);
