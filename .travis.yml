@@ -26,7 +26,6 @@ before_install:
   - tar -xzf fmodstudioapi11002linux.tar.gz
 
 script:
-  - ls /usr/include/SDL2/
   - export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH;/usr/lib/x86_64-linux-gnu/"
   - CMAKE_OPTIONS='-DCMAKE_PREFIX_PATH='"$CMAKE_PREFIX_PATH"' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOX2D_INCLUDE_DIRS='"/usr/include/Box2D"' -DFMOD_INCLUDE_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_INCLUDE_SEARCH_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_LIBRARY='"../fmodstudioapi11002linux/api/lowlevel/lib/x86_64/libfmod.so"''
   - rm -rf cmake-build

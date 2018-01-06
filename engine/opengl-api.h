@@ -5,9 +5,7 @@
 #undef _DLL // HACK: don't put any __declspec in front of the function definitions
 #endif
 
-//#define APIENTRY
 #include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
 
 #define GL_FUNC(ret,fn,params,call,rt)
 #define GL_PTR(pty, fn) extern pty fn;
