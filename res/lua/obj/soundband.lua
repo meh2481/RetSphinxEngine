@@ -3,7 +3,7 @@ soundband.__index = soundband
 
 function soundband:init()
 	self.NUM = 16
-	self.HEIGHT = 1.5
+	self.HEIGHT = 2.5
 	self.SIZE_X, self.SIZE_Y = seg_getSize(self, 0)
 	self.POS_X, self.POS_Y = seg_getPos(self, 0)
 	self.SIDE = obj_getProperty(self, 'side')
