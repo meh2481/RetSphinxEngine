@@ -32,7 +32,9 @@ int SoundManager::init()
     ERRCHECK(result);
     if(version < FMOD_VERSION)
     {
-        LOG(ERR) << "Error! You are using an old version of FMOD " << version << ". This program requires " << FMOD_VERSION;
+        LOG(ERR) << "Error! You are using an old version of FMOD: " << std::hex
+            << (version & 0xFFFF0000) << '.' << (version & 0xFF00) << '.' << (version & 0xFF) << ". This program requires "
+            << (FMOD_VERSION & 0xFFFF0000) << '.' << (FMOD_VERSION & 0xFF00) << '.' << (FMOD_VERSION & 0xFF) << std::dec;
         return 1;
     }
     result = system->getNumDrivers(&numdrivers);
