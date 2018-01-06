@@ -1,6 +1,13 @@
 #include <cstdlib>
 #include <cstdio>
 #include <sstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifndef WIN32
+#include <unistd.h>
+#else
+#define stat _stat
+#endif
 #include "FileOperations.h"
 #include "tinydir.h"
 
@@ -56,6 +63,22 @@ namespace FileOperations
         tinydir_close(&dir);
 
         return returnedFiles;
+    }
+
+    time_t timeModified(const std::string& filename)
+    {
+        struct stat result;
+        if(stat(filename.c_str(), &result) == 0)
+        {
+            return result.st_mtime;
+        }
+        return time(0); //Return current time if can't stat last modified time
+    }
+
+    bool fileExists(const std::string& filename)
+    {
+        struct stat buffer;
+        return (stat(filename.c_str(), &buffer) == 0);
     }
 
 }

@@ -14,7 +14,9 @@
 #define DEFAULT_SOUND_FREQ 44100.0f
 #define SONG_LOOP_FILE_EXT ".loop"
 
-//Example initialization code from FMOD API doc
+#define FMOD_CHANNEL_L 0
+#define FMOD_CHANNEL_R 1
+
 int SoundManager::init()
 {
     LOG(INFO) << "Initializing FMOD...";
@@ -22,18 +24,17 @@ int SoundManager::init()
     unsigned int version;
     int numdrivers;
     FMOD_SPEAKERMODE speakermode;
-    FMOD_CAPS caps;
     char name[256];
-    /*
-    Create a System object and initialize.
-    */
+    //Create a System object and initialize.
     result = FMOD::System_Create(&system);
     ERRCHECK(result);
     result = system->getVersion(&version);
     ERRCHECK(result);
     if(version < FMOD_VERSION)
     {
-        LOG(ERR) << "Error! You are using an old version of FMOD " << version << ". This program requires " << FMOD_VERSION;
+        LOG(ERR) << "Error! You are using an old version of FMOD: " << std::hex
+            << ((version >> 16) & 0xFFFF) << '.' << ((version >> 8) & 0xFF) << '.' << (version & 0xFF) << ". This program requires "
+            << ((FMOD_VERSION >> 16) & 0xFFFF) << '.' << ((FMOD_VERSION >> 8) & 0xFF) << '.' << (FMOD_VERSION & 0xFF) << std::dec;
         return 1;
     }
     result = system->getNumDrivers(&numdrivers);
@@ -44,52 +45,7 @@ int SoundManager::init()
         ERRCHECK(result);
         LOG(WARN) << "No sound driver";
     }
-    else
-    {
-        result = system->getDriverCaps(0, &caps, 0, &speakermode);
-        ERRCHECK(result);
-        /*
-        Set the user selected speaker mode.
-        */
-        result = system->setSpeakerMode(speakermode);
-        ERRCHECK(result);
-        if(caps & FMOD_CAPS_HARDWARE_EMULATED)
-        {
-            /*
-            The user has the 'Acceleration' slider set to off! This is really bad
-            for latency! You might want to warn the user about this.
-            */
-            LOG(WARN) << "Sound acceleration disabled. May cause sound latency problems";
-            result = system->setDSPBufferSize(1024, 10);
-            ERRCHECK(result);
-
-        }
-        result = system->getDriverInfo(0, name, 256, 0);
-        ERRCHECK(result);
-        if(strstr(name, "SigmaTel"))
-        {
-            /*
-            Sigmatel sound devices crackle for some reason if the format is PCM 16bit.
-            PCM floating point output seems to solve it.
-            */
-            result = system->setSoftwareFormat(48000, FMOD_SOUND_FORMAT_PCMFLOAT, 0, 0, FMOD_DSP_RESAMPLER_LINEAR);
-            ERRCHECK(result);
-        }
-    }
     result = system->init(100, FMOD_INIT_NORMAL, 0);
-    if(result == FMOD_ERR_OUTPUT_CREATEBUFFER)
-    {
-        /*
-        Ok, the speaker mode selected isn't supported by this soundcard. Switch it
-        back to stereo...
-        */
-        result = system->setSpeakerMode(FMOD_SPEAKERMODE_STEREO);
-        ERRCHECK(result);
-        /*
-        ... and re-init.
-        */
-        result = system->init(100, FMOD_INIT_NORMAL, 0);
-    }
     ERRCHECK(result);
 
     //Set up sound groups
@@ -104,6 +60,9 @@ int SoundManager::init()
     ERRCHECK(result);
     result = system->createChannelGroup("Voices", &voxGroup);
     ERRCHECK(result);
+    result = system->createDSPByType(FMOD_DSP_TYPE_FFT, &fftdsp);
+    ERRCHECK(result);
+    masterChannelGroup->addDSP(FMOD_CHANNELCONTROL_DSP_TAIL, fftdsp);
 
     masterChannelGroup->addGroup(musicGroup);
     masterChannelGroup->addGroup(sfxGroup);
@@ -135,14 +94,14 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
 {
     switch(group)
     {
-        case GROUP_MUSIC:
-            return musicGroup;
+    case GROUP_MUSIC:
+        return musicGroup;
 
-        case GROUP_BGFX:
-            return bgFxGroup;
+    case GROUP_BGFX:
+        return bgFxGroup;
 
-        case GROUP_VOX:
-            return voxGroup;
+    case GROUP_VOX:
+        return voxGroup;
     }
     return sfxGroup;
 }
@@ -248,9 +207,8 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
 Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 {
     Channel* ret = NULL;
-    FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, sound, true, &ret);
+    FMOD_RESULT result = system->playSound(sound, getGroup(group), true, &ret);
     ERRCHECK(result);
-    setGroup(ret, group);
     result = ret->setPaused(false);
     ERRCHECK(result);
     return ret;
@@ -286,7 +244,7 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     }
     Channel* channel;
     //Paused at start so can seek
-    FMOD_RESULT result = system->playSound(FMOD_CHANNEL_FREE, stream, true, &channel);
+    FMOD_RESULT result = system->playSound(stream, getGroup(group), true, &channel);
     ERRCHECK(result);
 
     //Set looping
@@ -298,9 +256,6 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
         result = channel->setLoopPoints(loop->second->loopStartMsec, FMOD_TIMEUNIT_MS, loop->second->loopEndMsec, FMOD_TIMEUNIT_MS);
         ERRCHECK(result);
     }
-
-    //Set group
-    setGroup(channel, group);
 
     if(group == GROUP_MUSIC)
     {
@@ -371,35 +326,59 @@ void SoundManager::setFreq(Channel* channel, float freq)
 
 void SoundManager::getSpectrum(Channel* channel, float* outSpec, int specLen)
 {
-    float* outL = new float[specLen];
-    float* outR = new float[specLen];
-
-    //Get spectrum for both left and right
-    FMOD_RESULT result = channel->getSpectrum(outL, specLen, 0, WINDOW_TYPE);
-    ERRCHECK(result);    //0 = Left
-    result = channel->getSpectrum(outR, specLen, 1, WINDOW_TYPE);
-    ERRCHECK(result);    //1 = Right
-
-    //Average them
-    float* l = outL;
-    float* r = outR;
-    for(int i = 0; i < specLen; i++)
-        *outSpec++ = (*l++ + *r++) / 2.0f;
-
-    delete[] outL;
-    delete[] outR;
+    int cur = 0;
+    memset(outSpec, 0, specLen);    //Set output to 0
+    FMOD_DSP_PARAMETER_FFT *fft;
+    fftdsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+    for(int channel = 0; channel < fft->numchannels; channel++)
+    {
+        for(int bin = 0; bin < fft->length; bin++)
+        {
+            //Normalize
+            if(cur < specLen)
+                outSpec[cur++] += fft->spectrum[channel][bin] / (float)fft->numchannels;
+            else
+                break;
+        }
+    }
 }
 
 void SoundManager::getSpectrumL(Channel* channel, float* outSpec, int specLen)
 {
-    FMOD_RESULT result = channel->getSpectrum(outSpec, specLen, 0, WINDOW_TYPE);
-    ERRCHECK(result);    //0 = Left
+    int cur = 0;
+    memset(outSpec, 0, specLen);    //Set output to 0
+    FMOD_DSP_PARAMETER_FFT *fft;
+    fftdsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+    if(fft->numchannels > FMOD_CHANNEL_L)
+    {
+        for(int bin = 0; bin < fft->length; bin++)
+        {
+            //Normalize
+            if(cur < specLen)
+                outSpec[cur++] = fft->spectrum[FMOD_CHANNEL_L][bin];
+            else
+                break;
+        }
+    }
 }
 
 void SoundManager::getSpectrumR(Channel* channel, float* outSpec, int specLen)
 {
-    FMOD_RESULT result = channel->getSpectrum(outSpec, specLen, 1, WINDOW_TYPE);
-    ERRCHECK(result);    //1 = Right
+    int cur = 0;
+    memset(outSpec, 0, specLen);    //Set output to 0
+    FMOD_DSP_PARAMETER_FFT *fft;
+    fftdsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+    if(fft->numchannels > FMOD_CHANNEL_R)
+    {
+        for(int bin = 0; bin < fft->length; bin++)
+        {
+            //Normalize
+            if(cur < specLen)
+                outSpec[cur++] = fft->spectrum[FMOD_CHANNEL_R][bin];
+            else
+                break;
+        }
+    }
 }
 
 Channel* SoundManager::getChannel(int channelIdx)
@@ -470,7 +449,11 @@ void SoundManager::resumeAll()
 
 void SoundManager::setPlaybackRate(float rate)
 {
-    masterChannelGroup->overrideFrequency(DEFAULT_SOUND_FREQ * rate);
+    if(musicChannel)
+    {
+        FMOD_RESULT result = musicChannel->setFrequency(DEFAULT_SOUND_FREQ * rate);
+        ERRCHECK(result);
+    }
 }
 
 void SoundManager::setVolume(float fvol)

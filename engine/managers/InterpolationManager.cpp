@@ -72,6 +72,16 @@ void InterpolationManager::interpolate(float * val, float end, float time, Inter
     }
 }
 
+bool InterpolationManager::contains(float * val)
+{
+    for(std::vector<InterpHolder>::iterator i = interpolations.begin(); i != interpolations.end(); i++)
+    {
+        if(i->interp->val == val)
+            return true;
+    }
+    return false;
+}
+
 void InterpolationManager::clear()
 {
     for(std::vector<InterpHolder>::iterator i = interpolations.begin(); i != interpolations.end(); i++)

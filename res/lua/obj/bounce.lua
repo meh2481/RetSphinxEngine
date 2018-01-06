@@ -3,8 +3,8 @@ bounce.__index = bounce
 
 function bounce:init()
 	self.SEG = 0
-	self.NUM = 4
-	self.ADD_FAC = 0.2
+	self.NUM = 6
+	self.ADD_FAC = 1.25
 	self.FALL_FAC = 0.15
 	self.SIZE_X, self.SIZE_Y = seg_getSize(self, self.SEG)
 	self.CUR_X = self.SIZE_X
@@ -24,7 +24,7 @@ function bounce:update(dt)
 	local spectrum = table.pack(music_spectrum(channel, self.NUM))
 	
 	--Error check
-	if spectrum[1] == nil then
+	if spectrum[self.NUM] == nil then
 		return
 	end
 	
@@ -36,8 +36,8 @@ function bounce:update(dt)
 	--print(self.SIZE_X, self.SIZE_Y)
 	
 	--Add fac
-	self.CUR_X = self.CUR_X + self.ADD_FAC * spectrum[1]
-	self.CUR_Y = self.CUR_Y + self.ADD_FAC * spectrum[1]
+	self.CUR_X = self.CUR_X + self.ADD_FAC * spectrum[self.NUM]
+	self.CUR_Y = self.CUR_Y + self.ADD_FAC * spectrum[self.NUM]
 	
 	--Bounds check
 	if self.CUR_X > self.MAX_X then

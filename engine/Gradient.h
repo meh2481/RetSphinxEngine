@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include <map>
+#include <stdint.h>
 
 
 class Gradient 

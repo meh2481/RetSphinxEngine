@@ -1,5 +1,5 @@
-local node_burgermakingcontroller = {}
-node_burgermakingcontroller.__index = node_burgermakingcontroller
+local burgermakingcontroller = {}
+burgermakingcontroller.__index = burgermakingcontroller
 
 --Notes that are enough to experiment with
 local notes = {
@@ -785,7 +785,7 @@ local notes = {
 }
 
 --Called when this node is created
-function node_burgermakingcontroller:init()
+function burgermakingcontroller:init()
 	self.LAUNCH_TOP = node_get("noteLauncherTop")
 	self.LAUNCH_BOTTOM = node_get("noteLauncherBottom")
 	self.LAUNCH_LEFT = node_get("noteLauncherLeft")
@@ -804,11 +804,11 @@ function node_burgermakingcontroller:init()
 end
 
 --Called when an object enters this node
-function node_burgermakingcontroller:collide(object)
+function burgermakingcontroller:collide(object)
 end
 
 --Called every timestep to update the node
-function node_burgermakingcontroller:update(dt)
+function burgermakingcontroller:update(dt)
 
 	local curMusicPos = music_getPos()
 	
@@ -868,7 +868,7 @@ function node_burgermakingcontroller:update(dt)
 end
 
 --Called when node is destroyed
-function node_burgermakingcontroller:destroy()
+function burgermakingcontroller:destroy()
 end
 
-return node_burgermakingcontroller
+return burgermakingcontroller

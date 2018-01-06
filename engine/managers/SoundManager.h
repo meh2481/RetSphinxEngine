@@ -39,6 +39,7 @@ private:
     FMOD::ChannelGroup* sfxGroup;
     FMOD::ChannelGroup* bgFxGroup;
     FMOD::ChannelGroup* voxGroup;
+    FMOD::DSP* fftdsp;
     ResourceLoader* loader;
     InterpolationManager* interpolationManager;
 

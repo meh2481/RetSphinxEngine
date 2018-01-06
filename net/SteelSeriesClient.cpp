@@ -107,7 +107,7 @@ std::string SteelSeriesClient::getSSURL()
     return std::string();
 #else
     #warning TODO Support other OSs for SteelSeries stuff...
-        return string();
+    return std::string();
     //On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
     //SS has no Linux support yet
 #endif	//_WIN32
@@ -163,7 +163,7 @@ bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char 
     ssURL << url << endpoint;
     msg.url = ssURL.str();
 
-    LOG(TRACE) << "Sending json to " << ssURL.str() << " : " << std::endl << stringifiedJSON;
+    LOG(TRACE) << "Sending json to " << ssURL.str() << " :\n" << stringifiedJSON;
 
     return NetworkThread::send(msg);
 }

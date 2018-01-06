@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <string>
+#include <stdint.h>
 
 //TODO: Move this inside ResourceLoader or something, since this is just a map
 class ResourceCache

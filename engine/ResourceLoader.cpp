@@ -13,6 +13,7 @@
 #include "ResourceTypes.h"
 #include "Quad.h"
 #include "ObjSegment.h"
+#include "LuaInterface.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
@@ -334,22 +335,21 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 
 SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
 {
-    LOG(INFO) << "Load image " << sID;
+    LOG(INFO) << "Load icon " << sID;
+    uint64_t hashID = Hash::hash(sID.c_str());
+    unsigned char* imgBuf = m_pakLoader->loadResource(hashID, NULL);
+    ImageHeader* imgHeader = (ImageHeader*)imgBuf;
 
-    int comp = 0;
-    int width = 0;
-    int height = 0;
-    unsigned char* cBuf = stbi_load(sID.c_str(), &width, &height, &comp, 0);
-
-    if((cBuf == 0) || (width == 0) || (height == 0))
-    {
-        LOG(ERR) << "Unable to open image " << sID;
-        return NULL;
-    }
-
-    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(cBuf, width, height, 32, 4 * width, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-
-    //TODO stbi_image_free(cBuf); but SDL_Surface doesn't deep copy it...
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
+        imgBuf + sizeof(ImageHeader),
+        imgHeader->width,
+        imgHeader->height,
+        imgHeader->bpp * 8,
+        imgHeader->bpp * imgHeader->width,
+        0x000000ff,
+        0x0000ff00,
+        0x00ff0000,
+        0xff000000);
 
     return surface;
 }
@@ -546,7 +546,7 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
     return seg;
 }
 
-Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel)
+Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 ptVel, LuaInterface* lua)
 {
     std::ostringstream oss;
     oss << "res/obj/" << sType << ".xml";
@@ -589,6 +589,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     }
 
     Object* o = new Object;
+    o->lua = lua;
 
     const char* cLuaClass = root->Attribute("luaclass");
     if(cLuaClass != NULL)
@@ -787,11 +788,17 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
         }
     }
 
+    //Load the lua class
+    std::ostringstream objss;
+    objss << "res/lua/obj/";
+    if(cLuaClass != NULL)
+        objss << cLuaClass;
+    else
+        objss << o->getLuaClass();  //Use default lua class
+    objss << ".lua";
+    o->luaDef = getTextFile(objss.str());
 
-
-    //------------------------------------------------------------------------
     //Done
-
     delete doc;
     return o;
 }

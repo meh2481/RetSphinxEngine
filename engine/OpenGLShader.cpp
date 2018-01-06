@@ -1,53 +1,23 @@
 #include "OpenGLShader.h"
 #include "opengl-api.h"
 #include "Logger.h"
-#include <string>
-#include <fstream>
 #include <vector>
 
 
 namespace OpenGLShader
 {
-    GLuint loadShaders(const char * vertex_file_path, const char * fragment_file_path)
+    GLuint loadShaders(const char * VertexSourcePointer, const char * FragmentSourcePointer)
     {
         // Create the shaders
         GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
         GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-        // Read the Vertex Shader code from the file
-        std::string VertexShaderCode;
-        std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-        if(VertexShaderStream.is_open())
-        {
-            std::string Line = "";
-            while(getline(VertexShaderStream, Line))
-                VertexShaderCode += "\n" + Line;
-            VertexShaderStream.close();
-        }
-        else
-        {
-            LOG(WARN) << "Unable to open vertex shader " << vertex_file_path;
-            return 0;
-        }
-
-        // Read the Fragment Shader code from the file
-        std::string FragmentShaderCode;
-        std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-        if(FragmentShaderStream.is_open())
-        {
-            std::string Line = "";
-            while(getline(FragmentShaderStream, Line))
-                FragmentShaderCode += "\n" + Line;
-            FragmentShaderStream.close();
-        }
 
         GLint Result = GL_FALSE;
         int InfoLogLength;
 
 
         // Compile Vertex Shader
-        LOG(TRACE) << "Compiling shader " << vertex_file_path;
-        char const * VertexSourcePointer = VertexShaderCode.c_str();
+        LOG(TRACE) << "Compiling shader " << VertexSourcePointer;
         glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
         glCompileShader(VertexShaderID);
 
@@ -64,8 +34,7 @@ namespace OpenGLShader
 
 
         // Compile Fragment Shader
-        LOG(TRACE) << "Compiling shader " << fragment_file_path;
-        char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+        LOG(TRACE) << "Compiling shader " << FragmentSourcePointer;
         glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
         glCompileShader(FragmentShaderID);
 

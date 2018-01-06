@@ -34,7 +34,6 @@ include_directories("${SDL2_INCLUDE_DIR}")
 include_directories("${FMOD_INCLUDE_DIRS}")
 include_directories(dep/lua)
 include_directories(dep/imgui)
-include_directories(dep/squish)
 
 add_subdirectory(net)
 
@@ -46,4 +45,6 @@ include_directories(engine/events)
 include_directories(engine/managers)
 include_directories(engine/actions)
 add_subdirectory(game)
+
+include_directories(dep/squish)
 add_subdirectory(tools)

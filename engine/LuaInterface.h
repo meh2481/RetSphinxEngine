@@ -8,14 +8,14 @@ class LuaInterface
 {
 public:
 
-    LuaInterface(const char *script, int argc, const char * const *argv);
+    LuaInterface(const char *script);
     ~LuaInterface();
-    
+
     bool Init();
     void Shutdown();
     void GC();
     unsigned int MemUsed();
-    
+
     LuaObjGlue *createObject(void *o, unsigned ty, const char *classname);
     void deleteObject(LuaObjGlue *glue);
 
@@ -30,7 +30,7 @@ public:
     bool call(const char *func, int a, int b, int c, int d, int e);
     bool call(const char *func, const char *a, const char *b, const char *c, const char *d, const char *e);
     bool call(const char *func, const char *a, const char *b, const char *c, const char *d);
-    
+
     //Method calls on classes
     bool callMethod(void *o, const char *func);
     bool callMethod(void *o, const char *func, float a);
@@ -38,7 +38,7 @@ public:
     bool callMethod(void *o, const char *func, float a, float b, float c);
     bool callMethod(void *o, const char *func, void* other);
     bool callMethod(void *o, const char *func, void* other, float a);
-    
+
     //FG TODO: Add functions that call luaL_newmetatable() and all that, rather than just getState()
     lua_State* getState() {return _lua;};
 
@@ -50,8 +50,6 @@ protected:
     bool doCall(int nparams, int nrets = 0);
 
     const char *script;
-    int argc;
-    const char *const *argv;
 
     lua_State *_lua;
 };
@@ -63,7 +61,7 @@ public:
     LuaObjGlue(void *p, unsigned ty) : obj(p), type(ty) {}
     void *obj; // read-only
     const unsigned type;
-    
+
 private:
     LuaObjGlue(const LuaObjGlue&); // non-copyable
 };

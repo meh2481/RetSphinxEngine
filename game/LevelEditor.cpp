@@ -4,6 +4,9 @@
 #include "Node.h"
 #include "EntityManager.h"
 #include "Box2D/Box2D.h"
+#include "LuaInterface.h"
+
+#define WINDOW_TITLE "Level Editor"
 
 LevelEditor::LevelEditor(GameEngine * _g)
 {
@@ -48,7 +51,10 @@ void LevelEditor::draw(int windowFlags, bool focus)
             draggingNode->body->SetTransform(b2Vec2(draggingNode->pos.x, draggingNode->pos.y), draggingNode->body->GetAngle());
         }
     }
+#ifdef _DEBUG
     else
         ge->playPhysics();
+#endif
     ImGui::End();
 }
+

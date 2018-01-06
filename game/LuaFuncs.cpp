@@ -52,9 +52,7 @@ public:
 
     static Object* xmlParseObj(const std::string& sClassName, Vec2 ptOffset = Vec2(0, 0), Vec2 ptVel = Vec2(0, 0))
     {
-        Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel);
-        if(o)
-            o->lua = g_pGlobalEngine->Lua;    //TODO Better way to load lua
+        Object* o = g_pGlobalEngine->getResourceLoader()->getObject(sClassName, ptOffset, ptVel, g_pGlobalEngine->Lua);
         return o;
     }
 
@@ -234,6 +232,11 @@ public:
     static Vec3 getHeadMovement()
     {
         return g_pGlobalEngine->getInputManager()->getHeadMovement();
+    }
+
+    static std::string loadText(const std::string& filename)
+    {
+        return g_pGlobalEngine->getResourceLoader()->getTextFile(filename);
     }
 };
 
@@ -746,6 +749,16 @@ luaFunc(particles_setEmitAngle)    //void particles_setEmitAngle(ParticleSystem*
 }
 
 //-----------------------------------------------------------------------------------------------------------
+// Resource functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(resource_loadText) //string resource_loadText(string filename)
+{
+    if(lua_isstring(L, 1))
+        luaReturnString(GameEngineLua::loadText(lua_tostring(L, 1)));
+    luaReturnNil();
+}
+
+//-----------------------------------------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------------------------------------
 luaFunc(mouse_getPos) //int x, int y mouse_getPos()
@@ -937,7 +950,7 @@ luaFunc(music_spectrumL) //float[] music_spectrumL(int channel, int num)
 luaFunc(music_getPos)    //double music_getPos()        //Return music pos in seconds
 {
     Channel* ch = GameEngineLua::getMusicChannel();
-    if(ch) 
+    if(ch)
     {
         unsigned int positionMs;
         FMOD_RESULT result = ch->getPosition(&positionMs, FMOD_TIMEUNIT_MS);
@@ -1034,6 +1047,8 @@ static LuaFunctions s_functab[] =
     luaRegister(particles_setEmitPos),
     luaRegister(particles_setEmitVel),
     luaRegister(particles_setEmitAngle),
+    //Resources
+    luaRegister(resource_loadText),
     //Object segments
     luaRegister(seg_getSize),
     luaRegister(seg_setSize),

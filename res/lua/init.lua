@@ -12,10 +12,11 @@ setglobal("setglobal", setglobal)
 
 local classes = {}	--List of all loaded classes (so we know to reload them)
 
---Load a class' lua file from class name
-local function loadclass(s)
+--Load a class' lua definition from a string
+local function loadclass(s, def)
 	if rawget(_G, s) == nil then
-		local cls = dofile("res/lua/" .. s .. ".lua")
+	    local classFunc = load(def)
+		local cls = classFunc()
 		setglobal(s, cls)
 		local reg = debug.getregistry()	--HACK
 		reg[s] = cls
@@ -44,4 +45,5 @@ end
 setglobal("loadLua", loadLua)
 
 --Load our math functions
-dofile("res/lua/math.lua")
+local mathfunc = load(resource_loadText("res/lua/math.lua"))
+mathfunc()

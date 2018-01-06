@@ -87,8 +87,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
     m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
 
-    _loadicon();    //Load our window icon
-
     m_inputManager = new InputManager();
     m_interpolationManager = new InterpolationManager();
 
@@ -127,7 +125,9 @@ Engine::~Engine()
     ImGui_Impl_GL3_Shutdown();
 
     glDeleteProgram(m_renderState.programId);
+#ifdef _DEBUG
     glDeleteProgram(m_debugRenderState.programId);
+#endif
 
     //Clean up SDL
     SDL_DestroyWindow(m_Window);
@@ -142,9 +142,8 @@ Engine::~Engine()
 void Engine::start()
 {
     // Load all that we need to
-    init(lCommandLine);
-    // Let's rock now!
-    while(!_frame());
+    if(init(lCommandLine))
+        while(!_frame());   // Let's rock now!
 }
 
 bool Engine::_processEvent(SDL_Event& e)

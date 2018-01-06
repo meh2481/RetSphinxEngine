@@ -21,7 +21,7 @@ Object::Object()
   glueObj = NULL;
   luaClass = "templateobj";
   depth = 0;
-  img = NULL; 
+  img = NULL;
   active = true;
   alive = true;
   segments.reserve(1);    //don't expect very many segments
@@ -33,7 +33,7 @@ Object::~Object()
     {
         //Call Lua destroy()
         lua->callMethod(this, "destroy");
-        
+
         //Cleanup Lua glue object
         lua->deleteObject(glueObj);
     }
@@ -45,7 +45,7 @@ void Object::draw(RenderState renderState)
 {
     if(!active)
         return;
-    
+
     //Draw segments of this object
     for(std::vector<ObjSegment*>::iterator i = segments.begin(); i != segments.end(); i++)
     {
@@ -96,8 +96,8 @@ void Object::addSegment(ObjSegment* seg)
 
 ObjSegment* Object::getSegment(unsigned int idx)
 {
-    if(segments.size() > idx) 
-        return segments[idx]; 
+    if(segments.size() > idx)
+        return segments[idx];
     return NULL;
 }
 
@@ -143,11 +143,11 @@ void Object::initLua()
 {
     if(lua && !glueObj)
     {
-        lua->call("loadclass", luaClass.c_str());    //Create this class if it hasn't been created already
-        
+        lua->call("loadclass", ("obj" + luaClass).c_str(), luaDef.c_str());    //Create this class if it hasn't been created already
+
         //Parse this lua object first
-        glueObj = lua->createObject(this, TYPE, luaClass.c_str());
-        
+        glueObj = lua->createObject(this, TYPE, ("obj" + luaClass).c_str());
+
         //Call Lua init() function in file defined by luaFile
         lua->callMethod(this, "init");
     }

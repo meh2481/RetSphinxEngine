@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Box2D/Box2D.h"
-#include <list>
+#include <vector>
 
 //-----------------------------------------------------
 // Callback helper class for finding objects

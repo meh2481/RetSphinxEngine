@@ -1,8 +1,8 @@
-local node_radialforcefield = {}
-node_radialforcefield.__index = node_radialforcefield
+local radialforcefield = {}
+radialforcefield.__index = radialforcefield
 
 --Called when this node is created
-function node_radialforcefield:init()
+function radialforcefield:init()
 	self.forcecenter = tonumber(node_getProperty(self, "forceatcenter"))
 	self.forceedge = tonumber(node_getProperty(self, "forceatedge"))
 	self.rad = tonumber(node_getProperty(self, "radius"))
@@ -10,7 +10,7 @@ function node_radialforcefield:init()
 end
 
 --Called when an object enters this node
-function node_radialforcefield:collide(object)
+function radialforcefield:collide(object)
 	local objx, objy = obj_getPos(object)
 	
 	--Get vector from object to me
@@ -41,11 +41,11 @@ function node_radialforcefield:collide(object)
 end
 
 --Called every timestep to update the node
-function node_radialforcefield:update(dt)
+function radialforcefield:update(dt)
 end
 
 --Called when node is destroyed
-function node_radialforcefield:destroy()
+function radialforcefield:destroy()
 end
 
-return node_radialforcefield
+return radialforcefield

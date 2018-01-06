@@ -67,7 +67,7 @@ namespace NetworkThread
 
 	static int NetworkingThread(void *ptr)
 	{
-		LOG(INFO) << "Starting networking thread";
+		//LOG(INFO) << "Starting networking thread";
 
 		//Init networking
 		minihttp::InitNetwork();
@@ -93,7 +93,7 @@ namespace NetworkThread
 			SDL_Delay(10);
 		}
 
-		LOG(INFO) << "Networking thread finished";
+		//LOG(INFO) << "Networking thread finished";
 		return 0;
 	}
 

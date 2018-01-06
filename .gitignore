@@ -4,6 +4,7 @@ build/*
 *.o
 *.res
 *.exe
+*.log
 _downloaded/*
 _gfxbase/*
 *.dll
@@ -37,6 +38,8 @@ res/json/*
 res/mus/*
 res/pak/*
 res/3d/*
+res/icons/*
+res/cursor/*
 dev/*
 workspace.np
 gamecontrollerdb.txt

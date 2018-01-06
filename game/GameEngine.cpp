@@ -63,6 +63,7 @@ GameEngine::~GameEngine()
     delete m_debugUI;
     delete steelSeriesClient;
     NetworkThread::stop();
+    delete Lua;
 }
 
 void GameEngine::frame(float dt)
@@ -179,7 +180,7 @@ void GameEngine::draw(RenderState& renderState)
 
 }
 
-void GameEngine::init(std::vector<commandlineArg> sArgs)
+bool GameEngine::init(std::vector<commandlineArg> sArgs)
 {
     //Run through list for arguments we recognize
     for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
@@ -188,8 +189,14 @@ void GameEngine::init(std::vector<commandlineArg> sArgs)
     //Load our last screen position and such
     loadConfig(getSaveLocation() + CONFIG_FILE);
 
-    lua_State* L = Lua->getState();
-
+    //Init lua
+    std::string s = getResourceLoader()->getTextFile("res/lua/init.lua");
+    Lua = new LuaInterface(s.c_str());
+    if(!Lua->Init())
+    {
+        LOG(ERR) << "Failed to init lua";
+        return false;
+    }
     Lua->call("loadLua");
 
     std::string sLocale = SystemUtils::getCurLocale();
@@ -215,6 +222,7 @@ void GameEngine::init(std::vector<commandlineArg> sArgs)
 
     //Add kb+mouse controller
     getInputManager()->addController(new InputDevice(steelSeriesClient));
+    return true;
 }
 
 void GameEngine::pause()

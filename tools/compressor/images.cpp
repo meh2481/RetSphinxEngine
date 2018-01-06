@@ -15,10 +15,11 @@
 #include <SDL_opengl_glext.h>
 
 #define DEFAULT_SZ 9    //512*512
-#define BYTES_PER_PIXEL_RGBA 4
-#define BYTES_PER_PIXEL_RGB  3
+#define BYTES_PER_PIXEL_RGBA STBI_rgb_alpha
+#define BYTES_PER_PIXEL_RGB  STBI_rgb
 
 extern bool g_bImageOut;
+extern bool g_bRawImg;
 
 typedef struct
 {
@@ -52,7 +53,7 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
 
             //Back up on first and last pixels of row
             if(x == 0 || x == img->width)
-                src -= img->comp;    //Slight hack assumes STB comp = bytes per pixel
+                src -= img->comp;
         }
         //Back up on first and last rows
         if(y == 0 || y == img->height)
@@ -60,53 +61,20 @@ void copyImage(unsigned char* buf, ImageHelper* img, unsigned short xPos, unsign
     }
 }
 
-void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename)
+void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int atlasSzPixels, uint64_t atlasId, int bytesPerPixel)
 {
-    //First pass: See if RGB or RGBA
-    //TODO: Probably want to pack only RGB->RGB and RGBA->RGBA unless there's some kind of space saving we can do?
-    int bytesPerPixel = BYTES_PER_PIXEL_RGB;
     for(int i = 0; i < rectSz; i++)
     {
         stbrp_rect r = rects[i];
         if(r.was_packed)
         {
             ImageHelper img = images->at(r.id);
-            if(img.comp == STBI_rgb_alpha)
-            {
-                bytesPerPixel = BYTES_PER_PIXEL_RGBA;
-                break;
-            }
-        }
-    }
-
-    int atlasSzPixels = 1 << atlasSz;
-
-    //Create destination buffer for atlas
-    //TODO: Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1. Should go back to using bytesPerPixel when re-adding raw compression
-    size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
-    unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
-    memset(uncompressedBuf, 0, bufferSize);    //Clear dest buf
-    
-    //Create compression helper for atlas
-    std::ostringstream oss;
-    oss << filename << curAtlas << ".atlas";    //Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
-    CompressionHelper atlasHelper;
-    atlasHelper.header.type = RESOURCE_TYPE_IMAGE_ATLAS;
-    atlasHelper.id = Hash::hash(oss.str().c_str());
-    
-    //Create Textures that point to locations in this atlas
-    for(int i = 0; i < rectSz; i++)
-    {
-        stbrp_rect r = rects[i];
-        if(r.was_packed)
-        {
-            ImageHelper img = images->at(r.id);
-            copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, BYTES_PER_PIXEL_RGBA);    //Copy image data over to dest buf, in the proper location
+            copyImage(uncompressedBuf, &img, r.x, r.y, atlasSzPixels, bytesPerPixel);    //Copy image data over to dest buf, in the proper location
 
             //Store coords
             TextureHeader* rc = (TextureHeader*)malloc(sizeof(TextureHeader));
-            rc->atlasId = atlasHelper.id;
-            
+            rc->atlasId = atlasId;
+
             float actualX = r.x + 1.0f;    // +1 offset here for UVs
             float actualY = r.y + 1.0f;
 
@@ -134,35 +102,150 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
             addHelper(textureHelper);
         }
     }
+}
 
-    //Output PNG if in testing mode
-    if(g_bImageOut)
-    {
-        std::ostringstream oss2;
-        oss2 << filename << " - atlas " << curAtlas << ".png";
-        std::cout << "Save " << oss2.str() << std::endl;
-        if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, BYTES_PER_PIXEL_RGBA, uncompressedBuf, atlasSzPixels * BYTES_PER_PIXEL_RGBA))
-            std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
-    }
+unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas,stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
+{
+    //Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1.
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+        *mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+    else
+        *mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
+    size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
+    unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
+    memset(uncompressedBuf, 0, bufferSize);    //Clear dest buf
+
+    //Create compression helper for atlas
+    std::ostringstream oss;
+    oss << filename << curAtlas << ".atlas";    //Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
+
+    atlasHelper->header.type = RESOURCE_TYPE_IMAGE_ATLAS;
+    atlasHelper->id = Hash::hash(oss.str().c_str());
+
+    //Create Textures that point to locations in this atlas
+    createTexturesForAtlas(uncompressedBuf, rects, rectSz, images, atlasSzPixels, atlasHelper->id, BYTES_PER_PIXEL_RGBA);
 
     //Compress with libsquish
     int flags = squish::kDxt5;
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
         flags = squish::kDxt1;
-    int compressedSize = squish::GetStorageRequirements(atlasSzPixels, atlasSzPixels, flags) + sizeof(AtlasHeader);
-    unsigned char* compressedBuf = (unsigned char*)malloc(compressedSize);
+
+    *compressedSize = squish::GetStorageRequirements(atlasSzPixels, atlasSzPixels, flags) + sizeof(AtlasHeader);
+    unsigned char* compressedBuf = (unsigned char*)malloc(*compressedSize);
     std::cout << "squishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
     squish::CompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), flags);
     free(uncompressedBuf);
+    return compressedBuf;
+}
+
+unsigned char* compressImageRaw(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
+{
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+        *mode = GL_RGB;
+    else
+        *mode = GL_RGBA;
+
+    *compressedSize = atlasSzPixels * atlasSzPixels * bytesPerPixel + sizeof(AtlasHeader);
+    unsigned char* uncompressedBuf = (unsigned char*)malloc(*compressedSize);
+    memset(uncompressedBuf, 0, *compressedSize);    //Clear dest buf
+
+    //Create compression helper for atlas
+    std::ostringstream oss;
+    oss << filename << curAtlas << ".atlas";    //Assign an .atlas extension for this atlas, just so it's a different resource ID from anything else
+
+    atlasHelper->header.type = RESOURCE_TYPE_IMAGE_ATLAS;
+    atlasHelper->id = Hash::hash(oss.str().c_str());
+
+    //Create Textures that point to locations in this atlas
+    createTexturesForAtlas(uncompressedBuf+sizeof(AtlasHeader), rects, rectSz, images, atlasSzPixels, atlasHelper->id, bytesPerPixel);
+
+    return uncompressedBuf;
+}
+
+unsigned char* stripAlpha(unsigned char* buf, int bufSzPixels)
+{
+    unsigned char* ret = (unsigned char*)malloc(bufSzPixels*bufSzPixels*BYTES_PER_PIXEL_RGB);
+    unsigned char* ptr = ret;
+    for(int y = 0; y < bufSzPixels; y++)
+    {
+        for(int x = 0; x < bufSzPixels; x++)
+        {
+            for(int i = 0; i < BYTES_PER_PIXEL_RGB; i++)
+                *ptr++ = *buf++;
+            buf++;  //Skip alpha
+        }
+    }
+    return ret;
+}
+
+void writePNGDXT(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned char* compressedBuf, const std::string& filename)
+{
+    //Note that this image will be RGBA, even though alpha-less images will be DXT1-compressed
+    int flags = squish::kDxt5;
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+        flags = squish::kDxt1;
+    std::cout << "unsquishing atlas " << curAtlas << " (" << atlasSzPixels << ") with flags " << flags << std::endl;
+    size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
+    unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
+    squish::DecompressImage(uncompressedBuf, atlasSzPixels, atlasSzPixels, compressedBuf, flags);
+    std::ostringstream oss2;
+    oss2 << filename << " - atlas " << curAtlas << ".png";
+    std::cout << "Save " << oss2.str() << std::endl;
+    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
+    {
+        unsigned char* strippedAlpha = stripAlpha(uncompressedBuf, atlasSzPixels);
+        free(uncompressedBuf);
+        uncompressedBuf = strippedAlpha;
+    }
+    if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
+        std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+    free(uncompressedBuf);
+}
+
+void writePNGRaw(int bytesPerPixel, int curAtlas, int atlasSzPixels, unsigned char* uncompressedBuf, const std::string& filename)
+{
+    //Note that this image will be RGBA, even though alpha-less images will be DXT1-compressed
+    std::ostringstream oss2;
+    oss2 << filename << " - atlas " << curAtlas << ".png";
+    std::cout << "Save " << oss2.str() << std::endl;
+    if(!stbi_write_png(oss2.str().c_str(), atlasSzPixels, atlasSzPixels, bytesPerPixel, uncompressedBuf, atlasSzPixels * bytesPerPixel))
+        std::cout << "stbi_write_png error while saving " << oss2.str() << ' ' << curAtlas << std::endl;
+}
+
+void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int curAtlas, int atlasSz, const std::string& filename, int bytesPerPixel)
+{
+    //Select compression/save method to use
+    unsigned char* (*compressFunc)(int, int*, CompressionHelper*, const std::string&, int, stbrp_rect*, int, std::vector<ImageHelper>*, int, uint16_t*);
+    void (*saveFunc)(int, int, int, unsigned char*, const std::string&);
+    if(g_bRawImg)
+    {
+        compressFunc = &compressImageRaw;
+        saveFunc = &writePNGRaw;
+    }
+    else
+    {
+        compressFunc = &compressImageDXT;
+        saveFunc = &writePNGDXT;
+    }
+
+
+    int atlasSzPixels = 1 << atlasSz;
+    CompressionHelper atlasHelper;
+    //Create destination buffer for atlas
+    int compressedSize;
+    uint16_t mode;
+    unsigned char* compressedBuf = (*compressFunc)(atlasSzPixels, &compressedSize,&atlasHelper,filename,curAtlas, rects, rectSz, images, bytesPerPixel, &mode);
+
+    //Output PNG if in testing mode
+    if(g_bImageOut)
+        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf+sizeof(AtlasHeader), filename);
 
     //Create header for atlas
     AtlasHeader* header = (AtlasHeader*)compressedBuf;
     header->height = atlasSz;
     header->width = atlasSz;
-    if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-        header->mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-    else
-        header->mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    header->mode = mode;
 
     //Add atlas to .pak
     createCompressionHelper(&atlasHelper, compressedBuf, compressedSize);
@@ -183,48 +266,15 @@ void removeDone(stbrp_rect *rects, int* rectsz)
     }
 }
 
-//-----------------------------------------------------------------------------------------------
-// Public functions
-//-----------------------------------------------------------------------------------------------
-
-static std::vector<std::string> images;
-void addImage(const std::string& img)
+void packImagesByBPP(std::vector<ImageHelper> startImages, const std::string& filename, int atlasSz, int* curAtlas, int bytesPerPixel)
 {
-    images.push_back(img);
-}
-
-void packImages(const std::string& filename)
-{
-    int atlasSz = DEFAULT_SZ;
-
-    std::vector<ImageHelper> startImages;
-    for(std::vector<std::string>::iterator i = images.begin(); i != images.end(); i++)
-    {
-        ImageHelper img;
-
-        img.comp = 0;
-        img.width = 0;
-        img.height = 0;
-        img.buf = stbi_load(i->c_str(), &img.width, &img.height, &img.comp, 0);
-        img.hash = Hash::hash(i->c_str());
-
-        startImages.push_back(img);
-
-        //Scale up atlas size as necessary
-        while(img.width+2 > 1 << atlasSz)
-            atlasSz++;
-
-        while(img.height+2 > 1 << atlasSz)
-            atlasSz++;
-    }
-
     stbrp_context context;
     int atlasSzPixels = 1 << atlasSz;
 
     //TODO: Take texture bpp's into account when determining which atlas to pack them into
 
-    stbrp_node *nodes = (stbrp_node*) malloc(sizeof(stbrp_node) * atlasSzPixels);
-    stbrp_rect *rects = (stbrp_rect*) malloc(sizeof(stbrp_rect) * startImages.size());
+    stbrp_node *nodes = (stbrp_node*)malloc(sizeof(stbrp_node) * atlasSzPixels);
+    stbrp_rect *rects = (stbrp_rect*)malloc(sizeof(stbrp_rect) * startImages.size());
     int rectsLeft = startImages.size();
     //Init rects
     for(int i = 0; i < rectsLeft; i++)
@@ -237,17 +287,16 @@ void packImages(const std::string& filename)
 
     //Main packing loop
     int packed = 1;
-    int curAtlas = 0;
     do
     {
         stbrp_init_target(&context, atlasSzPixels, atlasSzPixels, nodes, atlasSzPixels);
-        
+
         packed = stbrp_pack_rects(&context, rects, rectsLeft);
 
         //TODO At some point, we'll want to check if only one image was packed and just store it by itself in a separate texture
 
         //Pack into image
-        packImage(rects, rectsLeft, &startImages, curAtlas++, atlasSz, filename);
+        packImage(rects, rectsLeft, &startImages, (*curAtlas)++, atlasSz, filename, bytesPerPixel);
 
         //Pull out done rects and update rectsLeft. If list is empty, packed will be 1 and we'll break out anyway. Probably. It'll be fine.
         if(!packed)    //Only worry about removing done rects if we're not done yet
@@ -255,12 +304,88 @@ void packImages(const std::string& filename)
 
     } while(!packed);
 
-    //Reset so we can call this again later for another .pak file
-    images.clear();
-
     //Clean up memory
     for(std::vector<ImageHelper>::iterator i = startImages.begin(); i != startImages.end(); i++)
         stbi_image_free(i->buf);
     free(nodes);
     free(rects);
+}
+
+std::vector<ImageHelper> getImages(std::vector<std::string> imgs, int* atlasSz, int comp)
+{
+    std::vector<ImageHelper> ret;
+    for(std::vector<std::string>::iterator i = imgs.begin(); i != imgs.end(); i++)
+    {
+        ImageHelper img;
+
+        img.comp = 0;
+        img.width = 0;
+        img.height = 0;
+        img.buf = stbi_load(i->c_str(), &img.width, &img.height, &img.comp, 0);
+        img.hash = Hash::hash(i->c_str());
+
+        if(img.comp == comp)
+        {
+            ret.push_back(img);
+
+            //Scale up atlas size as necessary
+            while(img.width + 2 > 1 << *atlasSz)
+                (*atlasSz)++;
+
+            while(img.height + 2 > 1 << *atlasSz)
+                (*atlasSz)++;
+        }
+    }
+    return ret;
+}
+
+//-----------------------------------------------------------------------------------------------
+// Public functions
+//-----------------------------------------------------------------------------------------------
+
+static std::vector<std::string> images;
+void addImage(const std::string& img)
+{
+    images.push_back(img);
+}
+
+void packImages(const std::string& filename)
+{
+    if(images.empty())
+        return; //Nothing to do
+
+    int atlasSz24 = DEFAULT_SZ;
+    int atlasSz32 = DEFAULT_SZ;
+
+    std::vector<ImageHelper> images24 = getImages(images, &atlasSz24, BYTES_PER_PIXEL_RGB);
+    std::vector<ImageHelper> images32 = getImages(images, &atlasSz32, BYTES_PER_PIXEL_RGBA);
+
+    int curAtlas = 0;
+    packImagesByBPP(images24, filename, atlasSz24, &curAtlas, BYTES_PER_PIXEL_RGB);
+    packImagesByBPP(images32, filename, atlasSz32, &curAtlas, BYTES_PER_PIXEL_RGBA);
+
+    //Reset so we can call this again later for another .pak file
+    images.clear();
+}
+
+unsigned char* extractImage(const std::string& filename, unsigned int* size)
+{
+    int w, h, bpp;
+    unsigned char* cBuf = stbi_load(filename.c_str(), &w, &h, &bpp, 0);
+
+    unsigned char* outBuf = (unsigned char*)malloc(sizeof(ImageHeader) + w*h*bpp);
+
+    ImageHeader* header = (ImageHeader*) outBuf;
+    header->width = w;
+    header->height = h;
+    header->bpp = bpp;
+    header->pad = 0;
+
+    memcpy(outBuf + sizeof(ImageHeader), cBuf, w*h*bpp);
+    stbi_image_free(cBuf);
+
+    if(size)
+        *size = w*h*bpp + sizeof(ImageHeader);
+
+    return outBuf;
 }

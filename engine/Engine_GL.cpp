@@ -3,6 +3,7 @@
 #include "OpenGLShader.h"
 #include "DebugDraw.h"
 #include "Logger.h"
+#include "ResourceLoader.h"
 
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
@@ -146,6 +147,7 @@ void Engine::setup_sdl()
     if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
         LOG(WARN) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
 
+    _loadicon();    //Load our window icon
 }
 
 //Set up OpenGL
@@ -173,15 +175,19 @@ void Engine::setup_opengl()
     // Set the rendering program
     glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
 
-    //TODO: Load from resources
-    m_renderState.programId = OpenGLShader::loadShaders("res/shaders/default.vert", "res/shaders/default.frag");
+    //Load shaders from resources
+    std::string vertShaderCode = getResourceLoader()->getTextFile("res/shaders/default.vert");
+    std::string fragShaderCode = getResourceLoader()->getTextFile("res/shaders/default.frag");
+    m_renderState.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
     m_renderState.modelId = glGetUniformLocation(m_renderState.programId, "model");
     m_renderState.viewId = glGetUniformLocation(m_renderState.programId, "view");
     m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
     m_renderState.projection = persp;
 
 #ifdef _DEBUG
-    m_debugRenderState.programId = OpenGLShader::loadShaders("res/shaders/debugdraw.vert", "res/shaders/debugdraw.frag");
+    vertShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.vert");
+    fragShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.frag");
+    m_debugRenderState.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
     m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
     m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
     m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");

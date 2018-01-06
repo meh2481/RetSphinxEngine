@@ -46,17 +46,20 @@ typedef struct
     //Followed by compressed data
 } CompressionHeader;
 
-#define RESOURCE_TYPE_UNKNOWN        0    //Default for don't care
-#define RESOURCE_TYPE_IMAGE            1
-#define RESOURCE_TYPE_IMAGE_ATLAS    2
-#define RESOURCE_TYPE_SOUND            3
+#define RESOURCE_TYPE_UNKNOWN       0   //Default for don't care
+#define RESOURCE_TYPE_IMAGE         1
+#define RESOURCE_TYPE_IMAGE_ATLAS   2
+#define RESOURCE_TYPE_SOUND         3
 #define RESOURCE_TYPE_SOUND_LOOP    4
-#define RESOURCE_TYPE_FONT            5
+#define RESOURCE_TYPE_FONT          5
 #define RESOURCE_TYPE_STRINGBANK    6
-#define RESOURCE_TYPE_OBJ            7    //3D object (linking between a 3D mesh and a texture)
-#define RESOURCE_TYPE_MESH            8    //3D mesh
-#define RESOURCE_TYPE_JSON            9
-#define RESOURCE_TYPE_XML            10    //Prolly wanna remove this at some point as we migrate away from xml formats
+#define RESOURCE_TYPE_OBJ           7   //3D object (linking between a 3D mesh and a texture)
+#define RESOURCE_TYPE_MESH          8   //3D mesh
+#define RESOURCE_TYPE_JSON          9
+#define RESOURCE_TYPE_XML           10  //Prolly wanna remove this at some point as we migrate away from xml formats
+#define RESOURCE_TYPE_LUA           11  //Lua script
+#define RESOURCE_TYPE_IMAGE_NO_ATLAS 12  //Icon image or other image without atlas
+#define RESOURCE_TYPE_SHADER        13
 //#define RESOURCE_TYPE_
 //etc
 
@@ -77,6 +80,16 @@ typedef struct //Structure for image indices into the atlas AtlasHeader
     uint64_t atlasId;    //ID of AtlasHeader
     f32_t coordinates[8];    //UV texture coordinates for the image in the atlas
 } TextureHeader;
+
+typedef struct //Structure for (non-atlased) image data
+{
+    uint16_t bpp;           //bytes per pixel
+    uint16_t width;         //Width of image
+    uint16_t height;        //Height of image
+    uint16_t pad;
+                           //Followed by image data
+} ImageHeader;
+
 
 //--------------------------------------------------------------
 // Fonts
@@ -111,7 +124,7 @@ typedef struct
     char languageID[4];    //ISO 639-1 (if existing) or 639-2 language code in all-lowercase (en for English, es for Spanish, etc). Should only be two or three chars, others '\0'
     uint32_t offset;    //Offset from first StringDataPointer for a string's ID to the StringDataPointer for this language
 
-    //For example, for languages en=0 and es=1, for a StringID that's number 7 in the list (8th entry), 
+    //For example, for languages en=0 and es=1, for a StringID that's number 7 in the list (8th entry),
     //en's StringDataPointer is number 7*2+0=14 and the English string can be found at that pointer's offset
     //es's StringDataPointer is number 7*2+1=15 and the Spanish string can be found at that pointer's offset
 
