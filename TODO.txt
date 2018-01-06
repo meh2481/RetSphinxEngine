@@ -1,8 +1,6 @@
 Current higher pri:
-- Tee log output to std::cout also in debug mode
-- Update FMOD
+- Slowing down via key doesn't change particle dt; particles are thus affected by framerate
 - Load Music from pak? Need to stream from disk
-- Double-check particle pak loading
 - Particle with x that tapers to points (anime-style)
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
 - Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
@@ -26,10 +24,9 @@ Current higher pri:
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
+- Test at 144Hz and see what breaks
 
 Bugs:
-- Slowing down via key doesn't seem to change lua dt; particles/lua are affected by framerate
-	- Test at 144Hz and see what breaks
 - Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
@@ -45,7 +42,8 @@ Possible sound channels:
 - Movie
 
 Overall TODO list:
-- Use const declarations for variables
+- Use DSPs for audio fx
+	- Research FMOD Studio & what I could do with that
 - Revisit class predeclaration and add more where possible
 - Curve editor via ImGUI
 - Resources should be streamed from disk?

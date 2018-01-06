@@ -3,10 +3,9 @@
 #include <fstream>
 #include <ctime>
 
-#define NULL_OUT std::cerr
 #define BUF_SZ 32
 
-static std::ofstream logfile;
+static logstream logfile;
 static LogLevel curLogLevel;
 static char buffer[BUF_SZ];
 
@@ -36,16 +35,24 @@ static const char* curTime()
     return buffer;
 }
 
-std::ostream& logg(LogLevel l, const char* file, int line)
+#ifdef _DEBUG
+logstream& logg(LogLevel l, const char* file, int line)
+#else
+logstream& logg(LogLevel l)
+#endif
 {
     if(l >= curLogLevel)
     {
-        logfile << std::endl << curTime() << ' ' << levelToString(l) << ' ' << StringUtils::getFilename(file) << ':' << line << " : ";
-        return logfile;
+        logfile._on();
+        logfile << std::endl << curTime() << ' ' << levelToString(l);
+#ifdef _DEBUG
+        logfile << ' ' << StringUtils::getFilename(file) << ':' << line;
+#endif
+        logfile << " : ";
     }
-
-    //cerr is used as null output (badbit-set on logger init).
-    return NULL_OUT;
+    else
+        logfile._off();
+    return logfile;
 }
 
 void logger_init(const char* filename, LogLevel l)
@@ -58,15 +65,37 @@ void logger_init(const char* filename, LogLevel l)
     #define MODE std::ofstream::out | std::ofstream::app
 #endif
     curLogLevel = l;
-    logfile.open(filename, MODE);
+    logfile.coss.open(filename, MODE);
     logfile << curTime() << " Logger init";
-
-    //Set cerr to not output anything, so we can use it as a null out. Note that writing to cerr is disabled this way, but that would be a stupid idea anyway
-    NULL_OUT.setstate(std::ios_base::badbit);
 }
 
 void logger_quit()
 {
     logfile << std::endl << curTime() << " Logger close" << std::endl;
-    logfile.close();
+    logfile.coss.close();
+}
+
+void logstream::_on()
+{
+    coss.clear();
+#ifdef _DEBUG
+    std::cout.clear();
+#endif
+}
+
+void logstream::_off()
+{
+    coss.setstate(std::ios_base::badbit);
+#ifdef _DEBUG
+    std::cout.setstate(std::ios_base::badbit);
+#endif
+}
+
+logstream& logstream::operator<< (std::ostream& (*pfun)(std::ostream&))
+{
+    pfun(coss);
+#ifdef _DEBUG
+    pfun(std::cout);
+#endif
+    return *this;
 }

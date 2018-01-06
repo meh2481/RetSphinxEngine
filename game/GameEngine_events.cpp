@@ -148,12 +148,12 @@ void GameEngine::handleEvent(SDL_Event event)
             break;
 
         case SDL_CONTROLLERBUTTONUP:
-            LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button << std::endl;
+            LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button;
             break;
 
         case SDL_CONTROLLERAXISMOTION:
             if(abs(event.caxis.value) > JOY_AXIS_TRIP)
-                LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value << std::endl;
+                LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value;
             break;
     }
 

@@ -163,7 +163,7 @@ bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char 
     ssURL << url << endpoint;
     msg.url = ssURL.str();
 
-    LOG(TRACE) << "Sending json to " << ssURL.str() << " : " << std::endl << stringifiedJSON;
+    LOG(TRACE) << "Sending json to " << ssURL.str() << " :\n" << stringifiedJSON;
 
     return NetworkThread::send(msg);
 }
