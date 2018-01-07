@@ -5,9 +5,10 @@
 #include "Logger.h"
 #include "ResourceLoader.h"
 
-static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
+#ifdef _DEBUG
+static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #ifdef _WIN32
 static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
 #else
@@ -32,7 +33,7 @@ static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity
         assert(false);
     }
 }
-
+#endif
 
 void Engine::setup_sdl()
 {
@@ -130,9 +131,8 @@ void Engine::setup_sdl()
         if(ven)
             LOG(INFO) << "GL vendor: " << ven;
 
-    glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
-
 #ifdef _DEBUG
+    glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
     if(glDebugMessageCallback)
     {
         LOG(DBG) << "Using GL debug callbacks";
