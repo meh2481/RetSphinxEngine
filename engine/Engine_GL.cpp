@@ -5,7 +5,9 @@
 #include "Logger.h"
 #include "ResourceLoader.h"
 
+#ifdef GL_GLEXT_VERSION
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
+#endif
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
 #ifdef _WIN32
@@ -130,6 +132,8 @@ void Engine::setup_sdl()
         if(ven)
             LOG(INFO) << "GL vendor: " << ven;
 
+#ifdef GL_GLEXT_VERSION
+
     glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
 
 #ifdef _DEBUG
@@ -141,6 +145,7 @@ void Engine::setup_sdl()
     }
     else
         LOG(DBG) << "glDebugMessageCallback() not supported";
+#endif
 #endif
 
     LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;

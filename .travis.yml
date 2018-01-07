@@ -5,7 +5,7 @@ sudo: false
 
 compiler:
   - gcc
-  - clang
+#  - clang
 
 os:
   - linux
@@ -17,17 +17,25 @@ branches:
 addons:
   apt:
     packages:
-      - libbox2d-dev
+#      - libbox2d-dev
       - libglm-dev
       - libsdl2-dev
 
 before_install:
   - wget https://www.dropbox.com/s/61h7ziwo4fdk8xc/fmodstudioapi11002linux.tar.gz
   - tar -xzf fmodstudioapi11002linux.tar.gz
+  - wget https://www.dropbox.com/s/vku4vicddawbwem/Box2D.tar.gz
+  - tar -xzf Box2D.tar.gz
 
 script:
+  - cd Box2D
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake .. -DBOX2D_BUILD_EXAMPLES=OFF
+  - make -j 2
+  - cd ../..
   - export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH;/usr/lib/x86_64-linux-gnu/"
-  - CMAKE_OPTIONS='-DCMAKE_PREFIX_PATH='"$CMAKE_PREFIX_PATH"' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOX2D_INCLUDE_DIRS='"/usr/include/Box2D"' -DFMOD_INCLUDE_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_INCLUDE_SEARCH_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_LIBRARY='"../fmodstudioapi11002linux/api/lowlevel/lib/x86_64/libfmod.so"''
+  - CMAKE_OPTIONS='-DCMAKE_PREFIX_PATH='"$CMAKE_PREFIX_PATH"' -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBOX2D_LIBRARY='"../Box2D/cmake-build/Box2D/libBox2d.a"' -DBOX2D_INCLUDE_DIRS='"../Box2D/Box2D"' -DFMOD_INCLUDE_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_INCLUDE_SEARCH_DIRS='"../fmodstudioapi11002linux/api/lowlevel/inc"' -DFMOD_LIBRARY='"../fmodstudioapi11002linux/api/lowlevel/lib/x86_64/libfmod.so"''
   - rm -rf cmake-build
   - mkdir cmake-build
   - cd cmake-build
