@@ -8,6 +8,8 @@ NetworkThread.h
 SteelSeriesClient.h
 SteelSeriesClient.cpp
 SteelSeriesEvents.h
+SteelSeriesHaptic.h
+SteelSeriesHaptic.cpp
 ThreadsafeQueue.h
 )
 

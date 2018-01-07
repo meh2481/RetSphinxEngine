@@ -5,40 +5,41 @@
 */
 #pragma once
 
-#include "Drawable.h"
 #include "Rect.h"
+#include "Color.h"
 #include <string>
 
-class Image;
-
-class Arc : public Drawable
+class Arc
 {
 protected:
-	float* segmentPos;
-	Image* arcSegImg;
-	unsigned numSegments;
-	
-	Arc(){};
-	void average();	//Helper function to average the values for a less jittery arc
-	
+    float* segmentPos;
+    //Image* arcSegImg;
+    unsigned numSegments;
+    
+    Arc(){};
+    void average();    //Helper function to average the values for a less jittery arc
+    
 public:
-	Vec2 p1, p2;
-	float add;
-	float max;
-	float height;
-	unsigned avg;
-	
-	Arc(unsigned number, Image* img);
-	~Arc();
-	
-	void init();
-	void draw();
-	void update(float dt);
-	
-	//Accessor methods
-	const std::string& getImageFilename();
-	unsigned getNumber()	{return numSegments;};
-	
+    Vec2 p1, p2;
+    float add;
+    float max;
+    float height;
+    unsigned avg;
+    float depth;
+    //Image* img;
+    bool active;
+    Color col;
+    
+    Arc(unsigned number);
+    ~Arc();
+    
+    void init();
+    void draw(glm::mat4 mat);
+    void update(float dt);
+    
+    //Accessor methods
+    unsigned getNumber()    {return numSegments;};
+    
 
 };
 

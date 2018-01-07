@@ -1,17 +1,17 @@
 #pragma once
 #include "Observer.h"
-#include <list>
+#include <vector>
 
 class Subject
 {
-	std::list<Observer*> observers;
-	int numObservers;
+    std::vector<Observer*> observers;
+    int numObservers;
 
 public:
 
-	void addObserver(Observer* o);
-	void removeObserver(Observer* o);
+    void addObserver(Observer* o);
+    void removeObserver(Observer* o);
 
-	void notify(std::string sMsg, Vec2 pos);
+    void notify(const std::string& sMsg, Vec2 pos);
 
 };

@@ -1,41 +1,73 @@
--Particles follow ship with acceleration applied
--Particle editor breaks after F5
+Current higher pri:
+- Slowing down via key doesn't change particle dt; particles are thus affected by framerate
+- Load Music from pak? Need to stream from disk
+- Particle with x that tapers to points (anime-style)
+- Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
+- Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
+	- Automatically walk dependency chain to get used assets per chunk / manually specify?
+	- Need some way of building out levels/chunks automatically, or more easy way to do it manually
+	- Potentially can export current resources via keypress or something like that; requires pak to have been hit for all tho
+		-If so, large errors like error textures etc. for when a miss happens (as described in talk). These will have to be stubbed out for final game
+	- Think about tree structure for asset dependencies, pros/cons
+- Better handling of raw vs. DXT images
+- Compressor should be multithreaded
+- Remove OpenGL deprecated things and re-enable forward compat flag
+	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: Using glDrawArrays in a Core context with parameter <mode> and enum '0x7' which was removed from Core OpenGL (GL_INVALID_ENUM)
+	GL[37190]: glEnableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glColorPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
+- Small-block memory allocator for Lua
+	- Other memory allocators/uses?
+
+- Particles follow ship with acceleration applied
+- Use level editor to create geometry/scenery
+- Fix tamerisk board
+- Test at 144Hz and see what breaks
+
+Bugs:
+- Ship stops suddenly when moving joystick slowly towards center position
+- Particle editor breaks after F5
+- Fix objsegment partial tiling? Or do I not care?
+- Adding to a pak .txt doesn't check that the pak contains said files; just says up-to-date
+
+Possible sound channels:
+- BGM
+- SFX
+- Environmental SFX
+- System SFX
+- Voice
+- Bg voice
+- Movie
 
 Overall TODO list:
-- Fix math for softbody lattice anim so it actually works properly
-- Use GLM for math stuff instead of glPushMatrix() and friends
-- Implement newer OpenGL shaders
-- Use shaders rather than lattice animations where possible
-- IO in separate thread?
-- Disable exceptions/rtti?
-- rip out displaylists for 3D objects and use vertex buffers instead
+- Use DSPs for audio fx
+	- Research FMOD Studio & what I could do with that
 - Revisit class predeclaration and add more where possible
+- Curve editor via ImGUI
+- Resources should be streamed from disk?
+- Sound filters
+- Fix math for softbody lattice anim so it actually works properly
+	- Use shaders rather than lattice animations where possible
 - Ortho for HUD and text drawing
-- Create allocator / choose one to use rather than mixing malloc & new
-- Decide if map loading is engine-specific or game-specific
 - Particle systems, objects, etc should be loaded by template, not from XML each time
-- Move all resource loading stuff to IO?
-- Move object self-creation into resource loaders where applicable
-- Revisit gamepad support - support multiple controllers, switching input modes, etc
-- Support SDL joystick also if gamecontroller isn't opened - see my SNES knockoff
+	- Also XML->PAK binary formats to simplify this
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
-- "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 
 Particle System Editing:
-- Fix image rect preview
 - UI should save/load window booleans as config
-- Re - add death spawn types (tho prolly on a per-system basis?)
+- Re-add death spawn types (tho prolly on a per-system basis?)
 - Add particle support for emitter acceleration
-- Fix other TODO items in particle UI and saving
 - Add support for seeing particle death spawns
 - Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
 
-
-Refactoring thoughts:
-- Image class is bloated with too much junk; once shaders are implemented see what can be cropped out
-- lots of classes are in files for other classes; move to own files
-
-
+Lower priority:
+- Test sound pitch shifting; current implementation seems to not work for all sound effects as intended
+- "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
+- UTF code point lookup should use array of direct values rather than binary search? Or hashmap of some sort?
+- Use SDL_GetPowerInfo() for laptop battery reminders
+- Move all resource loading stuff to IO?
 
 Reasoning behind the engine design (aka why not just use Unity or whatever):
 - Robust Lua scripting interface
@@ -46,16 +78,17 @@ Reasoning behind the engine design (aka why not just use Unity or whatever):
 	-- Paged in with memory mapping if intelligent enough for performance gains
 - XML vs. Lua - when to use one over the other? Can XML be removed intelligently?
 - Optimization and data-driven programming/design where applicable
-
+- I had a look at Unity; it sucks all the joy out of game development
+	- Low-level code (the fun part) is replaced with high-level APIs to learn. Learning APIs is not fun, and never will be.
+	- Actual learning as a whole is removed; you won't learn anything practical from learning Unity
+	- No programming experience is required in Unity; any old artist can throw something together that will look better. Lack of art skill will become the major limiting factor.
+	- Unity uses C#. C# is a terrible language made by novices, for novices
+	- The "portability" aspect is thrown out the window when optimization is difficult. New Unity projects can't be ported to Vita. Old ones could, but were incredibly impossible to optimize (because C#). In essence, using a "more portable" platform prevents actual portability, and optimizing per-system is nigh on impossible. A render method that's fast on one system may be impossibly slow on another, and Unity can't take this into account as well as a well-designed, lower-level engine can (because C#).
 
 
 Other misc unordered TODO:
 - Scene editor / XML exporter
 - Intelligently split things into subclasses
-
-
-
-
 
 
 
@@ -65,7 +98,8 @@ OPENGL STUFF
 https://www.opengl.org/wiki/Nomenclature/Direct_State_Access
 https://dl.dropboxusercontent.com/u/22111385/crap/renderer.cpp
 - glUniformX() functions for sending stuff to shaders
-- Load from pakfile only if actual file doesn't exist
+- Load from pakfile only if actual file doesn't exist?
+	- Better to remove file loading entirely and ONLY load from pakfile
 https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.vert
 https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.frag
 https://dl.dropboxusercontent.com/u/22111385/crap/gpubase.7z
@@ -107,7 +141,7 @@ notes from talk with fg:
 - if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
 	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
 	-- gontext)forward_compatible_flag | sdl_gl_context debug_flag
-	--SDL_GL_SHARE_WITH_CURRENT_CONTEXT
+- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
 	
 -GLM for math
 	- mat4 for transformations
@@ -121,3 +155,9 @@ Endianness testing:
 	
 	
 Note: On Linux, "xboxdrv" is the driver I had the most success with when it came to gamepad rumble (default driver said it rumbled, but didn't)
+
+@fgenesis | debug.traceback() in a xpcall() handler at least
+@fgenesis | so if stuff breaks you know why
+@fgenesis | i think my Lua C++ api already does this for C++->Lua calls
+
+Also add lua error stuff to log as well as cmdline, only cmdline if in debug mode

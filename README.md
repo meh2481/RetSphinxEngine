@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/meh2481/RetSphinxEngine.svg?branch=develop)](https://travis-ci.org/meh2481/RetSphinxEngine)
+
 GameEngine
 ==============
 

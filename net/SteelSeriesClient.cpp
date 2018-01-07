@@ -1,18 +1,16 @@
 #include "SteelSeriesClient.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "NetworkThread.h"
 #include "StringUtils.h"
 #include <sstream>
 #include <fstream>
 
 #ifdef _WIN32
-	#include <windows.h>
-	#include <shlobj.h>		//for knownFolder
-	#include <winerror.h>	//for HRESULT
-	#include <atlstr.h>		//for CW2A
+    #include <windows.h>
+    #include <shlobj.h>		//for knownFolder
+    #include <winerror.h>	//for HRESULT
+    #include <atlstr.h>		//for CW2A
 #endif //_WIN32
-
-using namespace std;
 
 #define SS_FILEPATH "/SteelSeries/SteelSeries Engine 3/coreProps.json"	//Location SteelSeries ini file is relative to %PROGRAMDATA%
 #define START_HREF_HTTP "http://"
@@ -40,162 +38,163 @@ const float HEARTBEAT_FREQUENCY = (((float)MAX_TIMEOUT_LEN) / (1000.0) - 1.0);
 
 SteelSeriesClient::SteelSeriesClient()
 {
-	valid = true;
-	url = getSSURL();
-	if(url.empty())
-		valid = false;
-	heartbeatTimer = 0;
+    valid = true;
+    url = getSSURL();
+    if(url.empty())
+        valid = false;
+    heartbeatTimer = 0;
 }
 
 SteelSeriesClient::~SteelSeriesClient()
 {
 }
 
-string SteelSeriesClient::getSSURL()
+std::string SteelSeriesClient::getSSURL()
 {
 #ifdef _WIN32
-	//Path on Windows is defined by SteelSeries API to be %PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json
-	LPWSTR wszPath = NULL;
-	HRESULT hr;
+    //Path on Windows is defined by SteelSeries API to be %PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json
+    LPWSTR wszPath = NULL;
+    HRESULT hr;
 
-	hr = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &wszPath);
+    hr = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &wszPath);
 
-	if(SUCCEEDED(hr))
-	{
-		//Get the actual path to the file
-		string strPath = CW2A(wszPath);
-		ostringstream oss;
-		oss << strPath << SS_FILEPATH;
+    if(SUCCEEDED(hr))
+    {
+        //Get the actual path to the file
+        std::string strPath = CW2A(wszPath);
+        std::ostringstream oss;
+        oss << strPath << SS_FILEPATH;
 
-		//Read the contents of the file
-		ifstream jsonFile(oss.str());
+        //Read the contents of the file
+        std::ifstream jsonFile(oss.str());
 
-		if(!jsonFile.fail())
-		{
-			ostringstream buffer;
-			buffer << jsonFile.rdbuf();
+        if(!jsonFile.fail())
+        {
+            std::ostringstream buffer;
+            buffer << jsonFile.rdbuf();
 
-			//Parse the JSON
-			rapidjson::Document document;
-			if(!document.Parse(buffer.str().c_str()).HasParseError())
-			{
-				if(document.IsObject())    // Document is a JSON value represents the root of DOM. Root can be either an object or array.
-				{
-					if(document.HasMember(JSON_KEY_ADDRESS))
-					{
-						if(document[JSON_KEY_ADDRESS].IsString())
-						{
-							ostringstream SSURL;
-							SSURL << START_HREF_HTTP << document[JSON_KEY_ADDRESS].GetString();
-							return SSURL.str();
-						}
-					}
-				}
-			}
-			else
-			{
-				LOG(ERROR) << "Unable to parse JSON " << oss.str();
-			}
-		}
-		else
-		{
-			LOG(ERROR) << "Unable to open file " << oss.str();
-		}
-	}
-	else
-	{
-		LOG(ERROR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
-	}
-	return string();
+            //Parse the JSON
+            rapidjson::Document document;
+            if(!document.Parse(buffer.str().c_str()).HasParseError())
+            {
+                if(document.IsObject())    // Document is a JSON value represents the root of DOM. Root can be either an object or array.
+                {
+                    if(document.HasMember(JSON_KEY_ADDRESS))
+                    {
+                        if(document[JSON_KEY_ADDRESS].IsString())
+                        {
+                            std::ostringstream SSURL;
+                            SSURL << START_HREF_HTTP << document[JSON_KEY_ADDRESS].GetString();
+                            return SSURL.str();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                LOG(ERR) << "Unable to parse JSON " << oss.str();
+            }
+        }
+        else
+        {
+            LOG(ERR) << "Unable to open file " << oss.str();
+        }
+    }
+    else
+    {
+        LOG(ERR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
+    }
+    return std::string();
 #else
-	#error TODO Support other OSs for SteelSeries stuff...
-	//On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
-	//SS has no Linux support yet
+    #warning TODO Support other OSs for SteelSeries stuff...
+    return std::string();
+    //On OSX it'll be at /Library/Application Support/SteelSeries Engine 3/coreProps.json
+    //SS has no Linux support yet
 #endif	//_WIN32
 }
 
-bool SteelSeriesClient::init(std::string appName)
+bool SteelSeriesClient::init(const std::string& appName)
 {
-	if(!registerApp(StringUtils::normalize(appName), appName))
-	{
-		valid = false;
-		return false;
-	}
-	return true;
+    if(!registerApp(StringUtils::normalize(appName), appName))
+    {
+        valid = false;
+        return false;
+    }
+    return true;
 }
 
 void SteelSeriesClient::update(float dt)
 {
-	if(!valid) 
-		return;
+    if(!valid)
+        return;
 
-	heartbeatTimer += dt;
-	if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
-	{
-		heartbeatTimer = 0;	//Reset
+    heartbeatTimer += dt;
+    if(heartbeatTimer >= HEARTBEAT_FREQUENCY)
+    {
+        heartbeatTimer = 0;	//Reset
 
-		//Send a new heartbeat message
-		heartbeat();
-	}
+        //Send a new heartbeat message
+        heartbeat();
+    }
 }
 
-bool SteelSeriesClient::registerApp(std::string ID, std::string displayName)
+bool SteelSeriesClient::registerApp(const std::string& ID, const std::string& displayName)
 {
-	appId = ID;
+    appId = ID;
 
-	rapidjson::Document doc(rapidjson::kObjectType);
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
-	doc.AddMember(JSON_KEY_GAME_DISPLAY_NAME, rapidjson::StringRef(displayName.c_str()), doc.GetAllocator());
-	doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
-	doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
+    rapidjson::Document doc(rapidjson::kObjectType);
+    doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
+    doc.AddMember(JSON_KEY_GAME_DISPLAY_NAME, rapidjson::StringRef(displayName.c_str()), doc.GetAllocator());
+    doc.AddMember(JSON_KEY_TIMEOUT, MAX_TIMEOUT_LEN, doc.GetAllocator());
+    doc.AddMember(JSON_KEY_ICON_COLOR_ID, ICON_COLOR_BLUE, doc.GetAllocator());
 
-	return sendJSON(StringUtils::stringify(doc), URL_REGISTER_APP);
+    return sendJSON(StringUtils::stringify(doc), URL_REGISTER_APP);
 }
 
-bool SteelSeriesClient::sendJSON(std::string stringifiedJSON, const char * endpoint)
+bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char * endpoint)
 {
-	if(!valid) 
-		return false;
+    if(!valid)
+        return false;
 
-	//Send message to SS
-	NetworkThread::NetworkMessage msg;
-	msg.data = stringifiedJSON;
-	ostringstream ssURL;
-	ssURL << url << endpoint;
-	msg.url = ssURL.str();
+    //Send message to SS
+    NetworkThread::NetworkMessage msg;
+    msg.data = stringifiedJSON;
+    std::ostringstream ssURL;
+    ssURL << url << endpoint;
+    msg.url = ssURL.str();
 
-	std::cout << "Sending json to " << ssURL.str() << " : " << endl << stringifiedJSON;
+    LOG(TRACE) << "Sending json to " << ssURL.str() << " :\n" << stringifiedJSON;
 
-	return NetworkThread::send(msg);
+    return NetworkThread::send(msg);
 }
 
 void SteelSeriesClient::heartbeat()
 {
-	rapidjson::Document doc(rapidjson::kObjectType);
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
-	string heartbeatJSON = StringUtils::stringify(doc);
+    rapidjson::Document doc(rapidjson::kObjectType);
+    doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), doc.GetAllocator());
+    std::string heartbeatJSON = StringUtils::stringify(doc);
 
-	sendJSON(StringUtils::stringify(doc), URL_HEARTBEAT);
+    sendJSON(StringUtils::stringify(doc), URL_HEARTBEAT);
 }
 
-void SteelSeriesClient::bindEvent(std::string eventJSON)
+void SteelSeriesClient::bindEvent(const std::string& eventJSON)
 {
-	sendJSON(eventJSON, URL_BIND_EVENT);
+    sendJSON(eventJSON, URL_BIND_EVENT);
 }
 
-void SteelSeriesClient::sendEvent(std::string eventId, int value)
+void SteelSeriesClient::sendEvent(const std::string& eventId, int value)
 {
-	rapidjson::Document doc(rapidjson::kObjectType);
-	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+    rapidjson::Document doc(rapidjson::kObjectType);
+    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-	doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
-	doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
+    doc.AddMember(JSON_KEY_GAME, rapidjson::StringRef(appId.c_str()), allocator);
+    doc.AddMember(JSON_KEY_EVENT, rapidjson::StringRef(eventId.c_str()), allocator);
 
-	rapidjson::Value data(rapidjson::kObjectType);
-	data.AddMember(JSON_KEY_VALUE, value, allocator);
-	doc.AddMember(JSON_KEY_DATA, data, allocator);
+    rapidjson::Value data(rapidjson::kObjectType);
+    data.AddMember(JSON_KEY_VALUE, value, allocator);
+    doc.AddMember(JSON_KEY_DATA, data, allocator);
 
-	sendJSON(StringUtils::stringify(doc), URL_GAME_EVENT);
+    sendJSON(StringUtils::stringify(doc), URL_GAME_EVENT);
 }
 
 

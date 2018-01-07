@@ -7,34 +7,37 @@ class GameEngine;
 class ParticleSystem;
 class SteelSeriesEditor;
 class ParticleEditor;
+class LevelEditor;
 
 class DebugUI
 {
 public:
-	DebugUI(GameEngine*);
-	~DebugUI();
-	void draw();
-	bool hasFocus();
+    DebugUI(GameEngine*);
+    ~DebugUI();
+    void draw();
+    bool hasFocus();
 
-	bool visible;
-	bool hadFocus;
+    bool visible;
+    bool hadFocus;
 
-	//Steel Series editor
-	SteelSeriesEditor* steelSeriesEditor;
+    //Steel Series editor
+    SteelSeriesEditor* steelSeriesEditor;
 
-	//Particle system editor
-	ParticleEditor* particleEditor;
+    //Particle system editor
+    ParticleEditor* particleEditor;
 
 private:
-	void _draw();
-	MemoryEditor memEdit;
-	GameEngine *_ge;
+    void _draw();
 
-	bool rumbleMenu;
-	int windowFlags;
+    MemoryEditor memEdit;
+    LevelEditor* levelEditor;
+    GameEngine *_ge;
 
-	//Rumble testing helper vars
-	int largeMotorStrength;
-	int smallMotorStrength;
-	int motorDuration;
+    bool rumbleMenu;
+    int windowFlags;
+
+    //Rumble testing helper vars
+    int largeMotorStrength;
+    int smallMotorStrength;
+    int motorDuration;
 };

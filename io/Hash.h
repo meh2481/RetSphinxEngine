@@ -3,5 +3,5 @@
 
 namespace Hash
 {
-	uint64_t hash(const char* string);
+    uint64_t hash(const char* string);
 }

@@ -3,5 +3,5 @@
 
 namespace SystemUtils
 {
-	std::string getCurLocale();	//Returns current system locale.
+    std::string getCurLocale();    //Returns current system locale.
 }

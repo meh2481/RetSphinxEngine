@@ -1,5 +1,6 @@
 set(io_src
-easylogging++.h
+Logger.h
+Logger.cpp
 FileOperations.h
 FileOperations.cpp
 Hash.cpp

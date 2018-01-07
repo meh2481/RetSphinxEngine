@@ -1,14 +1,12 @@
 /*
-	GameEngine source - GameEngine.cpp
-	Copyright (c) 2014 Mark Hutcheson
+    GameEngine source - GameEngine.cpp
+    Copyright (c) 2014 Mark Hutcheson
 */
 
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
-#include "Image.h"
 #include "opengl-api.h"
-#include "easylogging++.h"
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
@@ -18,317 +16,235 @@
 #include "NetworkThread.h"
 #include "ParticleSystem.h"
 #include "ParticleEditor.h"
-using namespace std;
+#include "InputDevice.h"
+#include "InputManager.h"
+#include "SoundManager.h"
+#include "InterpolationManager.h"
+#include "Object.h"
+#include "Node.h"
+#include "Logger.h"
 
 //#define DEBUG_INPUT
+#define CONFIG_FILE "config.xml"
+#define CONTROLLER_DISCONNECTED_IMAGE "res/util/disconnected.png"
 
 //For our engine functions to be able to call our Engine class functions
 GameEngine* g_pGlobalEngine;
-float g_fParticleFac;
 
-GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, string sTitle, string sAppName, string sIcon, bool bResizable) : 
-Engine(iWidth, iHeight, sTitle, sAppName, sIcon, bResizable)
+GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, const std::string& sCompanyName, const std::string& sAppName, const std::string& sIcon, bool bResizable) : Engine(iWidth, iHeight, sTitle, sCompanyName, sAppName, sIcon, bResizable)
 {
-	g_pGlobalEngine = this;
-	
-	//Set camera position for this game
-	m_fDefCameraZ = -16;
-	CameraPos = Vec3(0,0,m_fDefCameraZ);
+    g_pGlobalEngine = this;
+
+    //Set camera position for this game
+    m_fDefCameraZ = -16;
+    cameraPos = Vec3(0,0,m_fDefCameraZ);
 #ifdef _DEBUG
-	m_bMouseGrabOnWindowRegain = false;
+    m_bMouseGrabOnWindowRegain = false;
 #else
-	m_bMouseGrabOnWindowRegain = true;
+    m_bMouseGrabOnWindowRegain = true;
 #endif
-	showCursor();
-	
-	m_controller = NULL;
-	m_rumble = NULL;
-	player = NULL;
-	
-	//Keybinding stuff!
-	JOY_AXIS_TRIP = 20000;
-	KEY_UP1 = SDL_SCANCODE_W;
-	KEY_UP2 = SDL_SCANCODE_UP;
-	KEY_DOWN1 = SDL_SCANCODE_S;
-	KEY_DOWN2 = SDL_SCANCODE_DOWN;
-	KEY_LEFT1 = SDL_SCANCODE_A;
-	KEY_LEFT2 = SDL_SCANCODE_LEFT;
-	KEY_RIGHT1 = SDL_SCANCODE_D;
-	KEY_RIGHT2 = SDL_SCANCODE_RIGHT;
-	KEY_ENTER1 = SDL_SCANCODE_SPACE;
-	KEY_ENTER2 = SDL_SCANCODE_RETURN;
+    showCursor();
 
-	g_fParticleFac = 1.0f;
+    player = NULL;
 
-	m_debugUI = new DebugUI(this);
+    //Keybinding stuff!
+    JOY_AXIS_TRIP = 20000;
 
-	steelSeriesClient = new SteelSeriesClient();
+    m_debugUI = new DebugUI(this);
+
+    steelSeriesClient = new SteelSeriesClient();
 }
 
 GameEngine::~GameEngine()
 {
-	LOG(INFO) << "~GameEngine()";
-	saveConfig(getSaveLocation() + "config.xml");
-	getEntityManager()->cleanup();
-	delete m_debugUI;
-	delete steelSeriesClient;
-	NetworkThread::stop();
+    LOG(INFO) << "~GameEngine()";
+    saveConfig(getSaveLocation() + CONFIG_FILE);
+    getEntityManager()->cleanup();
+    delete m_debugUI;
+    delete steelSeriesClient;
+    NetworkThread::stop();
+    delete Lua;
 }
 
 void GameEngine::frame(float dt)
 {
-	handleKeys();
+    handleKeys();
 
-	stepPhysics(dt);
+    stepPhysics(dt);
 #ifdef _DEBUG
-	if(m_debugUI->particleEditor->open && m_debugUI->visible)
-		m_debugUI->particleEditor->particles->update(dt);
-	else
+    if(m_debugUI->particleEditor->open && m_debugUI->visible)
+        m_debugUI->particleEditor->particles->update(dt);
+    else
 #endif
-	{
-		getEntityManager()->update(dt);
-	}
-	steelSeriesClient->update(dt);
-	
-	//Load a new scene after updating if we've been told to
-	if(m_sLoadScene.size())
-	{
-		loadScene(m_sLoadScene);
-		m_sLoadScene.clear();
-		if(m_sLoadNode.size())
-		{
-			//Warp to node on map
-			warpObjectToNode(player, getEntityManager()->getNode(m_sLoadNode));
-			m_sLoadNode.clear();
-		}
-	}
+    {
+        getEntityManager()->update(dt);
+    }
+    steelSeriesClient->update(dt);
+    getInterpolationManager()->update(dt);
+
+    //Load a new scene after updating if we've been told to
+    if(m_sLoadScene.size())
+    {
+        loadScene(m_sLoadScene);
+        m_sLoadScene.clear();
+        if(m_sLoadNode.size())
+        {
+            //Warp to node on map
+            warpObjectToNode(player, getEntityManager()->getNode(m_sLoadNode));
+            m_sLoadNode.clear();
+        }
+    }
 }
 
-void GameEngine::draw()
+const double CAMERA_ANGLE_RAD = glm::radians(60.0);
+void GameEngine::draw(RenderState& renderState)
 {
-	//Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
-	glDisable(GL_CULL_FACE);	//Draw both sides of 2D objects (So we can flip images for free)
-	glDisable(GL_LIGHTING);
-	fillScreen(Color(0,0,0,1));
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
+    //Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
+    glDisable(GL_CULL_FACE);    //Draw both sides of 2D objects (So we can flip images for free)
+    glClear(GL_DEPTH_BUFFER_BIT);
 
-	m_debugUI->draw();
-	
-	glColor4f(1,1,1,1);
-	
-	//-------------------------------------------------------------
-	//Set up OpenGL lights
-	//TODO: Remove or move to an actual class
-	//-------------------------------------------------------------
-	float lightPosition[] = {0.0, 0.0, 0.0, 1.0};
-	float lightAmbient[]  = {0.0f, 0.0f, 0.0f, 1.0f};
-	float lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	float lightSpecular[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
+    //Draw debug UI
+    m_debugUI->draw();
 
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
-	
-	
-	//Set up OpenGL materials
-	float materialAmbient[] = {0.2f, 0.2f, 0.2f, 1.0f};
-	float materialDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f };
-	float materialSpecular[] = {0.6f, 0.6f, 0.6f, 1.0f };
-	float materialEmission[] = {0.0f, 0.0f, 0.0f, 1.0f };
-	float materialShininess = 50.0f;
-	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, materialAmbient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialDiffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, materialEmission);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
-		
-	//Set up global OpenGL lighting
-	float globalAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+    //Keep camera within camera bounds
+    if(rcSceneBounds.area())    //If it's not unset
+    {
+        //Check for within bounds
+        Rect rcCam = getCameraView(cameraPos);
+        if(rcCam.left < rcSceneBounds.left)
+        {
+            cameraPos.x -= rcSceneBounds.left - rcCam.left;
+            rcCam = getCameraView(cameraPos);
+        }
+        if(rcCam.right > rcSceneBounds.right)
+        {
+            cameraPos.x += rcCam.right - rcSceneBounds.right;
+            rcCam = getCameraView(cameraPos);
+        }
+        if(rcCam.top > rcSceneBounds.top)
+        {
+            cameraPos.y -= rcSceneBounds.top - rcCam.top;
+            rcCam = getCameraView(cameraPos);
+        }
+        if(rcCam.bottom < rcSceneBounds.bottom)
+        {
+            cameraPos.y += rcCam.bottom - rcSceneBounds.bottom;
+            rcCam = getCameraView(cameraPos);
+        }
+        //Secondary check to see if we're over both, in which case center
+        if(rcCam.left < rcSceneBounds.left)
+            cameraPos.x -= (rcSceneBounds.left - rcCam.left) / 2.0f;
+        if(rcCam.top > rcSceneBounds.top)
+            cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
+    }
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
+    //Set flat camera
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
 
-	//-------------------------------------------------------------
-	
-	//Keep camera within camera bounds
-	if(rcSceneBounds.area())	//If it's not unset
-	{
-		Rect rcCam = getCameraView(CameraPos);
-		if(rcCam.left < rcSceneBounds.left)
-		{
-			CameraPos.x += rcSceneBounds.left - rcCam.left;
-			rcCam = getCameraView(CameraPos);
-		}
-		if(rcCam.right > rcSceneBounds.right)
-		{
-			CameraPos.x -= rcCam.right - rcSceneBounds.right;
-			rcCam = getCameraView(CameraPos);
-		}
-		if(rcCam.top < rcSceneBounds.top)
-		{
-			CameraPos.y += rcSceneBounds.top - rcCam.top;
-			rcCam = getCameraView(CameraPos);
-		}
-		if(rcCam.bottom > rcSceneBounds.bottom)
-		{
-			CameraPos.y -= rcCam.bottom - rcSceneBounds.bottom;
-			rcCam = getCameraView(CameraPos);
-		}
-	}
-	glLoadIdentity();
-	glTranslatef(CameraPos.x, CameraPos.y, CameraPos.z);
-	//glLoadIdentity();
-	//gluLookAt(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z, -CameraPos.x, -CameraPos.y, 0.0f, 0, 0, 1);
-    //Vec3 eye(-CameraPos.x, -CameraPos.y + cos(CAMERA_ANGLE_RAD)*CameraPos.z, -sin(CAMERA_ANGLE_RAD)*CameraPos.z);
-    //Vec3 center(-CameraPos.x, -CameraPos.y, 0.0f);
-    //Vec3 up(0.0f, 0.0f, -1.0f); // working as intended
-    //glm::mat4 look = glm::lookAt(eye, center, up);
-    //glLoadMatrixf(glm::value_ptr(look));
+    //Set tilted view camera
+    //Vec3 eye(-cameraPos.x, -cameraPos.y + cos(CAMERA_ANGLE_RAD)*cameraPos.z, -sin(CAMERA_ANGLE_RAD)*cameraPos.z);
+    //Vec3 center(-cameraPos.x, -cameraPos.y, 0.0f);
+    //Vec3 up(0.0f, 0.0f, 1.0f);
+    //glm::mat4 view = glm::lookAt(eye, center, up);
+    renderState.view = view;
 
-	
-	glDisable(GL_LIGHTING);
-	glm::mat4 mat;	//TODO Use real mat
-	getEntityManager()->render(mat);
-	drawDebug();
+    glm::mat4 model = glm::mat4(1.0f);    //Identity matrix
+    renderState.model = model;
+    getEntityManager()->render(renderState);
 
 #ifdef _DEBUG
-	if(m_debugUI->particleEditor->open && m_debugUI->visible)
-	{
-		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		fillScreen(m_debugUI->particleEditor->particleBgColor);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		m_debugUI->particleEditor->particles->draw();
-	}
+    renderState.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, m_fDefCameraZ));
+    if(m_debugUI->particleEditor->open && m_debugUI->visible)
+    {
+        glClear(GL_DEPTH_BUFFER_BIT);
+        Color col = m_debugUI->particleEditor->particleBgColor;
+        glClearColor(col.r, col.g, col.b, col.a);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        m_debugUI->particleEditor->particles->draw(renderState);
+    }
+    renderState.view = view;
 #endif
-	
+
+    //TODO
+    //if(isControllerDisconnected())
+    //{
+        //glLoadIdentity();
+        //glTranslatef(0.0f, 0.0f, m_fDefCameraZ);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+        //glEnable(GL_BLEND);
+        //Image* disconnectedImage = getResourceLoader()->getImage(CONTROLLER_DISCONNECTED_IMAGE);
+        //if(disconnectedImage)
+        //    disconnectedImage->render4V(Vec2(-4.01, -1), Vec2(4.01, -1), Vec2(-4.01, 1), Vec2(4.01, 1));
+    //}
+
 }
 
-void GameEngine::init(list<commandlineArg> sArgs)
+bool GameEngine::init(std::vector<commandlineArg> sArgs)
 {
-	//Run through list for arguments we recognize
-	for (list<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
-		LOG(DEBUG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
-		
-	//Load our last screen position and such
-	loadConfig(getSaveLocation() + "config.xml");
-	
-	lua_State* L = Lua->getState();
-	
-	//Have to do this manually because non-constants?
-	//TODO: Fix/move from here
-	//TODO: Also update these on user key/joystick config
-	unsigned int JOY_BUTTON_BACK = SDL_CONTROLLER_BUTTON_BACK;
-	unsigned int JOY_BUTTON_START = SDL_CONTROLLER_BUTTON_START;
-	unsigned int JOY_BUTTON_X = SDL_CONTROLLER_BUTTON_X;
-	unsigned int JOY_BUTTON_Y = SDL_CONTROLLER_BUTTON_Y;
-	unsigned int JOY_BUTTON_A = SDL_CONTROLLER_BUTTON_A;
-	unsigned int JOY_BUTTON_B = SDL_CONTROLLER_BUTTON_B;
-	unsigned int JOY_BUTTON_LB = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
-	unsigned int JOY_BUTTON_RB = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
-	unsigned int JOY_BUTTON_LSTICK = SDL_CONTROLLER_BUTTON_LEFTSTICK;
-	unsigned int JOY_BUTTON_RSTICK = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
-	unsigned int JOY_AXIS_HORIZ = SDL_CONTROLLER_AXIS_LEFTX;
-	unsigned int JOY_AXIS_VERT = SDL_CONTROLLER_AXIS_LEFTY;
-	unsigned int JOY_AXIS2_HORIZ = SDL_CONTROLLER_AXIS_RIGHTX;
-	unsigned int JOY_AXIS2_VERT = SDL_CONTROLLER_AXIS_RIGHTY;
-	unsigned int JOY_AXIS_LT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
-	unsigned int JOY_AXIS_RT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
-	unsigned int JOY_DPAD_UP = SDL_CONTROLLER_BUTTON_DPAD_UP;
-	unsigned int JOY_DPAD_DOWN = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-	unsigned int JOY_DPAD_LEFT = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
-	unsigned int JOY_DPAD_RIGHT = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+    //Run through list for arguments we recognize
+    for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+        LOG(DBG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 
-	//Set joystick config
-	luaSetGlobal(JOY_BUTTON_BACK);
-	luaSetGlobal(JOY_BUTTON_START);
-	luaSetGlobal(JOY_BUTTON_X);
-	luaSetGlobal(JOY_BUTTON_Y);
-	luaSetGlobal(JOY_BUTTON_A);
-	luaSetGlobal(JOY_BUTTON_B);
-	luaSetGlobal(JOY_BUTTON_LB);
-	luaSetGlobal(JOY_BUTTON_RB);
-	luaSetGlobal(JOY_BUTTON_LSTICK);
-	luaSetGlobal(JOY_BUTTON_RSTICK);
-	luaSetGlobal(JOY_AXIS_HORIZ);
-	luaSetGlobal(JOY_AXIS_VERT);
-	luaSetGlobal(JOY_AXIS2_HORIZ);
-	luaSetGlobal(JOY_AXIS2_VERT);
-	luaSetGlobal(JOY_AXIS_LT);
-	luaSetGlobal(JOY_AXIS_RT);
-	luaSetGlobal(JOY_AXIS_TRIP);
-	luaSetGlobal(JOY_DPAD_UP);
-	luaSetGlobal(JOY_DPAD_DOWN);
-	luaSetGlobal(JOY_DPAD_LEFT);
-	luaSetGlobal(JOY_DPAD_RIGHT);
+    //Load our last screen position and such
+    loadConfig(getSaveLocation() + CONFIG_FILE);
 
-	//Set key config
-	luaSetGlobal(KEY_UP1);
-	luaSetGlobal(KEY_UP2);
-	luaSetGlobal(KEY_DOWN1);
-	luaSetGlobal(KEY_DOWN2);
-	luaSetGlobal(KEY_LEFT1);
-	luaSetGlobal(KEY_LEFT2);
-	luaSetGlobal(KEY_RIGHT1);
-	luaSetGlobal(KEY_RIGHT2);
-	luaSetGlobal(KEY_ENTER1);
-	luaSetGlobal(KEY_ENTER2);
-	
-	Lua->call("loadLua");
+    //Init lua
+    std::string s = getResourceLoader()->getTextFile("res/lua/init.lua");
+    Lua = new LuaInterface(s.c_str());
+    if(!Lua->Init())
+    {
+        LOG(ERR) << "Failed to init lua";
+        return false;
+    }
+    Lua->call("loadLua");
 
-	string sLocale = SystemUtils::getCurLocale();
-	if(sLocale.size())
-	{
-		LOG(INFO) << "Current system locale: " << sLocale;
-		getStringbank()->setLanguage(sLocale.c_str());
-	}
+    std::string sLocale = SystemUtils::getCurLocale();
+    if(sLocale.size())
+    {
+        LOG(INFO) << "Current system locale: " << sLocale;
+        getStringbank()->setLanguage(sLocale.c_str());
+    }
 
-	//Start network thread, if SS engine is here
-	if(steelSeriesClient->isValid())
-	{
-		//TODO: If we have other networking stuff, this shouldn't depend on SS engine
-		if(!NetworkThread::start())
-			LOG(ERROR) << "Unable to start networking thread";
+    //Start network thread, if SS engine is here
+    if(steelSeriesClient->isValid())
+    {
+        //NOTE: If we have other networking stuff later, this shouldn't depend on SS engine
+        if(!NetworkThread::start())
+            LOG(ERR) << "Unable to start networking thread";
 
-		//Open communication to SteelSeries drivers
-		if(steelSeriesClient->init(getAppName()))
-			LOG(INFO) << "Initialized with SteelSeries drivers";
-		else
-			LOG(WARNING) << "Unable to communicate with SteelSeries drivers";
-	}
+        //Open communication to SteelSeries drivers
+        if(steelSeriesClient->init(getAppName()))
+            LOG(INFO) << "Initialized with SteelSeries drivers";
+        else
+            LOG(WARN) << "Unable to communicate with SteelSeries drivers";
+    }
 
+    //Add kb+mouse controller
+    getInputManager()->addController(new InputDevice(steelSeriesClient));
+    return true;
 }
 
 void GameEngine::pause()
 {
-	pauseMusic();
+    getSoundManager()->pauseAll();
 }
 
 void GameEngine::resume()
 {
-	resumeMusic();
+    getSoundManager()->resumeAll();
 }
 
 void GameEngine::warpObjectToNode(Object* o, Node* n)
 {
-	if(o && n)
-		o->setPosition(n->pos);
+    if(o && n)
+        o->setPosition(n->pos);
 }
 
-
+bool GameEngine::drawDebugUI()
+{
+    return m_debugUI->visible;
+}
 
 
 

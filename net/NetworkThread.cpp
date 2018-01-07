@@ -7,7 +7,7 @@
 #include "MutexLock.h"
 #include "SDL_thread.h"
 #include "SDL_timer.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "minihttp.h"
 
 // Overloaded socket class that handles incoming data.
@@ -21,12 +21,12 @@ protected:
 	virtual void _OnRecv(void *buf, unsigned int size)
 	{
 #ifdef _DEBUG
-		if(size)
-		{
-			printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
-			fwrite(buf, 1, size, stdout);
-			puts("\n===END====================");
-		}
+		//if(size)
+		//{
+		//	printf("===START==[Status:%d, Size:%d]======\n", GetStatusCode(), size);
+		//	fwrite(buf, 1, size, stdout);
+		//	puts("\n===END====================");
+		//}
 #endif
 	}
 };
@@ -67,12 +67,12 @@ namespace NetworkThread
 
 	static int NetworkingThread(void *ptr)
 	{
-		LOG(INFO) << "Starting networking thread";
+		//LOG(INFO) << "Starting networking thread";
 
 		//Init networking
 		minihttp::InitNetwork();
 		atexit(minihttp::StopNetwork);
-				
+
 		//Start main loop
 		bool shouldStop = false;
 		while(!shouldStop)
@@ -93,7 +93,7 @@ namespace NetworkThread
 			SDL_Delay(10);
 		}
 
-		LOG(INFO) << "Networking thread finished";
+		//LOG(INFO) << "Networking thread finished";
 		return 0;
 	}
 
@@ -116,7 +116,7 @@ namespace NetworkThread
 			MutexLock lock(stopMutex);
 			stopFlag = true;
 		}
-		
+
 		//Wait for thread to finish
 		int threadReturnValue;
 		SDL_WaitThread(thread, &threadReturnValue);

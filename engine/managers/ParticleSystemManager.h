@@ -3,29 +3,29 @@
 #include "Observer.h"
 #include "Subject.h"
 #include "ResourceLoader.h"
-#include "glmx.h"
+#include "RenderState.h"
 
 class ParticleSystem;
 
 class ParticleSystemManager : public Observer
 {
-	ParticleSystemManager() {};
+    ParticleSystemManager() {};
 
-	std::list<ParticleSystem*> m_particles;
-	std::list<ParticleSystem*> m_updateParticles;
-	Subject* m_notifySubject;
-	ResourceLoader* m_loader;
-	bool updating;
+    std::vector<ParticleSystem*> m_particles;
+    std::vector<ParticleSystem*> m_updateParticles;
+    Subject* m_notifySubject;
+    ResourceLoader* m_loader;
+    bool updating;
 
 public:
-	ParticleSystemManager(ResourceLoader* loader);
-	~ParticleSystemManager();
+    ParticleSystemManager(ResourceLoader* loader);
+    ~ParticleSystemManager();
 
-	void add(ParticleSystem* sys);
-	void cleanup();
-	void render(glm::mat4 mat);
-	void update(float dt);
+    void add(ParticleSystem* sys);
+    void cleanup();
+    void render(const RenderState& renderState);
+    void update(float dt);
 
-	virtual void onNotify(std::string sParticleFilename, Vec2 pos);
+    virtual void onNotify(const std::string& sParticleFilename, Vec2 pos);
 };
 

@@ -4,11 +4,11 @@
 
 MutexLock::MutexLock(SDL_mutex * m)
 {
-	mutex = m;
-	assert(!SDL_LockMutex(m));
+    mutex = m;
+    assert(!SDL_LockMutex(m));
 }
 
 MutexLock::~MutexLock()
 {
-	assert(!SDL_UnlockMutex(mutex));
+    assert(!SDL_UnlockMutex(mutex));
 }

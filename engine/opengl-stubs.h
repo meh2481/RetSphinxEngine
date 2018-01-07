@@ -15,6 +15,7 @@ GL_FUNC(void,glPushAttrib,(GLbitfield mask),(mask),)
 GL_FUNC(GLenum,glGetError,(void),(),return)
 GL_FUNC(void,glGetFloatv,(GLenum pname, GLfloat *params),(pname,params),)
 GL_FUNC(void,glGetDoublev,(GLenum pname, GLdouble *params),(pname,params),)
+GL_FUNC(void, glGetBooleanv, (GLenum pname, GLboolean* params), (pname, params),)
 GL_FUNC(void,glGetTexParameterfv,(GLenum target, GLenum pname, GLfloat *params),(target,pname,params),)
 GL_FUNC(void,glViewport,(GLint x, GLint y, GLsizei width, GLsizei height),(x,y,width,height),)
 GL_FUNC(void,glScissor,(GLint x, GLint y, GLsizei width, GLsizei height),(x,y,width,height),)
@@ -37,6 +38,7 @@ GL_FUNC(void,glTexImage2D,(GLenum target, GLint level, GLenum internalFormat, GL
 #else
 GL_FUNC(void,glTexImage2D,(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels),(target,level,internalFormat,width,height,border,format,type,pixels),)
 #endif
+GL_FUNC(void,glCompressedTexImage2D,(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data),(target,level,internalformat,width,height,border,imageSize,data),)
 GL_FUNC(void,glBindTexture,(GLenum target,GLuint name),(target,name),)
 GL_FUNC(void,glDeleteTextures,(GLsizei n, const GLuint *textures),(n,textures),)
 GL_FUNC(void,glTexParameterf,(GLenum target, GLenum pname, GLfloat param),(target,pname,param),)
@@ -44,70 +46,43 @@ GL_FUNC(void,glTexParameteri,(GLenum target, GLenum pname, GLint param),(target,
 GL_FUNC(void,glPixelStorei,(GLenum pname, GLint param),(pname,param),)
 GL_FUNC(void,glTexSubImage2D,(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels),(target,level,xoffset,yoffset,width,height, format,type,pixels),)
 
-// deprecated?
+//FIXME: deprecated
 GL_FUNC(void,glBegin,(GLenum e),(e),)
 GL_FUNC(void,glEnd,(void),(),)
-
-// matrix stack - deprecated
 GL_FUNC(void,glLoadIdentity,(void),(),)
 GL_FUNC(void,glPopMatrix,(void),(),)
 GL_FUNC(void,glPushMatrix,(void),(),)
 GL_FUNC(void,glRotatef,(GLfloat angle, GLfloat x, GLfloat y, GLfloat z),(angle,x,y,z),)
 GL_FUNC(void,glScalef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
 GL_FUNC(void,glTranslatef,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
-GL_FUNC(void,glLoadMatrixf,(const GLfloat *m),(m),)
+GL_FUNC(void, glVertex2f, (GLfloat x, GLfloat y), (x, y), )
+GL_FUNC(void, glPointSize, (GLfloat size), (size), )
+GL_FUNC(void, glTexCoord2f, (GLfloat u, GLfloat v), (u, v), )
+GL_FUNC(void, glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha), (red, green, blue, alpha), )
+GL_FUNC(void, glClearDepth, (GLdouble depth), (depth), )
+GL_FUNC(void, glDepthFunc, (GLenum func), (func), )
+GL_FUNC(void, glHint, (GLenum target, GLenum mode), (target, mode), )
 
 // drawing
 GL_FUNC(void,glVertexPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
-GL_FUNC(void,glTexCoordPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer),(size,type,stride,pointer),)
+GL_FUNC(void, glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const GLvoid *pointer), (size, type, stride, pointer),)
+GL_FUNC(void, glNormalPointer, (GLenum type, GLsizei stride, const GLvoid *pointer), (type, stride, pointer),)
 GL_FUNC(void,glDrawArrays,(GLenum mode, GLint first, GLsizei count),(mode,first,count),)
 GL_FUNC(void,glDrawElements,(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices),(mode,count,type,indices),)
+GL_FUNC(void, glColorPointer, (GLint size, GLenum type, GLsizei stride, const GLvoid *ptr), (size, type, stride, ptr), )
+GL_FUNC(void, glBlendEquationSeparate, (GLenum modeRGB, GLenum modeAlpha), (modeRGB, modeAlpha), )
 
-GL_FUNC(void,glVertex3f,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
-GL_FUNC(void,glVertex3i,(GLint x, GLint y, GLint z),(x,y,z),)
-GL_FUNC(void,glVertex2f,(GLfloat x, GLfloat y),(x,y),)
-GL_FUNC(void,glPointSize,(GLfloat size),(size),)
-GL_FUNC(void,glNormal3f,(GLfloat x, GLfloat y, GLfloat z),(x,y,z),)
-GL_FUNC(void,glDeleteLists,(GLuint list, GLsizei range),(list,range),)
-GL_FUNC(GLuint,glGenLists,(GLsizei range),(range),return)
-GL_FUNC(void,glNewList,(GLuint list, GLenum mode),(list,mode),)
-GL_FUNC(void,glTexCoord2f,(GLfloat u, GLfloat v),(u,v),)
-GL_FUNC(void,glEndList,(void),(),)
-GL_FUNC(void,glPolygonMode,(GLenum face, GLenum mode),(face,mode),)
-GL_FUNC(void,glCallList,(GLuint list),(list),)
-GL_FUNC(void,glColor4f,(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha),(red,green,blue,alpha),)
-GL_FUNC(void,glColor3f,(GLfloat red, GLfloat green, GLfloat blue),(red,green,blue),)
-GL_FUNC(void,glClearDepth,(GLdouble depth),(depth),)
-GL_FUNC(void,glDepthFunc,(GLenum func),(func),)
-GL_FUNC(void,glHint,(GLenum target,  GLenum mode),(target,mode),)
-GL_FUNC(void,glShadeModel,(GLenum  mode),(mode),)
-GL_FUNC(void,glLightfv,(GLenum light, GLenum pname, const GLfloat *params),(light,pname,params),)
-GL_FUNC(void,glGetLightfv,(GLenum light, GLenum pname, GLfloat *params),(light,pname,params),)
-GL_FUNC(void,glLightModelfv,(GLenum pname, const GLfloat *params),(pname, params),)
-GL_FUNC(void,glMaterialfv,(GLenum face, GLenum pname, const GLfloat *params),(face, pname, params),)
-GL_FUNC(void,glMaterialf,(GLenum face, GLenum pname, const GLfloat param),(face, pname, param),)
-
-GL_FUNC(void,glColorPointer,(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr),(size,type,stride,ptr),)
-
-
-//Win32 context stuff
-#ifdef _WIN32
-GL_FUNC(HGLRC,wglCreateContext,(HDC hdc),(hdc),return)
-GL_FUNC(HGLRC,wglGetCurrentContext,(void),(),return)
-GL_FUNC(BOOL,wglShareLists,(HGLRC hglrc1, HGLRC hglrc2),(hglrc1, hglrc2),return)
-GL_FUNC(BOOL,wglDeleteContext,(HGLRC hglrc),(hglrc),return)
-#endif
-
-
-
+//Shader stuff
 GL_PTR(PFNGLUNIFORM1IPROC, glUniform1i)
 GL_PTR(PFNGLUNIFORM1UIPROC, glUniform1ui)
 GL_PTR(PFNGLUNIFORM3IPROC, glUniform3i)
 GL_PTR(PFNGLUNIFORM3UIPROC, glUniform3ui)
 GL_PTR(PFNGLUNIFORM1FPROC, glUniform1f)
 GL_PTR(PFNGLUNIFORM3FPROC, glUniform3f)
-GL_PTR(PFNGLUNIFORM4FPROC, glUniform4f)
-GL_PTR(PFNGLUNIFORM4FPROC, glUniform4fv)
+//NOTE: SDL is non-compliant with OpenGL spec here, so we'll define our own API entries for uniforms
+typedef void (APIENTRYP PFNGLUNIFORM4FPROC_FIXED) (GLint location, GLsizei count, const GLfloat * value);
+GL_PTR(PFNGLUNIFORM4FPROC_FIXED, glUniform4f)
+GL_PTR(PFNGLUNIFORM4FPROC_FIXED, glUniform4fv)
 GL_PTR(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv)
 GL_PTR(PFNGLUSEPROGRAMPROC,glUseProgram)
 GL_PTR(PFNGLBINDVERTEXARRAYPROC,glBindVertexArray)

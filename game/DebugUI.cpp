@@ -1,91 +1,124 @@
 #include "DebugUI.h"
 #include "imgui/imgui.h"
 #include "GameEngine.h"
-#include "easylogging++.h"
+#include "Logger.h"
 #include "SteelSeriesEditor.h"
 #include "ParticleEditor.h"
+#include "LevelEditor.h"
+#include "InputDevice.h"
+#include "InputManager.h"
+#include <vector>
+#include <list>
 #include <climits>
 
 DebugUI::DebugUI(GameEngine *ge)
 {
-	visible = false;
-	hadFocus = false;
-	_ge = ge;
-	rumbleMenu = false;
-	windowFlags = ImGuiWindowFlags_ShowBorders;
+    visible = false;
+    hadFocus = false;
+    _ge = ge;
+    rumbleMenu = true;
+    windowFlags = ImGuiWindowFlags_ShowBorders;
 
-	largeMotorStrength = USHRT_MAX;
-	smallMotorStrength = USHRT_MAX;
-	motorDuration = 100;
-	
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
-	style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
-	
-	steelSeriesEditor = new SteelSeriesEditor(ge);
-	particleEditor = new ParticleEditor(ge);
+    largeMotorStrength = USHRT_MAX;
+    smallMotorStrength = USHRT_MAX;
+    motorDuration = 100;
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
+    style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.9f);
+
+    steelSeriesEditor = new SteelSeriesEditor(ge);
+    particleEditor = new ParticleEditor(ge);
+    levelEditor = new LevelEditor(ge);
 }
 
 DebugUI::~DebugUI()
 {
-	delete steelSeriesEditor;
-	delete particleEditor;
+    delete steelSeriesEditor;
+    delete particleEditor;
+    delete levelEditor;
 }
 
 void DebugUI::draw()
 {
-	_draw();
-	hadFocus = ImGui::IsMouseHoveringAnyWindow();
+    _draw();
+    hadFocus = ImGui::IsMouseHoveringAnyWindow();
 }
 
 void DebugUI::_draw()
 {
-	if(!visible)
-		return;
+    if(!visible)
+        return;
 
-	if(ImGui::BeginMainMenuBar())
-	{
-		if(ImGui::BeginMenu("Windows"))
-		{
-			ImGui::MenuItem("Memory Editor", NULL, &memEdit.Open);
+    if(ImGui::BeginMainMenuBar())
+    {
+        if(ImGui::BeginMenu("Windows"))
+        {
+            ImGui::MenuItem("Memory Editor", NULL, &memEdit.Open);
 
-			ImGui::MenuItem("Controller Rumble", NULL, &rumbleMenu);
+            ImGui::MenuItem("Controller Rumble", NULL, &rumbleMenu);
 
-			ImGui::MenuItem("SteelSeries", NULL, &steelSeriesEditor->open);
+            ImGui::MenuItem("SteelSeries", NULL, &steelSeriesEditor->open);
 
-			ImGui::MenuItem("Particle System Editor", NULL, &particleEditor->open);
+            ImGui::MenuItem("Particle System Editor", NULL, &particleEditor->open);
 
-			ImGui::EndMenu();
-		}
+            ImGui::MenuItem("Level Editor", NULL, &levelEditor->open);
 
-		ImGui::EndMainMenuBar();
-	}
+            ImGui::EndMenu();
+        }
 
-	if(memEdit.Open)
-		memEdit.Draw("Memory Editor", (unsigned char*)_ge, sizeof(*_ge), 0, windowFlags);
+        ImGui::EndMainMenuBar();
+    }
 
-	if(steelSeriesEditor->open)
-		steelSeriesEditor->draw(windowFlags);
+    if(memEdit.Open)
+        memEdit.Draw("Memory Editor", (unsigned char*)_ge, sizeof(*_ge), 0, windowFlags);
 
-	if(particleEditor->open)
-		particleEditor->draw(windowFlags);
+    if(steelSeriesEditor->open)
+        steelSeriesEditor->draw(windowFlags);
 
-	if(rumbleMenu)
-	{
-		if(ImGui::Begin("Controller Rumble", &rumbleMenu, windowFlags))
-		{
-			//Controller rumble testing
-			if(ImGui::Button("Test controller rumble"))
-				_ge->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength);
-			ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
-			ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
-			ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
-		}
-		ImGui::End();
-	}
+    if(particleEditor->open)
+        particleEditor->draw(windowFlags);
+
+    if(levelEditor->open)
+    {
+#ifdef _DEBUG
+        _ge->pausePhysics();
+#endif
+        levelEditor->draw(windowFlags, hasFocus());
+    }
+#ifdef _DEBUG
+    else
+        _ge->playPhysics();
+#endif
+
+    if(rumbleMenu)
+    {
+        if(ImGui::Begin("Controller Rumble", &rumbleMenu, windowFlags))
+        {
+            //Controller rumble testing
+            if(ImGui::Button("Test controller rumble"))
+            {
+                InputDevice* controller = _ge->getInputManager()->getCurController();
+                if(controller != NULL)
+                    controller->rumbleLR(motorDuration, largeMotorStrength, smallMotorStrength, _ge->getSeconds());
+            }
+            ImGui::SliderInt("Large motor", &largeMotorStrength, 0, USHRT_MAX);
+            ImGui::SliderInt("Small motor", &smallMotorStrength, 0, USHRT_MAX);
+            ImGui::SliderInt("Rumble duration (ms)", &motorDuration, 10, 5000);
+            ImGui::Text("Controllers connected:");
+            std::vector<InputDevice*> controllerList = _ge->getInputManager()->getControllerList();
+            InputDevice* currentController = _ge->getInputManager()->getCurController();
+            for(size_t i = 0; i < controllerList.size(); i++)
+            {
+                InputDevice* id = controllerList[i];
+                ImGui::Text("%s%s#%d %s: %s", (id == currentController)?("* "):(""), (id->hasHaptic())?("(haptic) "):(""), id->getDeviceIndex(), id->getControllerName().c_str(), id->getJoystickName().c_str());
+            }
+        }
+        ImGui::End();
+    }
 }
 
 bool DebugUI::hasFocus()
 {
-	return visible && (hadFocus || ImGui::IsMouseHoveringAnyWindow());
+    return visible && (hadFocus || ImGui::IsMouseHoveringAnyWindow());
 }

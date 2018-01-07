@@ -1,11 +1,10 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
 
 #include <iostream>
 #include "opengl-api.h"
-#include "easylogging++.h"
+#include "Logger.h"
 
 
 // Populate global namespace with static function pointers pFUNC,
@@ -25,7 +24,7 @@ static bool lookup_glsym(const char *funcname, void **func)
     *func = SDL_GL_GetProcAddress(funcname);
     if (*func == NULL)
     {
-		LOG(ERROR) << "Failed to find OpenGL symbol '" << funcname << "'";
+        LOG(ERR) << "Failed to find OpenGL symbol '" << funcname << "'";
         return false;
     }
     return true;
