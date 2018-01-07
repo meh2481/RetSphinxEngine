@@ -3,6 +3,7 @@
 #include "Quad.h"
 #include "SDL_opengl.h"
 #include <cstring>
+#include <cstdlib>
 
 ImgFont::ImgFont(Image* image, unsigned int count, uint32_t* codePoints, float* imgRects)
 {
