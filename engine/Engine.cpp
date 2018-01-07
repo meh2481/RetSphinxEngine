@@ -473,7 +473,7 @@ Vec2 Engine::worldPosFromCursor(Vec2 cursorpos, Vec3 Camera)
 
 void Engine::stepPhysics(float dt)
 {
-    m_physicsWorld->Step(dt * m_fTimeScale, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
+    m_physicsWorld->Step(dt, VELOCITY_ITERATIONS, PHYSICS_ITERATIONS);
 
     //Update collisions
     std::set<b2Contact*> contacts = m_clContactListener->currentContacts;    //Grab all the currently-active contacts

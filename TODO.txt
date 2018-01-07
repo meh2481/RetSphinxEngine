@@ -1,7 +1,6 @@
 Current higher pri:
-- Slowing down via key doesn't change particle dt; particles are thus affected by framerate
 - Load Music from pak? Need to stream from disk
-- Particle with x that tapers to points (anime-style)
+- Particle with x that tapers to points (anime-style) - also see star lens flares on space photos
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
 - Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
 	- Automatically walk dependency chain to get used assets per chunk / manually specify?
@@ -9,7 +8,7 @@ Current higher pri:
 	- Potentially can export current resources via keypress or something like that; requires pak to have been hit for all tho
 		-If so, large errors like error textures etc. for when a miss happens (as described in talk). These will have to be stubbed out for final game
 	- Think about tree structure for asset dependencies, pros/cons
-- Better handling of raw vs. DXT images
+- Better handling of raw vs. DXT images for compression - need to be able to specify which you want
 - Compressor should be multithreaded
 - Remove OpenGL deprecated things and re-enable forward compat flag
 	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)

@@ -70,14 +70,14 @@ void GameEngine::frame(float dt)
 {
     handleKeys();
 
-    stepPhysics(dt);
+    stepPhysics(dt * getTimeScale());
 #ifdef _DEBUG
     if(m_debugUI->particleEditor->open && m_debugUI->visible)
-        m_debugUI->particleEditor->particles->update(dt);
+        m_debugUI->particleEditor->particles->update(dt * getTimeScale());
     else
 #endif
     {
-        getEntityManager()->update(dt);
+        getEntityManager()->update(dt * getTimeScale());
     }
     steelSeriesClient->update(dt);
     getInterpolationManager()->update(dt);
