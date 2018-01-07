@@ -7,6 +7,7 @@
 #include "opengl-api.h"
 #include "Object.h"
 #include "Random.h"
+#include <cstdlib>
 
 Arc::Arc(unsigned number)
 {
@@ -39,7 +40,7 @@ void Arc::draw(glm::mat4 mat)
     ////Calculate angle between two points and offset accordingly
     //float fDistance = sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.y-p1.y)*(p2.y-p1.y));
     //float fAngle = -atan2((p2.y-p1.y),(p2.x-p1.x));
-    //    
+    //
     ////Offset according to depth
     //glTranslatef(p1.x, -p1.y, depth);
     //glRotatef(glm::degrees(fAngle),0.0f,0.0f,1.0f);
@@ -87,15 +88,15 @@ void Arc::init()
 void Arc::average()
 {
     if(avg < 1) return;
-    
+
     float* temp = (float*) malloc(sizeof(float)*numSegments);
-    
+
     //Copy our array values into temporary storage to work off of
     memcpy(temp, segmentPos, sizeof(float)*numSegments);
-    
+
     //Center two end values
     temp[0] = temp[numSegments-1] = 0.0f;
-    
+
     //Loop through, averaging values of all but two end values
     for(int i = 1; i < int(numSegments)-1; i++)
     {
@@ -107,7 +108,7 @@ void Arc::average()
       }
       temp[i] = fTot / (float)(avg*2+1);
     }
-    
+
     //Copy back over
     memcpy(segmentPos, temp, sizeof(float)*numSegments);
     free(temp);
