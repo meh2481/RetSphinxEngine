@@ -5,19 +5,15 @@ sudo: false
 
 compiler:
   - gcc
-#  - clang
+  - clang
 
 os:
   - linux
 
-branches:
-  only:
-    - ci
-
 addons:
   apt:
     packages:
-#      - libbox2d-dev
+#      - libbox2d-dev   #This is backported on the travis-ci servers for some reason. We'll use our own
       - libglm-dev
       - libsdl2-dev
 
