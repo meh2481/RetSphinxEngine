@@ -1,6 +1,7 @@
 #include "ResourceCache.h"
 #include "Object3D.h"
 #include "ImgFont.h"
+#include <cstdlib>
 
 ResourceCache::~ResourceCache()
 {
