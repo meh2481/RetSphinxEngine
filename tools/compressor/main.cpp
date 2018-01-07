@@ -316,7 +316,9 @@ unsigned char* extractFont(const std::string& filename, unsigned int* fileSize)
 
     //First codepoint (0) is always 0,0,0,0
     codepoints.push_back(0);
-    imgRects.push_back({ 0,0,0,0 });
+    cRect cp0;
+    cp0.bottom = cp0.left = cp0.right = cp0.top = 0.0f;
+    imgRects.push_back(cp0);
 
     for(tinyxml2::XMLElement* elem = root->FirstChildElement("char"); elem != NULL; elem = elem->NextSiblingElement())
     {
