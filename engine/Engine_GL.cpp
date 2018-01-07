@@ -5,11 +5,10 @@
 #include "Logger.h"
 #include "ResourceLoader.h"
 
-#ifdef GL_GLEXT_VERSION
-static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
-#endif
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
+#ifdef _DEBUG
+static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback = NULL;
 #ifdef _WIN32
 static void __stdcall debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
 #else
@@ -34,7 +33,7 @@ static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity
         assert(false);
     }
 }
-
+#endif
 
 void Engine::setup_sdl()
 {
@@ -132,11 +131,8 @@ void Engine::setup_sdl()
         if(ven)
             LOG(INFO) << "GL vendor: " << ven;
 
-#ifdef GL_GLEXT_VERSION
-
-    glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
-
 #ifdef _DEBUG
+    glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
     if(glDebugMessageCallback)
     {
         LOG(DBG) << "Using GL debug callbacks";
@@ -145,7 +141,6 @@ void Engine::setup_sdl()
     }
     else
         LOG(DBG) << "glDebugMessageCallback() not supported";
-#endif
 #endif
 
     LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;
