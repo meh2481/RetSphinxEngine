@@ -2,6 +2,7 @@ Current higher pri:
 - Load Music from pak? Need to stream from disk
 - Particle with x that tapers to points (anime-style) - also see star lens flares on space photos
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
+- clear log after every day? Zip logs? Etc
 - Assets in pak files according to levels/chunks; all assets in one chunk are loaded at once
 	- Automatically walk dependency chain to get used assets per chunk / manually specify?
 	- Need some way of building out levels/chunks automatically, or more easy way to do it manually
@@ -26,6 +27,7 @@ Current higher pri:
 - Test at 144Hz and see what breaks
 
 Bugs:
+- Setting fps to 144 in config and then running on 60fps monitor causes game to be slow
 - Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5
 - Fix objsegment partial tiling? Or do I not care?
