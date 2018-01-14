@@ -1,21 +1,26 @@
-local lowpassfilter = {}
-lowpassfilter.__index = lowpassfilter
+local audiofilter = {}
+audiofilter.__index = audiofilter
 
 --Called when this node is created
-function lowpassfilter:init()
+function audiofilter:init()
 	self.freq = tonumber(node_getProperty(self, "freq"))
-	self.dsp = audio_createLowpassFilter(self.freq)
+	local filtertype = node_getProperty(self, "filtertype")
+	if filtertype == "highpass" then
+		self.dsp = audio_createHighpassFilter(self.freq)
+	else
+		self.dsp = audio_createLowpassFilter(self.freq)
+	end
 	self.x, self.y = node_getPos(self)
 	self.sizex, self.sizey = node_getVec2Property(self, "size")
 	audio_deactivateFilter(self.dsp)
 end
 
 --Called when an object enters this node
-function lowpassfilter:collide(object)
+function audiofilter:collide(object)
 end
 
 --Called every timestep to update the node
-function lowpassfilter:update(dt)
+function audiofilter:update(dt)
 	local player = obj_getPlayer()
 	if player == nil then return end
 	local objx, objy = obj_getPos(player)
@@ -30,8 +35,8 @@ function lowpassfilter:update(dt)
 end
 
 --Called when node is destroyed
-function lowpassfilter:destroy()
+function audiofilter:destroy()
 	audio_destroyFilter(self.dsp)
 end
 
-return lowpassfilter
+return audiofilter
