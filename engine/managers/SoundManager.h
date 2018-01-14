@@ -10,6 +10,7 @@
 typedef FMOD::Sound SoundHandle;
 typedef FMOD::Sound StreamHandle;
 typedef FMOD::Channel Channel;
+typedef FMOD::DSP SoundFilter;
 
 class ResourceLoader;
 class SoundVol;
@@ -83,6 +84,10 @@ public:
     void pauseMusic();
     void resumeMusic();
     Channel* getMusicChannel() { return musicChannel; }
+
+    //Filter functions
+    SoundFilter* createFilter();
+    void destroyFilter(SoundFilter* f);
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

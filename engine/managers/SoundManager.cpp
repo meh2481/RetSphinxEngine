@@ -23,8 +23,6 @@ int SoundManager::init()
     FMOD_RESULT result;
     unsigned int version;
     int numdrivers;
-    FMOD_SPEAKERMODE speakermode;
-    char name[256];
     //Create a System object and initialize.
     result = FMOD::System_Create(&system);
     ERRCHECK(result);
@@ -433,6 +431,28 @@ void SoundManager::resumeMusic()
 {
     if(musicChannel)
         musicChannel->setPaused(false);
+}
+
+SoundFilter* SoundManager::createFilter()
+{
+    SoundFilter* f;
+    FMOD_RESULT result = system->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &f);
+    ERRCHECK(result);
+    result = f->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_LOWPASS_12DB);
+    ERRCHECK(result);
+    result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, 5000.0f);
+    ERRCHECK(result);
+    //result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_Q, 1.0f);
+    //ERRCHECK(result);
+    result = masterChannelGroup->addDSP(FMOD_CHANNELCONTROL_DSP_HEAD, f);
+
+    return f;
+}
+
+void SoundManager::destroyFilter(SoundFilter * f)
+{
+    masterChannelGroup->removeDSP(f);
+    f->release();
 }
 
 void SoundManager::pauseAll()

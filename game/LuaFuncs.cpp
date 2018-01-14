@@ -238,6 +238,16 @@ public:
     {
         return g_pGlobalEngine->getResourceLoader()->getTextFile(filename);
     }
+
+    static SoundFilter* createSoundFilter()
+    {
+        return g_pGlobalEngine->getSoundManager()->createFilter();
+    }
+
+    static void destroySoundFilter(SoundFilter* f)
+    {
+        g_pGlobalEngine->getSoundManager()->destroyFilter(f);
+    }
 };
 
 
@@ -279,6 +289,39 @@ luaFunc(map_load)    //void map_load(string sFilename, string sNodeToPlacePlayer
 luaFunc(getFramerate)    //float getFramerate()
 {
     luaReturnNum(GameEngineLua::getFramerate());
+}
+
+//-----------------------------------------------------------------------------------------------------------
+// Audio functions
+//-----------------------------------------------------------------------------------------------------------
+luaFunc(audio_createFilter)
+{
+    SoundFilter* f = GameEngineLua::createSoundFilter();
+    luaReturnPtr(f);
+}
+
+luaFunc(audio_activateFilter)
+{
+    SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+    if(f)
+        f->setBypass(false);
+    luaReturnNil();
+}
+
+luaFunc(audio_deactivateFilter)
+{
+    SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+    if(f)
+        f->setBypass(true);
+    luaReturnNil();
+}
+
+luaFunc(audio_destroyFilter)
+{
+    SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+    if(f)
+        GameEngineLua::destroySoundFilter(f);
+    luaReturnNil();
 }
 
 //-----------------------------------------------------------------------------------------------------------
@@ -989,6 +1032,11 @@ static LuaFunctions s_functab[] =
     //Actions (input)
     luaRegister(action_analog),
     luaRegister(action_digital),
+    //Audio
+    luaRegister(audio_createFilter),
+    luaRegister(audio_activateFilter),
+    luaRegister(audio_deactivateFilter),
+    luaRegister(audio_destroyFilter),
     //Camera
     luaRegister(camera_centerOnXY),
     luaRegister(camera_getPos),
