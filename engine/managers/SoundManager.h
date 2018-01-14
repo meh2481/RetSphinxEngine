@@ -32,6 +32,12 @@ typedef enum
     TAIL = FMOD_CHANNELCONTROL_DSP_TAIL
 } FilterIndex;
 
+typedef enum
+{
+    LOWPASS = FMOD_DSP_MULTIBAND_EQ_FILTER_LOWPASS_12DB,
+    HIGHPASS = FMOD_DSP_MULTIBAND_EQ_FILTER_HIGHPASS_12DB
+} FilterType;
+
 class SoundManager
 {
 private:
@@ -95,8 +101,7 @@ public:
     Channel* getMusicChannel() { return musicChannel; }
 
     //Filter functions
-    SoundFilter* createLowpassFilter(float freq);
-    SoundFilter* createHighpassFilter(float freq);
+    SoundFilter* createFilter(float freq, int filter);
     void destroyFilter(SoundFilter* f);
     void assignFilter(SoundGroup group, SoundFilter* f, int idx);
 

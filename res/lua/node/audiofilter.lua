@@ -6,9 +6,9 @@ function audiofilter:init()
 	self.freq = tonumber(node_getProperty(self, "freq"))
 	local filtertype = node_getProperty(self, "filtertype")
 	if filtertype == "highpass" then
-		self.dsp = audio_createHighpassFilter(self.freq)
+		self.dsp = audio_createFilter(self.freq, HIGHPASS)
 	else
-		self.dsp = audio_createLowpassFilter(self.freq)
+		self.dsp = audio_createFilter(self.freq, LOWPASS)
 	end
 	self.x, self.y = node_getPos(self)
 	self.sizex, self.sizey = node_getVec2Property(self, "size")

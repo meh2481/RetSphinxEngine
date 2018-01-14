@@ -239,14 +239,9 @@ public:
         return g_pGlobalEngine->getResourceLoader()->getTextFile(filename);
     }
 
-    static SoundFilter* createLowpassFilter(float freq)
+    static SoundFilter* createFilter(float freq, int type)
     {
-        return g_pGlobalEngine->getSoundManager()->createLowpassFilter(freq);
-    }
-
-    static SoundFilter* createHighpassFilter(float freq)
-    {
-        return g_pGlobalEngine->getSoundManager()->createHighpassFilter(freq);
+        return g_pGlobalEngine->getSoundManager()->createFilter(freq, type);
     }
 
     static void assignFilter(SoundFilter* f, SoundGroup group, int idx)
@@ -304,24 +299,13 @@ luaFunc(getFramerate)    //float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 // Audio functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(audio_createLowpassFilter)  //SoundFilter* audio_createLowpassFilter(float freq)
+luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(float freq, int type)
 {
-    if(lua_isnumber(L, 1))
+    if(lua_isnumber(L, 1) && lua_isnumber(L, 2))
     {
         float freq = (float)lua_tonumber(L, 1);
-        SoundFilter* f = GameEngineLua::createLowpassFilter(freq);
-        GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
-        luaReturnPtr(f);
-    }
-    luaReturnNil();
-}
-
-luaFunc(audio_createHighpassFilter)  //SoundFilter* audio_createHighpassFilter(float freq)
-{
-    if(lua_isnumber(L, 1))
-    {
-        float freq = (float)lua_tonumber(L, 1);
-        SoundFilter* f = GameEngineLua::createHighpassFilter(freq);
+        int type = lua_tointeger(L, 2);
+        SoundFilter* f = GameEngineLua::createFilter(freq, type);
         GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
         luaReturnPtr(f);
     }
@@ -1061,8 +1045,7 @@ static LuaFunctions s_functab[] =
     luaRegister(action_analog),
     luaRegister(action_digital),
     //Audio
-    luaRegister(audio_createLowpassFilter),
-    luaRegister(audio_createHighpassFilter),
+    luaRegister(audio_createFilter),
     luaRegister(audio_activateFilter),
     luaRegister(audio_deactivateFilter),
     luaRegister(audio_destroyFilter),
@@ -1181,6 +1164,10 @@ static const struct
     luaConstant(GL_FRONT_AND_BACK),
     luaConstant(GL_EMISSION),
     luaConstant(GL_SHININESS),
+
+    //Audio
+    luaConstant(LOWPASS),
+    luaConstant(HIGHPASS),
 };
 
 void lua_register_all(lua_State *L)
