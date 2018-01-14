@@ -1154,17 +1154,6 @@ static const struct
     luaConstant(GROUP_BGFX),
     luaConstant(GROUP_VOX),
 
-    //gfx
-    luaConstant(GL_LIGHT0),
-    luaConstant(GL_LIGHT1),
-    luaConstant(GL_POSITION),
-    luaConstant(GL_AMBIENT),
-    luaConstant(GL_DIFFUSE),
-    luaConstant(GL_SPECULAR),
-    luaConstant(GL_FRONT_AND_BACK),
-    luaConstant(GL_EMISSION),
-    luaConstant(GL_SHININESS),
-
     //Audio
     luaConstant(LOWPASS),
     luaConstant(HIGHPASS),
