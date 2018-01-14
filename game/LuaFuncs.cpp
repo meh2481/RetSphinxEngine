@@ -239,9 +239,14 @@ public:
         return g_pGlobalEngine->getResourceLoader()->getTextFile(filename);
     }
 
-    static SoundFilter* createSoundFilter()
+    static SoundFilter* createLowpassFilter(float freq)
     {
-        return g_pGlobalEngine->getSoundManager()->createFilter();
+        return g_pGlobalEngine->getSoundManager()->createLowpassFilter(freq);
+    }
+
+    static void assignFilter(SoundFilter* f, SoundGroup group, int idx)
+    {
+        g_pGlobalEngine->getSoundManager()->assignFilter(group, f, idx);
     }
 
     static void destroySoundFilter(SoundFilter* f)
@@ -294,13 +299,19 @@ luaFunc(getFramerate)    //float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 // Audio functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(audio_createFilter)
+luaFunc(audio_createLowpassFilter)  //audio_createLowpassFilter(float freq)
 {
-    SoundFilter* f = GameEngineLua::createSoundFilter();
-    luaReturnPtr(f);
+    if(lua_isnumber(L, 1))
+    {
+        float freq = (float)lua_tonumber(L, 1);
+        SoundFilter* f = GameEngineLua::createLowpassFilter(freq);
+        GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
+        luaReturnPtr(f);
+    }
+    luaReturnNil();
 }
 
-luaFunc(audio_activateFilter)
+luaFunc(audio_activateFilter)   //audio_activateFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
@@ -308,7 +319,7 @@ luaFunc(audio_activateFilter)
     luaReturnNil();
 }
 
-luaFunc(audio_deactivateFilter)
+luaFunc(audio_deactivateFilter)   //audio_deactivateFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
@@ -316,7 +327,7 @@ luaFunc(audio_deactivateFilter)
     luaReturnNil();
 }
 
-luaFunc(audio_destroyFilter)
+luaFunc(audio_destroyFilter)   //audio_destroyFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
@@ -1033,7 +1044,7 @@ static LuaFunctions s_functab[] =
     luaRegister(action_analog),
     luaRegister(action_digital),
     //Audio
-    luaRegister(audio_createFilter),
+    luaRegister(audio_createLowpassFilter),
     luaRegister(audio_activateFilter),
     luaRegister(audio_deactivateFilter),
     luaRegister(audio_destroyFilter),

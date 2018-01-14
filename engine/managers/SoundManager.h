@@ -21,8 +21,16 @@ typedef enum
     GROUP_MUSIC,
     GROUP_SFX,
     GROUP_BGFX,
-    GROUP_VOX
+    GROUP_VOX,
+    GROUP_MASTER
 } SoundGroup;
+
+typedef enum
+{
+    HEAD = FMOD_CHANNELCONTROL_DSP_HEAD,
+    FADER = FMOD_CHANNELCONTROL_DSP_FADER,
+    TAIL = FMOD_CHANNELCONTROL_DSP_TAIL
+} FilterIndex;
 
 class SoundManager
 {
@@ -31,6 +39,7 @@ private:
     std::map<const std::string, FMOD::Sound*> sounds;    //Cache for loaded sounds
     std::map<StreamHandle*, SoundLoop*> soundLoopPoints;    //Cache for sound looping points
     std::map<StreamHandle*, unsigned int> musicPositions;    //Last play position for each song
+    std::map<SoundFilter*, FMOD::ChannelGroup*> filterGroups;    //Groups each filter belongs to
     std::vector<SoundVol*> soundVolumes;
     std::vector<unsigned char*> soundResources;
     FMOD::System* system;
@@ -86,8 +95,9 @@ public:
     Channel* getMusicChannel() { return musicChannel; }
 
     //Filter functions
-    SoundFilter* createFilter();
+    SoundFilter* createLowpassFilter(float freq);
     void destroyFilter(SoundFilter* f);
+    void assignFilter(SoundGroup group, SoundFilter* f, int idx);
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

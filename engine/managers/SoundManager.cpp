@@ -100,6 +100,9 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
 
     case GROUP_VOX:
         return voxGroup;
+
+    case GROUP_MASTER:
+        return masterChannelGroup;
     }
     return sfxGroup;
 }
@@ -433,26 +436,32 @@ void SoundManager::resumeMusic()
         musicChannel->setPaused(false);
 }
 
-SoundFilter* SoundManager::createFilter()
+SoundFilter* SoundManager::createLowpassFilter(float freq)
 {
     SoundFilter* f;
     FMOD_RESULT result = system->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &f);
     ERRCHECK(result);
     result = f->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_LOWPASS_12DB);
     ERRCHECK(result);
-    result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, 5000.0f);
+    result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, freq);
     ERRCHECK(result);
-    //result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_Q, 1.0f);
-    //ERRCHECK(result);
-    result = masterChannelGroup->addDSP(FMOD_CHANNELCONTROL_DSP_HEAD, f);
 
     return f;
 }
 
 void SoundManager::destroyFilter(SoundFilter * f)
 {
-    masterChannelGroup->removeDSP(f);
+    filterGroups[f]->removeDSP(f);
     f->release();
+    filterGroups.erase(f);
+}
+
+void SoundManager::assignFilter(SoundGroup group, SoundFilter * f, int idx)
+{
+    FMOD::ChannelGroup* channelGroup = getGroup(group);
+    FMOD_RESULT result = channelGroup->addDSP(idx, f);
+    ERRCHECK(result);
+    filterGroups[f] = channelGroup;
 }
 
 void SoundManager::pauseAll()

@@ -7,7 +7,7 @@ function radialforcefield:init()
 	self.forceedge = tonumber(node_getProperty(self, "forceatedge"))
 	self.rad = tonumber(node_getProperty(self, "radius"))
 	self.posx, self.posy = node_getPos(self)
-	self.dsp = audio_createFilter()
+	self.dsp = audio_createLowpassFilter(5000.0)
 	audio_deactivateFilter(self.dsp)
 end
 
