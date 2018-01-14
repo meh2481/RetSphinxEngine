@@ -449,6 +449,19 @@ SoundFilter* SoundManager::createLowpassFilter(float freq)
     return f;
 }
 
+SoundFilter * SoundManager::createHighpassFilter(float freq)
+{
+    SoundFilter* f;
+    FMOD_RESULT result = system->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &f);
+    ERRCHECK(result);
+    result = f->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_HIGHPASS_12DB);
+    ERRCHECK(result);
+    result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, freq);
+    ERRCHECK(result);
+
+    return f;
+}
+
 void SoundManager::destroyFilter(SoundFilter * f)
 {
     filterGroups[f]->removeDSP(f);

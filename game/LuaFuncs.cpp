@@ -244,6 +244,11 @@ public:
         return g_pGlobalEngine->getSoundManager()->createLowpassFilter(freq);
     }
 
+    static SoundFilter* createHighpassFilter(float freq)
+    {
+        return g_pGlobalEngine->getSoundManager()->createHighpassFilter(freq);
+    }
+
     static void assignFilter(SoundFilter* f, SoundGroup group, int idx)
     {
         g_pGlobalEngine->getSoundManager()->assignFilter(group, f, idx);
@@ -299,12 +304,24 @@ luaFunc(getFramerate)    //float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 // Audio functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(audio_createLowpassFilter)  //audio_createLowpassFilter(float freq)
+luaFunc(audio_createLowpassFilter)  //SoundFilter* audio_createLowpassFilter(float freq)
 {
     if(lua_isnumber(L, 1))
     {
         float freq = (float)lua_tonumber(L, 1);
         SoundFilter* f = GameEngineLua::createLowpassFilter(freq);
+        GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
+        luaReturnPtr(f);
+    }
+    luaReturnNil();
+}
+
+luaFunc(audio_createHighpassFilter)  //SoundFilter* audio_createHighpassFilter(float freq)
+{
+    if(lua_isnumber(L, 1))
+    {
+        float freq = (float)lua_tonumber(L, 1);
+        SoundFilter* f = GameEngineLua::createHighpassFilter(freq);
         GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
         luaReturnPtr(f);
     }
@@ -1045,6 +1062,7 @@ static LuaFunctions s_functab[] =
     luaRegister(action_digital),
     //Audio
     luaRegister(audio_createLowpassFilter),
+    luaRegister(audio_createHighpassFilter),
     luaRegister(audio_activateFilter),
     luaRegister(audio_deactivateFilter),
     luaRegister(audio_destroyFilter),

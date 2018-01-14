@@ -96,6 +96,7 @@ public:
 
     //Filter functions
     SoundFilter* createLowpassFilter(float freq);
+    SoundFilter* createHighpassFilter(float freq);
     void destroyFilter(SoundFilter* f);
     void assignFilter(SoundGroup group, SoundFilter* f, int idx);
 
