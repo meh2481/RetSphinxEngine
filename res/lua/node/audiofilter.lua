@@ -5,11 +5,13 @@ audiofilter.__index = audiofilter
 function audiofilter:init()
 	self.freq = tonumber(node_getProperty(self, "freq"))
 	local filtertype = node_getProperty(self, "filtertype")
+	self.dsp = audio_createFilter(FMOD_DSP_TYPE_MULTIBAND_EQ)
 	if filtertype == "highpass" then
-		self.dsp = audio_createFilter(self.freq, HIGHPASS)
+		audio_setFilterInt(self.dsp, FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_HIGHPASS_12DB)
 	else
-		self.dsp = audio_createFilter(self.freq, LOWPASS)
+		audio_setFilterInt(self.dsp, FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_LOWPASS_12DB)
 	end
+	audio_setFilterFloat(self.dsp, FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, self.freq)
 	self.x, self.y = node_getPos(self)
 	self.sizex, self.sizey = node_getVec2Property(self, "size")
 	audio_deactivateFilter(self.dsp)

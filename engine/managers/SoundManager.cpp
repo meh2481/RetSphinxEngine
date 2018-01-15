@@ -436,14 +436,10 @@ void SoundManager::resumeMusic()
         musicChannel->setPaused(false);
 }
 
-SoundFilter* SoundManager::createFilter(float freq, int filter)
+SoundFilter* SoundManager::createFilter(int filter)
 {
     SoundFilter* f;
-    FMOD_RESULT result = system->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &f);
-    ERRCHECK(result);
-    result = f->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, filter);
-    ERRCHECK(result);
-    result = f->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, freq);
+    FMOD_RESULT result = system->createDSPByType(/*FMOD_DSP_TYPE_MULTIBAND_EQ*/(FMOD_DSP_TYPE)filter, &f);
     ERRCHECK(result);
 
     return f;

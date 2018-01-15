@@ -15,6 +15,7 @@
 #include "Object.h"
 #include "Node.h"
 #include "EngineContactListener.h"
+#include "Logger.h"
 
 //Defined by SDL
 #define JOY_AXIS_MIN    -32768
@@ -239,9 +240,9 @@ public:
         return g_pGlobalEngine->getResourceLoader()->getTextFile(filename);
     }
 
-    static SoundFilter* createFilter(float freq, int type)
+    static SoundFilter* createFilter(int type)
     {
-        return g_pGlobalEngine->getSoundManager()->createFilter(freq, type);
+        return g_pGlobalEngine->getSoundManager()->createFilter(type);
     }
 
     static void assignFilter(SoundFilter* f, SoundGroup group, int idx)
@@ -299,20 +300,21 @@ luaFunc(getFramerate)    //float getFramerate()
 //-----------------------------------------------------------------------------------------------------------
 // Audio functions
 //-----------------------------------------------------------------------------------------------------------
-luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(float freq, int type)
+luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(int type)
 {
-    if(lua_isnumber(L, 1) && lua_isnumber(L, 2))
+    if(lua_isnumber(L, 1))
     {
-        float freq = (float)lua_tonumber(L, 1);
-        int type = lua_tointeger(L, 2);
-        SoundFilter* f = GameEngineLua::createFilter(freq, type);
-        GameEngineLua::assignFilter(f, GROUP_MASTER, HEAD);
+        int type = lua_tointeger(L, 1);
+        SoundFilter* f = GameEngineLua::createFilter(type);
+        GameEngineLua::assignFilter(f, GROUP_MASTER, FMOD_CHANNELCONTROL_DSP_HEAD);
         luaReturnPtr(f);
     }
+    else
+        LOG(WARN) << "Improper call to audio_createFilter";
     luaReturnNil();
 }
 
-luaFunc(audio_activateFilter)   //audio_activateFilter(SoundFilter* filter)
+luaFunc(audio_activateFilter)   //void audio_activateFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
@@ -320,7 +322,7 @@ luaFunc(audio_activateFilter)   //audio_activateFilter(SoundFilter* filter)
     luaReturnNil();
 }
 
-luaFunc(audio_deactivateFilter)   //audio_deactivateFilter(SoundFilter* filter)
+luaFunc(audio_deactivateFilter)   //void audio_deactivateFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
@@ -328,11 +330,54 @@ luaFunc(audio_deactivateFilter)   //audio_deactivateFilter(SoundFilter* filter)
     luaReturnNil();
 }
 
-luaFunc(audio_destroyFilter)   //audio_destroyFilter(SoundFilter* filter)
+luaFunc(audio_destroyFilter)   //void audio_destroyFilter(SoundFilter* filter)
 {
     SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
     if(f)
         GameEngineLua::destroySoundFilter(f);
+    luaReturnNil();
+}
+
+luaFunc(audio_setFilterInt)     //void audio_setFilterInt(SoundFilter* filter, int filterParam, int value)
+{
+    if(lua_isuserdata(L, 1) && lua_isinteger(L, 2) && lua_isinteger(L, 3))
+    {
+        SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+        if(f)
+        {
+            int filterParam = lua_tointeger(L, 2);
+            int filterValue = lua_tointeger(L, 3);
+            FMOD_RESULT result = f->setParameterInt(filterParam, filterValue);
+            if(result != 0)
+                LOG(WARN) << "FMOD Error: " << result;
+        }
+        else
+            LOG(WARN) << "No DSP provided to audio_setFilterInt";
+    }
+    else
+        LOG(WARN) << "Improper call to audio_setFilterInt";
+
+    luaReturnNil();
+}
+
+luaFunc(audio_setFilterFloat)     //void audio_setFilterFloat(SoundFilter* filter, int filterParam, float value)
+{
+    if(lua_isuserdata(L, 1) && lua_isinteger(L, 2) && lua_isnumber(L, 3))
+    {
+        SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+        if(f)
+        {
+            int filterParam = lua_tointeger(L, 2);
+            float filterValue = lua_tonumber(L, 3);
+            FMOD_RESULT result = f->setParameterFloat(filterParam, filterValue);
+            if(result != 0)
+                LOG(WARN) << "FMOD Error: " << result;
+        }
+        else
+            LOG(WARN) << "No DSP provided to audio_setFilterFloat";
+    }
+    else
+        LOG(WARN) << "Improper call to audio_setFilterFloat";
     luaReturnNil();
 }
 
@@ -1049,6 +1094,8 @@ static LuaFunctions s_functab[] =
     luaRegister(audio_activateFilter),
     luaRegister(audio_deactivateFilter),
     luaRegister(audio_destroyFilter),
+    luaRegister(audio_setFilterInt),
+    luaRegister(audio_setFilterFloat),
     //Camera
     luaRegister(camera_centerOnXY),
     luaRegister(camera_getPos),
@@ -1155,8 +1202,11 @@ static const struct
     luaConstant(GROUP_VOX),
 
     //Audio
-    luaConstant(LOWPASS),
-    luaConstant(HIGHPASS),
+    luaConstant(FMOD_DSP_MULTIBAND_EQ_FILTER_LOWPASS_12DB),
+    luaConstant(FMOD_DSP_MULTIBAND_EQ_FILTER_HIGHPASS_12DB),
+    luaConstant(FMOD_DSP_TYPE_MULTIBAND_EQ),
+    luaConstant(FMOD_DSP_MULTIBAND_EQ_A_FILTER),
+    luaConstant(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY),
 };
 
 void lua_register_all(lua_State *L)
