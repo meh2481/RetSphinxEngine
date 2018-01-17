@@ -25,6 +25,17 @@ typedef enum
     GROUP_MASTER
 } SoundGroup;
 
+//My own constants for these, since FMOD doesn't have them
+typedef enum
+{
+    FMOD_DSP_OSCILLATOR_SINE = 0,
+    FMOD_DSP_OSCILLATOR_SQUARE = 1,
+    FMOD_DSP_OSCILLATOR_SAWUP = 2,
+    FMOD_DSP_OSCILLATOR_SAWDOWN = 3,
+    FMOD_DSP_OSCILLATOR_TRIANGLE = 4,
+    FMOD_DSP_OSCILLATOR_NOISE = 5
+} FMOD_DSP_OSCILLATOR_WAVE_TYPE;
+
 class SoundManager
 {
 private:

@@ -1403,6 +1403,12 @@ static const struct
     //oscillator
     luaConstant(FMOD_DSP_OSCILLATOR_TYPE),
     luaConstant(FMOD_DSP_OSCILLATOR_RATE),
+    luaConstant(FMOD_DSP_OSCILLATOR_SINE),
+    luaConstant(FMOD_DSP_OSCILLATOR_SQUARE),
+    luaConstant(FMOD_DSP_OSCILLATOR_SAWUP),
+    luaConstant(FMOD_DSP_OSCILLATOR_SAWDOWN),
+    luaConstant(FMOD_DSP_OSCILLATOR_TRIANGLE),
+    luaConstant(FMOD_DSP_OSCILLATOR_NOISE),
     //pan
     luaConstant(FMOD_DSP_PAN_MODE),
     luaConstant(FMOD_DSP_PAN_2D_STEREO_POSITION),

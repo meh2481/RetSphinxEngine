@@ -439,7 +439,7 @@ void SoundManager::resumeMusic()
 SoundFilter* SoundManager::createFilter(int filter)
 {
     SoundFilter* f;
-    FMOD_RESULT result = system->createDSPByType(/*FMOD_DSP_TYPE_MULTIBAND_EQ*/(FMOD_DSP_TYPE)filter, &f);
+    FMOD_RESULT result = system->createDSPByType((FMOD_DSP_TYPE)filter, &f);
     ERRCHECK(result);
 
     return f;
