@@ -5,17 +5,17 @@ audiofilter.__index = audiofilter
 Audio filters and params to pass via xml:
 
 highpass:
-	freq: float, required
+	freq: float between 20 and 22000, required
 	
 lowpass:
-	freq: float, required
+	freq: float between 20 and 22000, required
 	
 bandpass:
-	freq: float, required
-	bandwidth: float, required
+	freq: float between 20 and 22000, required
+	bandwidth: float between 0.1 and 10, required
 
 oscillator:
-	rate: float, required
+	rate: float between 1 and 22000, required
 	wavetype: one of "square", "sawup", "sawdown", "triangle", "noise", "sine". sine default, optional
 
 flange:
@@ -24,7 +24,7 @@ flange:
 	rate: float between 0 and 20. Default: 0.1. Optional
 	
 pitchshift:
-	pitch: float, required
+	pitch: float between 0.5 to 2.0, required
 	
 chorus:
 	mix: float between 0 and 100. Default: 50. Optional
