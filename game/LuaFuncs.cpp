@@ -703,7 +703,9 @@ luaFunc(node_getProperty)    //string node_getProperty(Node* n, string propName)
     Node* n = getObj<Node>(L);
     if(n)
         s = n->getProperty(lua_tostring(L, 2));
-    luaReturnString(s);
+    if(s.size())
+        luaReturnString(s);
+    luaReturnNil();
 }
 
 luaFunc(node_getVec2Property)    //float x, float y node_getVec2Property(Node* n, string propName)
