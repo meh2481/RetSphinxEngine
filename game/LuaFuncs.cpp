@@ -381,6 +381,32 @@ luaFunc(audio_setFilterFloat)     //void audio_setFilterFloat(SoundFilter* filte
     luaReturnNil();
 }
 
+luaFunc(audio_setWetDryMix)   //void audio_setWetDryMix(SoundFilter* filter, float prewet, float postwet, float dry)
+{
+    if(lua_isuserdata(L, 1) && lua_isnumber(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
+    {
+        SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+        if(f)
+            f->setWetDryMix(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4));
+    }
+    luaReturnNil();
+}
+
+luaFunc(audio_getWetDryMix)   //float prewet, float postwet, float dry audio_setWetDryMix(SoundFilter* filter)
+{
+    if(lua_isuserdata(L, 1))
+    {
+        SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+        if(f)
+        {
+            float prewet, postwet, dry;
+            f->getWetDryMix(&prewet, &postwet, &dry);
+            luaReturnVec3(prewet, postwet, dry);
+        }
+    }
+    luaReturnNil();
+}
+
 //-----------------------------------------------------------------------------------------------------------
 // Object functions
 //-----------------------------------------------------------------------------------------------------------
@@ -1098,6 +1124,8 @@ static LuaFunctions s_functab[] =
     luaRegister(audio_destroyFilter),
     luaRegister(audio_setFilterInt),
     luaRegister(audio_setFilterFloat),
+    luaRegister(audio_getWetDryMix),
+    luaRegister(audio_setWetDryMix),
     //Camera
     luaRegister(camera_centerOnXY),
     luaRegister(camera_getPos),

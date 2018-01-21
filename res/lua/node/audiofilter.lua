@@ -4,6 +4,8 @@ audiofilter.__index = audiofilter
 --[=[
 Audio filters and params to pass via xml:
 
+faderate: float, speed to fade filter in/out when entering/leaving node. Default to 20
+
 highpass:
 	freq: float between 20 and 22000, required
 	
@@ -248,7 +250,17 @@ function audiofilter:init()
 	end
 	self.x, self.y = node_getPos(self)
 	self.sizex, self.sizey = node_getVec2Property(self, "size")
-	audio_deactivateFilter(self.dsp)	--Deactivate to start
+	--Use wet/dry mix instead of directly activating/deactivating the filter because of popping noise when doing the latter
+	--audio_deactivateFilter(self.dsp)
+	audio_setWetDryMix(self.dsp, 0, 0, 1)	--Deactivate to start
+	
+	--Get rate to turn filter on/off
+	self.fadeRate = node_getProperty(self, "faderate")
+	if self.fadeRate ~= nil then
+		self.fadeRate = tonumber(self.fadeRate)
+	else
+		self.fadeRate = 20.0	--Default to 1/20th of a second
+	end
 end
 
 --Called when an object enters this node
@@ -262,11 +274,34 @@ function audiofilter:update(dt)
 	local objx, objy = obj_getPos(player)
 	
 	--Test if contains the center of player (Not precise but good enough for audio node)
-	--TODO: Sharp click when enable/disable abruptly like this. Prolly want to interpolate wet/dry or such
 	if rect_contains(objx, objy, self.x, self.y, self.sizex, self.sizey) then 
-		audio_activateFilter(self.dsp)
+		--audio_activateFilter(self.dsp)
+		local pre, post, dry = audio_getWetDryMix(self.dsp)
+		if post < 1.0 then
+			post = post + self.fadeRate * dt
+		end
+		
+		if post > 1.0 then
+			post = 1.0
+		end
+		pre = post
+		dry = 1.0 - pre
+		
+		audio_setWetDryMix(self.dsp, pre, post, dry)
 	else
-		audio_deactivateFilter(self.dsp)
+		--audio_deactivateFilter(self.dsp)
+		local pre, post, dry = audio_getWetDryMix(self.dsp)
+		if post > 0.0 then
+			post = post - self.fadeRate * dt
+		end
+		
+		if post < 0.0 then
+			post = 0.0
+		end
+		pre = post
+		dry = 1.0 - pre
+		
+		audio_setWetDryMix(self.dsp, pre, post, dry)
 	end
 end
 
