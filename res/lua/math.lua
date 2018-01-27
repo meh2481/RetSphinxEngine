@@ -31,3 +31,16 @@ local function vec2_angle(x,y)
 	return math.atan(y,x)
 end
 setglobal("vec2_angle", vec2_angle)
+
+--See if a point is in a rect
+local function rect_contains(x,y,rx,ry,rw,rh)
+	local left = rx - rw / 2.0
+	local right = rx + rw / 2.0
+	local top = ry + rh / 2.0
+	local bottom = ry - rh / 2.0
+	if x >= left and x <= right and y <= top and y >= bottom then
+		return true
+	end
+	return false
+end
+setglobal("rect_contains", rect_contains)

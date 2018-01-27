@@ -10,6 +10,7 @@
 typedef FMOD::Sound SoundHandle;
 typedef FMOD::Sound StreamHandle;
 typedef FMOD::Channel Channel;
+typedef FMOD::DSP SoundFilter;
 
 class ResourceLoader;
 class SoundVol;
@@ -20,8 +21,20 @@ typedef enum
     GROUP_MUSIC,
     GROUP_SFX,
     GROUP_BGFX,
-    GROUP_VOX
+    GROUP_VOX,
+    GROUP_MASTER
 } SoundGroup;
+
+//My own constants for these, since FMOD doesn't have them
+typedef enum
+{
+    FMOD_DSP_OSCILLATOR_SINE = 0,
+    FMOD_DSP_OSCILLATOR_SQUARE = 1,
+    FMOD_DSP_OSCILLATOR_SAWUP = 2,
+    FMOD_DSP_OSCILLATOR_SAWDOWN = 3,
+    FMOD_DSP_OSCILLATOR_TRIANGLE = 4,
+    FMOD_DSP_OSCILLATOR_NOISE = 5
+} FMOD_DSP_OSCILLATOR_WAVE_TYPE;
 
 class SoundManager
 {
@@ -30,6 +43,7 @@ private:
     std::map<const std::string, FMOD::Sound*> sounds;    //Cache for loaded sounds
     std::map<StreamHandle*, SoundLoop*> soundLoopPoints;    //Cache for sound looping points
     std::map<StreamHandle*, unsigned int> musicPositions;    //Last play position for each song
+    std::map<SoundFilter*, FMOD::ChannelGroup*> filterGroups;    //Groups each filter belongs to
     std::vector<SoundVol*> soundVolumes;
     std::vector<unsigned char*> soundResources;
     FMOD::System* system;
@@ -83,6 +97,11 @@ public:
     void pauseMusic();
     void resumeMusic();
     Channel* getMusicChannel() { return musicChannel; }
+
+    //Filter functions
+    SoundFilter* createFilter(int filter);
+    void destroyFilter(SoundFilter* f);
+    void assignFilter(SoundGroup group, SoundFilter* f, int idx);
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

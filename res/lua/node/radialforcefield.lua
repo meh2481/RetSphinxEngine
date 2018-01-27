@@ -46,6 +46,7 @@ end
 
 --Called when node is destroyed
 function radialforcefield:destroy()
+	audio_destroyFilter(self.dsp)
 end
 
 return radialforcefield

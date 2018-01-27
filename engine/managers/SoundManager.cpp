@@ -23,8 +23,6 @@ int SoundManager::init()
     FMOD_RESULT result;
     unsigned int version;
     int numdrivers;
-    FMOD_SPEAKERMODE speakermode;
-    char name[256];
     //Create a System object and initialize.
     result = FMOD::System_Create(&system);
     ERRCHECK(result);
@@ -102,6 +100,9 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
 
     case GROUP_VOX:
         return voxGroup;
+
+    case GROUP_MASTER:
+        return masterChannelGroup;
     }
     return sfxGroup;
 }
@@ -433,6 +434,30 @@ void SoundManager::resumeMusic()
 {
     if(musicChannel)
         musicChannel->setPaused(false);
+}
+
+SoundFilter* SoundManager::createFilter(int filter)
+{
+    SoundFilter* f;
+    FMOD_RESULT result = system->createDSPByType((FMOD_DSP_TYPE)filter, &f);
+    ERRCHECK(result);
+
+    return f;
+}
+
+void SoundManager::destroyFilter(SoundFilter * f)
+{
+    filterGroups[f]->removeDSP(f);
+    f->release();
+    filterGroups.erase(f);
+}
+
+void SoundManager::assignFilter(SoundGroup group, SoundFilter * f, int idx)
+{
+    FMOD::ChannelGroup* channelGroup = getGroup(group);
+    FMOD_RESULT result = channelGroup->addDSP(idx, f);
+    ERRCHECK(result);
+    filterGroups[f] = channelGroup;
 }
 
 void SoundManager::pauseAll()

@@ -24,9 +24,9 @@ Current higher pri:
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
-- Test at 144Hz and see what breaks
 
 Bugs:
+- Physics engine tied to framerate; 144Hz same # of physics engine cycles as 60Hz per frame
 - Setting fps to 144 in config and then running on 60fps monitor causes game to be slow
 - Ship stops suddenly when moving joystick slowly towards center position
 - Particle editor breaks after F5

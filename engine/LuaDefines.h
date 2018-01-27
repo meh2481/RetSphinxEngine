@@ -27,6 +27,7 @@
 #define luaReturnVec2(x, y) { lua_pushnumber(L, x); lua_pushnumber(L, y); return 2; }
 #define luaReturnVec3(x, y, z) { lua_pushnumber(L, x); lua_pushnumber(L, y); lua_pushnumber(L, z); return 3; }
 #define luaReturnVec4(x, y, z, w) { lua_pushnumber(L, x); lua_pushnumber(L, y); lua_pushnumber(L, z); lua_pushnumber(L, w); return 4; }
+#define luaReturnPtr(x) { lua_pushlightuserdata(L, x); return 1; }
 
 #define lua_tofloat(L, x) (static_cast<float>(lua_tonumber(L, x)))
 
