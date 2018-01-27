@@ -31,7 +31,7 @@ public:
     float depth;
     Image* img;
     bool active;
-    Color col;    //TODO: Implement or remove
+    Color col;    //DEPRECATED
 
     ObjSegment();
     ~ObjSegment();

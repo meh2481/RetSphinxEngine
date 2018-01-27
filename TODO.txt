@@ -20,6 +20,24 @@ Current higher pri:
 	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 - Small-block memory allocator for Lua
 	- Other memory allocators/uses?
+- FMOD 3D sound
+	- Objects can have their own sfx associated with them (channel group)
+	- Player is listener object
+	- Level geometry (and large objects) are registered as FMOD geometry
+		- See Geometry::save and System::loadGeometry
+- Objects
+	- Objects stored as binary files, not XML
+		- Templated so that complicated setup work doesn't have to be done every time (like Lua class loading)
+	- Objects stored in folder with:
+		- Lua
+		- Segments
+			- Box2D Fixtures
+			- Images/3D meshes
+			- Sound geometry
+		- Sound references
+		- Properties (for Lua instantiation)
+		- Box2D constraints/joints/etc
+		- Shaders
 
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery

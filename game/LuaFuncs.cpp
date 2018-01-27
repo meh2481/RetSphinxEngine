@@ -306,7 +306,6 @@ luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(int type)
     {
         int type = lua_tointeger(L, 1);
         SoundFilter* f = GameEngineLua::createFilter(type);
-        GameEngineLua::assignFilter(f, GROUP_MASTER, FMOD_CHANNELCONTROL_DSP_HEAD);
         luaReturnPtr(f);
     }
     else
@@ -404,6 +403,20 @@ luaFunc(audio_getWetDryMix)   //float prewet, float postwet, float dry audio_set
             luaReturnVec3(prewet, postwet, dry);
         }
     }
+    luaReturnNil();
+}
+
+luaFunc(audio_addFilterToGroup) //void audio_addFilterToGroup(SoundFilter* filter, SoundGroup group, int index)
+{
+    if(lua_isuserdata(L, 1) && lua_isinteger(L, 2) && lua_isinteger(L, 3))
+    {
+        SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
+        SoundGroup group = (SoundGroup)lua_tointeger(L, 2);
+        int index = lua_tointeger(L, 3);
+        GameEngineLua::assignFilter(f, group, index);
+    }
+    else
+        LOG(WARN) << "Improper call to audio_addFilterToGroup";
     luaReturnNil();
 }
 
@@ -1126,6 +1139,7 @@ static LuaFunctions s_functab[] =
     luaRegister(audio_setFilterFloat),
     luaRegister(audio_getWetDryMix),
     luaRegister(audio_setWetDryMix),
+    luaRegister(audio_addFilterToGroup),
     //Camera
     luaRegister(camera_centerOnXY),
     luaRegister(camera_getPos),
@@ -1568,6 +1582,18 @@ static const struct
     luaConstant(FMOD_DSP_TREMOLO_SQUARE),
     luaConstant(FMOD_DSP_TREMOLO_PHASE),
     luaConstant(FMOD_DSP_TREMOLO_SPREAD),
+
+    //FMOD_CHANNELCONTROL_DSP_INDEX
+    luaConstant(FMOD_CHANNELCONTROL_DSP_HEAD),
+    luaConstant(FMOD_CHANNELCONTROL_DSP_FADER),
+    luaConstant(FMOD_CHANNELCONTROL_DSP_TAIL),
+
+    //Sound groups
+    luaConstant(GROUP_MUSIC),
+    luaConstant(GROUP_SFX),
+    luaConstant(GROUP_BGFX),
+    luaConstant(GROUP_VOX),
+    luaConstant(GROUP_MASTER),
 
 };
 

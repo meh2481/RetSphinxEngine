@@ -261,6 +261,7 @@ function audiofilter:init()
 	else
 		self.fadeRate = 20.0	--Default to 1/20th of a second
 	end
+	audio_addFilterToGroup(self.dsp, GROUP_MASTER, FMOD_CHANNELCONTROL_DSP_TAIL)	--Default to the master channel group, tail of the dsp chain
 end
 
 --Called when an object enters this node
