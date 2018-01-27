@@ -55,7 +55,7 @@ void ObjectManager::cleanup()
 void ObjectManager::update(float dt)
 {
     //Update
-    updating = true;    //TODO: Remember what this mutex is for
+    updating = true;
     for(std::vector<Object*>::iterator i = m_lObjects.begin(); i != m_lObjects.end(); i++)
     {
         (*i)->update(dt);

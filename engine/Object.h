@@ -28,15 +28,11 @@ class Object
 public:
     enum { TYPE = OT_OBJECT };
 
-    Vec2 meshSize; //DEPRECATED
     LuaInterface* lua;
     std::string luaClass;
     std::string luaDef;
-    float depth; //DEPRECATED
-    Image* img; //DEPRECATED
     bool active;
-    bool alive; //DEPRECATED
-    Color col;  //DEPRECATED
+    bool alive;
 
     Object();
     ~Object();

@@ -20,8 +20,6 @@ Object::Object()
   lua = NULL;
   glueObj = NULL;
   luaClass = "templateobj";
-  depth = 0;
-  img = NULL;
   active = true;
   alive = true;
   segments.reserve(1);    //don't expect very many segments
@@ -51,39 +49,6 @@ void Object::draw(RenderState renderState)
     {
         if((*i)->active)    //Skip frames that shouldn't be drawn up front
             (*i)->draw(renderState);
-    }
-    if(img)
-    {
-        //TODO Clarify need for object mesh image rather than ObjSegment image
-        std::vector<ObjSegment*>::iterator i = segments.begin();
-        if(i != segments.end())    //Not a for loop!
-        {
-            ObjSegment* seg = *i;
-            if(seg != NULL && seg->body != NULL)
-            {
-                b2Vec2 pos = seg->body->GetPosition();
-
-                renderState.model = glm::translate(renderState.model, glm::vec3(pos.x, pos.y, depth));
-                renderState.apply();
-
-                //TODO: This needs to be constant, only updating when size/tex changes
-                Quad q;
-                q.tex = *img;
-                q.pos[0] = -meshSize.x / 2.0f;
-                q.pos[1] = -meshSize.y / 2.0f; // upper left
-
-                q.pos[2] = meshSize.x / 2.0f;
-                q.pos[3] = -meshSize.y / 2.0f; // upper right
-
-                q.pos[4] = -meshSize.x / 2.0f;
-                q.pos[5] = meshSize.y / 2.0f; // lower left
-
-                q.pos[6] = meshSize.x / 2.0f;
-                q.pos[7] = meshSize.y / 2.0f; // lower right
-
-                Draw::drawQuad(&q);
-            }
-        }
     }
 }
 

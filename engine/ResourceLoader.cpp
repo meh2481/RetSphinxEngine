@@ -535,10 +535,6 @@ ObjSegment* ResourceLoader::getObjectSegment(tinyxml2::XMLElement* layer)
     if(cSegSz != NULL)
         seg->size = pointFromString(cSegSz);
 
-    const char* cSegCol = layer->Attribute("col");
-    if(cSegCol != NULL)
-        seg->col.fromString(cSegCol);
-
     const char* cSegObj = layer->Attribute("obj");
     if(cSegObj != NULL)
         seg->obj3D = get3dObject(cSegObj);
@@ -709,82 +705,6 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
                 m_world->CreateJoint(&jd);
             }
             //else TODO add more joint types
-        }
-    }
-
-
-    tinyxml2::XMLElement* latticeElem = root->FirstChildElement("lattice");
-    if(latticeElem)
-    {
-        const char* cMeshImg = latticeElem->Attribute("img");
-        const char* cBodyRes = latticeElem->Attribute("resolution");
-        const char* cMeshImgSize = latticeElem->Attribute("size");
-
-        //Default lattice resolution = 10, 10
-        Vec2 pMeshSize(10, 10);
-
-        if(cMeshImg && cMeshImgSize)
-        {
-            o->img = getImage(cMeshImg);
-            o->meshSize = pointFromString(cMeshImgSize);
-
-            const char* cLatticeType = latticeElem->Attribute("type");
-            if(cLatticeType)
-            {
-                //if(cBodyRes)
-                //    pMeshSize = pointFromString(cBodyRes);
-
-                //o->meshLattice = new Lattice((int)pMeshSize.x, (int)pMeshSize.y);
-
-                //std::string sLatticeType = cLatticeType;
-                //if(sLatticeType == "softbody")
-                //{
-                //    //const char* cBodyCenter = latticeElem->Attribute("centerbody");
-                //    //if(cBodyCenter && mBodyNames.count(cBodyCenter))
-                //    //{
-                //    //    //Override default mesh size if we've provided one
-
-                //    //    SoftBodyAnim* manim = new SoftBodyAnim(o->meshLattice);
-                //    //    manim->addBody(mBodyNames[cBodyCenter], true);
-                //    //    manim->size = o->meshSize;
-                //    //    for(std::map<std::string, b2Body*>::iterator i = mBodyNames.begin(); i != mBodyNames.end(); i++)
-                //    //    {
-                //    //        if(i->first != cBodyCenter)
-                //    //            manim->addBody(i->second);
-                //    //    }
-                //    //    manim->init();
-                //    //    o->meshAnim = manim;
-                //    //    //o->meshSize.Set(1,1);    //Can't take this into account on draw time; mesh will deform by hand
-                //    //}
-                //}
-                //else if(sLatticeType == "sin")
-                //{
-                //    SinLatticeAnim* manim = new SinLatticeAnim(o->meshLattice);
-
-                //    latticeElem->QueryFloatAttribute("amp", &manim->amp);
-                //    latticeElem->QueryFloatAttribute("freq", &manim->freq);
-                //    latticeElem->QueryFloatAttribute("vtime", &manim->vtime);
-
-                //    manim->init();
-                //    o->meshAnim = manim;
-                //}
-                //else if(sLatticeType == "wobble")
-                //{
-                //    WobbleLatticeAnim* manim = new WobbleLatticeAnim(o->meshLattice);
-
-                //    latticeElem->QueryFloatAttribute("speed", &manim->speed);
-                //    latticeElem->QueryFloatAttribute("dist", &manim->startdist);
-                //    latticeElem->QueryFloatAttribute("distvar", &manim->distvar);
-                //    latticeElem->QueryFloatAttribute("angle", &manim->startangle);
-                //    latticeElem->QueryFloatAttribute("anglevar", &manim->anglevar);
-                //    latticeElem->QueryFloatAttribute("hfac", &manim->hfac);
-                //    latticeElem->QueryFloatAttribute("vfac", &manim->vfac);
-
-                //    manim->init();
-                //    o->meshAnim = manim;
-                //}
-            }
-
         }
     }
 
