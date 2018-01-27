@@ -22,7 +22,8 @@ Current higher pri:
 	- Other memory allocators/uses?
 - FMOD 3D sound
 	- Objects can have their own sfx associated with them (channel group)
-	- Player is listener object
+	- Player is listener object, with forward/up vectors set according to center of screen
+		- Potential here to change these vectors with head tracker if we want to get crazy
 	- Level geometry (and large objects) are registered as FMOD geometry
 		- See Geometry::save and System::loadGeometry
 - Objects
@@ -34,14 +35,23 @@ Current higher pri:
 			- Box2D Fixtures
 			- Images/3D meshes
 			- Sound geometry
+			- Shaders
+			- Animation frame sequences/reskins
 		- Sound references
 		- Properties (for Lua instantiation)
 		- Box2D constraints/joints/etc
-		- Shaders
+		- Animations
+- Save/Load state on game exit/launch (and periodically)
+	- Music & music position
+	- Current level, position, enemy location, geometry
+	- Current cutscene/dialogue (prolly restart these from beginning)
+	- Quicksaves should be interruptable without failure/save loss
+	- Ways to fast travel/reset map so that softlocks can be avoided
 
 - Particles follow ship with acceleration applied
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
+- Better handling of object reskinning than obj_setImage from lua
 
 Bugs:
 - Physics engine tied to framerate; 144Hz same # of physics engine cycles as 60Hz per frame
