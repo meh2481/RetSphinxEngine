@@ -304,7 +304,7 @@ luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(int type)
 {
     if(lua_isnumber(L, 1))
     {
-        int type = lua_tointeger(L, 1);
+        int type = (int)lua_tointeger(L, 1);
         SoundFilter* f = GameEngineLua::createFilter(type);
         luaReturnPtr(f);
     }
@@ -344,8 +344,8 @@ luaFunc(audio_setFilterInt)     //void audio_setFilterInt(SoundFilter* filter, i
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
         {
-            int filterParam = lua_tointeger(L, 2);
-            int filterValue = lua_tointeger(L, 3);
+            int filterParam = (int)lua_tointeger(L, 2);
+            int filterValue = (int)lua_tointeger(L, 3);
             FMOD_RESULT result = f->setParameterInt(filterParam, filterValue);
             if(result != 0)
                 LOG(WARN) << "FMOD Error: " << result;
@@ -366,8 +366,8 @@ luaFunc(audio_setFilterFloat)     //void audio_setFilterFloat(SoundFilter* filte
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
         {
-            int filterParam = lua_tointeger(L, 2);
-            float filterValue = lua_tonumber(L, 3);
+            int filterParam = (int)lua_tointeger(L, 2);
+            float filterValue = (float)lua_tonumber(L, 3);
             FMOD_RESULT result = f->setParameterFloat(filterParam, filterValue);
             if(result != 0)
                 LOG(WARN) << "FMOD Error: " << result;
@@ -386,7 +386,7 @@ luaFunc(audio_setWetDryMix)   //void audio_setWetDryMix(SoundFilter* filter, flo
     {
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
-            f->setWetDryMix(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4));
+            f->setWetDryMix((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3), (float)lua_tonumber(L, 4));
     }
     luaReturnNil();
 }
@@ -412,7 +412,7 @@ luaFunc(audio_addFilterToGroup) //void audio_addFilterToGroup(SoundFilter* filte
     {
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         SoundGroup group = (SoundGroup)lua_tointeger(L, 2);
-        int index = lua_tointeger(L, 3);
+        int index = (int)lua_tointeger(L, 3);
         GameEngineLua::assignFilter(f, group, index);
     }
     else

@@ -11,6 +11,7 @@ typedef FMOD::Sound SoundHandle;
 typedef FMOD::Sound StreamHandle;
 typedef FMOD::Channel Channel;
 typedef FMOD::DSP SoundFilter;
+typedef FMOD::Geometry SoundGeometry;
 
 class ResourceLoader;
 class SoundVol;
@@ -56,6 +57,7 @@ private:
     FMOD::DSP* fftdsp;
     ResourceLoader* loader;
     InterpolationManager* interpolationManager;
+    SoundGeometry* soundGeometry;
 
     int init();
     void setGroup(Channel* ch, SoundGroup group);
@@ -102,6 +104,11 @@ public:
     SoundFilter* createFilter(int filter);
     void destroyFilter(SoundFilter* f);
     void assignFilter(SoundGroup group, SoundFilter* f, int idx);
+
+    //Geometry functions
+    void setGeometryWorldSize(float sizeCenterToEdge);                  //Call before calls to createGeometry
+    SoundGeometry* createGeometry(int maxpolygons, int maxvertices);    //Create a Geometry object (or return the active if one already exists)
+    void clearGeometry();                                               //Delete the current Geometry object
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

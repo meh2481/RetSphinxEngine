@@ -34,7 +34,7 @@ Current higher pri:
 		- Segments
 			- Box2D Fixtures
 			- Images/3D meshes
-			- Sound geometry
+			- Sound geometry (Only on level geometry/large objects)
 			- Shaders
 			- Animation frame sequences/reskins
 		- Sound references

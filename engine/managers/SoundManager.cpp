@@ -112,6 +112,7 @@ SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
     loader = l;
     musicChannel = NULL;
     interpolationManager = interp;
+    soundGeometry = NULL;
     init();
 }
 
@@ -458,6 +459,25 @@ void SoundManager::assignFilter(SoundGroup group, SoundFilter * f, int idx)
     FMOD_RESULT result = channelGroup->addDSP(idx, f);
     ERRCHECK(result);
     filterGroups[f] = channelGroup;
+}
+
+void SoundManager::setGeometryWorldSize(float sizeCenterToEdge)
+{
+    system->setGeometrySettings(sizeCenterToEdge);
+}
+
+SoundGeometry * SoundManager::createGeometry(int maxpolygons, int maxvertices)
+{
+    SoundGeometry* geom = NULL;
+    FMOD_RESULT result = system->createGeometry(maxpolygons, maxvertices, &geom);
+    ERRCHECK(result);
+    return geom;
+}
+
+void SoundManager::clearGeometry()
+{
+    soundGeometry->release();
+    soundGeometry = NULL;
 }
 
 void SoundManager::pauseAll()

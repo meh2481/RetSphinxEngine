@@ -311,12 +311,18 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         b2Fixture* fixture = getResourceLoader()->getObjectFixture(geom, body);
         if(fixture)
         {
+            //Load sound geometry
+            if(!fixture->IsSensor())
+            {
+
+            }
+            //Load lua for this, if it exists
             const char* cLua = geom->Attribute("luaclass");
             if(cLua)
             {
                 Node* n = new Node();
                 n->luaClass = cLua;
-                n->lua = Lua;            //TODO: Better handling of node/object LuaInterfaces
+                n->lua = Lua;
                 n->pos = pos;
                 n->body = body;
                 std::ostringstream objss;

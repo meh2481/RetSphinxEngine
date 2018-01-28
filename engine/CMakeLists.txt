@@ -62,8 +62,6 @@ ResourceCache.h
 ResourceCache.cpp
 SystemUtils.cpp
 SystemUtils.h
-SoundVol.h
-SoundVol.cpp
 Text.cpp
 Text.h
 Quad.h
@@ -122,14 +120,21 @@ actions/DpadMovement.h
 actions/DpadMovement.cpp
 )
 
+set(engine_sound_src
+sound/SoundVol.h
+sound/SoundVol.cpp
+)
+
 include_directories (.)
 include_directories (events)
+include_directories (sound)
 include_directories (managers)
 include_directories (actions)
 
 source_group("events" FILES ${engine_events_src})
+source_group("sound" FILES ${engine_sound_src})
 source_group("managers" FILES ${engine_manager_src})
 source_group("actions" FILES ${engine_actions_src})
 
-add_library(engine ${engine_src} ${engine_events_src} ${engine_manager_src} ${engine_actions_src})
+add_library(engine ${engine_src} ${engine_events_src} ${engine_sound_src} ${engine_manager_src} ${engine_actions_src})
 target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY} ${FMOD_LIBRARIES})
