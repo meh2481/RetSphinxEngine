@@ -46,7 +46,7 @@ int SoundManager::init()
     }
     result = system->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
     ERRCHECK(result);
-    result = system->set3DSettings(1.0f, 5000000.0f, 1.0f);
+    result = system->set3DSettings(1.0f, 1.0f, 1.0f);
     ERRCHECK(result);
 
     //Set up sound groups
@@ -152,24 +152,24 @@ void SoundManager::update()
     }
 }
 
-void SoundManager::setListener(Vec2 listenerPos, Vec2 listenerVel)
+void SoundManager::setListener(const Vec2& listenerPos, const Vec2& listenerVel)
 {
     FMOD_VECTOR pos;
     pos.x = listenerPos.x;
     pos.y = listenerPos.y;
     pos.z = 0.0f;
     FMOD_VECTOR vel;
-    pos.x = listenerVel.x;
-    pos.y = listenerVel.y;
-    pos.z = 0.0f;
+    vel.x = listenerVel.x;
+    vel.y = listenerVel.y;
+    vel.z = 0.0f;
     FMOD_VECTOR forward;
-    pos.x = 0.0f;
-    pos.y = 0.0f;
-    pos.z = -1.0f;
+    forward.x = 0.0f;
+    forward.y = 0.0f;
+    forward.z = -1.0f;
     FMOD_VECTOR up;
-    pos.x = 0.0f;
-    pos.y = 1.0f;
-    pos.z = 0.0f;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f;
     system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
 }
 
@@ -204,7 +204,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
                 LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
         }
         sounds[filename] = handle;
-        FMOD_RESULT result = handle->set3DMinMaxDistance(0.05f, 10.0f);
+        FMOD_RESULT result = handle->set3DMinMaxDistance(0.5f, 5000.0f);
         ERRCHECK(result);
         return handle;
     }
@@ -228,7 +228,7 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         }
 
         sounds[filename] = handle;
-        result = handle->set3DMinMaxDistance(0.05f, 10.0f);
+        result = handle->set3DMinMaxDistance(0.5f, 5000.0f);
         ERRCHECK(result);
         loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
         return handle;
@@ -242,8 +242,10 @@ Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
     FMOD_RESULT result = system->playSound(sound, getGroup(group), true, &ret);
     ERRCHECK(result);
     FMOD_VECTOR pos;
+    FMOD_VECTOR vel;
     pos.x = pos.y = pos.z = 0.0f;
-    result = ret->set3DAttributes(&pos, &pos);
+    vel.x = vel.y = vel.z = 0.0f;
+    result = ret->set3DAttributes(&pos, &vel);
     ERRCHECK(result);
     result = ret->setPaused(false);
     ERRCHECK(result);
@@ -283,8 +285,10 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     FMOD_RESULT result = system->playSound(stream, getGroup(group), true, &channel);
     ERRCHECK(result);
     FMOD_VECTOR pos;
+    FMOD_VECTOR vel;
     pos.x = pos.y = pos.z = 0.0f;
-    result = channel->set3DAttributes(&pos, &pos);
+    vel.x = vel.y = vel.z = 0.0f;
+    result = channel->set3DAttributes(&pos, &vel);
     ERRCHECK(result);
 
     //Set looping
@@ -309,6 +313,8 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 
         musicChannel = channel;    //Save this as our new music channel
         fadeInChannel(musicChannel, MUSIC_FADE_TIME);
+        result = channel->set3DLevel(0.0f);	//Turn off 3D effects for music
+        ERRCHECK(result);
     }
 
     //Start playing

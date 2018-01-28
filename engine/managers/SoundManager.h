@@ -77,7 +77,7 @@ public:
     ~SoundManager();
 
     void update();    //Call every frame
-    void setListener(Vec2 listenerPos, Vec2 listenerVel);
+    void setListener(const Vec2& listenerPos, const Vec2& listenerVel);
 
     SoundHandle* loadSound(const std::string& filename);
     StreamHandle* loadStream(const std::string& filename);
