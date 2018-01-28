@@ -15,7 +15,7 @@
 
 #define MAX_POLY 256
 #define MAX_VERT 2560
-#define MAX_SOUND_POLY_VERTS 12
+#define MAX_SOUND_POLY_VERTS 16
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -68,7 +68,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         window->QueryBoolAttribute("doublebuf", &bDoubleBuf);
         window->QueryIntAttribute("vsync", &iVsync);
         window->QueryIntAttribute("MSAA", &iMSAA);
-//        window->QueryBoolAttribute("textureantialias", &bTexAntialias);
+        //        window->QueryBoolAttribute("textureantialias", &bTexAntialias);
         window->QueryFloatAttribute("brightness", &fGamma);
         window->QueryBoolAttribute("pauseminimized", &bPausesOnFocus);
 
@@ -86,7 +86,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         setVsync(iVsync);
         setDoubleBuffered(bDoubleBuf);
         setMSAA(iMSAA);
-//        setImgBlur(bTexAntialias);
+        //        setImgBlur(bTexAntialias);
         setGamma(fGamma);
         pauseOnKeyboard(bPausesOnFocus);
     }
@@ -159,7 +159,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     getSoundManager()->clearGeometry();
     player = NULL;
     LOG(INFO) << "Loading scene " << sXMLFilename;
-    cameraPos = Vec3(0,0,m_fDefCameraZ);    //Reset camera
+    cameraPos = Vec3(0, 0, m_fDefCameraZ);    //Reset camera
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
@@ -245,8 +245,8 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         const char* cVel = object->Attribute("vel");
         if(cObjType != NULL)
         {
-            Vec2 pos(0,0);
-            Vec2 vel(0,0);
+            Vec2 pos(0, 0);
+            Vec2 vel(0, 0);
 
             if(cPos != NULL)
                 pos = pointFromString(cPos);
@@ -361,10 +361,23 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     m_sLastScene = sXMLFilename;
 }
 
+static void rotPoint(FMOD_VECTOR* vec, float x, float y, float rot)
+{
+    float s = sin(rot);
+    float c = cos(rot);
+    float xnew = x * c - y * s;
+    float ynew = x * s + y * c;
+    vec->x = xnew;
+    vec->y = ynew;
+}
+
 const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)MAX_SOUND_POLY_VERTS;
 void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
 {
     FMOD_VECTOR vertices[MAX_SOUND_POLY_VERTS];
+    for(int i = 0; i < MAX_SOUND_POLY_VERTS; i++)
+        vertices[i].z = 0.0f;
+
     int num = 0;
     //A bit of duplicate code here from ResourceLoader::getObjectFixture(), but whatevs.
     //We'll want to have this generated automatically at resource build time, then stored with Geometry::save() anyway
@@ -381,6 +394,32 @@ void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* s
     std::string sFixType = cFixType;
     if(sFixType == "box")
     {
+        Vec2 pBoxSize(1.0f, 1.0f);
+        const char* cBoxSize = fixture->Attribute("size");
+        if(cBoxSize)
+            pBoxSize = pointFromString(cBoxSize);
+
+        //Get rotation (angle) of box
+        float fRot = 0.0f;
+        fixture->QueryFloatAttribute("rot", &fRot);
+
+        //Rotate manually
+        float x = pBoxSize.x / 2.0f;
+        float y = pBoxSize.y / 2.0f;
+        rotPoint(&vertices[0], x, y, fRot);
+        rotPoint(&vertices[1], x, -y, fRot);
+        rotPoint(&vertices[2], -x, -y, fRot);
+        rotPoint(&vertices[3], -x, y, fRot);
+
+        vertices[0].x += pos.x;
+        vertices[0].y += pos.y;
+        vertices[1].x += pos.x;
+        vertices[1].y += pos.y;
+        vertices[2].x += pos.x;
+        vertices[2].y += pos.y;
+        vertices[3].x += pos.x;
+        vertices[3].y += pos.y;
+        num = 4;
 
     }
     else if(sFixType == "circle")
@@ -394,13 +433,27 @@ void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* s
             b2Vec2 v = b2Vec2(pos.x, pos.y) + radius * b2Vec2(cosf(angle), sinf(angle));
             vertices[num].x = v.x;
             vertices[num].y = v.y;
-            vertices[num].z = 0.0f;
             angle += ANGLE_INCREMENT;
         }
     }
     else if(sFixType == "polygon")
     {
-
+        for(tinyxml2::XMLElement* vertex = fixture->FirstChildElement("vertex"); vertex != NULL; vertex = vertex->NextSiblingElement("vertex"))
+        {
+            if(num > MAX_SOUND_POLY_VERTS)
+            {
+                LOG(ERR) << "Only " << MAX_SOUND_POLY_VERTS << " are allowed per polygon";
+                num = MAX_SOUND_POLY_VERTS;
+                break;
+            }
+            float x = 0.0;
+            float y = 0.0;
+            vertex->QueryFloatAttribute("x", &x);
+            vertex->QueryFloatAttribute("y", &y);
+            vertices[num].x = x + pos.x;
+            vertices[num].y = y + pos.y;
+            num++;
+        }
     }
     //Not doing anything for lines; FMOD doesn't support it terribly well
 

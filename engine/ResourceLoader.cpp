@@ -772,6 +772,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
             verts[3].Set(pBoxSize.x / 2.0f, -pBoxSize.y / 2.0f);
             chainShape.CreateLoop(verts, 4);
             fixtureDef.shape = &chainShape;
+            //TODO: Apparently this doesn't take rotation into account
         }
         else
         {
