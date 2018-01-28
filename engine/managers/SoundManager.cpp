@@ -466,17 +466,19 @@ void SoundManager::setGeometryWorldSize(float sizeCenterToEdge)
     system->setGeometrySettings(sizeCenterToEdge);
 }
 
-SoundGeometry * SoundManager::createGeometry(int maxpolygons, int maxvertices)
+SoundGeometry* SoundManager::createGeometry(int maxpolygons, int maxvertices)
 {
-    SoundGeometry* geom = NULL;
-    FMOD_RESULT result = system->createGeometry(maxpolygons, maxvertices, &geom);
+    if(soundGeometry)
+        return soundGeometry;
+    FMOD_RESULT result = system->createGeometry(maxpolygons, maxvertices, &soundGeometry);
     ERRCHECK(result);
-    return geom;
+    return soundGeometry;
 }
 
 void SoundManager::clearGeometry()
 {
-    soundGeometry->release();
+    if(soundGeometry)
+        soundGeometry->release();
     soundGeometry = NULL;
 }
 

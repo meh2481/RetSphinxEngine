@@ -11,6 +11,10 @@
 #include "Object.h"
 #include "Node.h"
 #include <sstream>
+#include <algorithm>    // std::max
+
+#define MAX_POLY 256
+#define MAX_VERT 2560
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -151,6 +155,7 @@ void GameEngine::saveConfig(const std::string& sFilename)
 void GameEngine::loadScene(const std::string& sXMLFilename)
 {
     getEntityManager()->cleanup();
+    getSoundManager()->clearGeometry();
     player = NULL;
     LOG(INFO) << "Loading scene " << sXMLFilename;
     cameraPos = Vec3(0,0,m_fDefCameraZ);    //Reset camera
@@ -293,6 +298,12 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         }
     }
 
+    //Set world size for sound geometry
+    float xWorldSz = std::max(abs(rcSceneBounds.left), abs(rcSceneBounds.right));
+    float yWorldSz = std::max(abs(rcSceneBounds.top), abs(rcSceneBounds.bottom));
+    float worldSz = sqrt(xWorldSz*xWorldSz + yWorldSz*yWorldSz);
+    getSoundManager()->setGeometryWorldSize(worldSz);
+    SoundGeometry* soundGeom = getSoundManager()->createGeometry(MAX_POLY, MAX_VERT);   //TODO: maxpoly/vert from actual geom existing in level. tinyxml2 doesn't allow count for child elements here
     //Load level geometry
     for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
     {

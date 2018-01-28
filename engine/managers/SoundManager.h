@@ -108,6 +108,7 @@ public:
     //Geometry functions
     void setGeometryWorldSize(float sizeCenterToEdge);                  //Call before calls to createGeometry
     SoundGeometry* createGeometry(int maxpolygons, int maxvertices);    //Create a Geometry object (or return the active if one already exists)
+    SoundGeometry* getGeometry() { return soundGeometry; }
     void clearGeometry();                                               //Delete the current Geometry object
 
     //Global functions
