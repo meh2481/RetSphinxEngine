@@ -96,11 +96,13 @@ void GameEngine::frame(float dt)
     }
 
     //Update sound
-    Vec2 pos(0.0f, 0.0f);
+    Vec3 pos(0.0f, 0.0f, cameraPos.z);
     Vec2 vel(0.0f, 0.0f);
     if(player)
     {
-        pos = player->getPos();
+        Vec2 pos2 = player->getPos();
+        pos.x = pos2.x;
+        pos.y = pos2.y;
         b2Vec2 bvel = player->getBody()->GetLinearVelocity();
         vel.x = bvel.x;
         vel.y = bvel.y;

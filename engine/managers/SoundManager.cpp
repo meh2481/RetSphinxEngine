@@ -152,12 +152,12 @@ void SoundManager::update()
     }
 }
 
-void SoundManager::setListener(const Vec2& listenerPos, const Vec2& listenerVel)
+void SoundManager::setListener(const Vec3& listenerPos, const Vec2& listenerVel)
 {
     FMOD_VECTOR pos;
     pos.x = listenerPos.x;
     pos.y = listenerPos.y;
-    pos.z = 0.0f;
+    pos.z = listenerPos.z;
     FMOD_VECTOR vel;
     vel.x = listenerVel.x;
     vel.y = listenerVel.y;
@@ -204,7 +204,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
                 LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
         }
         sounds[filename] = handle;
-        FMOD_RESULT result = handle->set3DMinMaxDistance(0.5f, 5000.0f);
+        FMOD_RESULT result = handle->set3DMinMaxDistance(5.0f, 5000.0f);
         ERRCHECK(result);
         return handle;
     }
@@ -228,7 +228,7 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         }
 
         sounds[filename] = handle;
-        result = handle->set3DMinMaxDistance(0.5f, 5000.0f);
+        result = handle->set3DMinMaxDistance(5.0f, 5000.0f);
         ERRCHECK(result);
         loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
         return handle;
