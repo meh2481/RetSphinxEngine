@@ -220,7 +220,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     if(cMusic)
         mus = getSoundManager()->loadStream(cMusic);
     if(cMusic && mus)
-        getSoundManager()->playLoop(mus);
+        getSoundManager()->playLoop(mus, GROUP_MUSIC, Vec2(0.0f, 0.0f), Vec2(0.0f, 0.0f));
     else
     {
         Channel* musicChannel = getSoundManager()->getMusicChannel();

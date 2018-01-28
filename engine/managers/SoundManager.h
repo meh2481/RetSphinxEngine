@@ -82,8 +82,8 @@ public:
     SoundHandle* loadSound(const std::string& filename);
     StreamHandle* loadStream(const std::string& filename);
 
-    Channel* playSound(SoundHandle* sound, SoundGroup group = GROUP_SFX);
-    Channel* playLoop(StreamHandle* music, SoundGroup group = GROUP_MUSIC);
+    Channel* playSound(SoundHandle* sound, SoundGroup group, const Vec2& pos, const Vec2& vel);
+    Channel* playLoop(StreamHandle* music, SoundGroup group, const Vec2& pos, const Vec2& vel);
 
     //Group functions
     void setVolume(SoundGroup group, float fvol);

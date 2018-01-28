@@ -236,23 +236,21 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
     return existing->second;
 }
 
-Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
+Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group, const Vec2& pos, const Vec2& vel)
 {
     Channel* ret = NULL;
     FMOD_RESULT result = system->playSound(sound, getGroup(group), true, &ret);
     ERRCHECK(result);
-    FMOD_VECTOR pos;
-    FMOD_VECTOR vel;
-    pos.x = pos.y = pos.z = 0.0f;
-    vel.x = vel.y = vel.z = 0.0f;
-    result = ret->set3DAttributes(&pos, &vel);
+    FMOD_VECTOR posz = { pos.x, pos.y, 0.0f };
+    FMOD_VECTOR velz = { vel.x, vel.y, 0.0f };
+    result = ret->set3DAttributes(&posz, &velz);
     ERRCHECK(result);
     result = ret->setPaused(false);
     ERRCHECK(result);
     return ret;
 }
 
-Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
+Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group, const Vec2& pos, const Vec2& vel)
 {
     //Check if this is a song and we have a song currently playing
     if(musicChannel != NULL && group == GROUP_MUSIC)
@@ -284,11 +282,9 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     //Paused at start so can seek
     FMOD_RESULT result = system->playSound(stream, getGroup(group), true, &channel);
     ERRCHECK(result);
-    FMOD_VECTOR pos;
-    FMOD_VECTOR vel;
-    pos.x = pos.y = pos.z = 0.0f;
-    vel.x = vel.y = vel.z = 0.0f;
-    result = channel->set3DAttributes(&pos, &vel);
+    FMOD_VECTOR posz = { pos.x, pos.y, 0.0f };
+    FMOD_VECTOR velz = { vel.x, vel.y, 0.0f };
+    result = channel->set3DAttributes(&posz, &velz);
     ERRCHECK(result);
 
     //Set looping

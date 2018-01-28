@@ -67,8 +67,9 @@ end
 function spaceship:shoot(x, y, vx, vy, dt)
 
 	self.curTime = self.curTime + dt
-	
-	particles_setEmitPos(self.fireParticles, x-vx*dt, y-vy*dt)
+	local posx = x-vx*dt
+	local posy = y-vy*dt
+	particles_setEmitPos(self.fireParticles, posx, posy)
 	particles_setEmitVel(self.fireParticles, vx, vy)
 	local rStickX, rStickY = movement_vec(AIM)
 	--Make sure we're outside of our trip radius before moving
@@ -76,7 +77,7 @@ function spaceship:shoot(x, y, vx, vy, dt)
 		local angle = 1.0
 		particles_setFireRate(self.fireParticles, 1.0)	--firing
 		if self.curTime > self.lastFireSound + self.FIRE_RATE then
-			sound_play(self.SOUND_LASER)
+			sound_play(self.SOUND_LASER, obj_getPos(self))
 			self.lastFireSound = self.curTime
 		end
 		
@@ -159,6 +160,14 @@ function spaceship:update(dt)
 	
 	--Check shooting
 	self:shoot(x, y, vx, vy, dt)
+	
+	
+	--Debug sound stuff
+	if mouse_isDown() then
+		local mx, my = mouse_getPos()
+		mx, my = mouse_transformToWorld(mx, my)
+		sound_play(self.SOUND_LASER, mx, my)
+	end
 	
 end
 
