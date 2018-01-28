@@ -71,17 +71,12 @@ Possible sound channels:
 - Movie
 
 Overall TODO list:
-- Use DSPs for audio fx
-	- Research FMOD Studio & what I could do with that
+- Research FMOD Studio & what I could do with that
 - Revisit class predeclaration and add more where possible
 - Curve editor via ImGUI
 - Resources should be streamed from disk?
-- Sound filters
-- Fix math for softbody lattice anim so it actually works properly
-	- Use shaders rather than lattice animations where possible
+- Use shaders for lattice-based animations
 - Ortho for HUD and text drawing
-- Particle systems, objects, etc should be loaded by template, not from XML each time
-	- Also XML->PAK binary formats to simplify this
 - Error checking of parameters in luafuncs.cpp (without breaking everything this time)
 
 Particle System Editing:
@@ -92,7 +87,6 @@ Particle System Editing:
 - Add rotation angle for setting rotation based on velocity (so you don't have to image edit for a particle problem)
 
 Lower priority:
-- Test sound pitch shifting; current implementation seems to not work for all sound effects as intended
 - "Press Any Key" in games is used to determine which controller to use (though this should be stored, which most games don't do)
 - UTF code point lookup should use array of direct values rather than binary search? Or hashmap of some sort?
 - Use SDL_GetPowerInfo() for laptop battery reminders
