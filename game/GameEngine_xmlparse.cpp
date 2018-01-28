@@ -15,6 +15,7 @@
 
 #define MAX_POLY 256
 #define MAX_VERT 2560
+#define MAX_SOUND_POLY_VERTS 12
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -304,6 +305,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     float worldSz = sqrt(xWorldSz*xWorldSz + yWorldSz*yWorldSz);
     getSoundManager()->setGeometryWorldSize(worldSz);
     SoundGeometry* soundGeom = getSoundManager()->createGeometry(MAX_POLY, MAX_VERT);   //TODO: maxpoly/vert from actual geom existing in level. tinyxml2 doesn't allow count for child elements here
+    //soundGeom->setPosition()
     //Load level geometry
     for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
     {
@@ -325,7 +327,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
             //Load sound geometry
             if(!fixture->IsSensor())
             {
-
+                loadSoundGeom(geom, soundGeom, pos);
             }
             //Load lua for this, if it exists
             const char* cLua = geom->Attribute("luaclass");
@@ -357,5 +359,63 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     delete doc;
 
     m_sLastScene = sXMLFilename;
+}
+
+const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)MAX_SOUND_POLY_VERTS;
+void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
+{
+    FMOD_VECTOR vertices[MAX_SOUND_POLY_VERTS];
+    int num = 0;
+    //A bit of duplicate code here from ResourceLoader::getObjectFixture(), but whatevs.
+    //We'll want to have this generated automatically at resource build time, then stored with Geometry::save() anyway
+    const char* cFixType = fixture->Attribute("type");
+    if(!cFixType)
+    {
+        LOG(WARN) << "loadSoundGeom: No fixture type";
+        return;
+    }
+
+    bool bHollow = false;
+    fixture->QueryBoolAttribute("hollow", &bHollow);
+
+    std::string sFixType = cFixType;
+    if(sFixType == "box")
+    {
+
+    }
+    else if(sFixType == "circle")
+    {
+        float radius = 1.0f;
+        fixture->QueryFloatAttribute("radius", &radius);
+
+        float angle = 0.0f;
+        for(num = 0; num < MAX_SOUND_POLY_VERTS; num++)
+        {
+            b2Vec2 v = b2Vec2(pos.x, pos.y) + radius * b2Vec2(cosf(angle), sinf(angle));
+            vertices[num].x = v.x;
+            vertices[num].y = v.y;
+            vertices[num].z = 0.0f;
+            angle += ANGLE_INCREMENT;
+        }
+    }
+    else if(sFixType == "polygon")
+    {
+
+    }
+    //Not doing anything for lines; FMOD doesn't support it terribly well
+
+    if(num > 0)
+    {
+        int polygonIndex;   //Unused
+        float directocclusion = 0.8f;
+        fixture->QueryFloatAttribute("directocclusion", &directocclusion);
+        float reverbocclusion = 0.2f;
+        fixture->QueryFloatAttribute("reverbocclusion", &reverbocclusion);
+        FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, num, vertices, &polygonIndex);
+        if(result != FMOD_OK)
+        {
+            LOG(WARN) << "Unable to create FMOD polygon: " << result;
+        }
+    }
 }
 

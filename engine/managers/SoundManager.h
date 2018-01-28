@@ -17,6 +17,10 @@ class ResourceLoader;
 class SoundVol;
 class InterpolationManager;
 
+#ifdef _DEBUG
+    class DebugDraw;
+#endif
+
 typedef enum
 {
     GROUP_MUSIC,
@@ -58,6 +62,9 @@ private:
     ResourceLoader* loader;
     InterpolationManager* interpolationManager;
     SoundGeometry* soundGeometry;
+#ifdef _DEBUG
+    bool bDebugDraw;
+#endif // _DEBUG
 
     int init();
     void setGroup(Channel* ch, SoundGroup group);
@@ -110,6 +117,10 @@ public:
     SoundGeometry* createGeometry(int maxpolygons, int maxvertices);    //Create a Geometry object (or return the active if one already exists)
     SoundGeometry* getGeometry() { return soundGeometry; }
     void clearGeometry();                                               //Delete the current Geometry object
+#ifdef _DEBUG
+    bool shouldDrawDebug() { return bDebugDraw; }
+    void drawDebug(DebugDraw* debugDraw);
+#endif
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

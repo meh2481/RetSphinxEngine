@@ -327,6 +327,8 @@ void Engine::drawDebug()
         m_debugRenderState.apply();
         glBindTexture(GL_TEXTURE_2D, 0);
         m_physicsWorld->DrawDebugData();
+
+        getSoundManager()->drawDebug(m_debugDraw);
     }
 #endif // _DEBUG
 }

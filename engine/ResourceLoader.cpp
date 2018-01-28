@@ -730,13 +730,16 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
     b2PolygonShape polygonShape;
     b2CircleShape circleShape;
     b2ChainShape chainShape;
-    b2Vec2 vertices[b2_maxPolygonVertices+1];
+    b2Vec2 vertices[b2_maxPolygonVertices];
 
     //Get position (center of box)
     Vec2 pos(0, 0);
     const char* cPos = fixture->Attribute("pos");
     if(cPos)
         pos = pointFromString(cPos);
+
+    bool bHollow = false;
+    fixture->QueryBoolAttribute("hollow", &bHollow);
 
     const char* cFixType = fixture->Attribute("type");
     if(!cFixType)
@@ -757,9 +760,6 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         //Get rotation (angle) of box
         float fRot = 0.0f;
         fixture->QueryFloatAttribute("rot", &fRot);
-
-        bool bHollow = false;
-        fixture->QueryBoolAttribute("hollow", &bHollow);
 
         Vec2 pBoxSize = pointFromString(cBoxSize);
         if(bHollow)
@@ -822,8 +822,6 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
             LOG(ERR) << "Polygons require at least 3 vertices";
             return NULL;
         }
-        bool bHollow = false;
-        fixture->QueryBoolAttribute("hollow", &bHollow);
         if(bHollow)
         {
             //Hollow polygon

@@ -113,11 +113,13 @@ SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
     musicChannel = NULL;
     interpolationManager = interp;
     soundGeometry = NULL;
+    bDebugDraw = false;
     init();
 }
 
 SoundManager::~SoundManager()
 {
+    clearGeometry();
     //TODO: Save/load song location on app exit?
     FMOD_RESULT result = system->release();
     if(result)
@@ -521,3 +523,37 @@ void SoundManager::stopSounds(SoundGroup group)
     FMOD_RESULT result = sg->stop();
     ERRCHECK(result);
 }
+
+#ifdef _DEBUG
+#include "DebugDraw.h"
+const b2Color color = b2Color(0.1f, 0.1f, 1.0f);
+void SoundManager::drawDebug(DebugDraw* debugDraw)
+{
+    b2Vec2 vertices[32];
+    int polyCount = 0;
+    FMOD_RESULT result = soundGeometry->getNumPolygons(&polyCount);
+    ERRCHECK(result);
+    for(int i = 0; i < polyCount; i++)
+    {
+        int vertCount = 0;
+        result = soundGeometry->getPolygonNumVertices(i, &vertCount);
+        ERRCHECK(result);
+        float diroc;    //ignored
+        float revoc;    //ignored
+        bool doublesided = false;
+        result = soundGeometry->getPolygonAttributes(i, &diroc, &revoc, &doublesided);
+        ERRCHECK(result);
+        for(int j = 0; j < vertCount; j++)
+        {
+            FMOD_VECTOR vert;
+            result = soundGeometry->getPolygonVertex(i, j, &vert);
+            vertices[j].x = vert.x;
+            vertices[j].y = vert.y;
+        }
+        if(doublesided)
+            debugDraw->DrawPolygon(vertices, vertCount, color);
+        else
+            debugDraw->DrawSolidPolygon(vertices, vertCount, color);
+    }
+}
+#endif // _DEBUG
