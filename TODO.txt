@@ -1,4 +1,15 @@
 Current higher pri:
+- FMOD 3D sound
+	- Add sound polygons 
+    - Show sound debug info (polygons) with separate keypress
+	
+	- Objects can have their own sfx associated with them (channel group)
+	- Player is listener object, with forward/up vectors set according to center of screen
+		- Potential here to change these vectors with head tracker if we want to get crazy
+	- Level geometry (and large objects) are registered as FMOD geometry
+		- See Geometry::save and System::loadGeometry
+		
+		
 - Load Music from pak? Need to stream from disk
 - Particle with x that tapers to points (anime-style) - also see star lens flares on space photos
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
@@ -20,12 +31,6 @@ Current higher pri:
 	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 - Small-block memory allocator for Lua
 	- Other memory allocators/uses?
-- FMOD 3D sound
-	- Objects can have their own sfx associated with them (channel group)
-	- Player is listener object, with forward/up vectors set according to center of screen
-		- Potential here to change these vectors with head tracker if we want to get crazy
-	- Level geometry (and large objects) are registered as FMOD geometry
-		- See Geometry::save and System::loadGeometry
 - Objects
 	- Objects stored as binary files, not XML
 		- Templated so that complicated setup work doesn't have to be done every time (like Lua class loading)

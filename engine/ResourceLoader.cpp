@@ -838,7 +838,10 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         }
     }
     else
+    {
         LOG(ERR) << "Unknown fixture type: " << sFixType;
+        return NULL;
+    }
 
     unsigned int categoryBits = 0x0001;
     unsigned int maskBits = 0xFFFF;
