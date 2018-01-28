@@ -729,7 +729,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
     b2PolygonShape dynamicBox;
     b2CircleShape dynamicCircle;
     b2ChainShape dynamicChain;
-    b2Vec2 vertices[b2_maxPolygonVertices];
+    b2Vec2 vertices[b2_maxPolygonVertices+1];
 
     //Get position (center of box)
     Vec2 pos(0, 0);
@@ -821,8 +821,20 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
             LOG(ERR) << "Polygons require at least 3 vertices";
             return NULL;
         }
-        dynamicBox.Set(vertices, vertexCount);
-        fixtureDef.shape = &dynamicBox;
+        bool bHollow = false;
+        fixture->QueryBoolAttribute("hollow", &bHollow);
+        if(bHollow)
+        {
+            //Hollow polygon
+            dynamicChain.CreateLoop(vertices, vertexCount);
+            fixtureDef.shape = &dynamicChain;
+        }
+        else
+        {
+            //Filled polygon
+            dynamicBox.Set(vertices, vertexCount);
+            fixtureDef.shape = &dynamicBox;
+        }
     }
     else
         LOG(ERR) << "Unknown fixture type: " << sFixType;
