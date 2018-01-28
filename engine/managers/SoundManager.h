@@ -1,6 +1,7 @@
 #pragma once
 #include "fmod.hpp"
 #include "ResourceTypes.h"
+#include "Rect.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -76,6 +77,7 @@ public:
     ~SoundManager();
 
     void update();    //Call every frame
+    void setListener(Vec2 listenerPos, Vec2 listenerVel);
 
     SoundHandle* loadSound(const std::string& filename);
     StreamHandle* loadStream(const std::string& filename);

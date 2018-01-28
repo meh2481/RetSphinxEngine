@@ -5,6 +5,7 @@
 #include "ResourceTypes.h"
 #include "InterpolationManager.h"
 #include "SoundVol.h"
+#include "Rect.h"
 #include <cstring>
 
 #define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
@@ -43,7 +44,9 @@ int SoundManager::init()
         ERRCHECK(result);
         LOG(WARN) << "No sound driver";
     }
-    result = system->init(100, FMOD_INIT_NORMAL, 0);
+    result = system->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
+    ERRCHECK(result);
+    result = system->set3DSettings(1.0f, 5000000.0f, 1.0f);
     ERRCHECK(result);
 
     //Set up sound groups
@@ -149,6 +152,27 @@ void SoundManager::update()
     }
 }
 
+void SoundManager::setListener(Vec2 listenerPos, Vec2 listenerVel)
+{
+    FMOD_VECTOR pos;
+    pos.x = listenerPos.x;
+    pos.y = listenerPos.y;
+    pos.z = 0.0f;
+    FMOD_VECTOR vel;
+    pos.x = listenerVel.x;
+    pos.y = listenerVel.y;
+    pos.z = 0.0f;
+    FMOD_VECTOR forward;
+    pos.x = 0.0f;
+    pos.y = 0.0f;
+    pos.z = -1.0f;
+    FMOD_VECTOR up;
+    pos.x = 0.0f;
+    pos.y = 1.0f;
+    pos.z = 0.0f;
+    system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+}
+
 SoundHandle* SoundManager::loadSound(const std::string& filename)
 {
     std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
@@ -167,7 +191,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             memset(&info, 0, sizeof(FMOD_CREATESOUNDEXINFO));    //Clear all fields to 0
             info.length = length;    //Set length
             //In pak; load from memory
-            FMOD_RESULT result = system->createSound((const char*)data, FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
+            FMOD_RESULT result = system->createSound((const char*)data, FMOD_3D | FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
             if(result)
                 LOG(WARN) << "Unable to create sound resource " << filename << "from pak, error " << result;
             soundResources.push_back(data);    //Free this later
@@ -175,11 +199,13 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
         else
         {
             //Not in pak; load from file
-            FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
+            FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESAMPLE, NULL, &handle);
             if(result)
                 LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
         }
         sounds[filename] = handle;
+        FMOD_RESULT result = handle->set3DMinMaxDistance(0.05f, 10.0f);
+        ERRCHECK(result);
         return handle;
     }
     return existing->second;
@@ -194,7 +220,7 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         SoundHandle* handle = NULL;
 
         //Create a streamed, loopable sound
-        FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
+        FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
         if(result)
         {
             LOG(WARN) << "Unable to create music resource " << filename << ", error " << result;
@@ -202,6 +228,8 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         }
 
         sounds[filename] = handle;
+        result = handle->set3DMinMaxDistance(0.05f, 10.0f);
+        ERRCHECK(result);
         loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
         return handle;
     }
@@ -212,6 +240,10 @@ Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
 {
     Channel* ret = NULL;
     FMOD_RESULT result = system->playSound(sound, getGroup(group), true, &ret);
+    ERRCHECK(result);
+    FMOD_VECTOR pos;
+    pos.x = pos.y = pos.z = 0.0f;
+    result = ret->set3DAttributes(&pos, &pos);
     ERRCHECK(result);
     result = ret->setPaused(false);
     ERRCHECK(result);
@@ -249,6 +281,10 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     Channel* channel;
     //Paused at start so can seek
     FMOD_RESULT result = system->playSound(stream, getGroup(group), true, &channel);
+    ERRCHECK(result);
+    FMOD_VECTOR pos;
+    pos.x = pos.y = pos.z = 0.0f;
+    result = channel->set3DAttributes(&pos, &pos);
     ERRCHECK(result);
 
     //Set looping

@@ -239,6 +239,8 @@ bool Engine::_processEvent(SDL_Event& e)
 
 bool Engine::_frame()
 {
+    Vec2 pos(0, 0);
+    Vec2 vel(0, 0);
     m_soundManager->update();
 
     //Handle input events from SDL

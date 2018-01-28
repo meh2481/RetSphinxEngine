@@ -37,7 +37,7 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTi
 
     //Set camera position for this game
     m_fDefCameraZ = -16;
-    cameraPos = Vec3(0,0,m_fDefCameraZ);
+    cameraPos = Vec3(0, 0, m_fDefCameraZ);
 #ifdef _DEBUG
     m_bMouseGrabOnWindowRegain = false;
 #else
@@ -94,6 +94,18 @@ void GameEngine::frame(float dt)
             m_sLoadNode.clear();
         }
     }
+
+    //Update sound
+    Vec2 pos(0.0f, 0.0f);
+    Vec2 vel(0.0f, 0.0f);
+    if(player)
+    {
+        pos = player->getPos();
+        b2Vec2 bvel = player->getBody()->GetLinearVelocity();
+        vel.x = bvel.x;
+        vel.y = bvel.y;
+    }
+    getSoundManager()->setListener(pos, vel);
 }
 
 const double CAMERA_ANGLE_RAD = glm::radians(60.0);
@@ -183,7 +195,7 @@ void GameEngine::draw(RenderState& renderState)
 bool GameEngine::init(std::vector<commandlineArg> sArgs)
 {
     //Run through list for arguments we recognize
-    for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+    for(std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
         LOG(DBG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 
     //Load our last screen position and such
