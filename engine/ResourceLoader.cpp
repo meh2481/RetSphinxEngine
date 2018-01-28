@@ -729,6 +729,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
     b2PolygonShape dynamicBox;
     b2CircleShape dynamicCircle;
     b2ChainShape dynamicChain;
+    b2Vec2 vertices[b2_maxPolygonVertices];
 
     //Get position (center of box)
     Vec2 pos(0, 0);
@@ -797,6 +798,34 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         dynamicChain.CreateChain(verts, 2);
         fixtureDef.shape = &dynamicChain;
     }
+    else if(sFixType == "polygon")
+    {
+        //Read vertices for polygon
+        int32 vertexCount = 0;
+        for(tinyxml2::XMLElement* vertex = fixture->FirstChildElement("vertex"); vertex != NULL; vertex = vertex->NextSiblingElement("vertex"))
+        {
+            if(vertexCount > b2_maxPolygonVertices)
+            {
+                LOG(ERR) << "Only " << b2_maxPolygonVertices << " are allowed per polygon";
+                vertexCount = b2_maxPolygonVertices;
+                break;
+            }
+            float x = 0.0;
+            float y = 0.0;
+            vertex->QueryFloatAttribute("x", &x);
+            vertex->QueryFloatAttribute("y", &y);
+            vertices[vertexCount++].Set(x, y);
+        }
+        if(vertexCount < 3) //vertexCount <3
+        {
+            LOG(ERR) << "Polygons require at least 3 vertices";
+            return NULL;
+        }
+        dynamicBox.Set(vertices, vertexCount);
+        fixtureDef.shape = &dynamicBox;
+    }
+    else
+        LOG(ERR) << "Unknown fixture type: " << sFixType;
     //else TODO add other fixture types
 
     unsigned int categoryBits = 0x0001;
