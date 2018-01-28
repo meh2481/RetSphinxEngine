@@ -725,10 +725,11 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 
 b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
+    //Declare these here so they don't fall out of scope
     b2FixtureDef fixtureDef;
-    b2PolygonShape dynamicBox;
-    b2CircleShape dynamicCircle;
-    b2ChainShape dynamicChain;
+    b2PolygonShape polygonShape;
+    b2CircleShape circleShape;
+    b2ChainShape chainShape;
     b2Vec2 vertices[b2_maxPolygonVertices+1];
 
     //Get position (center of box)
@@ -769,22 +770,22 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
             verts[1].Set(-pBoxSize.x / 2.0f, pBoxSize.y / 2.0f);
             verts[2].Set(-pBoxSize.x / 2.0f, -pBoxSize.y / 2.0f);
             verts[3].Set(pBoxSize.x / 2.0f, -pBoxSize.y / 2.0f);
-            dynamicChain.CreateLoop(verts, 4);
-            fixtureDef.shape = &dynamicChain;
+            chainShape.CreateLoop(verts, 4);
+            fixtureDef.shape = &chainShape;
         }
         else
         {
             //Create box
-            dynamicBox.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(pos.x, pos.y), fRot);
-            fixtureDef.shape = &dynamicBox;
+            polygonShape.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(pos.x, pos.y), fRot);
+            fixtureDef.shape = &polygonShape;
         }
     }
     else if(sFixType == "circle")
     {
-        dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
-        dynamicCircle.m_radius = 1.0f;
-        fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
-        fixtureDef.shape = &dynamicCircle;
+        circleShape.m_p = b2Vec2(pos.x, pos.y);
+        circleShape.m_radius = 1.0f;
+        fixture->QueryFloatAttribute("radius", &circleShape.m_radius);
+        fixtureDef.shape = &circleShape;
     }
     else if(sFixType == "line")
     {
@@ -795,8 +796,8 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         verts[0].Set(0, fLen / 2.0f);
         verts[1].Set(0, -fLen / 2.0f);
 
-        dynamicChain.CreateChain(verts, 2);
-        fixtureDef.shape = &dynamicChain;
+        chainShape.CreateChain(verts, 2);
+        fixtureDef.shape = &chainShape;
     }
     else if(sFixType == "polygon")
     {
@@ -826,19 +827,18 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         if(bHollow)
         {
             //Hollow polygon
-            dynamicChain.CreateLoop(vertices, vertexCount);
-            fixtureDef.shape = &dynamicChain;
+            chainShape.CreateLoop(vertices, vertexCount);
+            fixtureDef.shape = &chainShape;
         }
         else
         {
             //Filled polygon
-            dynamicBox.Set(vertices, vertexCount);
-            fixtureDef.shape = &dynamicBox;
+            polygonShape.Set(vertices, vertexCount);
+            fixtureDef.shape = &polygonShape;
         }
     }
     else
         LOG(ERR) << "Unknown fixture type: " << sFixType;
-    //else TODO add other fixture types
 
     unsigned int categoryBits = 0x0001;
     unsigned int maskBits = 0xFFFF;
