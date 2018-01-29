@@ -18,6 +18,30 @@
 #define FMOD_CHANNEL_L 0
 #define FMOD_CHANNEL_R 1
 
+SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
+{
+    loader = l;
+    musicChannel = NULL;
+    interpolationManager = interp;
+    soundGeometry = NULL;
+    init();
+}
+
+SoundManager::~SoundManager()
+{
+    clearGeometry();
+    //TODO: Save/load song location on app exit?
+    FMOD_RESULT result = system->release();
+    if(result)
+        LOG(WARN) << "Unable to close FMOD: " << result;
+    for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
+        free(*i);
+    for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
+        free(i->second);
+    for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
+        delete *i;
+}
+
 int SoundManager::init()
 {
     LOG(INFO) << "Initializing FMOD...";
@@ -108,31 +132,6 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
         return masterChannelGroup;
     }
     return sfxGroup;
-}
-
-SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
-{
-    loader = l;
-    musicChannel = NULL;
-    interpolationManager = interp;
-    soundGeometry = NULL;
-    bDebugDraw = false;
-    init();
-}
-
-SoundManager::~SoundManager()
-{
-    clearGeometry();
-    //TODO: Save/load song location on app exit?
-    FMOD_RESULT result = system->release();
-    if(result)
-        LOG(WARN) << "Unable to close FMOD: " << result;
-    for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
-        free(*i);
-    for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
-        free(i->second);
-    for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
-        delete *i;
 }
 
 void SoundManager::update()

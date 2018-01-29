@@ -63,9 +63,6 @@ private:
     ResourceLoader* loader;
     InterpolationManager* interpolationManager;
     SoundGeometry* soundGeometry;
-#ifdef _DEBUG
-    bool bDebugDraw;
-#endif // _DEBUG
 
     int init();
     void setGroup(Channel* ch, SoundGroup group);
@@ -120,7 +117,6 @@ public:
     SoundGeometry* getGeometry() { return soundGeometry; }
     void clearGeometry();                                               //Delete the current Geometry object
 #ifdef _DEBUG
-    bool shouldDrawDebug() { return bDebugDraw; }
     void drawDebug(DebugDraw* debugDraw);
 #endif
 
