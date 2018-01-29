@@ -1,13 +1,10 @@
 Current higher pri:
 - FMOD 3D sound
-	- Add sound polygons 
-    - Show sound debug info (polygons) with separate keypress
-	
-	- Objects can have their own sfx associated with them (channel group)
-	- Player is listener object, with forward/up vectors set according to center of screen
-		- Potential here to change these vectors with head tracker if we want to get crazy
-	- Level geometry (and large objects) are registered as FMOD geometry
-		- See Geometry::save and System::loadGeometry
+	- Music shouldn't be occluded by geometry
+    - Objects can have their own sfx associated with them (channel group)
+	- Change listener up/forward vectors with head tracker for fun
+	- Large objects are registered as FMOD geometry
+		- Use Geometry::save and System::loadGeometry, precalc at resource pack time
 		
 		
 - Load Music from pak? Need to stream from disk

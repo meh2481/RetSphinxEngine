@@ -171,6 +171,10 @@ void GameEngine::handleEvent(SDL_Event event)
                     toggleDebugDraw();
                     break;
 
+                case SDL_SCANCODE_B:
+                    toggleSoundDebugDraw();
+                    break;
+
                 case SDL_SCANCODE_P:
                     playPausePhysics();
                     break;

@@ -372,6 +372,7 @@ static void rotPoint(FMOD_VECTOR* vec, float x, float y, float rot)
 }
 
 const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)MAX_SOUND_POLY_VERTS;
+const float SOUND_QUAD_HEIGHT = 50.0f;
 void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
 {
     FMOD_VECTOR vertices[MAX_SOUND_POLY_VERTS];
@@ -455,20 +456,51 @@ void GameEngine::loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* s
             num++;
         }
     }
-    //Not doing anything for lines; FMOD doesn't support it terribly well
+    else if(sFixType == "line")
+    {
+        float fLen = 1.0f;
+        fixture->QueryFloatAttribute("length", &fLen);
 
-    if(num > 0)
+        vertices[0].x = pos.x;
+        vertices[0].y = pos.y + fLen / 2.0f;
+        vertices[1].x = pos.x;
+        vertices[1].y = pos.y - fLen / 2.0f;
+        num = 2;
+    }
+    else
+        LOG(WARN) << "Unknown fixture type: " << sFixType;
+
+    if(num > 1)
     {
         int polygonIndex;   //Unused
-        float directocclusion = 0.8f;
+        float directocclusion = 0.6f;
         fixture->QueryFloatAttribute("directocclusion", &directocclusion);
-        float reverbocclusion = 0.2f;
+        float reverbocclusion = 0.02f;
         fixture->QueryFloatAttribute("reverbocclusion", &reverbocclusion);
-        FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, num, vertices, &polygonIndex);
-        if(result != FMOD_OK)
+        //Verticalize these polygons by turning each segment into a vertical quad
+        for(int i = 0; i < num; i++)
         {
-            LOG(WARN) << "Unable to create FMOD polygon: " << result;
+            FMOD_VECTOR quads[4];
+            FMOD_VECTOR* second;
+            if(i < num - 1)	//Wrap around at end
+                second = &vertices[i + 1];
+            else
+                second = &vertices[0];
+            quads[0].x = vertices[i].x;
+            quads[0].y = vertices[i].y;
+            quads[0].z = SOUND_QUAD_HEIGHT;
+            quads[1].x = vertices[i].x;
+            quads[1].y = vertices[i].y;
+            quads[1].z = -SOUND_QUAD_HEIGHT;
+            quads[2].x = second->x;
+            quads[2].y = second->y;
+            quads[2].z = -SOUND_QUAD_HEIGHT;
+            quads[3].x = second->x;
+            quads[3].y = second->y;
+            quads[3].z = SOUND_QUAD_HEIGHT;
+            FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, 4, quads, &polygonIndex);
+            if(result != FMOD_OK)
+                LOG(WARN) << "Unable to create FMOD polygon: " << result;
         }
     }
 }
-

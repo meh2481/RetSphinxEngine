@@ -98,7 +98,7 @@ void GameEngine::frame(float dt)
     //Update sound
     Vec3 pos(0.0f, 0.0f, cameraPos.z);
     Vec2 vel(0.0f, 0.0f);
-    if(player)
+    if(player && player->getBody())
     {
         Vec2 pos2 = player->getPos();
         pos.x = pos2.x;

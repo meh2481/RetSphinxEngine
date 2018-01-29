@@ -55,6 +55,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 #ifdef _DEBUG
     LOG(INFO) << "Debug build";
     m_bDebugDraw = true;
+    m_bSoundDebugDraw = false;
 #else
     LOG(INFO) << "Release build";
 #endif
@@ -319,7 +320,7 @@ void Engine::drawDebug()
 {
 #ifdef _DEBUG
     // Draw physics debug stuff
-    if(m_bDebugDraw)
+    if(m_bDebugDraw || m_bSoundDebugDraw)
     {
         glClear(GL_DEPTH_BUFFER_BIT);
         m_debugRenderState.projection = m_renderState.projection;
@@ -328,10 +329,11 @@ void Engine::drawDebug()
         glUseProgram(m_debugRenderState.programId);
         m_debugRenderState.apply();
         glBindTexture(GL_TEXTURE_2D, 0);
-        m_physicsWorld->DrawDebugData();
-
-        getSoundManager()->drawDebug(m_debugDraw);
     }
+    if(m_bDebugDraw)
+        m_physicsWorld->DrawDebugData();
+    if(m_bSoundDebugDraw)
+        getSoundManager()->drawDebug(m_debugDraw);
 #endif // _DEBUG
 }
 

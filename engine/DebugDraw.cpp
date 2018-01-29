@@ -141,3 +141,56 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 {
     //Don't care about drawing AABBs, as they're generally useless to see
 }
+
+#ifdef _DEBUG
+void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& color)
+{
+    const float data[] = {
+        p1.x,
+        p1.y,
+        p1.z,
+        p2.x,
+        p2.y,
+        p2.z
+    };
+    const float col[] = {
+        color.r,
+        color.g,
+        color.b,
+        color.a * outlineAlpha
+    };
+    glUniform4fv(uniformId, 1, col);
+    glVertexPointer(3, GL_FLOAT, 0, data);
+    glDrawArrays(GL_LINES, 0, 2);
+}
+
+void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color)
+{
+    //Draw filled center
+    float* data = new float[vertexCount * 3];
+    const float col[] = {
+        color.r * fillMul,
+        color.g * fillMul,
+        color.b * fillMul,
+        color.a * fillAlpha
+    };
+    for(int i = 0; i < vertexCount; i++)
+    {
+        data[i * 3] = vertices[i].x;
+        data[i * 3 + 1] = vertices[i].y;
+        data[i * 3 + 2] = vertices[i].z;
+    }
+    glUniform4fv(uniformId, 1, col);
+    glVertexPointer(3, GL_FLOAT, 0, data);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+
+    //Fill in outside
+    //Draw sides
+    for(int i = 0; i < vertexCount - 1; i++)
+        Draw3DSegment(vertices[i], vertices[i + 1], color);
+    //Draw last side
+    Draw3DSegment(vertices[0], vertices[vertexCount - 1], color);
+
+    delete[] data;
+}
+#endif

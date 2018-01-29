@@ -567,7 +567,7 @@ void SoundManager::stopSounds(SoundGroup group)
 const b2Color color = b2Color(0.1f, 0.1f, 1.0f);
 void SoundManager::drawDebug(DebugDraw* debugDraw)
 {
-    b2Vec2 vertices[32];
+    Vec3 vertices[32];
     int polyCount = 0;
     FMOD_RESULT result = soundGeometry->getNumPolygons(&polyCount);
     ERRCHECK(result);
@@ -587,11 +587,9 @@ void SoundManager::drawDebug(DebugDraw* debugDraw)
             result = soundGeometry->getPolygonVertex(i, j, &vert);
             vertices[j].x = vert.x;
             vertices[j].y = vert.y;
+            vertices[j].z = vert.z;
         }
-        if(doublesided)
-            debugDraw->DrawPolygon(vertices, vertCount, color);
-        else
-            debugDraw->DrawSolidPolygon(vertices, vertCount, color);
+        debugDraw->Draw3DPolygon(vertices, vertCount, color);
     }
 }
 #endif // _DEBUG

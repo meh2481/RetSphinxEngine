@@ -44,6 +44,7 @@ private:
 #ifdef _DEBUG
     DebugDraw* m_debugDraw;
     bool m_bDebugDraw;
+    bool m_bSoundDebugDraw;
 #endif
     Vec2 m_ptCursorPos;
     bool  m_bShowCursor;
@@ -150,6 +151,7 @@ public:
     void setDebugDraw(bool b) { m_bDebugDraw = b; };
     bool getDebugDraw() { return m_bDebugDraw; };
     void toggleDebugDraw() { m_bDebugDraw = !m_bDebugDraw; };
+    void toggleSoundDebugDraw() { m_bSoundDebugDraw = !m_bSoundDebugDraw; };
     void playPausePhysics() { m_bSteppingPhysics = !m_bSteppingPhysics; };
     void pausePhysics() { m_bSteppingPhysics = true; };
     void playPhysics() { m_bSteppingPhysics = false; };
