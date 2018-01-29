@@ -170,7 +170,16 @@ void SoundManager::setListener(const Vec3& listenerPos, const Vec2& listenerVel)
     up.x = 0.0f;
     up.y = 1.0f;
     up.z = 0.0f;
-    system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+    FMOD_RESULT result = system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+    ERRCHECK(result);
+
+    //Set music channel to listener pos; for some reason we're getting geometry occlusions even though 3D is off
+    if(musicChannel)
+    {
+        FMOD_VECTOR v1 = { 0.0f, 0.0f, 0.0f };
+        result = musicChannel->set3DAttributes(&pos, &v1);
+        ERRCHECK(result);
+    }
 }
 
 SoundHandle* SoundManager::loadSound(const std::string& filename)

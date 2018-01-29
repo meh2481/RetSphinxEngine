@@ -1,10 +1,10 @@
 Current higher pri:
 - FMOD 3D sound
-	- Music shouldn't be occluded by geometry
+	- Fix audio direction near sides of map
     - Objects can have their own sfx associated with them (channel group)
 	- Change listener up/forward vectors with head tracker for fun
 	- Large objects are registered as FMOD geometry
-		- Use Geometry::save and System::loadGeometry, precalc at resource pack time
+	- Use Geometry::save and System::loadGeometry, precalc at resource pack time
 		
 		
 - Load Music from pak? Need to stream from disk
@@ -54,6 +54,7 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Better handling of object reskinning than obj_setImage from lua
+- Fix framerate stuttering. For real this time.
 
 Bugs:
 - Physics engine tied to framerate; 144Hz same # of physics engine cycles as 60Hz per frame
