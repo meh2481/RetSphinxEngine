@@ -476,7 +476,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 
     std::string pakFilename = remove_extension(in);
     pakFilename += ".pak";
-    std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
+    std::cout << std::endl << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
 
     //TODO: Something better than just check-everything
     if(!g_bClean && nothingToDo(filesToPak, in, pakFilename))
@@ -651,5 +651,6 @@ int main(int argc, char** argv)
     free(workMem);
     teardownLua();
     teardownSound();
+    std::cout << "Complete." << std::endl;
     return 0;
 }

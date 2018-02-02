@@ -174,6 +174,8 @@ static void loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* soundG
 
 void extractSoundGeometry(const std::string& xmlFilename)
 {
+    std::string geomFilename = xmlFilename + ".soundgeom";
+    std::cout << "Compressing \"" << geomFilename << "\"..."<< std::endl;
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(xmlFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
@@ -224,18 +226,21 @@ void extractSoundGeometry(const std::string& xmlFilename)
     delete doc;
 
 
-    //TODO SoundGeomHeader/SoundGeom
     int sz;
     result = soundGeom->save(NULL, &sz);
     ERRCHECK(result);
-    unsigned char* data = (unsigned char*)malloc(sz);
-    result = soundGeom->save(data, &sz);
+    unsigned char* data = (unsigned char*)malloc(sz + sizeof(SoundGeomHeader));
+    result = soundGeom->save(&data[sizeof(SoundGeomHeader)], &sz);
     ERRCHECK(result);
-    LOG(INFO) << "saving geom size: " << sz;
+    LOG(TRACE) << "saving geom size: " << sz;
+
+    SoundGeomHeader* header = (SoundGeomHeader*)data;
+    header->worldSize = worldSz;
+    header->geomSize = sz;
 
     CompressionHelper helper;
     helper.header.type = RESOURCE_TYPE_SOUNDGEOM;
-    helper.id = Hash::hash((xmlFilename + ".soundgeom").c_str());
+    helper.id = Hash::hash(geomFilename.c_str());
     createCompressionHelper(&helper, data, sz);
     addHelper(helper);
 

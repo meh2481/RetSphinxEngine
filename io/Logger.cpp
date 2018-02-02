@@ -79,7 +79,7 @@ void logstream::_on()
 {
     coss.clear();
 #ifdef _DEBUG
-    std::cout.clear();
+    std::cerr.clear();
 #endif
 }
 
@@ -87,7 +87,7 @@ void logstream::_off()
 {
     coss.setstate(std::ios_base::badbit);
 #ifdef _DEBUG
-    std::cout.setstate(std::ios_base::badbit);
+    std::cerr.setstate(std::ios_base::badbit);
 #endif
 }
 
@@ -95,7 +95,7 @@ logstream& logstream::operator<< (std::ostream& (*pfun)(std::ostream&))
 {
     pfun(coss);
 #ifdef _DEBUG
-    pfun(std::cout);
+    pfun(std::cerr);
 #endif
     return *this;
 }

@@ -33,7 +33,7 @@ inline logstream& operator<<(logstream & st, const T & val)
 {
     st.coss << val;
 #ifdef _DEBUG
-    std::cout << val;
+    std::cerr << val;
 #endif
     return st;
 }

@@ -154,16 +154,9 @@ typedef struct
 typedef struct
 {
     f32_t worldSize;
-    uint32_t numGeometries;
-    //Followed by numGeometries SoundGeom
+    uint32_t geomSize;
+    //Followed by geomSize FMOD sound geometry data
 } SoundGeomHeader;
-
-typedef struct
-{
-    uint32_t size;
-    //Followed by FMOD sound geometry data
-    //uint64_t offset;
-} SoundGeom;
 
 //--------------------------------------------------------------
 // Mesh data
