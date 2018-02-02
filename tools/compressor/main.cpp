@@ -539,6 +539,8 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         }
         else if(ext == "xml")
         {
+            if(i->find(".scene.xml") != std::string::npos)
+                extractSoundGeometry(*i);   //Create sound geometry from scene
             helper.header.type = RESOURCE_TYPE_XML;
             decompressed = FileOperations::readFile(*i, &size);
         }

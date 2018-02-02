@@ -4,6 +4,7 @@ lua.cpp
 mesh.cpp
 main.cpp
 main.h
+sound.cpp
 )
 
 add_executable(compressor ${compressor_src})

@@ -150,6 +150,20 @@ typedef struct
     uint32_t loopEndMsec;
 } SoundLoop;
 
+typedef struct
+{
+    f32_t worldSize;
+    uint32_t numGeometries;
+    //Followed by numGeometries SoundGeom
+} SoundGeomHeader;
+
+typedef struct
+{
+    uint32_t size;
+    //Followed by FMOD sound geometry data
+    //uint64_t offset;
+} SoundGeom;
+
 //--------------------------------------------------------------
 // Mesh data
 //--------------------------------------------------------------

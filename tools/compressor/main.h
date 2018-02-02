@@ -30,3 +30,6 @@ unsigned char* extract3dObject(const std::string& xmlFilename, unsigned int* siz
 unsigned char* extractLua(const std::string& luaFilename, unsigned int* size);
 void initLua();
 void teardownLua();
+
+//sound.cpp
+void extractSoundGeometry(const std::string& xmlFilename);
