@@ -33,3 +33,6 @@ void teardownLua();
 
 //sound.cpp
 void extractSoundGeometry(const std::string& xmlFilename);
+void initSound();
+void teardownSound();
+

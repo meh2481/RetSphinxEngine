@@ -624,6 +624,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 int main(int argc, char** argv)
 {
     initLua();
+    initSound();
     g_bImageOut = g_bClean = g_bRawImg = false;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
@@ -649,5 +650,6 @@ int main(int argc, char** argv)
     //Free our WFLZ working memory
     free(workMem);
     teardownLua();
+    teardownSound();
     return 0;
 }
