@@ -70,4 +70,7 @@ public:
     //Sounds
     unsigned char* getSound(const std::string& sID, unsigned int* length);    // Raw data since we load with FMOD
     SoundLoop* getSoundLoop(const std::string& sID);
+
+    //Binary data
+    unsigned char* getData(const std::string& sID);
 };

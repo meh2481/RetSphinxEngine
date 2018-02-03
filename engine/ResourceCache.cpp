@@ -13,7 +13,7 @@ void ResourceCache::add(uint64_t id, void* item)
     map[id] = item;
 }
 
-void* ResourceCache::find(uint64_t id)
+void* ResourceCache::find(uint64_t id)  //NOTE: This seems like a mis-design to not have a length included
 {
     std::map<uint64_t, void*>::iterator i = map.find(id);
     if(i == map.end())    //This image isn't here

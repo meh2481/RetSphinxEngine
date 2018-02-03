@@ -983,3 +983,15 @@ Texture* ResourceLoader::getAtlas(uint64_t atlasId)
     }
     return atlas;
 }
+
+unsigned char* ResourceLoader::getData(const std::string& sID)
+{
+    uint64_t hash = Hash::hash(sID.c_str());
+    unsigned char* obj = (unsigned char*)m_cache->find(hash);
+    if(!obj)
+    {
+        unsigned int len = 0;
+        obj = m_pakLoader->loadResource(hash, &len);
+    }
+    return obj;
+}

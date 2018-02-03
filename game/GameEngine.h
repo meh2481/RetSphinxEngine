@@ -90,7 +90,7 @@ public:
     bool loadConfig(const std::string& sFilename);
     void saveConfig(const std::string& sFilename);
     void loadScene(const std::string& sXMLFilename);    //Load scene from file
-    void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGeom, const Vec2& pos);
+    void loadSoundGeom(const std::string& sXMLFilename);
 
     //Other stuff
     void warpObjectToNode(Object* o, Node* n);

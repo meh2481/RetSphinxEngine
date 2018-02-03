@@ -20,6 +20,8 @@ void initSound()
     ERRCHECK(result);
     result = soundSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
     ERRCHECK(result);
+    result = soundSystem->update();
+    ERRCHECK(result);
 }
 
 void teardownSound()
@@ -40,7 +42,7 @@ static void rotPoint(FMOD_VECTOR* vec, float x, float y, float rot)
 
 static const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)MAX_SOUND_POLY_VERTS;
 static const float SOUND_QUAD_HEIGHT = 50.0f;
-static void loadSoundGeom(tinyxml2::XMLElement * fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
+static void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
 {
     FMOD_VECTOR vertices[MAX_SOUND_POLY_VERTS];
     for(int i = 0; i < MAX_SOUND_POLY_VERTS; i++)
@@ -208,7 +210,9 @@ void extractSoundGeometry(const std::string& xmlFilename)
 
     //Loop through geom
     FMOD::Geometry* soundGeom;
-    FMOD_RESULT result = soundSystem->createGeometry(MAX_POLY, MAX_VERT, & soundGeom);
+    FMOD_RESULT result = soundSystem->setGeometrySettings(worldSz);
+    ERRCHECK(result);
+    result = soundSystem->createGeometry(MAX_POLY, MAX_VERT, &soundGeom);
     if(result != FMOD_OK)
     {
         LOG(ERR) << "Unable to create sound geom";
@@ -229,14 +233,21 @@ void extractSoundGeometry(const std::string& xmlFilename)
     int sz;
     result = soundGeom->save(NULL, &sz);
     ERRCHECK(result);
-    unsigned char* data = (unsigned char*)malloc(sz + sizeof(SoundGeomHeader));
-    result = soundGeom->save(&data[sizeof(SoundGeomHeader)], &sz);
+    int throwaway = sz;
+    sz += 128 + sizeof(SoundGeomHeader);
+    unsigned char* data = (unsigned char*)malloc(sz);
+    memset(data, 0, sz);
+    result = soundGeom->save(data + sizeof(SoundGeomHeader), &throwaway);
     ERRCHECK(result);
     LOG(TRACE) << "saving geom size: " << sz;
 
     SoundGeomHeader* header = (SoundGeomHeader*)data;
     header->worldSize = worldSz;
-    header->geomSize = sz;
+    header->geomSize = throwaway + 128;
+
+    FILE* fp = fopen("out.soundgeom", "wb");
+    fwrite(data, 1, sz, fp);
+    fclose(fp);
 
     CompressionHelper helper;
     helper.header.type = RESOURCE_TYPE_SOUNDGEOM;

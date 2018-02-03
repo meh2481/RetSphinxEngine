@@ -18,6 +18,89 @@
 #define FMOD_CHANNEL_L 0
 #define FMOD_CHANNEL_R 1
 
+FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TYPE type, void *commanddata1, void *commanddata2, void* userdata)
+{
+    FMOD::System *sys = (FMOD::System *)system;
+
+    switch(type)
+    {
+        case FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED:
+        {
+            int numdrivers;
+
+            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED occured.";
+
+            sys->getNumDrivers(&numdrivers);
+
+            LOG(INFO) << "Numdevices = " << numdrivers;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED:
+        {
+            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED occured.";
+            LOG(ERR) << (char*)commanddata1;
+            LOG(ERR) << "%d bytes." << (int)commanddata2;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_THREADCREATED:
+        {
+            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_THREADCREATED occured.";
+            LOG(INFO) << "Thread ID = " << (int)commanddata1;
+            LOG(INFO) << "Thread Name = " << (char*)commanddata2;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION:
+        {
+            FMOD::DSP *source = (FMOD::DSP *)commanddata1;
+            FMOD::DSP *dest = (FMOD::DSP *)commanddata2;
+
+            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION occured.";
+            if(source)
+            {
+                char name[256];
+                source->getInfo(name, 0, 0, 0, 0);
+                LOG(ERR) << "SOURCE = " << name;
+            }
+            if(dest)
+            {
+                char name[256];
+                dest->getInfo(name, 0, 0, 0, 0);
+                LOG(ERR) << "DEST = " << name;
+            }
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_PREMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_MIDMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_POSTMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_ERROR:
+        {
+            FMOD_ERRORCALLBACK_INFO* errInfo = (FMOD_ERRORCALLBACK_INFO*)commanddata1;
+            LOG(ERR) << "FMOD Callback error:";
+            LOG(ERR) << "Result: " << errInfo->result;
+            LOG(ERR) << "Instance Type: " << errInfo->instancetype;
+            LOG(ERR) << "Function name: " << errInfo->functionname;
+            LOG(ERR) << "Function params: " << errInfo->functionparams;
+
+            break;
+        }
+    }
+
+    return FMOD_OK;
+}
+
+
 SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
 {
     loader = l;
@@ -93,6 +176,9 @@ int SoundManager::init()
     masterChannelGroup->addGroup(sfxGroup);
     masterChannelGroup->addGroup(bgFxGroup);
     masterChannelGroup->addGroup(voxGroup);
+
+    result = system->setCallback(fmodCallback);
+    ERRCHECK(result);
 
     LOG(INFO) << "FMOD Init success";
 
@@ -528,6 +614,15 @@ void SoundManager::clearGeometry()
     if(soundGeometry)
         soundGeometry->release();
     soundGeometry = NULL;
+}
+
+void SoundManager::loadGeometry(int sz, void * data)
+{
+    soundGeometry = NULL;
+    FMOD_RESULT result = system->loadGeometry(data, sz, &soundGeometry);
+    ERRCHECK(result);
+    if(result != FMOD_OK)
+        soundGeometry = NULL;
 }
 
 void SoundManager::pauseAll()
