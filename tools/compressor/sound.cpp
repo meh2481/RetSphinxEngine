@@ -5,29 +5,31 @@
 #include "Rect.h"
 #include <algorithm>    // std::max
 #include "Box2D\Box2D.h"
+#include <vector>
 
 #define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
 
 #define MAX_POLY 256
 #define MAX_VERT 2560
 #define MAX_SOUND_POLY_VERTS 16
+#define QUAD_SZ 4
 
-static FMOD::System* soundSystem;
+//static FMOD::System* soundSystem;
 
 void initSound()
 {
-    FMOD_RESULT result = FMOD::System_Create(&soundSystem);
-    ERRCHECK(result);
-    result = soundSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
-    ERRCHECK(result);
-    result = soundSystem->update();
-    ERRCHECK(result);
+    //FMOD_RESULT result = FMOD::System_Create(&soundSystem);
+    //ERRCHECK(result);
+    //result = soundSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
+    //ERRCHECK(result);
+    //result = soundSystem->update();
+    //ERRCHECK(result);
 }
 
 void teardownSound()
 {
-    FMOD_RESULT result = soundSystem->release();
-    ERRCHECK(result);
+    //FMOD_RESULT result = soundSystem->release();
+    //ERRCHECK(result);
 }
 
 static void rotPoint(FMOD_VECTOR* vec, float x, float y, float rot)
@@ -42,7 +44,7 @@ static void rotPoint(FMOD_VECTOR* vec, float x, float y, float rot)
 
 static const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)MAX_SOUND_POLY_VERTS;
 static const float SOUND_QUAD_HEIGHT = 50.0f;
-static void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGeom, const Vec2& pos)
+static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPolygon*>& soundGeom, const Vec2& pos, int* totalVertices)
 {
     FMOD_VECTOR vertices[MAX_SOUND_POLY_VERTS];
     for(int i = 0; i < MAX_SOUND_POLY_VERTS; i++)
@@ -141,7 +143,6 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGe
 
     if(num > 1)
     {
-        int polygonIndex;   //Unused
         float directocclusion = 0.6f;
         fixture->QueryFloatAttribute("directocclusion", &directocclusion);
         float reverbocclusion = 0.02f;
@@ -149,7 +150,8 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGe
         //Verticalize these polygons by turning each segment into a vertical quad
         for(int i = 0; i < num; i++)
         {
-            FMOD_VECTOR quads[4];
+            unsigned char* data = (unsigned char*)malloc(sizeof(SoundGeomPolygon) + sizeof(SoundGeomVertex) * QUAD_SZ);
+            SoundGeomVertex* quads = (SoundGeomVertex*)&data[sizeof(SoundGeomPolygon)];
             FMOD_VECTOR* second;
             if(i < num - 1)	//Wrap around at end
                 second = &vertices[i + 1];
@@ -167,9 +169,20 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, FMOD::Geometry* soundGe
             quads[3].x = second->x;
             quads[3].y = second->y;
             quads[3].z = SOUND_QUAD_HEIGHT;
-            FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, 4, quads, &polygonIndex);
-            if(result != FMOD_OK)
-                LOG(WARN) << "Unable to create FMOD polygon: " << result;
+            SoundGeomPolygon* polygon = (SoundGeomPolygon*)data;
+            polygon->directOcclusion = directocclusion;
+            polygon->reverbOcclusion = reverbocclusion;
+            polygon->hollow = bHollow;
+            polygon->pad[0] = 'P';
+            polygon->pad[1] = 'A';
+            polygon->pad[2] = 'D';
+            polygon->numVertices = QUAD_SZ;
+            *totalVertices += QUAD_SZ;
+            soundGeom.push_back(polygon);
+            //int polygonIndex;   //Unused
+            //FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, 4, quads, &polygonIndex);
+            //if(result != FMOD_OK)
+            //    LOG(WARN) << "Unable to create FMOD polygon: " << result;
         }
     }
 }
@@ -209,43 +222,69 @@ void extractSoundGeometry(const std::string& xmlFilename)
     float worldSz = sqrt(xWorldSz*xWorldSz + yWorldSz*yWorldSz);
 
     //Loop through geom
-    FMOD::Geometry* soundGeom;
-    FMOD_RESULT result = soundSystem->setGeometrySettings(worldSz);
-    ERRCHECK(result);
-    result = soundSystem->createGeometry(MAX_POLY, MAX_VERT, &soundGeom);
-    if(result != FMOD_OK)
-    {
-        LOG(ERR) << "Unable to create sound geom";
-        delete doc;
-        return;
-    }
+    //FMOD::Geometry* soundGeom;
+    //FMOD_RESULT result = soundSystem->setGeometrySettings(worldSz);
+    //ERRCHECK(result);
+    //result = soundSystem->createGeometry(MAX_POLY, MAX_VERT, &soundGeom);
+    //if(result != FMOD_OK)
+    //{
+    //    LOG(ERR) << "Unable to create sound geom";
+    //    delete doc;
+    //    return;
+    //}
+    int numVerticesTotal = 0;
+    std::vector<SoundGeomPolygon*> soundGeom;
     for(tinyxml2::XMLElement* geom = root->FirstChildElement("geom"); geom != NULL; geom = geom->NextSiblingElement("geom"))
     {
         bool isSensor = false;
         geom->QueryBoolAttribute("sensor", &isSensor);
 
-        loadSoundGeom(geom, soundGeom, Vec2(0, 0));
+        Vec2 pos;
+        const char* cPos = geom->Attribute("pos");
+        if(cPos)
+            pos = pointFromString(cPos);
+
+        if(!isSensor)
+            loadSoundGeom(geom, soundGeom, pos, &numVerticesTotal);
     }
 
     delete doc;
 
-
-    int sz;
-    result = soundGeom->save(NULL, &sz);
-    ERRCHECK(result);
-    int throwaway = sz;
-    sz += 128 + sizeof(SoundGeomHeader);
+    int sz = sizeof(SoundGeomHeader) + sizeof(SoundGeomPolygon)  * soundGeom.size() + sizeof(SoundGeomVertex) * numVerticesTotal;
     unsigned char* data = (unsigned char*)malloc(sz);
-    memset(data, 0, sz);
-    result = soundGeom->save(data + sizeof(SoundGeomHeader), &throwaway);
-    ERRCHECK(result);
-    LOG(TRACE) << "saving geom size: " << sz;
 
     SoundGeomHeader* header = (SoundGeomHeader*)data;
+    header->numPolygons = soundGeom.size();
+    header->numVerticesTotal = numVerticesTotal;
     header->worldSize = worldSz;
-    header->geomSize = throwaway + 128;
+    header->pad = PAD_32BIT;
 
-    FILE* fp = fopen("out.soundgeom", "wb");
+    unsigned char* ptr = &data[sizeof(SoundGeomHeader)];
+    for(size_t i = 0; i < soundGeom.size(); i++)
+    {
+        SoundGeomPolygon* polygon = soundGeom[i];
+        int polysz = sizeof(SoundGeomPolygon) + sizeof(SoundGeomVertex) * polygon->numVertices;
+        memcpy(ptr, polygon, polysz);
+        ptr += polysz;
+        free(polygon);
+    }
+
+    //int sz;
+    //result = soundGeom->save(NULL, &sz);
+    //ERRCHECK(result);
+    //int throwaway = sz;
+    //sz += 128 + sizeof(SoundGeomHeader);
+    //unsigned char* data = (unsigned char*)malloc(sz);
+    //memset(data, 0, sz);
+    //result = soundGeom->save(data + sizeof(SoundGeomHeader), &throwaway);
+    //ERRCHECK(result);
+    //LOG(TRACE) << "saving geom size: " << sz;
+
+    //SoundGeomHeader* header = (SoundGeomHeader*)data;
+    //header->worldSize = worldSz;
+    //header->geomSize = throwaway + 128;
+
+    FILE* fp = fopen("test.soundgeom", "wb");
     fwrite(data, 1, sz, fp);
     fclose(fp);
 
@@ -255,5 +294,5 @@ void extractSoundGeometry(const std::string& xmlFilename)
     createCompressionHelper(&helper, data, sz);
     addHelper(helper);
 
-    //free(data);
+
 }

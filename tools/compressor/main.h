@@ -3,6 +3,8 @@
 #include "ResourceTypes.h"
 #include "Hash.h"
 
+#define PAD_32BIT 0x50444150
+
 //Helper struct for compression
 typedef struct
 {

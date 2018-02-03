@@ -13,7 +13,6 @@
 #include "FileOperations.h"
 #include "tinyxml2.h"
 
-#define PAD_32BIT 0x50444150
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"

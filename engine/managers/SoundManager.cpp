@@ -616,14 +616,14 @@ void SoundManager::clearGeometry()
     soundGeometry = NULL;
 }
 
-void SoundManager::loadGeometry(int sz, void * data)
-{
-    soundGeometry = NULL;
-    FMOD_RESULT result = system->loadGeometry(data, sz, &soundGeometry);
-    ERRCHECK(result);
-    if(result != FMOD_OK)
-        soundGeometry = NULL;
-}
+//void SoundManager::loadGeometry(int sz, void * data)
+//{
+//    soundGeometry = NULL;
+//    FMOD_RESULT result = system->loadGeometry(data, sz, &soundGeometry);
+//    ERRCHECK(result);
+//    if(result != FMOD_OK)
+//        soundGeometry = NULL;
+//}
 
 void SoundManager::pauseAll()
 {
@@ -672,6 +672,7 @@ void SoundManager::drawDebug(DebugDraw* debugDraw)
 {
     Vec3 vertices[32];
     int polyCount = 0;
+    if(!soundGeometry) return;
     FMOD_RESULT result = soundGeometry->getNumPolygons(&polyCount);
     ERRCHECK(result);
     for(int i = 0; i < polyCount; i++)

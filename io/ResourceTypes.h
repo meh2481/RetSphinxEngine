@@ -154,9 +154,28 @@ typedef struct
 typedef struct
 {
     f32_t worldSize;
-    uint32_t geomSize;
-    //Followed by geomSize FMOD sound geometry data
+    uint32_t numPolygons;       //Total number of polygons for this geometry
+    uint32_t numVerticesTotal;  //Total number of vertices in this geometry
+    uint32_t pad;
+    //Followed by numPolygons SoundGeomPolygons
 } SoundGeomHeader;
+
+typedef struct
+{
+    f32_t directOcclusion;
+    f32_t reverbOcclusion;
+    uint32_t numVertices;
+    uint8_t hollow;
+    uint8_t pad[3];
+    //Followed by numVertices SoundGeomVertices
+} SoundGeomPolygon;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+} SoundGeomVertex;  //Has to be identical to FMOD_VECTOR
 
 //--------------------------------------------------------------
 // Mesh data

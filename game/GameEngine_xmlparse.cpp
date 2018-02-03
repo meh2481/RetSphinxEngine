@@ -350,13 +350,22 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
 void GameEngine::loadSoundGeom(const std::string& sXMLFilename)
 {
     std::string geomFilename = sXMLFilename + ".soundgeom";
-    SoundGeomHeader* header = (SoundGeomHeader*)getResourceLoader()->getData(geomFilename);
+    unsigned char* resource = getResourceLoader()->getData(geomFilename);
+    SoundGeomHeader* header = (SoundGeomHeader*)resource;
     if(header != NULL)
     {
-        FILE* fp = fopen("out.soundgeom2", "wb");
-        fwrite(header, 1, header->geomSize + sizeof(SoundGeomHeader), fp);
-        fclose(fp);
         getSoundManager()->setGeometryWorldSize(header->worldSize);
-        getSoundManager()->loadGeometry(header->geomSize, (void*)(header + sizeof(SoundGeomHeader)));
+        SoundGeometry* soundGeom = getSoundManager()->createGeometry(header->numPolygons, header->numVerticesTotal);
+        unsigned char* ptr = resource + sizeof(SoundGeomHeader);
+        for(unsigned int i = 0; i < header->numPolygons; i++)
+        {
+            SoundGeomPolygon* polygon = (SoundGeomPolygon*)ptr;
+            FMOD_VECTOR* vertices = (FMOD_VECTOR*)(ptr + sizeof(SoundGeomPolygon));
+            int idx = 0; //Unused
+            FMOD_RESULT result = soundGeom->addPolygon(polygon->directOcclusion, polygon->reverbOcclusion, !!polygon->hollow, polygon->numVertices, vertices, &idx);
+            if(result != FMOD_OK)
+                LOG(ERR) << result;
+            ptr += sizeof(SoundGeomPolygon) + sizeof(FMOD_VECTOR) * polygon->numVertices;
+        }
     }
 }

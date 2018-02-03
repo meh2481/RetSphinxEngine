@@ -116,7 +116,7 @@ public:
     SoundGeometry* createGeometry(int maxpolygons, int maxvertices);    //Create a Geometry object (or return the active if one already exists)
     SoundGeometry* getGeometry() { return soundGeometry; }
     void clearGeometry();                                               //Delete the current Geometry object
-    void loadGeometry(int sz, void* data);
+    //void loadGeometry(int sz, void* data);
 #ifdef _DEBUG
     void drawDebug(DebugDraw* debugDraw);
 #endif
