@@ -1,6 +1,5 @@
 Current higher pri:
 - FMOD 3D sound
-	- Fix audio direction near sides of map
     - Objects can have their own sfx associated with them (channel group)
 	- Change listener up/forward vectors with head tracker for fun
 	- Large objects are registered as FMOD geometry
