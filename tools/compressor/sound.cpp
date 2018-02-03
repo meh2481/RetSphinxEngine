@@ -284,9 +284,9 @@ void extractSoundGeometry(const std::string& xmlFilename)
     //header->worldSize = worldSz;
     //header->geomSize = throwaway + 128;
 
-    FILE* fp = fopen("test.soundgeom", "wb");
-    fwrite(data, 1, sz, fp);
-    fclose(fp);
+    //FILE* fp = fopen("test.soundgeom", "wb");
+    //fwrite(data, 1, sz, fp);
+    //fclose(fp);
 
     CompressionHelper helper;
     helper.header.type = RESOURCE_TYPE_SOUNDGEOM;
