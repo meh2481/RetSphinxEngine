@@ -112,6 +112,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
                     LOG(ERR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
                     return NULL;
                 }
+                m_cache->add(header->meshId, meshData);
             }
 
             //free(resource);                        //Free memory
@@ -992,6 +993,7 @@ unsigned char* ResourceLoader::getData(const std::string& sID)
     {
         unsigned int len = 0;
         obj = m_pakLoader->loadResource(hash, &len);
+        m_cache->add(hash, obj);
     }
     return obj;
 }
