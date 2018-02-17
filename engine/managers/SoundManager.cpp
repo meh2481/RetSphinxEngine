@@ -5,6 +5,7 @@
 #include "ResourceTypes.h"
 #include "InterpolationManager.h"
 #include "SoundVol.h"
+#include "Rect.h"
 #include <cstring>
 
 #define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
@@ -16,6 +17,113 @@
 
 #define FMOD_CHANNEL_L 0
 #define FMOD_CHANNEL_R 1
+
+FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TYPE type, void *commanddata1, void *commanddata2, void* userdata)
+{
+    FMOD::System *sys = (FMOD::System *)system;
+
+    switch(type)
+    {
+        case FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED:
+        {
+            int numdrivers;
+
+            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED occured.";
+
+            sys->getNumDrivers(&numdrivers);
+
+            LOG(INFO) << "Numdevices = " << numdrivers;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED:
+        {
+            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED occured.";
+            LOG(ERR) << (char*)commanddata1;
+            LOG(ERR) << "%d bytes." << (int)commanddata2;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_THREADCREATED:
+        {
+            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_THREADCREATED occured.";
+            LOG(INFO) << "Thread ID = " << (int)commanddata1;
+            LOG(INFO) << "Thread Name = " << (char*)commanddata2;
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION:
+        {
+            FMOD::DSP *source = (FMOD::DSP *)commanddata1;
+            FMOD::DSP *dest = (FMOD::DSP *)commanddata2;
+
+            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION occured.";
+            if(source)
+            {
+                char name[256];
+                source->getInfo(name, 0, 0, 0, 0);
+                LOG(ERR) << "SOURCE = " << name;
+            }
+            if(dest)
+            {
+                char name[256];
+                dest->getInfo(name, 0, 0, 0, 0);
+                LOG(ERR) << "DEST = " << name;
+            }
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_PREMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_MIDMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_POSTMIX:
+        {
+            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.";
+            break;
+        }
+        case FMOD_SYSTEM_CALLBACK_ERROR:
+        {
+            FMOD_ERRORCALLBACK_INFO* errInfo = (FMOD_ERRORCALLBACK_INFO*)commanddata1;
+            LOG(ERR) << "FMOD Callback error:";
+            LOG(ERR) << "Result: " << errInfo->result;
+            LOG(ERR) << "Instance Type: " << errInfo->instancetype;
+            LOG(ERR) << "Function name: " << errInfo->functionname;
+            LOG(ERR) << "Function params: " << errInfo->functionparams;
+
+            break;
+        }
+    }
+
+    return FMOD_OK;
+}
+
+
+SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
+{
+    loader = l;
+    musicChannel = NULL;
+    interpolationManager = interp;
+    soundGeometry = NULL;
+    init();
+}
+
+SoundManager::~SoundManager()
+{
+    clearGeometry();
+    //TODO: Save/load song location on app exit?
+    FMOD_RESULT result = system->release();
+    if(result)
+        LOG(WARN) << "Unable to close FMOD: " << result;
+    for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
+        free(*i);
+    for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
+        free(i->second);
+    for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
+        delete *i;
+}
 
 int SoundManager::init()
 {
@@ -43,7 +151,9 @@ int SoundManager::init()
         ERRCHECK(result);
         LOG(WARN) << "No sound driver";
     }
-    result = system->init(100, FMOD_INIT_NORMAL, 0);
+    result = system->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
+    ERRCHECK(result);
+    result = system->set3DSettings(1.0f, 1.0f, 1.0f);
     ERRCHECK(result);
 
     //Set up sound groups
@@ -66,6 +176,9 @@ int SoundManager::init()
     masterChannelGroup->addGroup(sfxGroup);
     masterChannelGroup->addGroup(bgFxGroup);
     masterChannelGroup->addGroup(voxGroup);
+
+    result = system->setCallback(fmodCallback);
+    ERRCHECK(result);
 
     LOG(INFO) << "FMOD Init success";
 
@@ -107,28 +220,6 @@ FMOD::ChannelGroup * SoundManager::getGroup(SoundGroup group)
     return sfxGroup;
 }
 
-SoundManager::SoundManager(ResourceLoader* l, InterpolationManager* interp)
-{
-    loader = l;
-    musicChannel = NULL;
-    interpolationManager = interp;
-    init();
-}
-
-SoundManager::~SoundManager()
-{
-    //TODO: Save/load song location on app exit?
-    FMOD_RESULT result = system->release();
-    if(result)
-        LOG(WARN) << "Unable to close FMOD: " << result;
-    for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
-        free(*i);
-    for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
-        free(i->second);
-    for(std::vector<SoundVol*>::iterator i = soundVolumes.begin(); i != soundVolumes.end(); i++)
-        delete *i;
-}
-
 void SoundManager::update()
 {
     system->update();
@@ -143,6 +234,36 @@ void SoundManager::update()
         }
         else
             i++;
+    }
+}
+
+void SoundManager::setListener(const Vec3& listenerPos, const Vec2& listenerVel)
+{
+    FMOD_VECTOR pos;
+    pos.x = listenerPos.x;
+    pos.y = listenerPos.y;
+    pos.z = listenerPos.z;
+    FMOD_VECTOR vel;
+    vel.x = listenerVel.x;
+    vel.y = listenerVel.y;
+    vel.z = 0.0f;
+    FMOD_VECTOR forward;
+    forward.x = 0.0f;
+    forward.y = 0.0f;
+    forward.z = -1.0f;
+    FMOD_VECTOR up;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f;
+    FMOD_RESULT result = system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+    ERRCHECK(result);
+
+    //Set music channel to listener pos; for some reason we're getting geometry occlusions even though 3D is off
+    if(musicChannel)
+    {
+        FMOD_VECTOR v1 = { 0.0f, 0.0f, 0.0f };
+        result = musicChannel->set3DAttributes(&pos, &v1);
+        ERRCHECK(result);
     }
 }
 
@@ -164,7 +285,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             memset(&info, 0, sizeof(FMOD_CREATESOUNDEXINFO));    //Clear all fields to 0
             info.length = length;    //Set length
             //In pak; load from memory
-            FMOD_RESULT result = system->createSound((const char*)data, FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
+            FMOD_RESULT result = system->createSound((const char*)data, FMOD_3D | FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
             if(result)
                 LOG(WARN) << "Unable to create sound resource " << filename << "from pak, error " << result;
             soundResources.push_back(data);    //Free this later
@@ -172,11 +293,13 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
         else
         {
             //Not in pak; load from file
-            FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESAMPLE, NULL, &handle);
+            FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESAMPLE, NULL, &handle);
             if(result)
                 LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
         }
         sounds[filename] = handle;
+        FMOD_RESULT result = handle->set3DMinMaxDistance(5.0f, 5000.0f);
+        ERRCHECK(result);
         return handle;
     }
     return existing->second;
@@ -191,7 +314,7 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         SoundHandle* handle = NULL;
 
         //Create a streamed, loopable sound
-        FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
+        FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
         if(result)
         {
             LOG(WARN) << "Unable to create music resource " << filename << ", error " << result;
@@ -199,23 +322,29 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
         }
 
         sounds[filename] = handle;
+        result = handle->set3DMinMaxDistance(5.0f, 5000.0f);
+        ERRCHECK(result);
         loadLoopPoints(handle, filename + SONG_LOOP_FILE_EXT);
         return handle;
     }
     return existing->second;
 }
 
-Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group)
+Channel* SoundManager::playSound(SoundHandle* sound, SoundGroup group, const Vec2& pos, const Vec2& vel)
 {
     Channel* ret = NULL;
     FMOD_RESULT result = system->playSound(sound, getGroup(group), true, &ret);
+    ERRCHECK(result);
+    FMOD_VECTOR posz = { pos.x, pos.y, 0.0f };
+    FMOD_VECTOR velz = { vel.x, vel.y, 0.0f };
+    result = ret->set3DAttributes(&posz, &velz);
     ERRCHECK(result);
     result = ret->setPaused(false);
     ERRCHECK(result);
     return ret;
 }
 
-Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
+Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group, const Vec2& pos, const Vec2& vel)
 {
     //Check if this is a song and we have a song currently playing
     if(musicChannel != NULL && group == GROUP_MUSIC)
@@ -247,6 +376,10 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
     //Paused at start so can seek
     FMOD_RESULT result = system->playSound(stream, getGroup(group), true, &channel);
     ERRCHECK(result);
+    FMOD_VECTOR posz = { pos.x, pos.y, 0.0f };
+    FMOD_VECTOR velz = { vel.x, vel.y, 0.0f };
+    result = channel->set3DAttributes(&posz, &velz);
+    ERRCHECK(result);
 
     //Set looping
     result = channel->setLoopCount(LOOP_FOREVER);
@@ -270,6 +403,8 @@ Channel* SoundManager::playLoop(StreamHandle* stream, SoundGroup group)
 
         musicChannel = channel;    //Save this as our new music channel
         fadeInChannel(musicChannel, MUSIC_FADE_TIME);
+        result = channel->set3DLevel(0.0f);	//Turn off 3D effects for music
+        ERRCHECK(result);
     }
 
     //Start playing
@@ -460,6 +595,36 @@ void SoundManager::assignFilter(SoundGroup group, SoundFilter * f, int idx)
     filterGroups[f] = channelGroup;
 }
 
+void SoundManager::setGeometryWorldSize(float sizeCenterToEdge)
+{
+    system->setGeometrySettings(sizeCenterToEdge);
+}
+
+SoundGeometry* SoundManager::createGeometry(int maxpolygons, int maxvertices)
+{
+    if(soundGeometry)
+        return soundGeometry;
+    FMOD_RESULT result = system->createGeometry(maxpolygons, maxvertices, &soundGeometry);
+    ERRCHECK(result);
+    return soundGeometry;
+}
+
+void SoundManager::clearGeometry()
+{
+    if(soundGeometry)
+        soundGeometry->release();
+    soundGeometry = NULL;
+}
+
+//void SoundManager::loadGeometry(int sz, void * data)
+//{
+//    soundGeometry = NULL;
+//    FMOD_RESULT result = system->loadGeometry(data, sz, &soundGeometry);
+//    ERRCHECK(result);
+//    if(result != FMOD_OK)
+//        soundGeometry = NULL;
+//}
+
 void SoundManager::pauseAll()
 {
     if(masterChannelGroup)
@@ -499,3 +664,36 @@ void SoundManager::stopSounds(SoundGroup group)
     FMOD_RESULT result = sg->stop();
     ERRCHECK(result);
 }
+
+#ifdef _DEBUG
+#include "DebugDraw.h"
+const b2Color color = b2Color(0.1f, 0.1f, 1.0f);
+void SoundManager::drawDebug(DebugDraw* debugDraw)
+{
+    Vec3 vertices[32];
+    int polyCount = 0;
+    if(!soundGeometry) return;
+    FMOD_RESULT result = soundGeometry->getNumPolygons(&polyCount);
+    ERRCHECK(result);
+    for(int i = 0; i < polyCount; i++)
+    {
+        int vertCount = 0;
+        result = soundGeometry->getPolygonNumVertices(i, &vertCount);
+        ERRCHECK(result);
+        float diroc;    //ignored
+        float revoc;    //ignored
+        bool doublesided = false;
+        result = soundGeometry->getPolygonAttributes(i, &diroc, &revoc, &doublesided);
+        ERRCHECK(result);
+        for(int j = 0; j < vertCount; j++)
+        {
+            FMOD_VECTOR vert;
+            result = soundGeometry->getPolygonVertex(i, j, &vert);
+            vertices[j].x = vert.x;
+            vertices[j].y = vert.y;
+            vertices[j].z = vert.z;
+        }
+        debugDraw->Draw3DPolygon(vertices, vertCount, color);
+    }
+}
+#endif // _DEBUG

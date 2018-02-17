@@ -3,6 +3,8 @@
 #include "ResourceTypes.h"
 #include "Hash.h"
 
+#define PAD_32BIT 0x50444150
+
 //Helper struct for compression
 typedef struct
 {
@@ -30,3 +32,9 @@ unsigned char* extract3dObject(const std::string& xmlFilename, unsigned int* siz
 unsigned char* extractLua(const std::string& luaFilename, unsigned int* size);
 void initLua();
 void teardownLua();
+
+//sound.cpp
+void extractSoundGeometry(const std::string& xmlFilename);
+void initSound();
+void teardownSound();
+

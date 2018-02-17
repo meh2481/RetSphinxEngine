@@ -38,23 +38,12 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
     m_sIcon = sIcon;
     m_bResizable = bResizable;
-    b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
-    m_physicsWorld = new b2World(gravity);
-    m_physicsWorld->SetAllowSleeping(true);
-#ifdef _DEBUG
-    m_debugDraw = new DebugDraw();
-    m_debugDraw->outlineAlpha = 0.75f;
-    m_debugDraw->fillAlpha = 0.5f;
-    m_debugDraw->fillMul = m_debugDraw->fillAlpha;
-    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
-    m_physicsWorld->SetDebugDraw(m_debugDraw);
-#endif
-    m_clContactListener = new EngineContactListener();
-    m_physicsWorld->SetContactListener(m_clContactListener);
+
     LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
 #ifdef _DEBUG
     LOG(INFO) << "Debug build";
     m_bDebugDraw = true;
+    m_bSoundDebugDraw = false;
 #else
     LOG(INFO) << "Release build";
 #endif
@@ -82,7 +71,14 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     Random::seed(SDL_GetTicks());
     m_fTimeScale = 1.0f;
 
-    LOG(INFO) << "Creating resource loader";
+    LOG(DBG) << "Create physics world";
+    b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
+    m_physicsWorld = new b2World(gravity);
+    m_physicsWorld->SetAllowSleeping(true);
+    m_clContactListener = new EngineContactListener();
+    m_physicsWorld->SetContactListener(m_clContactListener);
+
+    LOG(DBG) << "Creating resource loader";
     m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
     m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
@@ -97,8 +93,19 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 
     //Init renderer
+    LOG(DBG) << "Init SDL/OpenGL";
     setup_sdl();
     setup_opengl();
+
+#ifdef _DEBUG
+    LOG(DBG) << "Create debug draw";
+    m_debugDraw = new DebugDraw(m_debugRenderState);
+    m_debugDraw->outlineAlpha = 0.75f;
+    m_debugDraw->fillAlpha = 0.5f;
+    m_debugDraw->fillMul = m_debugDraw->fillAlpha;
+    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
+    m_physicsWorld->SetDebugDraw(m_debugDraw);
+#endif
 
     //Init ImGUI
     ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
@@ -239,6 +246,8 @@ bool Engine::_processEvent(SDL_Event& e)
 
 bool Engine::_frame()
 {
+    Vec2 pos(0, 0);
+    Vec2 vel(0, 0);
     m_soundManager->update();
 
     //Handle input events from SDL
@@ -317,7 +326,7 @@ void Engine::drawDebug()
 {
 #ifdef _DEBUG
     // Draw physics debug stuff
-    if(m_bDebugDraw)
+    if(m_bDebugDraw || m_bSoundDebugDraw)
     {
         glClear(GL_DEPTH_BUFFER_BIT);
         m_debugRenderState.projection = m_renderState.projection;
@@ -326,8 +335,11 @@ void Engine::drawDebug()
         glUseProgram(m_debugRenderState.programId);
         m_debugRenderState.apply();
         glBindTexture(GL_TEXTURE_2D, 0);
-        m_physicsWorld->DrawDebugData();
     }
+    if(m_bDebugDraw)
+        m_physicsWorld->DrawDebugData();
+    if(m_bSoundDebugDraw)
+        getSoundManager()->drawDebug(m_debugDraw);
 #endif // _DEBUG
 }
 

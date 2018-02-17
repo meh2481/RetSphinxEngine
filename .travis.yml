@@ -37,6 +37,3 @@ script:
   - cd cmake-build
   - cmake $CMAKE_OPTIONS ..
   - make -j 2
-
-notifications:
-  email: false

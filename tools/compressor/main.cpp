@@ -13,7 +13,6 @@
 #include "FileOperations.h"
 #include "tinyxml2.h"
 
-#define PAD_32BIT 0x50444150
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
@@ -476,7 +475,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 
     std::string pakFilename = remove_extension(in);
     pakFilename += ".pak";
-    std::cout << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
+    std::cout << std::endl << "Packing pak file \"" << pakFilename << "\"..." << std::endl;
 
     //TODO: Something better than just check-everything
     if(!g_bClean && nothingToDo(filesToPak, in, pakFilename))
@@ -539,6 +538,8 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
         }
         else if(ext == "xml")
         {
+            if(i->find(".scene.xml") != std::string::npos)
+                extractSoundGeometry(*i);   //Create sound geometry from scene
             helper.header.type = RESOURCE_TYPE_XML;
             decompressed = FileOperations::readFile(*i, &size);
         }
@@ -622,6 +623,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
 int main(int argc, char** argv)
 {
     initLua();
+    initSound();
     g_bImageOut = g_bClean = g_bRawImg = false;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
@@ -647,5 +649,7 @@ int main(int argc, char** argv)
     //Free our WFLZ working memory
     free(workMem);
     teardownLua();
+    teardownSound();
+    std::cout << "Complete." << std::endl;
     return 0;
 }

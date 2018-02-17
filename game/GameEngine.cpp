@@ -37,7 +37,7 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTi
 
     //Set camera position for this game
     m_fDefCameraZ = -16;
-    cameraPos = Vec3(0,0,m_fDefCameraZ);
+    cameraPos = Vec3(0, 0, m_fDefCameraZ);
 #ifdef _DEBUG
     m_bMouseGrabOnWindowRegain = false;
 #else
@@ -94,17 +94,6 @@ void GameEngine::frame(float dt)
             m_sLoadNode.clear();
         }
     }
-}
-
-const double CAMERA_ANGLE_RAD = glm::radians(60.0);
-void GameEngine::draw(RenderState& renderState)
-{
-    //Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
-    glDisable(GL_CULL_FACE);    //Draw both sides of 2D objects (So we can flip images for free)
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    //Draw debug UI
-    m_debugUI->draw();
 
     //Keep camera within camera bounds
     if(rcSceneBounds.area())    //If it's not unset
@@ -137,6 +126,32 @@ void GameEngine::draw(RenderState& renderState)
         if(rcCam.top > rcSceneBounds.top)
             cameraPos.y -= (rcSceneBounds.top - rcCam.top) / 2.0f;
     }
+
+    //Update sound
+    Vec3 pos(0.0f, 0.0f, cameraPos.z);
+    Vec2 vel(0.0f, 0.0f);
+    b2Body* body;
+    if(player && (body = player->getBody()))
+    {
+        Vec2 pos2 = player->getPos();
+        pos.x = pos2.x;
+        pos.y = pos2.y;
+        b2Vec2 bvel = body->GetLinearVelocity();
+        vel.x = bvel.x;
+        vel.y = bvel.y;
+    }
+    getSoundManager()->setListener(pos, vel);
+}
+
+const double CAMERA_ANGLE_RAD = glm::radians(60.0);
+void GameEngine::draw(RenderState& renderState)
+{
+    //Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
+    glDisable(GL_CULL_FACE);    //Draw both sides of 2D objects (So we can flip images for free)
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    //Draw debug UI
+    m_debugUI->draw();
 
     //Set flat camera
     glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z));
@@ -183,7 +198,7 @@ void GameEngine::draw(RenderState& renderState)
 bool GameEngine::init(std::vector<commandlineArg> sArgs)
 {
     //Run through list for arguments we recognize
-    for (std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
+    for(std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
         LOG(DBG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
 
     //Load our last screen position and such

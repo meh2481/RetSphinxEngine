@@ -112,10 +112,11 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
                     LOG(ERR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
                     return NULL;
                 }
+                m_cache->add(header->meshId, meshData);
             }
 
             //free(resource);                        //Free memory
-            object3d = new Object3D(meshData, img);
+            object3d = new Object3D(meshData, img, m_3dShader);
             m_cache->add(hashVal, object3d);
         }
     }
@@ -725,16 +726,21 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
 
 b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Body* bod)
 {
+    //Declare these here so they don't fall out of scope
     b2FixtureDef fixtureDef;
-    b2PolygonShape dynamicBox;
-    b2CircleShape dynamicCircle;
-    b2ChainShape dynamicChain;
+    b2PolygonShape polygonShape;
+    b2CircleShape circleShape;
+    b2ChainShape chainShape;
+    b2Vec2 vertices[b2_maxPolygonVertices];
 
     //Get position (center of box)
     Vec2 pos(0, 0);
     const char* cPos = fixture->Attribute("pos");
     if(cPos)
         pos = pointFromString(cPos);
+
+    bool bHollow = false;
+    fixture->QueryBoolAttribute("hollow", &bHollow);
 
     const char* cFixType = fixture->Attribute("type");
     if(!cFixType)
@@ -756,9 +762,6 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         float fRot = 0.0f;
         fixture->QueryFloatAttribute("rot", &fRot);
 
-        bool bHollow = false;
-        fixture->QueryBoolAttribute("hollow", &bHollow);
-
         Vec2 pBoxSize = pointFromString(cBoxSize);
         if(bHollow)
         {
@@ -768,22 +771,23 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
             verts[1].Set(-pBoxSize.x / 2.0f, pBoxSize.y / 2.0f);
             verts[2].Set(-pBoxSize.x / 2.0f, -pBoxSize.y / 2.0f);
             verts[3].Set(pBoxSize.x / 2.0f, -pBoxSize.y / 2.0f);
-            dynamicChain.CreateLoop(verts, 4);
-            fixtureDef.shape = &dynamicChain;
+            chainShape.CreateLoop(verts, 4);
+            fixtureDef.shape = &chainShape;
+            //TODO: Apparently this doesn't take rotation into account
         }
         else
         {
             //Create box
-            dynamicBox.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(pos.x, pos.y), fRot);
-            fixtureDef.shape = &dynamicBox;
+            polygonShape.SetAsBox(pBoxSize.x / 2.0f, pBoxSize.y / 2.0f, b2Vec2(pos.x, pos.y), fRot);
+            fixtureDef.shape = &polygonShape;
         }
     }
     else if(sFixType == "circle")
     {
-        dynamicCircle.m_p = b2Vec2(pos.x, pos.y);
-        dynamicCircle.m_radius = 1.0f;
-        fixture->QueryFloatAttribute("radius", &dynamicCircle.m_radius);
-        fixtureDef.shape = &dynamicCircle;
+        circleShape.m_p = b2Vec2(pos.x, pos.y);
+        circleShape.m_radius = 1.0f;
+        fixture->QueryFloatAttribute("radius", &circleShape.m_radius);
+        fixtureDef.shape = &circleShape;
     }
     else if(sFixType == "line")
     {
@@ -794,10 +798,50 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         verts[0].Set(0, fLen / 2.0f);
         verts[1].Set(0, -fLen / 2.0f);
 
-        dynamicChain.CreateChain(verts, 2);
-        fixtureDef.shape = &dynamicChain;
+        chainShape.CreateChain(verts, 2);
+        fixtureDef.shape = &chainShape;
     }
-    //else TODO add other fixture types
+    else if(sFixType == "polygon")
+    {
+        //Read vertices for polygon
+        int32 vertexCount = 0;
+        for(tinyxml2::XMLElement* vertex = fixture->FirstChildElement("vertex"); vertex != NULL; vertex = vertex->NextSiblingElement("vertex"))
+        {
+            if(vertexCount > b2_maxPolygonVertices)
+            {
+                LOG(ERR) << "Only " << b2_maxPolygonVertices << " are allowed per polygon";
+                vertexCount = b2_maxPolygonVertices;
+                break;
+            }
+            float x = 0.0;
+            float y = 0.0;
+            vertex->QueryFloatAttribute("x", &x);
+            vertex->QueryFloatAttribute("y", &y);
+            vertices[vertexCount++].Set(x, y);
+        }
+        if(vertexCount < 3) //vertexCount <3
+        {
+            LOG(ERR) << "Polygons require at least 3 vertices";
+            return NULL;
+        }
+        if(bHollow)
+        {
+            //Hollow polygon
+            chainShape.CreateLoop(vertices, vertexCount);
+            fixtureDef.shape = &chainShape;
+        }
+        else
+        {
+            //Filled polygon
+            polygonShape.Set(vertices, vertexCount);
+            fixtureDef.shape = &polygonShape;
+        }
+    }
+    else
+    {
+        LOG(ERR) << "Unknown fixture type: " << sFixType;
+        return NULL;
+    }
 
     unsigned int categoryBits = 0x0001;
     unsigned int maskBits = 0xFFFF;
@@ -939,4 +983,17 @@ Texture* ResourceLoader::getAtlas(uint64_t atlasId)
         m_cache->add(atlasId, atlas);    //Add to the cache
     }
     return atlas;
+}
+
+unsigned char* ResourceLoader::getData(const std::string& sID)
+{
+    uint64_t hash = Hash::hash(sID.c_str());
+    unsigned char* obj = (unsigned char*)m_cache->find(hash);
+    if(!obj)
+    {
+        unsigned int len = 0;
+        obj = m_pakLoader->loadResource(hash, &len);
+        m_cache->add(hash, obj);
+    }
+    return obj;
 }

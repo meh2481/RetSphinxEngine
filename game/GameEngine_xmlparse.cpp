@@ -11,6 +11,7 @@
 #include "Object.h"
 #include "Node.h"
 #include <sstream>
+#include <algorithm>    // std::max
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Load game config from XML
@@ -63,7 +64,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         window->QueryBoolAttribute("doublebuf", &bDoubleBuf);
         window->QueryIntAttribute("vsync", &iVsync);
         window->QueryIntAttribute("MSAA", &iMSAA);
-//        window->QueryBoolAttribute("textureantialias", &bTexAntialias);
+        //        window->QueryBoolAttribute("textureantialias", &bTexAntialias);
         window->QueryFloatAttribute("brightness", &fGamma);
         window->QueryBoolAttribute("pauseminimized", &bPausesOnFocus);
 
@@ -81,7 +82,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
         setVsync(iVsync);
         setDoubleBuffered(bDoubleBuf);
         setMSAA(iMSAA);
-//        setImgBlur(bTexAntialias);
+        //        setImgBlur(bTexAntialias);
         setGamma(fGamma);
         pauseOnKeyboard(bPausesOnFocus);
     }
@@ -151,9 +152,10 @@ void GameEngine::saveConfig(const std::string& sFilename)
 void GameEngine::loadScene(const std::string& sXMLFilename)
 {
     getEntityManager()->cleanup();
+    getSoundManager()->clearGeometry();
     player = NULL;
     LOG(INFO) << "Loading scene " << sXMLFilename;
-    cameraPos = Vec3(0,0,m_fDefCameraZ);    //Reset camera
+    cameraPos = Vec3(0, 0, m_fDefCameraZ);    //Reset camera
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
@@ -214,7 +216,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     if(cMusic)
         mus = getSoundManager()->loadStream(cMusic);
     if(cMusic && mus)
-        getSoundManager()->playLoop(mus);
+        getSoundManager()->playLoop(mus, GROUP_MUSIC, Vec2(0.0f, 0.0f), Vec2(0.0f, 0.0f));
     else
     {
         Channel* musicChannel = getSoundManager()->getMusicChannel();
@@ -239,8 +241,8 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         const char* cVel = object->Attribute("vel");
         if(cObjType != NULL)
         {
-            Vec2 pos(0,0);
-            Vec2 vel(0,0);
+            Vec2 pos(0, 0);
+            Vec2 vel(0, 0);
 
             if(cPos != NULL)
                 pos = pointFromString(cPos);
@@ -311,12 +313,13 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         b2Fixture* fixture = getResourceLoader()->getObjectFixture(geom, body);
         if(fixture)
         {
+            //Load lua for this, if it exists
             const char* cLua = geom->Attribute("luaclass");
             if(cLua)
             {
                 Node* n = new Node();
                 n->luaClass = cLua;
-                n->lua = Lua;            //TODO: Better handling of node/object LuaInterfaces
+                n->lua = Lua;
                 n->pos = pos;
                 n->body = body;
                 std::ostringstream objss;
@@ -337,8 +340,32 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
         }
     }
 
+    loadSoundGeom(sXMLFilename);
+
     delete doc;
 
     m_sLastScene = sXMLFilename;
 }
 
+void GameEngine::loadSoundGeom(const std::string& sXMLFilename)
+{
+    std::string geomFilename = sXMLFilename + ".soundgeom";
+    unsigned char* resource = getResourceLoader()->getData(geomFilename);
+    SoundGeomHeader* header = (SoundGeomHeader*)resource;
+    if(header != NULL)
+    {
+        getSoundManager()->setGeometryWorldSize(header->worldSize);
+        SoundGeometry* soundGeom = getSoundManager()->createGeometry(header->numPolygons, header->numVerticesTotal);
+        unsigned char* ptr = resource + sizeof(SoundGeomHeader);
+        for(unsigned int i = 0; i < header->numPolygons; i++)
+        {
+            SoundGeomPolygon* polygon = (SoundGeomPolygon*)ptr;
+            FMOD_VECTOR* vertices = (FMOD_VECTOR*)(ptr + sizeof(SoundGeomPolygon));
+            int idx = 0; //Unused
+            FMOD_RESULT result = soundGeom->addPolygon(polygon->directOcclusion, polygon->reverbOcclusion, !!polygon->hollow, polygon->numVertices, vertices, &idx);
+            if(result != FMOD_OK)
+                LOG(ERR) << result;
+            ptr += sizeof(SoundGeomPolygon) + sizeof(FMOD_VECTOR) * polygon->numVertices;
+        }
+    }
+}

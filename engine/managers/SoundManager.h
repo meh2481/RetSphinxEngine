@@ -1,6 +1,7 @@
 #pragma once
 #include "fmod.hpp"
 #include "ResourceTypes.h"
+#include "Rect.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -11,10 +12,15 @@ typedef FMOD::Sound SoundHandle;
 typedef FMOD::Sound StreamHandle;
 typedef FMOD::Channel Channel;
 typedef FMOD::DSP SoundFilter;
+typedef FMOD::Geometry SoundGeometry;
 
 class ResourceLoader;
 class SoundVol;
 class InterpolationManager;
+
+#ifdef _DEBUG
+    class DebugDraw;
+#endif
 
 typedef enum
 {
@@ -56,6 +62,7 @@ private:
     FMOD::DSP* fftdsp;
     ResourceLoader* loader;
     InterpolationManager* interpolationManager;
+    SoundGeometry* soundGeometry;
 
     int init();
     void setGroup(Channel* ch, SoundGroup group);
@@ -67,12 +74,13 @@ public:
     ~SoundManager();
 
     void update();    //Call every frame
+    void setListener(const Vec3& listenerPos, const Vec2& listenerVel);
 
     SoundHandle* loadSound(const std::string& filename);
     StreamHandle* loadStream(const std::string& filename);
 
-    Channel* playSound(SoundHandle* sound, SoundGroup group = GROUP_SFX);
-    Channel* playLoop(StreamHandle* music, SoundGroup group = GROUP_MUSIC);
+    Channel* playSound(SoundHandle* sound, SoundGroup group, const Vec2& pos, const Vec2& vel);
+    Channel* playLoop(StreamHandle* music, SoundGroup group, const Vec2& pos, const Vec2& vel);
 
     //Group functions
     void setVolume(SoundGroup group, float fvol);
@@ -102,6 +110,16 @@ public:
     SoundFilter* createFilter(int filter);
     void destroyFilter(SoundFilter* f);
     void assignFilter(SoundGroup group, SoundFilter* f, int idx);
+
+    //Geometry functions
+    void setGeometryWorldSize(float sizeCenterToEdge);                  //Call before calls to createGeometry
+    SoundGeometry* createGeometry(int maxpolygons, int maxvertices);    //Create a Geometry object (or return the active if one already exists)
+    SoundGeometry* getGeometry() { return soundGeometry; }
+    void clearGeometry();                                               //Delete the current Geometry object
+    //void loadGeometry(int sz, void* data);
+#ifdef _DEBUG
+    void drawDebug(DebugDraw* debugDraw);
+#endif
 
     //Global functions
     void pauseAll();    //Pause all sounds/music

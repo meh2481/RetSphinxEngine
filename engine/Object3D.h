@@ -4,10 +4,10 @@
 */
 #pragma once
 #include <string>
-#include "RenderState.h"
 #include <stdint.h>
 
 class Image;
+class RenderState;
 
 class Object3D
 {
@@ -16,13 +16,14 @@ protected:
     unsigned int m_tex;
     unsigned int vertBuf;
     unsigned int vertArray;
-    
+    RenderState* m_renderState;
+
     void _fromData(unsigned char* data, Image* tex);
 
     Object3D() {};
 
 public:
-    Object3D(unsigned char* data, Image* tex);
+    Object3D(unsigned char* data, Image* tex, RenderState* renderState);
     ~Object3D();
 
     void render(RenderState renderState);

@@ -44,6 +44,7 @@ include_directories(engine)
 include_directories(engine/events)
 include_directories(engine/managers)
 include_directories(engine/actions)
+include_directories(engine/sound)
 add_subdirectory(game)
 
 include_directories(dep/squish)

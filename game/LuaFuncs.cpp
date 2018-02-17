@@ -172,10 +172,10 @@ public:
         return g_pGlobalEngine->getInputManager()->getMovement((Movement)movement);
     }
 
-    static int playSong(const std::string& songFilename, SoundGroup group = GROUP_MUSIC)
+    static int playSong(const std::string& songFilename, SoundGroup group, const Vec2& pos, const Vec2& vel)
     {
         StreamHandle* mus = g_pGlobalEngine->getSoundManager()->loadStream(songFilename);
-        Channel* channel = g_pGlobalEngine->getSoundManager()->playLoop(mus, group);
+        Channel* channel = g_pGlobalEngine->getSoundManager()->playLoop(mus, group, pos, vel);
         int channelIdx = 0;
         channel->getIndex(&channelIdx);
         return channelIdx;
@@ -216,10 +216,10 @@ public:
         return g_pGlobalEngine->getSoundManager()->getMusicChannel();
     }
 
-    static int playSound(const std::string& soundFilename, SoundGroup group = GROUP_SFX)
+    static int playSound(const std::string& soundFilename, SoundGroup group, const Vec2& pos, const Vec2& vel)
     {
         SoundHandle* sound = g_pGlobalEngine->getSoundManager()->loadSound(soundFilename);
-        Channel* channel = g_pGlobalEngine->getSoundManager()->playSound(sound, group);
+        Channel* channel = g_pGlobalEngine->getSoundManager()->playSound(sound, group, pos, vel);
         int channelIdx = 0;
         channel->getIndex(&channelIdx);
         return channelIdx;
@@ -304,7 +304,7 @@ luaFunc(audio_createFilter)  //SoundFilter* audio_createFilter(int type)
 {
     if(lua_isnumber(L, 1))
     {
-        int type = lua_tointeger(L, 1);
+        int type = (int)lua_tointeger(L, 1);
         SoundFilter* f = GameEngineLua::createFilter(type);
         luaReturnPtr(f);
     }
@@ -344,8 +344,8 @@ luaFunc(audio_setFilterInt)     //void audio_setFilterInt(SoundFilter* filter, i
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
         {
-            int filterParam = lua_tointeger(L, 2);
-            int filterValue = lua_tointeger(L, 3);
+            int filterParam = (int)lua_tointeger(L, 2);
+            int filterValue = (int)lua_tointeger(L, 3);
             FMOD_RESULT result = f->setParameterInt(filterParam, filterValue);
             if(result != 0)
                 LOG(WARN) << "FMOD Error: " << result;
@@ -366,8 +366,8 @@ luaFunc(audio_setFilterFloat)     //void audio_setFilterFloat(SoundFilter* filte
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
         {
-            int filterParam = lua_tointeger(L, 2);
-            float filterValue = lua_tonumber(L, 3);
+            int filterParam = (int)lua_tointeger(L, 2);
+            float filterValue = (float)lua_tonumber(L, 3);
             FMOD_RESULT result = f->setParameterFloat(filterParam, filterValue);
             if(result != 0)
                 LOG(WARN) << "FMOD Error: " << result;
@@ -386,7 +386,7 @@ luaFunc(audio_setWetDryMix)   //void audio_setWetDryMix(SoundFilter* filter, flo
     {
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         if(f)
-            f->setWetDryMix(lua_tonumber(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4));
+            f->setWetDryMix((float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3), (float)lua_tonumber(L, 4));
     }
     luaReturnNil();
 }
@@ -412,7 +412,7 @@ luaFunc(audio_addFilterToGroup) //void audio_addFilterToGroup(SoundFilter* filte
     {
         SoundFilter* f = (SoundFilter*)lua_touserdata(L, 1);
         SoundGroup group = (SoundGroup)lua_tointeger(L, 2);
-        int index = lua_tointeger(L, 3);
+        int index = (int)lua_tointeger(L, 3);
         GameEngineLua::assignFilter(f, group, index);
     }
     else
@@ -1008,7 +1008,7 @@ luaFunc(music_play)    //int music_play(string songPath, int soundGroup)
     if(lua_isinteger(L, 2))
         group = (SoundGroup)lua_tointeger(L, 2);
     if(lua_isstring(L, 1))
-        luaReturnInt(GameEngineLua::playSong(lua_tostring(L, 1), group));
+        luaReturnInt(GameEngineLua::playSong(lua_tostring(L, 1), group, Vec2(0.0f, 0.0f), Vec2(0.0f, 0.0f)));
     luaReturnNil();
 }
 
@@ -1105,13 +1105,23 @@ luaFunc(music_getPos)    //double music_getPos()        //Return music pos in se
     luaReturnNil();
 }
 
-luaFunc(sound_play)    //int sound_play(string soundPath, int soundGroup)
+luaFunc(sound_play)    //int sound_play(string soundPath, float xPos = 0.0f, float yPos = 0.0f, float xVel = 0.0f, float yVel = 0.0f, SoundGroup soundGroup = GROUP_SFX)
 {
     SoundGroup group = GROUP_SFX;
-    if(lua_isinteger(L, 2))
+    Vec2 pos(0.0f, 0.0f);
+    Vec2 vel(0.0f, 0.0f);
+    if(lua_isnumber(L, 2))
+        pos.x = (float)lua_tonumber(L, 2);
+    if(lua_isnumber(L, 3))
+        pos.y = (float)lua_tonumber(L, 3);
+    if(lua_isnumber(L, 4))
+        vel.x = (float)lua_tonumber(L, 4);
+    if(lua_isnumber(L, 5))
+        vel.y = (float)lua_tonumber(L, 5);
+    if(lua_isinteger(L, 6))
         group = (SoundGroup)lua_tointeger(L, 2);
     if(lua_isstring(L, 1))
-        luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1), group));
+        luaReturnInt(GameEngineLua::playSound(lua_tostring(L, 1), group, pos, vel));
     luaReturnNil();
 }
 

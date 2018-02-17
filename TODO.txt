@@ -1,4 +1,11 @@
 Current higher pri:
+- FMOD 3D sound
+    - Objects can have their own sfx associated with them (channel group)
+	- Change listener up/forward vectors with head tracker for fun
+	- Large objects are registered as FMOD geometry
+- Make logger threadsafe
+- Cache should keep object length, should have a maximum size that's time-rotated as new entries are made. Not cleared on level load.
+		
 - Load Music from pak? Need to stream from disk
 - Particle with x that tapers to points (anime-style) - also see star lens flares on space photos
 - Timestamp-based asset rebuilding; only rebuild changed assets, repack everything else around it
@@ -20,12 +27,6 @@ Current higher pri:
 	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 - Small-block memory allocator for Lua
 	- Other memory allocators/uses?
-- FMOD 3D sound
-	- Objects can have their own sfx associated with them (channel group)
-	- Player is listener object, with forward/up vectors set according to center of screen
-		- Potential here to change these vectors with head tracker if we want to get crazy
-	- Level geometry (and large objects) are registered as FMOD geometry
-		- See Geometry::save and System::loadGeometry
 - Objects
 	- Objects stored as binary files, not XML
 		- Templated so that complicated setup work doesn't have to be done every time (like Lua class loading)
@@ -34,7 +35,7 @@ Current higher pri:
 		- Segments
 			- Box2D Fixtures
 			- Images/3D meshes
-			- Sound geometry
+			- Sound geometry (Only on level geometry/large objects)
 			- Shaders
 			- Animation frame sequences/reskins
 		- Sound references
@@ -52,6 +53,7 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Better handling of object reskinning than obj_setImage from lua
+- Fix framerate stuttering. For real this time.
 
 Bugs:
 - Physics engine tied to framerate; 144Hz same # of physics engine cycles as 60Hz per frame
