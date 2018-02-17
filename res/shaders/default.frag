@@ -1,4 +1,4 @@
-#version 330 core
+#version 430
 uniform sampler2D tex;
 
 in vec2 uv;
