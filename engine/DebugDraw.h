@@ -15,8 +15,6 @@ class DebugDraw : public b2Draw
     int m_colorUniformId;
     int m_posAttribId;
 
-    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type);
-
     DebugDraw() {};
 
 public:
