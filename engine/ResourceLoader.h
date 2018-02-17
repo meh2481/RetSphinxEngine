@@ -19,6 +19,7 @@ class Stringbank;
 class Image;
 class Texture;
 class LuaInterface;
+class RenderState;
 
 class ResourceLoader
 {
@@ -26,6 +27,7 @@ class ResourceLoader
     ResourceCache* m_cache;
     PakLoader* m_pakLoader;
     std::string m_sPakDir;
+    RenderState* m_3dShader;
 
     std::string readTextFile(const std::string& filename);
     Image* loadImageFromFile(const std::string& filename);
@@ -40,6 +42,7 @@ public:
 
     //Utility
     void clearCache();
+    void set3dShader(RenderState* shader) { m_3dShader = shader; };
 
     //Images
     Image* getImage(const std::string& sID);

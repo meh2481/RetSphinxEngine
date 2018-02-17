@@ -83,7 +83,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     Random::seed(SDL_GetTicks());
     m_fTimeScale = 1.0f;
 
-    LOG(INFO) << "Creating resource loader";
+    LOG(DBG) << "Creating resource loader";
     m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
     m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
@@ -98,6 +98,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 
     //Init renderer
+    LOG(DBG) << "Init SDL/OpenGL";
     setup_sdl();
     setup_opengl();
 

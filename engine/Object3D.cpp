@@ -8,11 +8,13 @@
 #include "ResourceTypes.h"
 #include "Quad.h"
 #include "SDL_opengl.h"
+#include "RenderState.h"
 
-Object3D::Object3D(unsigned char* data, Image* tex)
+Object3D::Object3D(unsigned char* data, Image* tex, RenderState* renderState)
 {
     num = 0;
     m_tex = tex->tex.tex;
+    m_renderState = renderState;
 
     _fromData(data, tex);
 }
@@ -52,17 +54,34 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
     }
 
     //Gen vertex buffer
+    GLint position = glGetAttribLocation(m_renderState->programId, "position");
+    GLint texcoord = glGetAttribLocation(m_renderState->programId, "texcoord");
+    GLint normal = glGetAttribLocation(m_renderState->programId, "normal");
+
     glGenVertexArrays(1, &vertArray);
     glBindVertexArray(vertArray);
     glGenBuffers(1, &vertBuf);
     glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
     glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
-    glVertexPointer(3, GL_FLOAT, 0, (void*)vertexPtr);
-    glEnableClientState(GL_VERTEX_ARRAY);    //TODO: Shaders and glEnableVertexAttribArray() instead
-    glTexCoordPointer(2, GL_FLOAT, 0, (void*)texCoordPtr);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glNormalPointer(GL_FLOAT, 0, (void*)normalPtr);
-    glEnableClientState(GL_NORMAL_ARRAY);
+
+    if(position >= 0)
+    {
+        glEnableVertexAttribArray(position);
+        glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 0, (void*)vertexPtr);
+    }
+
+    if(texcoord >= 0)
+    {
+        glEnableVertexAttribArray(texcoord);
+        glVertexAttribPointer(texcoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)texCoordPtr);
+    }
+
+    if(normal >= 0) //This can be -1, since for now the variable is compiled out
+    {
+        glEnableVertexAttribArray(normal);
+        glVertexAttribPointer(normal, 3, GL_FLOAT, GL_FALSE, 0, (void*)normalPtr);
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -75,7 +94,12 @@ void Object3D::render(RenderState renderState)
     assert(m_tex);
     assert(num > 0);
 
-    //glUseProgram(0);
+    m_renderState->model = renderState.model;
+    m_renderState->projection = renderState.projection;
+    m_renderState->view = renderState.view;
+
+    glUseProgram(m_renderState->programId);
+    m_renderState->apply();
 
     glBindTexture(GL_TEXTURE_2D, m_tex);    //Bind texture
 
@@ -84,5 +108,5 @@ void Object3D::render(RenderState renderState)
     glDrawArrays(GL_TRIANGLES, 0, num);    //Render
     glBindVertexArray(0);
 
-    //glUseProgram(id);
+    glUseProgram(renderState.programId);
 }

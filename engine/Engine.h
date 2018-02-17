@@ -72,6 +72,7 @@ private:
 
     //OpenGL stuff
     RenderState m_renderState;
+    RenderState m_3dShader;
 #ifdef _DEBUG
     RenderState m_debugRenderState;
 #endif

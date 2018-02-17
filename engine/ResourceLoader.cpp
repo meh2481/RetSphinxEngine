@@ -116,7 +116,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
             }
 
             //free(resource);                        //Free memory
-            object3d = new Object3D(meshData, img);
+            object3d = new Object3D(meshData, img, m_3dShader);
             m_cache->add(hashVal, object3d);
         }
     }

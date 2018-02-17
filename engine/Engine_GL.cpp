@@ -184,6 +184,14 @@ void Engine::setup_opengl()
     m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
     m_renderState.projection = persp;
 
+    vertShaderCode = getResourceLoader()->getTextFile("res/shaders/3dobj.vert");
+    m_3dShader.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
+    m_3dShader.modelId = glGetUniformLocation(m_3dShader.programId, "model");
+    m_3dShader.viewId = glGetUniformLocation(m_3dShader.programId, "view");
+    m_3dShader.projectionId = glGetUniformLocation(m_3dShader.programId, "projection");
+    m_3dShader.projection = persp;
+    getResourceLoader()->set3dShader(&m_3dShader);
+
 #ifdef _DEBUG
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.vert");
     fragShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.frag");
