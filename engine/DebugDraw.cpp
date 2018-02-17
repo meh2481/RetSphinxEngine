@@ -10,7 +10,10 @@
 DebugDraw::DebugDraw(RenderState renderState)
 {
     m_renderState = renderState;
-    uniformId = glGetUniformLocation(m_renderState.programId, "col");
+    m_colorUniformId = glGetUniformLocation(m_renderState.programId, "col");
+    m_posAttribId = glGetAttribLocation(m_renderState.programId, "position");
+    assert(m_colorUniformId >= 0);
+    assert(m_posAttribId >= 0);
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -37,9 +40,9 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
         data[i * 2] = vertices[i].x;
         data[i * 2 + 1] = vertices[i].y;
     }
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(2, GL_FLOAT, 0, data);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+    //glUniform4fv(m_colorUniformId, 1, col);
+    //glVertexPointer(2, GL_FLOAT, 0, data);
+    //glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
@@ -79,9 +82,8 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
         data[i * 2 + 1] = v.y;
         angle += ANGLE_INCREMENT;
     }
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(2, GL_FLOAT, 0, data);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_SEGMENTS);
+    glUniform4fv(m_colorUniformId, 1, col);
+    drawThing(data, sizeof(float) * NUM_SEGMENTS * 2, 2, NUM_SEGMENTS, GL_TRIANGLE_FAN);
 
     //Draw circle
     DrawCircle(center, radius, color);
@@ -89,6 +91,20 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     //Draw axis
     b2Vec2 p = center + radius * axis;
     DrawSegment(center, p, color);
+}
+
+void DebugDraw::drawThing(const float* data, unsigned int len, int numPer, int count, int type)
+{
+    unsigned int vertBuf;
+    glGenBuffers(1, &vertBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
+    glBufferData(GL_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(m_posAttribId);
+    glVertexAttribPointer(m_posAttribId, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glDrawArrays(type, 0, count);
+    glDeleteBuffers(1, &vertBuf);
+    glDisableVertexAttribArray(m_posAttribId);
 }
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -105,9 +121,8 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
         color.b,
         color.a * outlineAlpha
     };
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(2, GL_FLOAT, 0, data);
-    glDrawArrays(GL_LINES, 0, 2);
+    glUniform4fv(m_colorUniformId, 1, col);
+    drawThing(data, sizeof(float) * 4, 2, 2, GL_LINES);
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
@@ -127,10 +142,10 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
         color.b,
         color.a * outlineAlpha
     };
-    glPointSize(size);
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(2, GL_FLOAT, 0, data);
-    glDrawArrays(GL_POINTS, 0, 1);
+    //glPointSize(size);
+    //glUniform4fv(m_colorUniformId, 1, col);
+    //glVertexPointer(2, GL_FLOAT, 0, data);
+    //glDrawArrays(GL_POINTS, 0, 1);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
@@ -165,9 +180,9 @@ void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& col
         color.b,
         color.a * outlineAlpha
     };
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(3, GL_FLOAT, 0, data);
-    glDrawArrays(GL_LINES, 0, 2);
+    //glUniform4fv(m_colorUniformId, 1, col);
+    //glVertexPointer(3, GL_FLOAT, 0, data);
+    //glDrawArrays(GL_LINES, 0, 2);
 }
 
 void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color)
@@ -186,9 +201,9 @@ void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2C
         data[i * 3 + 1] = vertices[i].y;
         data[i * 3 + 2] = vertices[i].z;
     }
-    glUniform4fv(uniformId, 1, col);
-    glVertexPointer(3, GL_FLOAT, 0, data);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+    //glUniform4fv(m_colorUniformId, 1, col);
+    //glVertexPointer(3, GL_FLOAT, 0, data);
+    //glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 
     //Fill in outside
     //Draw sides
