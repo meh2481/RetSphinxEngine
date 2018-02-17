@@ -7,6 +7,12 @@
 #include "opengl-api.h"
 #include "Box2D/Box2D.h"
 
+DebugDraw::DebugDraw(RenderState renderState)
+{
+    m_renderState = renderState;
+    uniformId = glGetUniformLocation(m_renderState.programId, "col");
+}
+
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
     //Draw sides

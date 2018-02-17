@@ -38,19 +38,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
     m_sIcon = sIcon;
     m_bResizable = bResizable;
-    b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
-    m_physicsWorld = new b2World(gravity);
-    m_physicsWorld->SetAllowSleeping(true);
-#ifdef _DEBUG
-    m_debugDraw = new DebugDraw();
-    m_debugDraw->outlineAlpha = 0.75f;
-    m_debugDraw->fillAlpha = 0.5f;
-    m_debugDraw->fillMul = m_debugDraw->fillAlpha;
-    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
-    m_physicsWorld->SetDebugDraw(m_debugDraw);
-#endif
-    m_clContactListener = new EngineContactListener();
-    m_physicsWorld->SetContactListener(m_clContactListener);
+
     LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
 #ifdef _DEBUG
     LOG(INFO) << "Debug build";
@@ -83,6 +71,13 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     Random::seed(SDL_GetTicks());
     m_fTimeScale = 1.0f;
 
+    LOG(DBG) << "Create physics world";
+    b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
+    m_physicsWorld = new b2World(gravity);
+    m_physicsWorld->SetAllowSleeping(true);
+    m_clContactListener = new EngineContactListener();
+    m_physicsWorld->SetContactListener(m_clContactListener);
+
     LOG(DBG) << "Creating resource loader";
     m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
@@ -101,6 +96,16 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     LOG(DBG) << "Init SDL/OpenGL";
     setup_sdl();
     setup_opengl();
+
+#ifdef _DEBUG
+    LOG(DBG) << "Create debug draw";
+    m_debugDraw = new DebugDraw(m_debugRenderState);
+    m_debugDraw->outlineAlpha = 0.75f;
+    m_debugDraw->fillAlpha = 0.5f;
+    m_debugDraw->fillMul = m_debugDraw->fillAlpha;
+    m_debugDraw->SetFlags(DebugDraw::e_shapeBit | DebugDraw::e_jointBit);
+    m_physicsWorld->SetDebugDraw(m_debugDraw);
+#endif
 
     //Init ImGUI
     ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
