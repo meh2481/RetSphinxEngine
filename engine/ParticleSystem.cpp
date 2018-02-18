@@ -11,6 +11,8 @@
 #include "OpenGLShader.h"
 #include "Quad.h"
 
+#define MAX_PARTICLES 10000 //HACK
+
 ParticleSystem::ParticleSystem(RenderState* shader)
 {
     m_imgRect = NULL;
@@ -44,7 +46,24 @@ ParticleSystem::ParticleSystem(RenderState* shader)
     curTime = 0;
     spawnCounter = 0;
     curRate = 1.0f;
+
+
+    //Init opengl stuff
     m_shader = shader;
+    m_posAttrib = glGetAttribLocation(shader->programId, "position");
+    m_colorAttrib = glGetAttribLocation(shader->programId, "color");
+    m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
+
+    //Gen VBOs
+    glGenBuffers(1, &posBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW); //HACK Should prolly do this in init() so we can dodge this max particle deal & save gfx memory when we can
+    glGenBuffers(1, &colorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glGenBuffers(1, &texBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -54,6 +73,11 @@ ParticleSystem::~ParticleSystem()
     {
         lua->deleteObject(glue);
     }
+
+    //Delete VBOs
+    glDeleteBuffers(1, &posBuffer);
+    glDeleteBuffers(1, &colorBuffer);
+    glDeleteBuffers(1, &texBuffer);
 }
 
 void ParticleSystem::_deleteAll()
@@ -492,6 +516,17 @@ void ParticleSystem::update(float dt)
         vel++;
         //imgRect++;
     }
+
+    //Update VBOs
+    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_vertexPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 16 * sizeof(float), m_colorPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_texCoordPtr);
 }
 
 void ParticleSystem::draw(const RenderState& renderState)
@@ -525,20 +560,41 @@ void ParticleSystem::draw(const RenderState& renderState)
     //Render everything in one pass
     glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
 
-    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableVertexAttribArray(m_colorAttrib);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, false, 0, (void*)0);
 
-    glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
-    glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
-    glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
+    glEnableVertexAttribArray(m_posAttrib);
+    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, false, 0, (void*)0);
 
-    glDrawArrays(GL_QUADS, 0, m_num*4);
+    glEnableVertexAttribArray(m_texAttrib);
+    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, false, 0, (void*)0);
+
+    //glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
+
+    glDrawArrays(GL_QUADS, 0, m_num * 4);
+
+    glDisableVertexAttribArray(m_colorAttrib);
+    glDisableVertexAttribArray(m_texAttrib);
+    glDisableVertexAttribArray(m_posAttrib);
+
+    //glEnableClientState(GL_COLOR_ARRAY);
+
+    //glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
+    //glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
+    //glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
+
+    //glDrawArrays(GL_QUADS, 0, m_num*4);
 
     //Reset OpenGL stuff
-    glDisableClientState(GL_COLOR_ARRAY);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisableClientState(GL_COLOR_ARRAY);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     glUseProgram(renderState.programId);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void ParticleSystem::init()
@@ -547,8 +603,8 @@ void ParticleSystem::init()
         _deleteAll();
 
     m_totalAmt = max;
-
-    if(!m_totalAmt) return;
+    assert(m_totalAmt <= MAX_PARTICLES);
+    assert(m_totalAmt > 0);
 
     m_imgRect = new Rect[m_totalAmt];
     m_pos = new Vec2[m_totalAmt];

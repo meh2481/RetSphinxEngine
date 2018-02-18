@@ -62,6 +62,13 @@ class ParticleSystem
     Subject* m_subject;
 
     RenderState* m_shader;
+    int m_posAttrib;
+    int m_colorAttrib;
+    int m_texAttrib;
+    unsigned int posBuffer;
+    unsigned int colorBuffer;
+    unsigned int texBuffer;
+
 
     ParticleSystem() {};
 
