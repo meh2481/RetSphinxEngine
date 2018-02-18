@@ -11,7 +11,7 @@
 #include "OpenGLShader.h"
 #include "Quad.h"
 
-ParticleSystem::ParticleSystem()
+ParticleSystem::ParticleSystem(RenderState* shader)
 {
     m_imgRect = NULL;
     m_pos = NULL;
@@ -44,6 +44,7 @@ ParticleSystem::ParticleSystem()
     curTime = 0;
     spawnCounter = 0;
     curRate = 1.0f;
+    m_shader = shader;
 }
 
 ParticleSystem::~ParticleSystem()
@@ -513,7 +514,13 @@ void ParticleSystem::draw(const RenderState& renderState)
             break;
     }
 
-    renderState.apply();
+    glUseProgram(m_shader->programId);
+
+    m_shader->model = renderState.model;
+    m_shader->view = renderState.view;
+    m_shader->projection = renderState.projection;
+
+    m_shader->apply();
 
     //Render everything in one pass
     glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
@@ -529,6 +536,9 @@ void ParticleSystem::draw(const RenderState& renderState)
     //Reset OpenGL stuff
     glDisableClientState(GL_COLOR_ARRAY);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    glUseProgram(renderState.programId);
 }
 
 void ParticleSystem::init()

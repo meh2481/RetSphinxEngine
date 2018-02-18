@@ -103,7 +103,7 @@ ParticleEditor::ParticleEditor(GameEngine * ge)
     curSelectedImgRect = -1;
     loadParticleImage = false;
 
-    particles = new ParticleSystem();
+    particles = new ParticleSystem(ge->getResourceLoader()->getParticleShader());
     //Set some reasonable defaults
     curImageFilename = "res/particles/particlesheet1.png";
     particles->img = _ge->getResourceLoader()->getImage(curImageFilename);

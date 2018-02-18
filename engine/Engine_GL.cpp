@@ -192,6 +192,15 @@ void Engine::setup_opengl()
     m_3dShader.projection = persp;
     getResourceLoader()->set3dShader(&m_3dShader);
 
+    vertShaderCode = getResourceLoader()->getTextFile("res/shaders/particles.vert");
+    fragShaderCode = getResourceLoader()->getTextFile("res/shaders/particles.frag");
+    m_particleShader.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
+    m_particleShader.modelId = glGetUniformLocation(m_particleShader.programId, "model");
+    m_particleShader.viewId = glGetUniformLocation(m_particleShader.programId, "view");
+    m_particleShader.projectionId = glGetUniformLocation(m_particleShader.programId, "projection");
+    m_particleShader.projection = persp;
+    getResourceLoader()->setParticleShader(&m_particleShader);
+
 #ifdef _DEBUG
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.vert");
     fragShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.frag");

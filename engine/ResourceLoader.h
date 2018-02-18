@@ -28,6 +28,7 @@ class ResourceLoader
     PakLoader* m_pakLoader;
     std::string m_sPakDir;
     RenderState* m_3dShader;
+    RenderState* m_particleShader;
 
     std::string readTextFile(const std::string& filename);
     Image* loadImageFromFile(const std::string& filename);
@@ -43,6 +44,8 @@ public:
     //Utility
     void clearCache();
     void set3dShader(RenderState* shader) { m_3dShader = shader; };
+    void setParticleShader(RenderState* shader) { m_particleShader = shader; };
+    RenderState* getParticleShader() { return m_particleShader; };
 
     //Images
     Image* getImage(const std::string& sID);

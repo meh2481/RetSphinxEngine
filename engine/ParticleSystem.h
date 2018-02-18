@@ -15,7 +15,7 @@
 
 class Image;
 
-typedef enum 
+typedef enum
 {
     ADDITIVE = 0,
     NORMAL,
@@ -24,8 +24,6 @@ typedef enum
 
 class ParticleSystem
 {
-    friend class ResourceLoader;
-
     //Drawing helper arrays
     float* m_vertexPtr;
     float* m_colorPtr;
@@ -56,25 +54,26 @@ class ParticleSystem
     void _deleteAll();            //Delete all memory associated with particles
     void _newParticle();        //Create a new particle
     void _rmParticle(const unsigned idx);    //Delete an expired particle (i.e. copy particle at end of the list to where this one was)
-    void _initValues();            //Initialize particle system variables
 
     float curTime;
     float spawnCounter;
     float startedFiring;            //When we started firing (to keep track of decay)
 
-    std::string m_sXMLFrom;    //So we know what XML file we should reload from
-
     Subject* m_subject;
+
+    RenderState* m_shader;
+
+    ParticleSystem() {};
 
 public:
 
     enum { TYPE = OT_PARTICLESYSTEM };
     LuaObjGlue *glue;
     LuaInterface* lua;
-    
-    ParticleSystem();
+
+    ParticleSystem(RenderState* shader);
     ~ParticleSystem();
-    
+
     //Variables used to determine starting values for each particle
     Vec2    sizeStart;            //Drawing size on particle spawn
     Vec2    sizeEnd;            //Drawing size at end of particle life
@@ -86,7 +85,7 @@ public:
     float    rotStart;            //Starting angle
     float    rotStartVar;
     float     rotVel;                //Starting rotational velocity
-    float     rotVelVar;            
+    float     rotVelVar;
     float     rotAccel;            //Rotational acceleration
     float     rotAccelVar;
     Color     colStart;            //Color at start of particle's life
@@ -103,7 +102,7 @@ public:
     float    decay;                //How many seconds after firing to stop firing
     Vec3    rotAxis;            //What axis these particles rotate around
     Vec3    rotAxisVar;
-    
+
     //Particle system variables
     Image*                img;                //Image to use for all of these particles    //TODO: Use quad instead
     std::vector<Rect>    imgRect;            //Possible positions in this image to use for each particle
@@ -119,7 +118,7 @@ public:
     std::vector<std::string>        spawnOnDeath;        //Spawn a new particle system whenever one of these dies
     Vec2                emissionVel;        //Move the emission point every frame
     bool                velAdd;                //True to add emitter vel to new particles
-    
+
     void update(float dt);
     void draw(const RenderState& renderState);
     void init();
@@ -128,6 +127,8 @@ public:
     bool done()                {return !(m_num || firing);};    //Test and see if effect is done
 
     void setSubject(Subject* subject) { m_subject = subject; };
+
+    void _initValues();            //Initialize particle system variables
 };
 
 

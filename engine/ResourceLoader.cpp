@@ -128,7 +128,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
 //Particle system
 ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 {
-    ParticleSystem* ps = new ParticleSystem();
+    ParticleSystem* ps = new ParticleSystem(getParticleShader());
     LOG(INFO) << "Loading particle system " << sID;
     ps->_initValues();
 
@@ -158,8 +158,6 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
         delete ps;
         return NULL;
     }
-
-    ps->m_sXMLFrom = sID;
 
     tinyxml2::XMLElement* root = doc->FirstChildElement("particlesystem");
     if(root == NULL)
