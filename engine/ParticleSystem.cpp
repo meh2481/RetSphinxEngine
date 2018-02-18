@@ -533,21 +533,21 @@ void ParticleSystem::draw(const RenderState& renderState)
 {
     assert(img);
 
-    switch(blend)
-    {
-        case ADDITIVE:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            break;
+    //switch(blend)
+    //{
+    //    case ADDITIVE:
+    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    //        break;
 
-        case NORMAL:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            break;
+    //    case NORMAL:
+    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //        break;
 
-        case SUBTRACTIVE:
-            //TODO This is incorrect
-            glBlendFunc(GL_DST_COLOR, GL_ONE);
-            break;
-    }
+    //    case SUBTRACTIVE:
+    //        //TODO This is incorrect
+    //        glBlendFunc(GL_DST_COLOR, GL_ONE);
+    //        break;
+    //}
 
     glUseProgram(m_shader->programId);
 
@@ -572,6 +572,9 @@ void ParticleSystem::draw(const RenderState& renderState)
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
     glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, false, 0, (void*)0);
 
+    //glVertexAttribDivisor(m_posAttrib, 0);
+    //glVertexAttribDivisor(m_texAttrib, 0);
+    //glVertexAttribDivisor(m_colorAttrib, 0);
     //glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
 
     glDrawArrays(GL_QUADS, 0, m_num * 4);
@@ -594,7 +597,7 @@ void ParticleSystem::draw(const RenderState& renderState)
 
 
     glUseProgram(renderState.programId);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void ParticleSystem::init()
