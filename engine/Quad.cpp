@@ -4,6 +4,9 @@
 
 namespace Draw
 {
+
+    static int program;
+
     void drawQuad(Quad* q)
     {
         // tell opengl to use the generated texture
@@ -23,7 +26,18 @@ namespace Draw
         glVertexAttribPointer(posAttribId, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         glDrawArrays(type, 0, count);
-        glDeleteBuffers(1, &vertBuf);
         glDisableVertexAttribArray(posAttribId);
+        glDeleteBuffers(1, &vertBuf);
+    }
+
+    void init(int programId)
+    {
+        program = programId;
+        //glGenBuffers(1, &vertBuf);
+    }
+
+    void shutdown()
+    {
+
     }
 }

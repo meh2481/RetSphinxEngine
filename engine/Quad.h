@@ -24,6 +24,8 @@ public:
 
 namespace Draw
 {
+    void init(int programId);
+    void shutdown();
     void drawQuad(Quad* q);    //Yeeeeaaaaaaah
 
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId = 0);

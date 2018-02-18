@@ -4,6 +4,7 @@
 #include "DebugDraw.h"
 #include "Logger.h"
 #include "ResourceLoader.h"
+#include "Quad.h"
 
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
@@ -183,6 +184,7 @@ void Engine::setup_opengl()
     m_renderState.viewId = glGetUniformLocation(m_renderState.programId, "view");
     m_renderState.projectionId = glGetUniformLocation(m_renderState.programId, "projection");
     m_renderState.projection = persp;
+    Draw::init(m_renderState.programId);
 
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/3dobj.vert");
     m_3dShader.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());

@@ -19,6 +19,7 @@
 #include "InterpolationManager.h"
 #include "EngineContactListener.h"
 #include "DebugDraw.h"
+#include "Quad.h"
 
 #define GUID_STR_SZ    256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -127,6 +128,7 @@ Engine::~Engine()
 #ifdef _DEBUG
     delete m_debugDraw;
 #endif
+    Draw::shutdown();
 
     //Clean up ImGui
     ImGui_Impl_GL3_Shutdown();
