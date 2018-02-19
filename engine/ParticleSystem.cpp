@@ -548,21 +548,21 @@ void ParticleSystem::draw(const RenderState& renderState)
 {
     assert(img);
 
-    //switch(blend)
-    //{
-    //    case ADDITIVE:
-    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    //        break;
+    switch(blend)
+    {
+        case ADDITIVE:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
 
-    //    case NORMAL:
-    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //        break;
+        case NORMAL:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
 
-    //    case SUBTRACTIVE:
-    //        //TODO This is incorrect
-    //        glBlendFunc(GL_DST_COLOR, GL_ONE);
-    //        break;
-    //}
+        case SUBTRACTIVE:
+            //TODO This is incorrect
+            glBlendFunc(GL_DST_COLOR, GL_ONE);
+            break;
+    }
 
     glUseProgram(m_shader->programId);
 
@@ -585,7 +585,7 @@ void ParticleSystem::draw(const RenderState& renderState)
     glBindVertexArray(0);
 
     glUseProgram(renderState.programId);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void ParticleSystem::init()
