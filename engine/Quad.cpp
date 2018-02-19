@@ -7,6 +7,7 @@
 
 namespace Draw
 {
+    const int MAX_COUNT = 1024;
     std::vector<glm::mat4> model;
     std::vector<glm::mat4> view;
     std::vector<glm::mat4> projection;
@@ -14,6 +15,7 @@ namespace Draw
     static int modelId;
     static int viewId;
     static int projectionId;
+    unsigned int vertBuf;
 
     void drawQuad(Quad* q, RenderState* state)
     {
@@ -35,8 +37,6 @@ namespace Draw
 
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId)
     {
-        unsigned int vertBuf;
-        glGenBuffers(1, &vertBuf);
         glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
         glBufferData(GL_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
         glEnableVertexAttribArray(posAttribId);
@@ -44,23 +44,25 @@ namespace Draw
 
         glDrawArrays(type, 0, count);
         glDisableVertexAttribArray(posAttribId);
-        glDeleteBuffers(1, &vertBuf);
     }
 
     void init(int programId)
     {
         program = programId;
-        model.reserve(1024);
-        view.reserve(1024);
-        projection.reserve(1024);
+        model.reserve(MAX_COUNT);
+        view.reserve(MAX_COUNT);
+        projection.reserve(MAX_COUNT);
 
         modelId = glGetUniformLocation(programId, "model");
         viewId = glGetUniformLocation(programId, "view");
         projectionId = glGetUniformLocation(programId, "projection");
+
+        glGenBuffers(1, &vertBuf);
     }
 
     void shutdown()
     {
+        glDeleteBuffers(1, &vertBuf);
 
     }
 }

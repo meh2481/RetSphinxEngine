@@ -29,20 +29,32 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
     //Draw filled center
-    float* data = new float[vertexCount*2];
+    assert(vertexCount >= 3);
+    unsigned int numTriangles = vertexCount - 2;
+    float* data = new float[numTriangles * 6];
     const float col[] = {
         color.r * fillMul,
         color.g * fillMul,
         color.b * fillMul,
         color.a * fillAlpha
     };
-    for(int i = 0; i < vertexCount; i++)
+    //Fill out triangles
+    for(unsigned int i = 0; i < numTriangles; i++)
     {
-        data[i * 2] = vertices[i].x;
-        data[i * 2 + 1] = vertices[i].y;
+        data[i * 6] = vertices[0].x;
+        data[i * 6 + 1] = vertices[0].y;
+        data[i * 6 + 2] = vertices[i + 1].x;
+        data[i * 6 + 3] = vertices[i + 1].y;
+        data[i * 6 + 4] = vertices[i + 2].x;
+        data[i * 6 + 5] = vertices[i + 2].y;
     }
+    //for(int i = 0; i < vertexCount; i++)
+    //{
+    //    data[i * 2] = vertices[i].x;
+    //    data[i * 2 + 1] = vertices[i].y;
+    //}
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * vertexCount * 2, 2, vertexCount, GL_TRIANGLE_FAN, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * numTriangles * 6, 2, numTriangles*3, GL_TRIANGLES, m_posAttribId);
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
@@ -67,7 +79,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
     //Draw filled circle in center
-    float data[NUM_SEGMENTS * 2];
+    float data[NUM_SEGMENTS * 6];
     const float col[] = {
         color.r * fillMul,
         color.g * fillMul,
@@ -78,12 +90,17 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     for(int i = 0; i < NUM_SEGMENTS; i++)
     {
         b2Vec2 v = center + radius * b2Vec2(cosf(angle), sinf(angle));
-        data[i * 2] = v.x;
-        data[i * 2 + 1] = v.y;
+        data[i * 6] = v.x;
+        data[i * 6 + 1] = v.y;
         angle += ANGLE_INCREMENT;
+        v = center + radius * b2Vec2(cosf(angle), sinf(angle));
+        data[i * 6 + 2] = v.x;
+        data[i * 6 + 3] = v.y;
+        data[i * 6 + 4] = center.x;
+        data[i * 6 + 5] = center.y;
     }
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * NUM_SEGMENTS * 2, 2, NUM_SEGMENTS, GL_TRIANGLE_FAN, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * NUM_SEGMENTS * 6, 2, NUM_SEGMENTS * 3, GL_TRIANGLES, m_posAttribId);
 
     //Draw circle
     DrawCircle(center, radius, color);
