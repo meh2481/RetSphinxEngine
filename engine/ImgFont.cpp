@@ -50,23 +50,24 @@ uint32_t ImgFont::getIndex(uint32_t codepoint)
 void ImgFont::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 {
     //TODO Store vertex data & don't re-send this to the gfx card every frame
-    Rect rc(
-        -drawSz.x / 2.0f + offset.x,
-        drawSz.y / 2.0f + offset.y,
-        drawSz.x / 2.0f + offset.x,
-        -drawSz.y / 2.0f + offset.y);
+    assert(false);  //Not implemented yet for modern OpenGL
+    //Rect rc(
+    //    -drawSz.x / 2.0f + offset.x,
+    //    drawSz.y / 2.0f + offset.y,
+    //    drawSz.x / 2.0f + offset.x,
+    //    -drawSz.y / 2.0f + offset.y);
 
-    const float vertexData[] =
-    {
-        rc.left, rc.top, // upper left
-        rc.right, rc.top, // upper right
-        rc.left, rc.bottom, // lower left
-        rc.right, rc.bottom // lower right
-    };
+    //const float vertexData[] =
+    //{
+    //    rc.left, rc.top, // upper left
+    //    rc.right, rc.top, // upper right
+    //    rc.left, rc.bottom, // lower left
+    //    rc.right, rc.bottom // lower right
+    //};
 
-    glVertexPointer(2, GL_FLOAT, 0, &vertexData);
-    glTexCoordPointer(2, GL_FLOAT, 0, rect);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //glVertexPointer(2, GL_FLOAT, 0, &vertexData);
+    //glTexCoordPointer(2, GL_FLOAT, 0, rect);
+    //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 }
 

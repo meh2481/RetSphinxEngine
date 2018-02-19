@@ -335,7 +335,9 @@ void Engine::drawDebug()
         m_debugRenderState.view = m_renderState.view;
         m_debugRenderState.model = glm::mat4(1.0f);
         glUseProgram(m_debugRenderState.programId);
-        m_debugRenderState.apply();
+        glUniformMatrix4fv(debugModelId, 1, false, &m_debugRenderState.model[0][0]);
+        glUniformMatrix4fv(debugViewId, 1, false, &m_debugRenderState.view[0][0]);
+        glUniformMatrix4fv(debugProjectionId, 1, false, &m_debugRenderState.projection[0][0]);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     if(m_bDebugDraw)

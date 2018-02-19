@@ -188,18 +188,18 @@ void Engine::setup_opengl()
 
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/3dobj.vert");
     m_3dShader.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
-    m_3dShader.modelId = glGetUniformLocation(m_3dShader.programId, "model");
-    m_3dShader.viewId = glGetUniformLocation(m_3dShader.programId, "view");
-    m_3dShader.projectionId = glGetUniformLocation(m_3dShader.programId, "projection");
+    //m_3dShader.modelId = glGetUniformLocation(m_3dShader.programId, "model");
+    //m_3dShader.viewId = glGetUniformLocation(m_3dShader.programId, "view");
+    //m_3dShader.projectionId = glGetUniformLocation(m_3dShader.programId, "projection");
     m_3dShader.projection = persp;
     getResourceLoader()->set3dShader(&m_3dShader);
 
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/particles.vert");
     fragShaderCode = getResourceLoader()->getTextFile("res/shaders/particles.frag");
     m_particleShader.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
-    m_particleShader.modelId = glGetUniformLocation(m_particleShader.programId, "model");
-    m_particleShader.viewId = glGetUniformLocation(m_particleShader.programId, "view");
-    m_particleShader.projectionId = glGetUniformLocation(m_particleShader.programId, "projection");
+    //m_particleShader.modelId = glGetUniformLocation(m_particleShader.programId, "model");
+    //m_particleShader.viewId = glGetUniformLocation(m_particleShader.programId, "view");
+    //m_particleShader.projectionId = glGetUniformLocation(m_particleShader.programId, "projection");
     m_particleShader.projection = persp;
     getResourceLoader()->setParticleShader(&m_particleShader);
 
@@ -207,9 +207,9 @@ void Engine::setup_opengl()
     vertShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.vert");
     fragShaderCode = getResourceLoader()->getTextFile("res/shaders/debugdraw.frag");
     m_debugRenderState.programId = OpenGLShader::loadShaders(vertShaderCode.c_str(), fragShaderCode.c_str());
-    m_debugRenderState.modelId = glGetUniformLocation(m_debugRenderState.programId, "model");
-    m_debugRenderState.viewId = glGetUniformLocation(m_debugRenderState.programId, "view");
-    m_debugRenderState.projectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
+    debugModelId = glGetUniformLocation(m_debugRenderState.programId, "model");
+    debugViewId = glGetUniformLocation(m_debugRenderState.programId, "view");
+    debugProjectionId = glGetUniformLocation(m_debugRenderState.programId, "projection");
     m_debugRenderState.projection = persp;
 #endif
 }

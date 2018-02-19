@@ -45,6 +45,9 @@ private:
     DebugDraw* m_debugDraw;
     bool m_bDebugDraw;
     bool m_bSoundDebugDraw;
+    int debugModelId;
+    int debugViewId;
+    int debugProjectionId;
 #endif
     Vec2 m_ptCursorPos;
     bool  m_bShowCursor;

@@ -40,7 +40,6 @@ void ObjSegment::draw(RenderState renderState)
         if(obj3D)
         {
             renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
-            renderState.apply();
 
             glEnable(GL_CULL_FACE);
             obj3D->render(renderState);
@@ -49,7 +48,6 @@ void ObjSegment::draw(RenderState renderState)
         else if(img != NULL)
         {
             renderState.apply();
-
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
             q.tex = *img;
@@ -71,7 +69,7 @@ void ObjSegment::draw(RenderState renderState)
                     q.pos[6] = q.pos[2];
                     q.pos[7] = q.pos[5]; // lower right
 
-                    Draw::drawQuad(&q);
+                    Draw::drawQuad(&q, &renderState);
                 }
             }
         }
@@ -87,7 +85,6 @@ void ObjSegment::draw(RenderState renderState)
         if(obj3D)
         {
             renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
-            renderState.apply();
 
             glEnable(GL_CULL_FACE);
             obj3D->render(renderState);
@@ -96,7 +93,6 @@ void ObjSegment::draw(RenderState renderState)
         else if(img != NULL)
         {
             renderState.apply();
-
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
             q.tex = *img;
@@ -118,7 +114,7 @@ void ObjSegment::draw(RenderState renderState)
                     q.pos[6] = q.pos[2];
                     q.pos[7] = q.pos[5]; // lower right
 
-                    Draw::drawQuad(&q);
+                    Draw::drawQuad(&q, &renderState);
                 }
             }
         }

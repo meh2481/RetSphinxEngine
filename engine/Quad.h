@@ -22,11 +22,13 @@ public:
     float pos[8];
 };
 
+class RenderState;
+
 namespace Draw
 {
     void init(int programId);
     void shutdown();
-    void drawQuad(Quad* q);    //Yeeeeaaaaaaah
+    void drawQuad(Quad* q, RenderState* state);    //Yeeeeaaaaaaah
 
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId = 0);
 }

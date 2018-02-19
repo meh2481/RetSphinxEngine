@@ -16,6 +16,9 @@ protected:
     unsigned int m_tex;
     unsigned int vertBuf;
     unsigned int vertArray;
+    int modelId;
+    int viewId;
+    int projectionId;
     RenderState* m_renderState;
 
     void _fromData(unsigned char* data, Image* tex);

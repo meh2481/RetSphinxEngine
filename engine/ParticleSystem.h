@@ -69,6 +69,9 @@ class ParticleSystem
     unsigned int colorBuffer;
     unsigned int texBuffer;
     unsigned int vertArray;
+    int modelId;
+    int viewId;
+    int projectionId;
 
 
     ParticleSystem() {};
