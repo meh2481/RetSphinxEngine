@@ -11,8 +11,6 @@
 #include "OpenGLShader.h"
 #include "Quad.h"
 
-#define MAX_PARTICLES 10000 //HACK
-
 ParticleSystem::ParticleSystem(RenderState* shader)
 {
     m_imgRect = NULL;
@@ -54,30 +52,7 @@ ParticleSystem::ParticleSystem(RenderState* shader)
     m_colorAttrib = glGetAttribLocation(shader->programId, "color");
     m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
 
-    //Gen VBOs
     glGenVertexArrays(1, &vertArray);
-    glBindVertexArray(vertArray);
-
-    glGenBuffers(1, &posBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW); //HACK Should prolly do this in init() so we can dodge this max particle deal & save gfx memory when we can
-    glEnableVertexAttribArray(m_posAttrib);
-    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glGenBuffers(1, &colorBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(m_colorAttrib);
-    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glGenBuffers(1, &texBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(m_texAttrib);
-    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -89,6 +64,7 @@ ParticleSystem::~ParticleSystem()
     }
 
     //Delete VBOs
+    glDeleteVertexArrays(1, &vertArray);
     glDeleteBuffers(1, &posBuffer);
     glDeleteBuffers(1, &colorBuffer);
     glDeleteBuffers(1, &texBuffer);
@@ -533,13 +509,13 @@ void ParticleSystem::update(float dt)
 
     //Update VBOs
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_vertexPtr);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 16 * sizeof(float), m_colorPtr);
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_texCoordPtr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -594,7 +570,6 @@ void ParticleSystem::init()
         _deleteAll();
 
     m_totalAmt = max;
-    assert(m_totalAmt <= MAX_PARTICLES);
     assert(m_totalAmt > 0);
 
     m_imgRect = new Rect[m_totalAmt];
@@ -618,6 +593,30 @@ void ParticleSystem::init()
     m_vertexPtr = new float[m_totalAmt * 8];    //2 per vert * 4 per quad = 8 per particle
     m_texCoordPtr = new float[m_totalAmt * 8];    //2 per vert * 4 per quad = 8 per particle
     m_colorPtr = new float[m_totalAmt * 16];    //4 per vert * 4 per quad = 16 per particle
+
+    //Gen VBOs
+    glBindVertexArray(vertArray);
+
+    glGenBuffers(1, &posBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(m_posAttrib);
+    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glGenBuffers(1, &colorBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(m_colorAttrib);
+    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glGenBuffers(1, &texBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(m_texAttrib);
+    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 
