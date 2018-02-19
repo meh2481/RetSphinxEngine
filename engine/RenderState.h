@@ -11,6 +11,4 @@ public:
     unsigned int modelId;
     unsigned int viewId;
     unsigned int projectionId;
-
-    void apply() const;
 };

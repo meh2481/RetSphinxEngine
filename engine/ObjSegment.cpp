@@ -47,7 +47,11 @@ void ObjSegment::draw(RenderState renderState)
         }
         else if(img != NULL)
         {
-            renderState.apply();
+            glUseProgram(renderState.programId);
+            glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
+            glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
+            glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
             q.tex = *img;
@@ -92,7 +96,11 @@ void ObjSegment::draw(RenderState renderState)
         }
         else if(img != NULL)
         {
-            renderState.apply();
+            glUseProgram(renderState.programId);
+            glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
+            glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
+            glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
             q.tex = *img;

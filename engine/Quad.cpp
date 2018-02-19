@@ -7,7 +7,9 @@
 
 namespace Draw
 {
-    std::vector<glm::mat4> mvps;
+    std::vector<glm::mat4> model;
+    std::vector<glm::mat4> view;
+    std::vector<glm::mat4> projection;
     static int program;
     static int modelId;
     static int viewId;
@@ -48,7 +50,9 @@ namespace Draw
     void init(int programId)
     {
         program = programId;
-        mvps.reserve(1024);
+        model.reserve(1024);
+        view.reserve(1024);
+        projection.reserve(1024);
 
         modelId = glGetUniformLocation(programId, "model");
         viewId = glGetUniformLocation(programId, "view");
