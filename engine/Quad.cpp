@@ -15,7 +15,6 @@ namespace Draw
     static int modelId;
     static int viewId;
     static int projectionId;
-    unsigned int vertBuf;
 
     void drawQuad(Quad* q, RenderState* state)
     {
@@ -34,7 +33,8 @@ namespace Draw
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
-
+#ifdef _DEBUG
+    unsigned int vertBuf;
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId)
     {
         glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
@@ -45,6 +45,7 @@ namespace Draw
         glDrawArrays(type, 0, count);
         glDisableVertexAttribArray(posAttribId);
     }
+#endif
 
     void init(int programId)
     {
@@ -56,13 +57,16 @@ namespace Draw
         modelId = glGetUniformLocation(programId, "model");
         viewId = glGetUniformLocation(programId, "view");
         projectionId = glGetUniformLocation(programId, "projection");
-
+#ifdef _DEBUG
         glGenBuffers(1, &vertBuf);
+#endif
     }
 
     void shutdown()
     {
+#ifdef _DEBUG
         glDeleteBuffers(1, &vertBuf);
+#endif
 
     }
 }
