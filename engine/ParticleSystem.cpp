@@ -150,7 +150,7 @@ void ParticleSystem::_newParticle()
     m_pos[m_num] = Vec2(Random::randomFloat(emitFrom.left, emitFrom.right), Random::randomFloat(emitFrom.top, emitFrom.bottom));
 
     //Add proper locations from m_imgRect to tex coord ptr array here
-    float* particleTexCoord = &m_texCoordPtr[m_num * 8];
+    float* particleTexCoord = &m_texCoordPtr[m_num * 12];
     float left = m_imgRect[m_num].left / (float)img->tex.width;
     float right = m_imgRect[m_num].right / (float)img->tex.width;
     float top = m_imgRect[m_num].top / (float)img->tex.height;
@@ -158,8 +158,10 @@ void ParticleSystem::_newParticle()
 
     *particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
     *particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
-    *particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
     *particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+    *particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+    *particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+    *particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
 
     float sizediff = Random::randomFloat(-sizeVar,sizeVar);
     m_sizeStart[m_num].x = sizeStart.x + sizediff;
@@ -237,7 +239,7 @@ void ParticleSystem::_newParticle()
 
 void ParticleSystem::_rmParticle(const unsigned idx)
 {
-    float* particleTexCoord = &m_texCoordPtr[idx * 8];
+    float* particleTexCoord = &m_texCoordPtr[idx * 12];
     float left = m_imgRect[m_num - 1].left / (float)img->tex.width;
     float right = m_imgRect[m_num - 1].right / (float)img->tex.width;
     float top = m_imgRect[m_num - 1].top / (float)img->tex.height;
@@ -245,8 +247,10 @@ void ParticleSystem::_rmParticle(const unsigned idx)
 
     *particleTexCoord++ = left; *particleTexCoord++ = top; // upper left
     *particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
-    *particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
     *particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+    *particleTexCoord++ = left; *particleTexCoord++ = bottom; // lower left
+    *particleTexCoord++ = right; *particleTexCoord++ = top; // upper right
+    *particleTexCoord++ = right; *particleTexCoord++ = bottom; // lower right
 
     m_imgRect[idx] = m_imgRect[m_num-1];
     m_pos[idx] = m_pos[m_num-1];
@@ -454,43 +458,44 @@ void ParticleSystem::update(float dt)
         y = y / 2.0f;
         xnew = x * c - y * s;
         ynew = x * s + y * c;
-        *vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper left
+        float left = pos->x + xnew;
+        float top = pos->y + ynew;
         x = -x;
-        xnew = x * c - y * s;
-        ynew = x * s + y * c;
-        *vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // upper right
         y = -y;
         xnew = x * c - y * s;
         ynew = x * s + y * c;
-        *vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower right
-        x = -x;
-        xnew = x * c - y * s;
-        ynew = x * s + y * c;
-        *vertexPos++ = pos->x + xnew; *vertexPos++ = pos->y + ynew; // lower left
+        float bottom = pos->y + ynew;
+        float right = pos->x + xnew;
+        *vertexPos++ = left; *vertexPos++ = top; // upper left
+        *vertexPos++ = right; *vertexPos++ = top; // upper right
+        *vertexPos++ = left; *vertexPos++ = bottom; // lower left
+        *vertexPos++ = left; *vertexPos++ = bottom; // lower left
+        *vertexPos++ = right; *vertexPos++ = top; // upper right
+        *vertexPos++ = right; *vertexPos++ = bottom; // lower right
 
         //Set color
-        //for(int j = 0; j < 4; j++)
-        //{
+        for(int j = 0; j < 6; j++)
+        {
         *colorPtr++ = r;
         *colorPtr++ = g;
         *colorPtr++ = b;
         *colorPtr++ = a;
 
-        *colorPtr++ = r;
-        *colorPtr++ = g;
-        *colorPtr++ = b;
-        *colorPtr++ = a;
+        //*colorPtr++ = r;
+        //*colorPtr++ = g;
+        //*colorPtr++ = b;
+        //*colorPtr++ = a;
 
-        *colorPtr++ = r;
-        *colorPtr++ = g;
-        *colorPtr++ = b;
-        *colorPtr++ = a;
+        //*colorPtr++ = r;
+        //*colorPtr++ = g;
+        //*colorPtr++ = b;
+        //*colorPtr++ = a;
 
-        *colorPtr++ = r;
-        *colorPtr++ = g;
-        *colorPtr++ = b;
-        *colorPtr++ = a;
-        //}
+        //*colorPtr++ = r;
+        //*colorPtr++ = g;
+        //*colorPtr++ = b;
+        //*colorPtr++ = a;
+        }
 
         //Increment pointers
         created++;
@@ -509,14 +514,14 @@ void ParticleSystem::update(float dt)
 
     //Update VBOs
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_vertexPtr);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_vertexPtr);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 16 * sizeof(float), m_colorPtr);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 24 * sizeof(float), m_colorPtr);
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_texCoordPtr);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_texCoordPtr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -553,11 +558,11 @@ void ParticleSystem::draw(const RenderState& renderState)
 
     //glVertexAttribDivisor(m_posAttrib, 0);
     //glVertexAttribDivisor(m_texAttrib, 0);
-    //glVertexAttribDivisor(m_colorAttrib, 0);
     //glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
 
     glBindVertexArray(vertArray);
-    glDrawArrays(GL_QUADS, 0, m_num * 4);
+    //glVertexAttribDivisor(m_colorAttrib, 2);
+    glDrawArrays(GL_TRIANGLES, 0, m_num * 6);
     glBindVertexArray(0);
 
     glUseProgram(renderState.programId);
@@ -590,28 +595,28 @@ void ParticleSystem::init()
     m_lifePreFade = new float[m_totalAmt];
     m_rotAxis = new Vec3[m_totalAmt];
 
-    m_vertexPtr = new float[m_totalAmt * 8];    //2 per vert * 4 per quad = 8 per particle
-    m_texCoordPtr = new float[m_totalAmt * 8];    //2 per vert * 4 per quad = 8 per particle
-    m_colorPtr = new float[m_totalAmt * 16];    //4 per vert * 4 per quad = 16 per particle
+    m_vertexPtr = new float[m_totalAmt * 12];    //2 per vert * 3 per triangle = 12 per particle
+    m_texCoordPtr = new float[m_totalAmt * 12];    //2 per vert * 3 per triangle = 12 per particle
+    m_colorPtr = new float[m_totalAmt * 24];    //4 per vertex
 
     //Gen VBOs
     glBindVertexArray(vertArray);
 
     glGenBuffers(1, &posBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
     glEnableVertexAttribArray(m_posAttrib);
     glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glGenBuffers(1, &colorBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
     glEnableVertexAttribArray(m_colorAttrib);
     glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glGenBuffers(1, &texBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
     glEnableVertexAttribArray(m_texAttrib);
     glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
