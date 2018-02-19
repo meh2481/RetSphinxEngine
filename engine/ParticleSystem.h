@@ -68,6 +68,7 @@ class ParticleSystem
     unsigned int posBuffer;
     unsigned int colorBuffer;
     unsigned int texBuffer;
+    unsigned int vertArray;
 
 
     ParticleSystem() {};

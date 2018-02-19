@@ -55,15 +55,29 @@ ParticleSystem::ParticleSystem(RenderState* shader)
     m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
 
     //Gen VBOs
+    glGenVertexArrays(1, &vertArray);
+    glBindVertexArray(vertArray);
+
     glGenBuffers(1, &posBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
     glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW); //HACK Should prolly do this in init() so we can dodge this max particle deal & save gfx memory when we can
+    glEnableVertexAttribArray(m_posAttrib);
+    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     glGenBuffers(1, &colorBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
     glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 16 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(m_colorAttrib);
+    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     glGenBuffers(1, &texBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
     glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(m_texAttrib);
+    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -527,6 +541,7 @@ void ParticleSystem::update(float dt)
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
     glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 8 * sizeof(float), NULL, GL_STREAM_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 8 * sizeof(float), m_texCoordPtr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleSystem::draw(const RenderState& renderState)
@@ -560,41 +575,14 @@ void ParticleSystem::draw(const RenderState& renderState)
     //Render everything in one pass
     glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
 
-    glEnableVertexAttribArray(m_colorAttrib);
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, false, 0, (void*)0);
-
-    glEnableVertexAttribArray(m_posAttrib);
-    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, false, 0, (void*)0);
-
-    glEnableVertexAttribArray(m_texAttrib);
-    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, false, 0, (void*)0);
-
     //glVertexAttribDivisor(m_posAttrib, 0);
     //glVertexAttribDivisor(m_texAttrib, 0);
     //glVertexAttribDivisor(m_colorAttrib, 0);
     //glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
 
+    glBindVertexArray(vertArray);
     glDrawArrays(GL_QUADS, 0, m_num * 4);
-
-    glDisableVertexAttribArray(m_colorAttrib);
-    glDisableVertexAttribArray(m_texAttrib);
-    glDisableVertexAttribArray(m_posAttrib);
-
-    //glEnableClientState(GL_COLOR_ARRAY);
-
-    //glTexCoordPointer(2, GL_FLOAT, 0, m_texCoordPtr);
-    //glColorPointer(4, GL_FLOAT, 0, m_colorPtr);
-    //glVertexPointer(2, GL_FLOAT, 0, m_vertexPtr);
-
-    //glDrawArrays(GL_QUADS, 0, m_num*4);
-
-    //Reset OpenGL stuff
-    //glDisableClientState(GL_COLOR_ARRAY);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    glBindVertexArray(0);
 
     glUseProgram(renderState.programId);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
