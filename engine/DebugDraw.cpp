@@ -12,9 +12,7 @@ DebugDraw::DebugDraw(RenderState renderState)
 {
     m_renderState = renderState;
     m_colorUniformId = glGetUniformLocation(m_renderState.programId, "col");
-    m_posAttribId = glGetAttribLocation(m_renderState.programId, "position");
     assert(m_colorUniformId >= 0);
-    assert(m_posAttribId >= 0);
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -54,7 +52,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     //    data[i * 2 + 1] = vertices[i].y;
     //}
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * numTriangles * 6, 2, numTriangles*3, GL_TRIANGLES, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * numTriangles * 6, 2, numTriangles*3, GL_TRIANGLES);
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
@@ -100,7 +98,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
         data[i * 6 + 5] = center.y;
     }
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * NUM_SEGMENTS * 6, 2, NUM_SEGMENTS * 3, GL_TRIANGLES, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * NUM_SEGMENTS * 6, 2, NUM_SEGMENTS * 3, GL_TRIANGLES);
 
     //Draw circle
     DrawCircle(center, radius, color);
@@ -125,7 +123,7 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
         color.a * outlineAlpha
     };
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * 4, 2, 2, GL_LINES, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * 4, 2, 2, GL_LINES);
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
@@ -147,7 +145,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
     };
     glPointSize(size);
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * 2, 2, 1, GL_POINTS, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * 2, 2, 1, GL_POINTS);
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
@@ -183,7 +181,7 @@ void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& col
         color.a * outlineAlpha
     };
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * 6, 3, 2, GL_LINES, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * 6, 3, 2, GL_LINES);
 }
 
 void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color)
@@ -220,7 +218,7 @@ void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2C
     //    data[i * 3 + 2] = vertices[i].z;
     //}
     glUniform4fv(m_colorUniformId, 1, col);
-    Draw::drawHelper(data, sizeof(float) * numTriangles * 9, 3, numTriangles * 3, GL_TRIANGLES, m_posAttribId);
+    Draw::drawHelper(data, sizeof(float) * numTriangles * 9, 3, numTriangles * 3, GL_TRIANGLES);
 
     //Fill in outside
     //Draw sides

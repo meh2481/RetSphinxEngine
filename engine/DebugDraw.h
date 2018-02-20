@@ -13,7 +13,6 @@ class DebugDraw : public b2Draw
 {
     RenderState m_renderState;
     int m_colorUniformId;
-    int m_posAttribId;
 
     DebugDraw() {};
 

@@ -30,5 +30,5 @@ namespace Draw
     void shutdown();
     void drawQuad(Quad* q, RenderState* state);    //Yeeeeaaaaaaah
 
-    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId = 0);
+    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type);
 }

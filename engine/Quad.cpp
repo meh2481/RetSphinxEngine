@@ -7,10 +7,10 @@
 
 namespace Draw
 {
-    const int MAX_COUNT = 1024;
-    std::vector<glm::mat4> model;
-    std::vector<glm::mat4> view;
-    std::vector<glm::mat4> projection;
+    static const int MAX_COUNT = 1024;
+    static std::vector<glm::mat4> model;
+    static std::vector<glm::mat4> view;
+    static std::vector<glm::mat4> projection;
     static int program;
     static int modelId;
     static int viewId;
@@ -34,16 +34,22 @@ namespace Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 #ifdef _DEBUG
-    unsigned int vertBuf;
-    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type, int posAttribId)
+    static unsigned int vertBuf;
+    static unsigned int vertArray;
+    static int curNumPer = 2;
+    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type)
     {
         glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
-        glBufferData(GL_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(posAttribId);
-        glVertexAttribPointer(posAttribId, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glBufferData(GL_ARRAY_BUFFER, len, data, GL_STREAM_DRAW);
 
+        glBindVertexArray(vertArray);
+        if(numPer != curNumPer) //Flip-flop this. Kinda mad hacky but whatevs
+        {
+            glVertexAttribPointer(0, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
+            curNumPer = numPer;
+        }
         glDrawArrays(type, 0, count);
-        glDisableVertexAttribArray(posAttribId);
+        glBindVertexArray(0);
     }
 #endif
 
@@ -58,13 +64,22 @@ namespace Draw
         viewId = glGetUniformLocation(programId, "view");
         projectionId = glGetUniformLocation(programId, "projection");
 #ifdef _DEBUG
+        glGenVertexArrays(1, &vertArray);
+        glBindVertexArray(vertArray);
         glGenBuffers(1, &vertBuf);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
+        glBufferData(GL_ARRAY_BUFFER, MAX_COUNT * sizeof(float), NULL, GL_STREAM_DRAW);
+        glEnableVertexAttribArray(0);   //Assumes position is at attribute location 0 in the debug shader
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
+        glBindVertexArray(0);
 #endif
     }
 
     void shutdown()
     {
 #ifdef _DEBUG
+        glDeleteVertexArrays(1, &vertArray);
         glDeleteBuffers(1, &vertBuf);
 #endif
 
