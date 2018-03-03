@@ -37,13 +37,11 @@ namespace Draw
     #define NUM_BUFS 5
     static unsigned int vertBuf[NUM_BUFS];
     static unsigned int vertArray[NUM_BUFS];
-    //static unsigned int curBuf = 0;
     static std::vector<float> triangles2d;
     static std::vector<float> lines2d;
     static std::vector<float> points2d;
     static std::vector<float> triangles3d;
     static std::vector<float> lines3d;
-    //static int curNumPer = 2;
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type)
     {
         assert(len % sizeof(float) == 0);
@@ -85,24 +83,6 @@ namespace Draw
         }
         else
             assert(false);
-
-        //Loop round
-        //if(curBuf < NUM_BUFS - 1)
-        //    curBuf++;
-        //else
-        //    curBuf = 0;
-
-        //glBindBuffer(GL_ARRAY_BUFFER, vertBuf[curBuf]);
-        //glBufferData(GL_ARRAY_BUFFER, len, data, GL_STREAM_DRAW);
-
-        //glBindVertexArray(vertArray[curBuf]);
-        ////if(numPer != curNumPer) //Flip-flop this. Kinda mad hacky but whatevs
-        ////{
-        //    //glVertexAttribPointer(0, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
-        //    //curNumPer = numPer;
-        ////}
-        //glDrawArrays(type, 0, count);
-        //glBindVertexArray(0);
     }
 #endif
 

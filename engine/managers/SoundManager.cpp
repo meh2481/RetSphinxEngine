@@ -39,13 +39,13 @@ FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TY
         {
             LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED occured.";
             LOG(ERR) << (char*)commanddata1;
-            LOG(ERR) << "%d bytes." << (int)commanddata2;
+            LOG(ERR) << "%d bytes." << (long)commanddata2;
             break;
         }
         case FMOD_SYSTEM_CALLBACK_THREADCREATED:
         {
             LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_THREADCREATED occured.";
-            LOG(INFO) << "Thread ID = " << (int)commanddata1;
+            LOG(INFO) << "Thread ID = " << (long)commanddata1;
             LOG(INFO) << "Thread Name = " << (char*)commanddata2;
             break;
         }
