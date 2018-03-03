@@ -4,7 +4,7 @@
 #include "Logger.h"
 #include "Rect.h"
 #include <algorithm>    // std::max
-#include "Box2D\Box2D.h"
+#include "Box2D/Box2D.h"
 #include <vector>
 
 #define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
