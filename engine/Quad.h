@@ -31,4 +31,5 @@ namespace Draw
     void drawQuad(Quad* q, RenderState* state);    //Yeeeeaaaaaaah
 
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type);
+    void flush();   //Flush all gathered draw data
 }

@@ -344,6 +344,7 @@ void Engine::drawDebug()
         m_physicsWorld->DrawDebugData();
     if(m_bSoundDebugDraw)
         getSoundManager()->drawDebug(m_debugDraw);
+    Draw::flush();
 #endif // _DEBUG
 }
 

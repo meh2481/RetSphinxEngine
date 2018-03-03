@@ -7,7 +7,7 @@
 
 namespace Draw
 {
-    static const int MAX_COUNT = 1024;
+    static const int MAX_COUNT = 4096;
     static std::vector<glm::mat4> model;
     static std::vector<glm::mat4> view;
     static std::vector<glm::mat4> projection;
@@ -34,44 +34,106 @@ namespace Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 #ifdef _DEBUG
-    static unsigned int vertBuf;
-    static unsigned int vertArray;
-    static int curNumPer = 2;
+    #define NUM_BUFS 5
+    static unsigned int vertBuf[NUM_BUFS];
+    static unsigned int vertArray[NUM_BUFS];
+    //static unsigned int curBuf = 0;
+    static std::vector<float> triangles2d;
+    static std::vector<float> lines2d;
+    static std::vector<float> points2d;
+    static std::vector<float> triangles3d;
+    static std::vector<float> lines3d;
+    //static int curNumPer = 2;
     void drawHelper(const float* data, unsigned int len, int numPer, int count, int type)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
-        glBufferData(GL_ARRAY_BUFFER, len, data, GL_STREAM_DRAW);
-
-        glBindVertexArray(vertArray);
-        if(numPer != curNumPer) //Flip-flop this. Kinda mad hacky but whatevs
+        assert(len % sizeof(float) == 0);
+        int num = len / sizeof(float);
+        if(numPer == 2)
         {
-            glVertexAttribPointer(0, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
-            curNumPer = numPer;
+            if(type == GL_LINES)
+            {
+                for(int i = 0; i < num; i++)
+                    lines2d.push_back(data[i]);
+            }
+            else if(type == GL_TRIANGLES)
+            {
+                for(int i = 0; i < num; i++)
+                    triangles2d.push_back(data[i]);
+            }
+            else if(type == GL_POINTS)
+            {
+                for(int i = 0; i < num; i++)
+                    points2d.push_back(data[i]);
+            }
+            else
+                assert(false);
         }
-        glDrawArrays(type, 0, count);
-        glBindVertexArray(0);
+        else if(numPer == 3)
+        {
+            if(type == GL_LINES)
+            {
+                for(int i = 0; i < num; i++)
+                    lines3d.push_back(data[i]);
+            }
+            else if(type == GL_TRIANGLES)
+            {
+                for(int i = 0; i < num; i++)
+                    triangles3d.push_back(data[i]);
+            }
+            else
+                assert(false);
+        }
+        else
+            assert(false);
+
+        //Loop round
+        //if(curBuf < NUM_BUFS - 1)
+        //    curBuf++;
+        //else
+        //    curBuf = 0;
+
+        //glBindBuffer(GL_ARRAY_BUFFER, vertBuf[curBuf]);
+        //glBufferData(GL_ARRAY_BUFFER, len, data, GL_STREAM_DRAW);
+
+        //glBindVertexArray(vertArray[curBuf]);
+        ////if(numPer != curNumPer) //Flip-flop this. Kinda mad hacky but whatevs
+        ////{
+        //    //glVertexAttribPointer(0, numPer, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
+        //    //curNumPer = numPer;
+        ////}
+        //glDrawArrays(type, 0, count);
+        //glBindVertexArray(0);
     }
 #endif
 
     void init(int programId)
     {
         program = programId;
-        model.reserve(MAX_COUNT);
-        view.reserve(MAX_COUNT);
-        projection.reserve(MAX_COUNT);
+        //model.reserve(MAX_COUNT);
+        //view.reserve(MAX_COUNT);
+        //projection.reserve(MAX_COUNT);
+        triangles2d.reserve(MAX_COUNT);
+        lines2d.reserve(MAX_COUNT);
+        points2d.reserve(MAX_COUNT);
+        triangles3d.reserve(MAX_COUNT);
+        lines3d.reserve(MAX_COUNT);
 
         modelId = glGetUniformLocation(programId, "model");
         viewId = glGetUniformLocation(programId, "view");
         projectionId = glGetUniformLocation(programId, "projection");
 #ifdef _DEBUG
-        glGenVertexArrays(1, &vertArray);
-        glBindVertexArray(vertArray);
-        glGenBuffers(1, &vertBuf);
+        glGenVertexArrays(NUM_BUFS, vertArray);
+        for(int i = 0; i < NUM_BUFS; i++)
+        {
+            glBindVertexArray(vertArray[i]);
+            glGenBuffers(1, &vertBuf[i]);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
-        glBufferData(GL_ARRAY_BUFFER, MAX_COUNT * sizeof(float), NULL, GL_STREAM_DRAW);
-        glEnableVertexAttribArray(0);   //Assumes position is at attribute location 0 in the debug shader
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
+            glBindBuffer(GL_ARRAY_BUFFER, vertBuf[i]);
+            glBufferData(GL_ARRAY_BUFFER, MAX_COUNT * sizeof(float), NULL, GL_STREAM_DRAW);
+            glEnableVertexAttribArray(0);   //Assumes position is at attribute location 0 in the debug shader
+            //First three bufs are 2, last two are 3
+            glVertexAttribPointer(0, (i < 3)?(2):(3), GL_FLOAT, GL_FALSE, 0, (void*)0);   //Assumes position is at attribute location 0 in the debug shader
+        }
         glBindVertexArray(0);
 #endif
     }
@@ -79,9 +141,66 @@ namespace Draw
     void shutdown()
     {
 #ifdef _DEBUG
-        glDeleteVertexArrays(1, &vertArray);
-        glDeleteBuffers(1, &vertBuf);
+        glDeleteVertexArrays(NUM_BUFS, vertArray);
+        glDeleteBuffers(NUM_BUFS, vertBuf);
 #endif
 
+    }
+
+    void flush()
+    {
+#ifdef _DEBUG
+        //Make sure we don't go over bounds
+        assert(triangles2d.size() <= MAX_COUNT);
+        assert(lines2d.size() <= MAX_COUNT);
+        assert(points2d.size() <= MAX_COUNT);
+        assert(triangles3d.size() <= MAX_COUNT);
+        assert(lines3d.size() <= MAX_COUNT);
+
+        //Draw 2d triangles
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf[0]);
+        glBufferData(GL_ARRAY_BUFFER, triangles2d.size() * sizeof(float), triangles2d.data(), GL_STREAM_DRAW);
+        glBindVertexArray(vertArray[0]);
+        assert(triangles2d.size() % 2 == 0);
+        glDrawArrays(GL_TRIANGLES, 0, triangles2d.size() / 2);
+
+        //Draw 2d lines
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf[1]);
+        glBufferData(GL_ARRAY_BUFFER, lines2d.size() * sizeof(float), lines2d.data(), GL_STREAM_DRAW);
+        glBindVertexArray(vertArray[1]);
+        assert(lines2d.size() % 2 == 0);
+        glDrawArrays(GL_LINES, 0, lines2d.size() / 2);
+
+        //Draw 2d points
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf[2]);
+        glBufferData(GL_ARRAY_BUFFER, points2d.size() * sizeof(float), points2d.data(), GL_STREAM_DRAW);
+        glBindVertexArray(vertArray[2]);
+        assert(points2d.size() % 2 == 0);
+        glDrawArrays(GL_POINTS, 0, points2d.size() / 2);
+
+        //Draw 3d triangles
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf[3]);
+        glBufferData(GL_ARRAY_BUFFER, triangles3d.size() * sizeof(float), triangles3d.data(), GL_STREAM_DRAW);
+        glBindVertexArray(vertArray[3]);
+        assert(triangles3d.size() % 3 == 0);
+        glDrawArrays(GL_TRIANGLES, 0, triangles3d.size() / 3);
+
+        //Draw 3d lines
+        glBindBuffer(GL_ARRAY_BUFFER, vertBuf[4]);
+        glBufferData(GL_ARRAY_BUFFER, lines3d.size() * sizeof(float), lines3d.data(), GL_STREAM_DRAW);
+        glBindVertexArray(vertArray[4]);
+        assert(lines3d.size() % 3 == 0);
+        glDrawArrays(GL_LINES, 0, lines3d.size() / 3);
+
+        //Done
+        glBindVertexArray(0);
+
+        //Clear
+        triangles2d.clear();
+        lines2d.clear();
+        points2d.clear();
+        triangles3d.clear();
+        lines3d.clear();
+#endif
     }
 }
