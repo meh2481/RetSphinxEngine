@@ -89,6 +89,12 @@ namespace Draw
     void init(int programId)
     {
         program = programId;
+
+        modelId = glGetUniformLocation(programId, "model");
+        viewId = glGetUniformLocation(programId, "view");
+        projectionId = glGetUniformLocation(programId, "projection");
+
+#ifdef _DEBUG
         //model.reserve(MAX_COUNT);
         //view.reserve(MAX_COUNT);
         //projection.reserve(MAX_COUNT);
@@ -98,10 +104,6 @@ namespace Draw
         triangles3d.reserve(MAX_COUNT);
         lines3d.reserve(MAX_COUNT);
 
-        modelId = glGetUniformLocation(programId, "model");
-        viewId = glGetUniformLocation(programId, "view");
-        projectionId = glGetUniformLocation(programId, "projection");
-#ifdef _DEBUG
         glGenVertexArrays(NUM_BUFS, vertArray);
         for(int i = 0; i < NUM_BUFS; i++)
         {

@@ -318,6 +318,7 @@ void Engine::_render()
     if(drawDebugUI())
         ImGui::Render();
 #endif
+    Draw::flush();
 
     //End rendering and update the screen
     SDL_GL_SwapWindow(m_Window);
@@ -344,7 +345,6 @@ void Engine::drawDebug()
         m_physicsWorld->DrawDebugData();
     if(m_bSoundDebugDraw)
         getSoundManager()->drawDebug(m_debugDraw);
-    Draw::flush();
 #endif // _DEBUG
 }
 
