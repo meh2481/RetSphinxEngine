@@ -93,12 +93,12 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
 
 void Object3D::render(RenderState renderState)
 {
-    assert(m_tex);
-    assert(num > 0);
+    //assert(m_tex);
+    //assert(num > 0);
 
-    m_renderState->model = renderState.model;
-    m_renderState->projection = renderState.projection;
-    m_renderState->view = renderState.view;
+    //m_renderState->model = renderState.model;
+    //m_renderState->projection = renderState.projection;
+    //m_renderState->view = renderState.view;
 
     //glUseProgram(m_renderState->programId);
 

@@ -13,7 +13,7 @@ DebugDraw::DebugDraw(RenderState renderState)
 {
     m_renderState = renderState;
     //m_colorUniformId = glGetUniformLocation(m_renderState.programId, "col");
-    assert(m_colorUniformId >= 0);
+    //assert(m_colorUniformId >= 0);
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
