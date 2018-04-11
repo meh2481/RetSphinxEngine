@@ -137,4 +137,4 @@ source_group("managers" FILES ${engine_manager_src})
 source_group("actions" FILES ${engine_actions_src})
 
 add_library(engine ${engine_src} ${engine_events_src} ${engine_sound_src} ${engine_manager_src} ${engine_actions_src})
-target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY} ${FMOD_LIBRARIES})
+target_link_libraries(engine imgui lua53 io net ${BOX2D_LIBRARY} ${SDL2_LIBRARY} ${FMOD_LIBRARIES} ${Vulkan_LIBRARIES})
