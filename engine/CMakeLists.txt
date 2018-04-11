@@ -58,7 +58,8 @@ SystemUtils.cpp
 SystemUtils.h
 Text.cpp
 Text.h
-vulkan.cpp
+VulkanInterface.cpp
+VulkanInterface.h
 Quad.h
 Quad.cpp
 )
