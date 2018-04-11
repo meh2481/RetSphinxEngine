@@ -1,5 +1,5 @@
-// ImGui SDL2 binding with OpenGL
-// You can copy and use unmodified imgui_impl_* files in your project. 
+// ImGui SDL2 binding with Vulkan
+// You can copy and use unmodified imgui_impl_* files in your project.
 // If you use this binding you'll need to call 4 functions: ImGui_ImplXXXX_Init(), ImGui_ImplXXXX_NewFrame(), ImGui::Render() and ImGui_ImplXXXX_Shutdown().
 // See main.cpp for an example of using this.
 // https://github.com/ocornut/imgui
@@ -89,14 +89,13 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFile)
     io.KeyMap[ImGuiKey_X] = SDLK_x;
     io.KeyMap[ImGuiKey_Y] = SDLK_y;
     io.KeyMap[ImGuiKey_Z] = SDLK_z;
-    
-    // FIXME: use GL2 if GL3 fails (on OSX?)
-    io.RenderDrawListsFn = ImGui_Impl_GL3_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
+
+    io.RenderDrawListsFn = ImGui_Impl_Vulkan_RenderDrawLists;   // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
     io.SetClipboardTextFn = ImGui_ImplSdl_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplSdl_GetClipboardText;
 
     io.IniFilename = cIniFile;
-    
+
 #ifdef _WIN32
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
@@ -109,11 +108,12 @@ bool    ImGui_ImplSdl_Init(SDL_Window *window, const char* cIniFile)
 
 void ImGui_ImplSdl_NewFrame(SDL_Window *window)
 {
-    void *glctx = SDL_GL_GetCurrentContext();
-    ImGui_Impl_GL3_SwitchContext(glctx);
+    //TODO
+    void *glctx = NULL;// SDL_GL_GetCurrentContext();
+    ImGui_Impl_Vulkan_SwitchContext(glctx);
 
     if (!g_imgui_FontTexture)
-        ImGui_Impl_GL3_CreateDeviceObjects();
+        ImGui_Impl_Vulkan_CreateDeviceObjects();
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -136,7 +136,7 @@ void ImGui_ImplSdl_NewFrame(SDL_Window *window)
         io.MousePos = ImVec2((float)mx, (float)my);   // Mouse position, in pixels (set to -1,-1 if no mouse / on another screen, etc.)
     else
         io.MousePos = ImVec2(-1,-1);
-   
+
     io.MouseDown[0] = g_MousePressed[0] || (mouseMask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;        // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
     io.MouseDown[1] = g_MousePressed[1] || (mouseMask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     io.MouseDown[2] = g_MousePressed[2] || (mouseMask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;

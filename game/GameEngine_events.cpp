@@ -3,9 +3,6 @@
 #include <climits>
 #include <iomanip>
 #include "Logger.h"
-#include <SDL_opengl.h>
-#include "stb_image_write.h"
-#include <SDL_thread.h>
 #include <sstream>
 #include "DebugUI.h"
 #include "ResourceLoader.h"
@@ -23,30 +20,6 @@ typedef struct
     unsigned char* pixels;
     std::string filename;
 } printscreenData;
-
-static int saveScreenshot(void *ptr)
-{
-    printscreenData* ps = (printscreenData*)ptr;
-    unsigned char* line_tmp = new unsigned char[3 * ps->w];
-    unsigned char* line_a = ps->pixels;
-    unsigned char* line_b = ps->pixels + (3 * ps->w * (ps->h - 1));
-    while(line_a < line_b)
-    {
-        memcpy(line_tmp, line_a, ps->w * 3);
-        memcpy(line_a, line_b, ps->w * 3);
-        memcpy(line_b, line_tmp, ps->w * 3);
-        line_a += ps->w * 3;
-        line_b -= ps->w * 3;
-    }
-
-    LOG(INFO) << "Saving screenshot " << ps->filename;
-    if(!stbi_write_png(ps->filename.c_str(), ps->w, ps->h, 3, ps->pixels, ps->w * 3))
-        LOG(WARN) << "stbi_write_png error while saving screenshot";
-    delete[] ps->pixels;
-    delete[] line_tmp;
-    delete ps;
-    return 0;
-}
 
 
 void GameEngine::handleEvent(SDL_Event event)
@@ -75,38 +48,6 @@ void GameEngine::handleEvent(SDL_Event event)
                 case SDL_SCANCODE_ESCAPE:
                     quit();
                     break;
-
-                case SDL_SCANCODE_PRINTSCREEN:
-                {
-                    //Save screenshot of current OpenGL window (example from https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl)
-                    time_t t = time(0);   // get time now
-                    struct tm * now = localtime(&t);
-
-                    //Create filename that we'll save this as
-                    std::ostringstream ssfile;
-                    ssfile << getSaveLocation() << "Screenshot "
-                           << now->tm_mon + 1 << '-' << now->tm_mday << '-' << now->tm_year + 1900 << ' '
-                           << now->tm_hour << '.' << std::setw(2) << std::setfill('0') << now->tm_min << '.' << std::setw(2) << std::setfill('0') << now->tm_sec << ',' << SDL_GetTicks() << ".png";
-
-                    uint16_t w = getWidth();
-                    uint16_t h = getHeight();
-
-                    //Copied whatever this guy did: https://github.com/ocornut/imgui/wiki/screenshot_tool
-                    unsigned char* pixels = new unsigned char[3 * w * h];
-                    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-                    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-                    //Spawn a new thread to handle saving the screenshot, since it's slow
-                    printscreenData* dat = new printscreenData;
-                    dat->w = w;
-                    dat->h = h;
-                    dat->pixels = pixels;
-                    dat->filename = ssfile.str();
-                    if(!SDL_CreateThread(saveScreenshot, "saveScreenshot", (void *)dat))
-                        LOG(WARN) << "Could not create thread to save screenshot.";
-
-                    break;
-                }
 
                 case SDL_SCANCODE_RETURN:    //Alt-Enter toggles fullscreen
                     if(getInputManager()->keyDown(SDL_SCANCODE_ALT))

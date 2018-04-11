@@ -9,7 +9,7 @@ DebugDraw.h
 DebugDraw.cpp
 Engine.cpp
 Engine.h
-Engine_GL.cpp
+Engine_Vulkan.cpp
 Engine_Window.cpp
 EngineContactListener.cpp
 EngineContactListener.h
@@ -19,8 +19,7 @@ HeadTracker.cpp
 HeadTracker.h
 ImgFont.cpp
 ImgFont.h
-#imgui_impl_opengl2.cpp
-imgui_impl_opengl3.cpp
+imgui_impl_vulkan.cpp
 imgui_impl_sdl.cpp
 imgui_impl_sdl.h
 InputDevice.cpp
@@ -42,11 +41,6 @@ Object3D.cpp
 Object3D.h
 ObjSegment.h
 ObjSegment.cpp
-opengl-api.cpp
-opengl-api.h
-opengl-stubs.h
-OpenGLShader.cpp
-OpenGLShader.h
 ParticleSystem.cpp
 ParticleSystem.h
 PointQueryCallback.h
@@ -64,6 +58,7 @@ SystemUtils.cpp
 SystemUtils.h
 Text.cpp
 Text.h
+vulkan.cpp
 Quad.h
 Quad.cpp
 )

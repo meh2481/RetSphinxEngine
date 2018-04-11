@@ -4,11 +4,9 @@
 */
 
 #include "ParticleSystem.h"
-#include "opengl-api.h"
 #include "tinyxml2.h"
 #include "Logger.h"
 #include "Random.h"
-#include "OpenGLShader.h"
 #include "Quad.h"
 
 ParticleSystem::ParticleSystem(RenderState* shader)
@@ -48,14 +46,14 @@ ParticleSystem::ParticleSystem(RenderState* shader)
 
     //Init opengl stuff
     m_shader = shader;
-    m_posAttrib = glGetAttribLocation(shader->programId, "position");
-    m_colorAttrib = glGetAttribLocation(shader->programId, "color");
-    m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
-    modelId = glGetUniformLocation(shader->programId, "model");
-    viewId = glGetUniformLocation(shader->programId, "view");
-    projectionId = glGetUniformLocation(shader->programId, "projection");
+    //m_posAttrib = glGetAttribLocation(shader->programId, "position");
+    //m_colorAttrib = glGetAttribLocation(shader->programId, "color");
+    //m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
+    //modelId = glGetUniformLocation(shader->programId, "model");
+    //viewId = glGetUniformLocation(shader->programId, "view");
+    //projectionId = glGetUniformLocation(shader->programId, "projection");
 
-    glGenVertexArrays(1, &vertArray);
+    //glGenVertexArrays(1, &vertArray);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -67,10 +65,10 @@ ParticleSystem::~ParticleSystem()
     }
 
     //Delete VBOs
-    glDeleteVertexArrays(1, &vertArray);
-    glDeleteBuffers(1, &posBuffer);
-    glDeleteBuffers(1, &colorBuffer);
-    glDeleteBuffers(1, &texBuffer);
+    //glDeleteVertexArrays(1, &vertArray);
+    //glDeleteBuffers(1, &posBuffer);
+    //glDeleteBuffers(1, &colorBuffer);
+    //glDeleteBuffers(1, &texBuffer);
 }
 
 void ParticleSystem::_deleteAll()
@@ -516,58 +514,58 @@ void ParticleSystem::update(float dt)
     }
 
     //Update VBOs
-    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_vertexPtr);
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 24 * sizeof(float), m_colorPtr);
-    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_texCoordPtr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See http://www.opengl.org/wiki/Buffer_Object_Streaming
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_vertexPtr);
+    //glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 24 * sizeof(float), m_colorPtr);
+    //glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, m_num * 12 * sizeof(float), m_texCoordPtr);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleSystem::draw(const RenderState& renderState)
 {
     assert(img);
 
-    switch(blend)
-    {
-        case ADDITIVE:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            break;
+    //switch(blend)
+    //{
+    //    case ADDITIVE:
+    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    //        break;
 
-        case NORMAL:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            break;
+    //    case NORMAL:
+    //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //        break;
 
-        case SUBTRACTIVE:
-            //TODO This is incorrect
-            glBlendFunc(GL_DST_COLOR, GL_ONE);
-            break;
-    }
+    //    case SUBTRACTIVE:
+    //        //TODO This is incorrect
+    //        glBlendFunc(GL_DST_COLOR, GL_ONE);
+    //        break;
+    //}
 
-    glUseProgram(m_shader->programId);
+    //glUseProgram(m_shader->programId);
 
-    glUniformMatrix4fv(modelId, 1, false, &renderState.model[0][0]);
-    glUniformMatrix4fv(viewId, 1, false, &renderState.view[0][0]);
-    glUniformMatrix4fv(projectionId, 1, false, &renderState.projection[0][0]);
+    //glUniformMatrix4fv(modelId, 1, false, &renderState.model[0][0]);
+    //glUniformMatrix4fv(viewId, 1, false, &renderState.view[0][0]);
+    //glUniformMatrix4fv(projectionId, 1, false, &renderState.projection[0][0]);
 
-    //Render everything in one pass
-    glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
+    ////Render everything in one pass
+    //glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture
 
-    //glVertexAttribDivisor(m_posAttrib, 0);
-    //glVertexAttribDivisor(m_texAttrib, 0);
-    //glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
+    ////glVertexAttribDivisor(m_posAttrib, 0);
+    ////glVertexAttribDivisor(m_texAttrib, 0);
+    ////glDrawArraysInstanced(GL_QUADS, 0, 4, m_num);
 
-    glBindVertexArray(vertArray);
-    //glVertexAttribDivisor(m_colorAttrib, 2);
-    glDrawArrays(GL_TRIANGLES, 0, m_num * 6);
-    glBindVertexArray(0);
+    //glBindVertexArray(vertArray);
+    ////glVertexAttribDivisor(m_colorAttrib, 2);
+    //glDrawArrays(GL_TRIANGLES, 0, m_num * 6);
+    //glBindVertexArray(0);
 
-    glUseProgram(renderState.programId);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glUseProgram(renderState.programId);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void ParticleSystem::init()
@@ -601,28 +599,28 @@ void ParticleSystem::init()
     m_colorPtr = new float[m_totalAmt * 24];    //4 per vertex
 
     //Gen VBOs
-    glBindVertexArray(vertArray);
+    //glBindVertexArray(vertArray);
 
-    glGenBuffers(1, &posBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(m_posAttrib);
-    glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    //glGenBuffers(1, &posBuffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
+    //glEnableVertexAttribArray(m_posAttrib);
+    //glVertexAttribPointer(m_posAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glGenBuffers(1, &colorBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(m_colorAttrib);
-    glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    //glGenBuffers(1, &colorBuffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 24 * sizeof(float), NULL, GL_STREAM_DRAW);
+    //glEnableVertexAttribArray(m_colorAttrib);
+    //glVertexAttribPointer(m_colorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glGenBuffers(1, &texBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(m_texAttrib);
-    glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    //glGenBuffers(1, &texBuffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    //glBufferData(GL_ARRAY_BUFFER, m_totalAmt * 12 * sizeof(float), NULL, GL_STREAM_DRAW);
+    //glEnableVertexAttribArray(m_texAttrib);
+    //glVertexAttribPointer(m_texAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindVertexArray(0);
 }
 
 

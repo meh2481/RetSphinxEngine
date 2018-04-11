@@ -1,5 +1,4 @@
 #include "RenderState.h"
-#include "opengl-api.h"
 
 //void RenderState::apply() const
 //{

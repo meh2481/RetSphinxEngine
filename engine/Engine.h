@@ -73,7 +73,7 @@ private:
     bool m_bSteppingPhysics;
 #endif
 
-    //OpenGL stuff
+    //Render states, which will prolly change
     RenderState m_renderState;
     RenderState m_3dShader;
     RenderState m_particleShader;
@@ -94,7 +94,8 @@ private:
     void _render();
 
     void setup_sdl();
-    void setup_opengl();
+    void setup_vulkan();
+    void teardown_vulkan();
     void _loadicon();                    //Load icon and set window to have said icon
 
     bool _processEvent(SDL_Event& e);    //Engine-specific handling of events
@@ -133,7 +134,7 @@ public:
     void drawDebug();
 
     //Window functions - engine_window.cpp
-    void changeScreenResolution(int w, int h);  //Change resolution mid-game and reload OpenGL textures as needed
+    void changeScreenResolution(int w, int h);  //Change resolution mid-game
     //void toggleFullscreen();                            //Switch between fullscreen/windowed modes
     void setFullscreen(bool bFullscreen);                //Set fullscreen to true or false as needed
     void setInitialFullscreen() { SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP); };
@@ -185,7 +186,7 @@ public:
     void setFramerate(float fFramerate);
     float getFramerate() { return m_fFramerate; };
 
-    //OpenGL methods
+    //Renderer config methods
     void setDoubleBuffered(bool bDoubleBuffered);
     bool getDoubleBuffered();
     void setVsync(int iVsync);

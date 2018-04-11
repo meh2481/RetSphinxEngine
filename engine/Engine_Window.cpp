@@ -13,8 +13,8 @@ void Engine::changeScreenResolution(int w, int h)
 
     SDL_SetWindowSize(m_Window, m_iWidth, m_iHeight);
 
-    //Set OpenGL back up
-    setup_opengl();
+    //TODO: Update vulkan
+    //setup_vulkan();
 }
 
 void Engine::setFullscreen(bool bFullscreen)

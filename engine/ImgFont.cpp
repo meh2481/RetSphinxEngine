@@ -1,7 +1,6 @@
 #include "ImgFont.h"
 #include "Logger.h"
 #include "Quad.h"
-#include "SDL_opengl.h"
 #include <cstring>
 #include <cstdlib>
 
@@ -50,7 +49,7 @@ uint32_t ImgFont::getIndex(uint32_t codepoint)
 void ImgFont::renderChar(Vec2 drawSz, Vec2 offset, float* rect)
 {
     //TODO Store vertex data & don't re-send this to the gfx card every frame
-    assert(false);  //Not implemented yet for modern OpenGL
+    assert(false);  //Not implemented yet for Vulkan
     //Rect rc(
     //    -drawSz.x / 2.0f + offset.x,
     //    drawSz.y / 2.0f + offset.y,
@@ -102,7 +101,7 @@ uint32_t ImgFont::getNextCodepoint(const char** strpos)
 void ImgFont::renderString(const char* str, float drawPt, Vec2 drawOffset)
 {
     float fac = (float)img->tex.width / (float)img->tex.height;
-    glBindTexture(GL_TEXTURE_2D, img->tex.tex);
+    //glBindTexture(GL_TEXTURE_2D, img->tex.tex);
     const char* strptr = str;
     while(*strptr)
     {

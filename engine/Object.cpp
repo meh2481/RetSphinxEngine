@@ -5,7 +5,6 @@
 
 #include "Object.h"
 #include "LuaFuncs.h"
-#include "opengl-api.h"
 #include "Quad.h"
 #include "ObjSegment.h"
 

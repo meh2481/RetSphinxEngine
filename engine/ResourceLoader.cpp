@@ -891,9 +891,9 @@ Image* ResourceLoader::loadImageFromFile(const std::string& filename)
     int height = 0;
     unsigned char* cBuf = stbi_load(filename.c_str(), &width, &height, &comp, 0);
 
-    int mode = GL_RGBA;     // RGBA 32bit
+    int mode = STBI_rgb_alpha;     // RGBA 32bit
     if(comp == STBI_rgb) // RGB 24bit
-        mode = GL_RGB;
+        mode = STBI_rgb;
 
     if((cBuf == 0) || (width == 0) || (height == 0))
     {
@@ -943,16 +943,16 @@ Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, un
     tex->height = height;
 
     //generate an OpenGL texture ID for this texture
-    glGenTextures(1, &tex->tex);
-    //bind to the new texture ID
-    glBindTexture(GL_TEXTURE_2D, tex->tex);
-    //store the texture data for OpenGL use
-    if(mode == GL_RGB || mode == GL_RGBA)
-        glTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, mode, GL_UNSIGNED_BYTE, data);
-    else    //Compressed image data
-        glCompressedTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, len, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glGenTextures(1, &tex->tex);
+    ////bind to the new texture ID
+    //glBindTexture(GL_TEXTURE_2D, tex->tex);
+    ////store the texture data for OpenGL use
+    //if(mode == GL_RGB || mode == GL_RGBA)
+    //    glTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, mode, GL_UNSIGNED_BYTE, data);
+    //else    //Compressed image data
+    //    glCompressedTexImage2D(GL_TEXTURE_2D, 0, mode, tex->width, tex->height, 0, len, data);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     return tex;
 }

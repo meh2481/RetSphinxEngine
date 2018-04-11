@@ -3,7 +3,6 @@
     Copyright (c) 2017 Mark Hutcheson
 */
 #include "ObjSegment.h"
-#include "opengl-api.h"
 #include "Quad.h"
 #include "Object3D.h"
 #include <Box2D/Box2D.h>
@@ -41,16 +40,16 @@ void ObjSegment::draw(RenderState renderState)
         {
             renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
 
-            glEnable(GL_CULL_FACE);
+            //glEnable(GL_CULL_FACE);
             obj3D->render(renderState);
-            glDisable(GL_CULL_FACE);
+            //glDisable(GL_CULL_FACE);
         }
         else if(img != NULL)
         {
-            glUseProgram(renderState.programId);
-            glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
-            glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
-            glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+            //glUseProgram(renderState.programId);
+            //glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
+            //glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
+            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
 
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
@@ -90,16 +89,16 @@ void ObjSegment::draw(RenderState renderState)
         {
             renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
 
-            glEnable(GL_CULL_FACE);
+            //glEnable(GL_CULL_FACE);
             obj3D->render(renderState);
-            glDisable(GL_CULL_FACE);
+            //glDisable(GL_CULL_FACE);
         }
         else if(img != NULL)
         {
-            glUseProgram(renderState.programId);
-            glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
-            glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
-            glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+            //glUseProgram(renderState.programId);
+            //glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
+            //glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
+            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
 
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;

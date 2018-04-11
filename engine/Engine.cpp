@@ -5,7 +5,6 @@
 #include <SDL_syswm.h>
 #include "Engine.h"
 #include "Box2D/Box2D.h"
-#include "opengl-api.h"
 #include "Logger.h"
 #include "Random.h"
 #include "imgui/imgui.h"
@@ -94,9 +93,9 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 
     //Init renderer
-    LOG(DBG) << "Init SDL/OpenGL";
+    LOG(DBG) << "Init SDL/Vulkan";
     setup_sdl();
-    setup_opengl();
+    setup_vulkan();
 
 #ifdef _DEBUG
     LOG(DBG) << "Create debug draw";
@@ -111,9 +110,10 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     //Init ImGUI
     ImGui_ImplSdl_Init(m_Window, sIniFile.c_str());
 
-    void *glctx = SDL_GL_GetCurrentContext();
-    ImGui_Impl_GL3_SwitchContext(glctx);
-    ImGui_Impl_GL3_CreateDeviceObjects();
+    //TODO
+    void *glctx = NULL;// SDL_GL_GetCurrentContext();
+    ImGui_Impl_Vulkan_SwitchContext(glctx);
+    ImGui_Impl_Vulkan_CreateDeviceObjects();
 }
 
 Engine::~Engine()
@@ -131,12 +131,10 @@ Engine::~Engine()
     Draw::shutdown();
 
     //Clean up ImGui
-    ImGui_Impl_GL3_Shutdown();
+    ImGui_Impl_Vulkan_Shutdown();
 
-    glDeleteProgram(m_renderState.programId);
-#ifdef _DEBUG
-    glDeleteProgram(m_debugRenderState.programId);
-#endif
+    //Clean up vulkan
+    teardown_vulkan();
 
     //Clean up SDL
     SDL_DestroyWindow(m_Window);
@@ -303,12 +301,6 @@ bool Engine::_frame()
 
 void Engine::_render()
 {
-    // Begin rendering by clearing the screen
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glClear(GL_COLOR_BUFFER_BIT);    //TODO: Determine if we should do this every frame, or what default color should be
-
-    glUseProgram(m_renderState.programId);
-
     // Game-specific drawing
     draw(m_renderState);
 
@@ -319,9 +311,6 @@ void Engine::_render()
         ImGui::Render();
 #endif
     Draw::flush();
-
-    //End rendering and update the screen
-    SDL_GL_SwapWindow(m_Window);
 }
 
 
@@ -329,18 +318,6 @@ void Engine::drawDebug()
 {
 #ifdef _DEBUG
     // Draw physics debug stuff
-    if(m_bDebugDraw || m_bSoundDebugDraw)
-    {
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m_debugRenderState.projection = m_renderState.projection;
-        m_debugRenderState.view = m_renderState.view;
-        m_debugRenderState.model = glm::mat4(1.0f);
-        glUseProgram(m_debugRenderState.programId);
-        glUniformMatrix4fv(debugModelId, 1, false, &m_debugRenderState.model[0][0]);
-        glUniformMatrix4fv(debugViewId, 1, false, &m_debugRenderState.view[0][0]);
-        glUniformMatrix4fv(debugProjectionId, 1, false, &m_debugRenderState.projection[0][0]);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
     if(m_bDebugDraw)
         m_physicsWorld->DrawDebugData();
     if(m_bSoundDebugDraw)
@@ -362,30 +339,7 @@ void Engine::setFramerate(float fFramerate)
 void Engine::setMSAA(int iMSAA)
 {
     m_iMSAA = iMSAA;
-    if(iMSAA)
-    {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, iMSAA);
-        glEnable(GL_MULTISAMPLE);
-
-        // Enable OpenGL antialiasing stuff
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-        glEnable(GL_LINE_SMOOTH);
-        glEnable(GL_POLYGON_SMOOTH);
-    }
-    else
-    {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-        glDisable(GL_MULTISAMPLE);
-
-        // Disable OpenGL antialiasing stuff
-        glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
-        glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-        glDisable(GL_LINE_SMOOTH);
-        glDisable(GL_POLYGON_SMOOTH);
-    }
+    //TODO
 }
 
 void Engine::_loadicon()    //Load icon into SDL window
@@ -536,25 +490,29 @@ void Engine::stepPhysics(float dt)
 
 void Engine::setDoubleBuffered(bool bDoubleBuffered)
 {
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);
+    //TODO
+    //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, bDoubleBuffered);
 }
 
 bool Engine::getDoubleBuffered()
 {
     int val = 1;
-    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
+    //TODO
+    //SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &val);
     return !!val;
 }
 
 void Engine::setVsync(int iVsync)
 {
-    if(SDL_GL_SetSwapInterval(iVsync) == -1)
-        SDL_GL_SetSwapInterval(1); //Default to vsync on if this fails
+    //TODO
+    //if(SDL_GL_SetSwapInterval(iVsync) == -1)
+    //    SDL_GL_SetSwapInterval(1); //Default to vsync on if this fails
 }
 
 int Engine::getVsync()
 {
-    return SDL_GL_GetSwapInterval();
+    //TODO
+    return 1;// SDL_GL_GetSwapInterval();
 }
 
 void Engine::setGravity(Vec2 ptGravity)

@@ -4,7 +4,6 @@
 */
 
 #include "Arc.h"
-#include "opengl-api.h"
 #include "Object.h"
 #include "Random.h"
 #include <cstdlib>

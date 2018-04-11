@@ -6,7 +6,6 @@
 #include "GameEngine.h"
 #include <float.h>
 #include <sstream>
-#include "opengl-api.h"
 #include "DebugUI.h"
 #include "ResourceLoader.h"
 #include "EntityManager.h"
@@ -147,8 +146,8 @@ const double CAMERA_ANGLE_RAD = glm::radians(60.0);
 void GameEngine::draw(RenderState& renderState)
 {
     //Clear bg (not done with OpenGL funcs, cause of weird black frame glitch when loading stuff)
-    glDisable(GL_CULL_FACE);    //Draw both sides of 2D objects (So we can flip images for free)
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glDisable(GL_CULL_FACE);    //Draw both sides of 2D objects (So we can flip images for free)
+    //glClear(GL_DEPTH_BUFFER_BIT);
 
     //Draw debug UI
     m_debugUI->draw();
@@ -171,11 +170,11 @@ void GameEngine::draw(RenderState& renderState)
     renderState.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, m_fDefCameraZ));
     if(m_debugUI->particleEditor->open && m_debugUI->visible)
     {
-        glClear(GL_DEPTH_BUFFER_BIT);
-        Color col = m_debugUI->particleEditor->particleBgColor;
-        glClearColor(col.r, col.g, col.b, col.a);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+        //Color col = m_debugUI->particleEditor->particleBgColor;
+        //glClearColor(col.r, col.g, col.b, col.a);
+        //glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
         m_debugUI->particleEditor->particles->draw(renderState);
     }
     renderState.view = view;

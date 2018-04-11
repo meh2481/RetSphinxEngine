@@ -4,10 +4,8 @@
 */
 #include "Object3D.h"
 #include <assert.h>
-#include "opengl-api.h"
 #include "ResourceTypes.h"
 #include "Quad.h"
-#include "SDL_opengl.h"
 #include "RenderState.h"
 
 Object3D::Object3D(unsigned char* data, Image* tex, RenderState* renderState)
@@ -16,16 +14,16 @@ Object3D::Object3D(unsigned char* data, Image* tex, RenderState* renderState)
     m_tex = tex->tex.tex;
     m_renderState = renderState;
 
-    modelId = glGetUniformLocation(renderState->programId, "model");
-    viewId = glGetUniformLocation(renderState->programId, "view");
-    projectionId = glGetUniformLocation(renderState->programId, "projection");
+    //modelId = glGetUniformLocation(renderState->programId, "model");
+    //viewId = glGetUniformLocation(renderState->programId, "view");
+    //projectionId = glGetUniformLocation(renderState->programId, "projection");
 
     _fromData(data, tex);
 }
 
 Object3D::~Object3D()
 {
-    glDeleteBuffers(1, &vertBuf);
+    //glDeleteBuffers(1, &vertBuf);
 }
 
 void Object3D::_fromData(unsigned char* data, Image* tex)
@@ -58,36 +56,36 @@ void Object3D::_fromData(unsigned char* data, Image* tex)
     }
 
     //Gen vertex buffer
-    GLint position = glGetAttribLocation(m_renderState->programId, "position");
-    GLint texcoord = glGetAttribLocation(m_renderState->programId, "texcoord");
-    GLint normal = glGetAttribLocation(m_renderState->programId, "normal");
+    //GLint position = glGetAttribLocation(m_renderState->programId, "position");
+    //GLint texcoord = glGetAttribLocation(m_renderState->programId, "texcoord");
+    //GLint normal = glGetAttribLocation(m_renderState->programId, "normal");
 
-    glGenVertexArrays(1, &vertArray);
-    glBindVertexArray(vertArray);
-    glGenBuffers(1, &vertBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
-    glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
+    //glGenVertexArrays(1, &vertArray);
+    //glBindVertexArray(vertArray);
+    //glGenBuffers(1, &vertBuf);
+    //glBindBuffer(GL_ARRAY_BUFFER, vertBuf);
+    //glBufferData(GL_ARRAY_BUFFER, len, bufferData, GL_STATIC_DRAW);
 
-    if(position >= 0)
-    {
-        glEnableVertexAttribArray(position);
-        glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 0, (void*)vertexPtr);
-    }
+    //if(position >= 0)
+    //{
+    //    glEnableVertexAttribArray(position);
+    //    glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 0, (void*)vertexPtr);
+    //}
 
-    if(texcoord >= 0)
-    {
-        glEnableVertexAttribArray(texcoord);
-        glVertexAttribPointer(texcoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)texCoordPtr);
-    }
+    //if(texcoord >= 0)
+    //{
+    //    glEnableVertexAttribArray(texcoord);
+    //    glVertexAttribPointer(texcoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)texCoordPtr);
+    //}
 
-    if(normal >= 0) //This can be -1, since for now the variable is compiled out
-    {
-        glEnableVertexAttribArray(normal);
-        glVertexAttribPointer(normal, 3, GL_FLOAT, GL_FALSE, 0, (void*)normalPtr);
-    }
+    //if(normal >= 0) //This can be -1, since for now the variable is compiled out
+    //{
+    //    glEnableVertexAttribArray(normal);
+    //    glVertexAttribPointer(normal, 3, GL_FLOAT, GL_FALSE, 0, (void*)normalPtr);
+    //}
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindVertexArray(0);
 
     //Free buffer data
     free(bufferData);
@@ -102,18 +100,18 @@ void Object3D::render(RenderState renderState)
     m_renderState->projection = renderState.projection;
     m_renderState->view = renderState.view;
 
-    glUseProgram(m_renderState->programId);
+    //glUseProgram(m_renderState->programId);
 
-    glUniformMatrix4fv(modelId, 1, false, &m_renderState->model[0][0]);
-    glUniformMatrix4fv(viewId, 1, false, &m_renderState->view[0][0]);
-    glUniformMatrix4fv(projectionId, 1, false, &m_renderState->projection[0][0]);
+    //glUniformMatrix4fv(modelId, 1, false, &m_renderState->model[0][0]);
+    //glUniformMatrix4fv(viewId, 1, false, &m_renderState->view[0][0]);
+    //glUniformMatrix4fv(projectionId, 1, false, &m_renderState->projection[0][0]);
 
-    glBindTexture(GL_TEXTURE_2D, m_tex);    //Bind texture
+    //glBindTexture(GL_TEXTURE_2D, m_tex);    //Bind texture
 
-    //Set pointers
-    glBindVertexArray(vertArray);
-    glDrawArrays(GL_TRIANGLES, 0, num);    //Render
-    glBindVertexArray(0);
+    ////Set pointers
+    //glBindVertexArray(vertArray);
+    //glDrawArrays(GL_TRIANGLES, 0, num);    //Render
+    //glBindVertexArray(0);
 
-    glUseProgram(renderState.programId);
+    //glUseProgram(renderState.programId);
 }
