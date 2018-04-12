@@ -67,7 +67,6 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 #endif
 
     //Initialize engine stuff
-    m_fAccumulatedTime = 0.0;
     m_bQuitting = false;
     Random::seed(SDL_GetTicks());
     m_fTimeScale = 1.0f;
@@ -151,7 +150,7 @@ void Engine::start()
 {
     // Load all that we need to
     if(init(lCommandLine))
-        while(!_frame());   // Let's rock now!
+        while(!_frame());
 }
 
 bool Engine::_processEvent(SDL_Event& e)
@@ -271,32 +270,25 @@ bool Engine::_frame()
 
     if(m_bPaused || m_bControllerDisconnected)
     {
-        SDL_Delay(100);    //Wait 100 ms until next frame to save CPU
+        //SDL_Delay(100);    //Wait 100 ms until next frame to save CPU
         _render();
         return m_bQuitting;    //Break out here
     }
 
-    float fCurTime = ((float)SDL_GetTicks()) / 1000.0f;
-    if(m_fAccumulatedTime <= fCurTime + m_fTargetTime * 2.0f)
+#ifdef _DEBUG
+    if(!m_bSteppingPhysics || m_bStepFrame)
     {
-        m_fAccumulatedTime += m_fTargetTime;
-#ifdef _DEBUG
-        if(!m_bSteppingPhysics || m_bStepFrame)
-        {
-            m_bStepFrame = false;
+        m_bStepFrame = false;
 #endif
 
-            frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+        frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
 
 #ifdef _DEBUG
-        }
-#endif
     }
-    _render();    //Render at uncapped FPS
+#endif
+    //}
+    _render();    //Vulkan handles our framerate sync
 
-
-    if(m_fAccumulatedTime + m_fTargetTime * 3.0 < fCurTime)    //We've gotten far too behind; we could have a huge FPS jump if the load lessens
-        m_fAccumulatedTime = fCurTime;     //Drop any frames past this
     return m_bQuitting;
 }
 
@@ -333,8 +325,6 @@ void Engine::setFramerate(float fFramerate)
     LOG(TRACE) << "Setting framerate to " << fFramerate;
     if(fFramerate < 60.0)
         fFramerate = 60.0;    //60fps is bare minimum
-    if(m_fFramerate == 0.0)
-        m_fAccumulatedTime = (float)SDL_GetTicks() / 1000.0f;     //If we're stuck at 0fps for a while, this number could be huge, which would cause unlimited fps for a bit
     m_fFramerate = fFramerate;
     m_fTargetTime = 1.0f / m_fFramerate;
 }

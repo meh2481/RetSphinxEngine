@@ -54,7 +54,6 @@ private:
     Vec2 m_ptCursorPos;
     bool  m_bShowCursor;
     float m_fFramerate;
-    float m_fAccumulatedTime;
     float m_fTargetTime;
 
     bool m_bQuitting;   //Stop the game if this turns true
