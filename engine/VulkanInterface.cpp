@@ -1378,7 +1378,7 @@ void VulkanInterface::pickPhysicalDevice()
         LOG(ERR) << "No physical device has Vulkan support";
         assert(false);
     }
-    LOG(ERR) << "Found " << deviceCount << " physical device(s)";
+    LOG(INFO) << "Found " << deviceCount << " physical device(s)";
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -1406,7 +1406,7 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
 {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    LOG(ERR) << "Device name: " << deviceProperties.deviceName;
+    LOG(INFO) << "Device name: " << deviceProperties.deviceName;
 
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);

@@ -268,25 +268,18 @@ bool Engine::_frame()
     if(drawDebugUI())
         ImGui_ImplSdl_NewFrame(m_Window);
 
-    if(m_bPaused || m_bControllerDisconnected)
-    {
-        //SDL_Delay(100);    //Wait 100 ms until next frame to save CPU
-        _render();
-        return m_bQuitting;    //Break out here
-    }
-
 #ifdef _DEBUG
     if(!m_bSteppingPhysics || m_bStepFrame)
     {
         m_bStepFrame = false;
 #endif
-
-        frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
+        if(!m_bPaused && !m_bControllerDisconnected)
+            frame(m_fTargetTime);    //Box2D wants fixed timestep, so we use target framerate here instead of actual elapsed time
 
 #ifdef _DEBUG
     }
 #endif
-    //}
+
     _render();    //Vulkan handles our framerate sync
 
     return m_bQuitting;
