@@ -20,6 +20,7 @@ class InterpolationManager;
 class HeadTracker;
 class EngineContactListener;
 class DebugDraw;
+class VulkanInterface;
 
 #define VELOCITY_ITERATIONS 8
 #define PHYSICS_ITERATIONS 3
@@ -41,6 +42,7 @@ private:
     std::vector<commandlineArg> lCommandLine;
     b2World* m_physicsWorld;
     EngineContactListener* m_clContactListener;
+    VulkanInterface* m_vulkan;
 #ifdef _DEBUG
     DebugDraw* m_debugDraw;
     bool m_bDebugDraw;

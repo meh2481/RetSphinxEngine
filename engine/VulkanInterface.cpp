@@ -1,7 +1,7 @@
 #include "VulkanInterface.h"
 
 #include <SDL.h>
-#include <SDL_vulkan.h>
+//#include <SDL_vulkan.h>
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -30,6 +30,11 @@
 //Vulkan-specific defines
 #define VULKAN_API_VERSION VK_API_VERSION_1_1
 #define QUEUE_PRIORITY 1.0f
+
+//Temp resources
+#define VERT_SHADER "res/shaders/vert.spv"
+#define FRAG_SHADER "res/shaders/frag.spv"
+#define IMG_TEXTURE "res/gfx/metalwall.png"
 
 struct Vertex
 {
@@ -122,13 +127,13 @@ void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
 }
 #endif
 
-void VulkanInterface::run()
-{
-    initWindow();
-    initVulkan();
-    mainLoop();
-    cleanup();
-}
+//void VulkanInterface::run()
+//{
+//    initWindow();
+//    initVulkan();
+//    mainLoop();
+//    cleanup();
+//}
 
 #ifdef ENABLE_VALIDATION_LAYERS
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
@@ -145,6 +150,18 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     std::cout << "Validation layer: " << msg << std::endl;
 
     return VK_FALSE;
+}
+
+VulkanInterface::VulkanInterface(SDL_Window* w)
+{
+    window = w;
+    //initWindow();
+    initVulkan();
+}
+
+VulkanInterface::~VulkanInterface()
+{
+    cleanup();
 }
 
 void VulkanInterface::setupDebugCallback()
@@ -181,29 +198,29 @@ std::vector<char> VulkanInterface::readFile(const std::string& filename)
     return buffer;
 }
 
-void VulkanInterface::initWindow()
-{
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    if(SDL_Vulkan_LoadLibrary(NULL) == -1)
-    {
-        std::cout << "Error loading vulkan" << std::endl;
-        exit(1);
-    }
-    atexit(SDL_Quit);
-
-    window = SDL_CreateWindow(APPLICATION_NAME,
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        WIDTH,
-        HEIGHT,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-
-    if(window == NULL)
-    {
-        std::cout << "Couldn\'t set video mode: " << SDL_GetError() << std::endl;
-        exit(1);
-    }
-}
+//void VulkanInterface::initWindow()
+//{
+//    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+//    if(SDL_Vulkan_LoadLibrary(NULL) == -1)
+//    {
+//        std::cout << "Error loading vulkan" << std::endl;
+//        exit(1);
+//    }
+//    atexit(SDL_Quit);
+//
+//    window = SDL_CreateWindow(APPLICATION_NAME,
+//        SDL_WINDOWPOS_UNDEFINED,
+//        SDL_WINDOWPOS_UNDEFINED,
+//        WIDTH,
+//        HEIGHT,
+//        SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+//
+//    if(window == NULL)
+//    {
+//        std::cout << "Couldn\'t set video mode: " << SDL_GetError() << std::endl;
+//        exit(1);
+//    }
+//}
 
 void VulkanInterface::initVulkan()
 {
@@ -331,7 +348,7 @@ VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkI
 void VulkanInterface::createTextureImage()
 {
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
     VkDeviceSize imageSize = texWidth * texHeight * 4;
 
     if(!pixels)
@@ -1042,8 +1059,8 @@ void VulkanInterface::createRenderPass()
 
 void VulkanInterface::createGraphicsPipeline()
 {
-    std::vector<char> vertShaderCode = readFile("shaders/vert.spv");
-    std::vector<char> fragShaderCode = readFile("shaders/frag.spv");
+    std::vector<char> vertShaderCode = readFile(VERT_SHADER);
+    std::vector<char> fragShaderCode = readFile(FRAG_SHADER);
 
     //std::cout << "Vert shader length: " << vertShaderCode.size() << std::endl;
     //std::cout << "Frag shader length: " << fragShaderCode.size() << std::endl;
@@ -1589,26 +1606,26 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
 void VulkanInterface::mainLoop()
 {
     //Loop forever
-    while(true)
-    {
-        //Pop events of SDL event queue
-        SDL_Event event;
-        while(SDL_PollEvent(&event))
-        {
-            //Exit by clicking X in window or pressing ESC
-            if(event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
-                return;
+    //while(true)
+    //{
+    //    //Pop events of SDL event queue
+    //    SDL_Event event;
+    //    while(SDL_PollEvent(&event))
+    //    {
+    //        //Exit by clicking X in window or pressing ESC
+    //        if(event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+    //            return;
 
-            if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                resizeWindow(event.window.data1, event.window.data2);
-        }
+    //        if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+    //            resizeWindow(event.window.data1, event.window.data2);
+    //    }
 
         //Update uniforms
         updateUniformBuffer();
 
         //Draw
         drawFrame();
-    }
+    //}
 }
 
 //TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
@@ -1746,10 +1763,6 @@ void VulkanInterface::cleanup()
 #endif
     vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyInstance(instance, NULL);
-
-    SDL_Vulkan_UnloadLibrary();
-    SDL_DestroyWindow(window);
-    SDL_Quit();
 }
 
 void VulkanInterface::createInstance()

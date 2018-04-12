@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Logger.h"
+#include "VulkanInterface.h"
 
 void Engine::changeScreenResolution(int w, int h)
 {
@@ -13,8 +14,8 @@ void Engine::changeScreenResolution(int w, int h)
 
     SDL_SetWindowSize(m_Window, m_iWidth, m_iHeight);
 
-    //TODO: Update vulkan
-    //setup_vulkan();
+    //Update vulkan
+    m_vulkan->resizeWindow(w, h);
 }
 
 void Engine::setFullscreen(bool bFullscreen)

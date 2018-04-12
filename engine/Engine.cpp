@@ -19,6 +19,7 @@
 #include "EngineContactListener.h"
 #include "DebugDraw.h"
 #include "Quad.h"
+#include "VulkanInterface.h"
 
 #define GUID_STR_SZ    256
 #define STRINGBANK_LOCATION "res/stringbank.xml"
@@ -311,6 +312,8 @@ void Engine::_render()
         ImGui::Render();
 #endif
     Draw::flush();
+
+    m_vulkan->mainLoop();
 }
 
 

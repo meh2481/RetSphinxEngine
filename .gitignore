@@ -30,6 +30,7 @@ gmon.out
 *.wflz
 *.ico
 *.pak
+*.spv
 Planet.cpp
 Planet.h
 res/**/*.xml

@@ -70,9 +70,15 @@ private:
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
 
+    //No default constructor
+    VulkanInterface() {};
+
 public:
-    //Public member functions
-    void run();
+    VulkanInterface(SDL_Window* window);
+    ~VulkanInterface();
+
+    void mainLoop();
+    void resizeWindow(int width, int height);
 
 private:
     //Private member functions
@@ -83,7 +89,7 @@ private:
 
     std::vector<char> readFile(const std::string& filename);
 
-    void initWindow();
+    //void initWindow();
 
     void initVulkan();
 
@@ -171,11 +177,7 @@ private:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-    void mainLoop();
-
     void updateUniformBuffer();
-
-    void resizeWindow(int width, int height);
 
     void drawFrame();
 

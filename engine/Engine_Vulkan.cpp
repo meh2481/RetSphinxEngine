@@ -5,6 +5,7 @@
 #include "Quad.h"
 #include <vulkan/vulkan.h>
 #include <SDL_vulkan.h>
+#include "VulkanInterface.h"
 
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
@@ -78,10 +79,11 @@ void Engine::setup_sdl()
 //Set up Vulkan
 void Engine::setup_vulkan()
 {
-
+    m_vulkan = new VulkanInterface(m_Window);
 }
 
 void Engine::teardown_vulkan()
 {
-
+    delete m_vulkan;
+    SDL_Vulkan_UnloadLibrary();
 }
