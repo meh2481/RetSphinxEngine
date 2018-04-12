@@ -1,4 +1,5 @@
 #include "VulkanInterface.h"
+#include "Logger.h"
 
 #include <SDL.h>
 //#include <SDL_vulkan.h>
@@ -8,7 +9,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
 
-#include <iostream>
 #include <stdexcept>
 #include <functional>
 #include <cstdlib>
@@ -34,7 +34,7 @@
 //Temp resources
 #define VERT_SHADER "res/shaders/vert.spv"
 #define FRAG_SHADER "res/shaders/frag.spv"
-#define IMG_TEXTURE "res/gfx/metalwall.png"
+#define IMG_TEXTURE "res/gfx/blob2.png"
 
 struct Vertex
 {
@@ -127,14 +127,6 @@ void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
 }
 #endif
 
-//void VulkanInterface::run()
-//{
-//    initWindow();
-//    initVulkan();
-//    mainLoop();
-//    cleanup();
-//}
-
 #ifdef ENABLE_VALIDATION_LAYERS
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugReportFlagsEXT flags,
@@ -147,7 +139,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     void* userData)
 {
 
-    std::cout << "Validation layer: " << msg << std::endl;
+    LOG(ERR) << "Validation layer: " << msg;
 
     return VK_FALSE;
 }
@@ -155,7 +147,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 VulkanInterface::VulkanInterface(SDL_Window* w)
 {
     window = w;
-    //initWindow();
     initVulkan();
 }
 
@@ -173,8 +164,8 @@ void VulkanInterface::setupDebugCallback()
 
     if(createDebugReportCallbackEXT(instance, &createInfo, NULL, &callback) != VK_SUCCESS)
     {
-        std::cout << "failed to set up debug callback!" << std::endl;
-        exit(1);
+        LOG(ERR) << "failed to set up debug callback";
+        assert(false);
     }
 }
 #endif
@@ -185,8 +176,8 @@ std::vector<char> VulkanInterface::readFile(const std::string& filename)
 
     if(!file.is_open())
     {
-        std::cout << "Failed to open file " << filename.c_str() << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to open file " << filename.c_str();
+        assert(false);
     }
 
     size_t fileSize = (size_t)file.tellg();
@@ -197,30 +188,6 @@ std::vector<char> VulkanInterface::readFile(const std::string& filename)
 
     return buffer;
 }
-
-//void VulkanInterface::initWindow()
-//{
-//    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-//    if(SDL_Vulkan_LoadLibrary(NULL) == -1)
-//    {
-//        std::cout << "Error loading vulkan" << std::endl;
-//        exit(1);
-//    }
-//    atexit(SDL_Quit);
-//
-//    window = SDL_CreateWindow(APPLICATION_NAME,
-//        SDL_WINDOWPOS_UNDEFINED,
-//        SDL_WINDOWPOS_UNDEFINED,
-//        WIDTH,
-//        HEIGHT,
-//        SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-//
-//    if(window == NULL)
-//    {
-//        std::cout << "Couldn\'t set video mode: " << SDL_GetError() << std::endl;
-//        exit(1);
-//    }
-//}
 
 void VulkanInterface::initVulkan()
 {
@@ -272,8 +239,9 @@ VkFormat VulkanInterface::findSupportedFormat(const std::vector<VkFormat>& candi
             return format;
     }
 
-    std::cout << "Failed to find supported format" << std::endl;
-    exit(1);
+    LOG(ERR) << "Failed to find supported format";
+    assert(false);
+    return VK_FORMAT_UNDEFINED; //Keep compiler happy
 }
 
 VkFormat VulkanInterface::findDepthFormat()
@@ -312,8 +280,8 @@ void VulkanInterface::createTextureSampler()
 
     if(vkCreateSampler(device, &samplerInfo, NULL, &textureSampler) != VK_SUCCESS)
     {
-        std::cout << "Failed to create texture sampler" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create texture sampler";
+        assert(false);
     }
 }
 
@@ -338,8 +306,8 @@ VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkI
     VkImageView imageView;
     if(vkCreateImageView(device, &viewInfo, NULL, &imageView) != VK_SUCCESS)
     {
-        std::cout << "Failed to create texture image view" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create texture image view";
+        assert(false);
     }
 
     return imageView;
@@ -353,8 +321,8 @@ void VulkanInterface::createTextureImage()
 
     if(!pixels)
     {
-        std::cout << "Failed to load texture image" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to load texture image";
+        assert(false);
     }
 
     textureMipLevels = (uint32_t)std::floor(std::log2(std::max(texWidth, texHeight))) + 1;
@@ -375,7 +343,6 @@ void VulkanInterface::createTextureImage()
 
     transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, textureMipLevels);
     copyBufferToImage(stagingBuffer, textureImage, (uint32_t)texWidth, (uint32_t)texHeight);
-    //transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, textureMipLevels);
 
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);
@@ -504,8 +471,8 @@ void VulkanInterface::createImage(uint32_t width, uint32_t height, uint32_t mipL
 
     if(vkCreateImage(device, &imageInfo, NULL, &image) != VK_SUCCESS)
     {
-        std::cout << "Failed to create image" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create image";
+        assert(false);
     }
 
     VkMemoryRequirements memRequirements;
@@ -518,8 +485,8 @@ void VulkanInterface::createImage(uint32_t width, uint32_t height, uint32_t mipL
 
     if(vkAllocateMemory(device, &allocInfo, NULL, &imageMemory) != VK_SUCCESS)
     {
-        std::cout << "Failed to allocate image memory!" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to allocate image memory!";
+        assert(false);
     }
 
     vkBindImageMemory(device, image, imageMemory, 0);
@@ -620,8 +587,8 @@ void VulkanInterface::transitionImageLayout(VkImage image, VkFormat format, VkIm
     }
     else
     {
-        std::cout << "Unsupported layout transition" << std::endl;
-        exit(1);
+        LOG(ERR) << "Unsupported layout transition";
+        assert(false);
     }
 
     vkCmdPipelineBarrier(
@@ -685,8 +652,8 @@ void VulkanInterface::createDescriptorSet()
 
     if(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)  //Note: Automagically freed
     {
-        std::cout << "Failed to allocate descriptor set" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to allocate descriptor set";
+        assert(false);
     }
 
     //Create descriptors
@@ -737,8 +704,8 @@ void VulkanInterface::createDescriptorPool()
 
     if(vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
     {
-        std::cout << "Failed to create descriptor pool" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create descriptor pool";
+        assert(false);
     }
 }
 
@@ -773,8 +740,8 @@ void VulkanInterface::createDescriptorSetLayout()
 
     if(vkCreateDescriptorSetLayout(device, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
     {
-        std::cout << "Failed to create descriptor set layout" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create descriptor set layout";
+        assert(false);
     }
 }
 
@@ -818,8 +785,8 @@ void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, 
 
     if(vkCreateBuffer(device, &bufferInfo, NULL, &buffer) != VK_SUCCESS)
     {
-        std::cout << "Failed to create vertex buffer" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create vertex buffer";
+        assert(false);
     }
 
     //Find memory requirements
@@ -836,8 +803,8 @@ void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, 
     //See https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator for a possible allocator to use
     if(vkAllocateMemory(device, &allocInfo, NULL, &bufferMemory) != VK_SUCCESS)
     {
-        std::cout << "Failed to allocate vertex buffer memory" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to allocate vertex buffer memory";
+        assert(false);
     }
 
     //Bind memory
@@ -866,8 +833,9 @@ uint32_t VulkanInterface::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFl
             return i;
     }
 
-    std::cout << "Failed to find suitable memory type" << std::endl;
-    exit(1);
+    LOG(ERR) << "Failed to find suitable memory type";
+    assert(false);
+    return 0;   //Keep compiler happy
 }
 
 void VulkanInterface::createSemaphores()
@@ -878,8 +846,8 @@ void VulkanInterface::createSemaphores()
     if(vkCreateSemaphore(device, &semaphoreInfo, NULL, &imageAvailableSemaphore) != VK_SUCCESS ||
         vkCreateSemaphore(device, &semaphoreInfo, NULL, &renderFinishedSemaphore) != VK_SUCCESS)
     {
-        std::cout << "Failed to create semaphores" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create semaphores";
+        assert(false);
     }
 }
 
@@ -896,8 +864,8 @@ void VulkanInterface::createCommandBuffers()
 
     if(vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
     {
-        std::cout << "Failed to allocate command buffers" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to allocate command buffers";
+        assert(false);
     }
 
     for(size_t i = 0; i < commandBuffers.size(); i++)
@@ -941,8 +909,8 @@ void VulkanInterface::createCommandBuffers()
 
         if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
         {
-            std::cout << "Failed to record command buffer" << std::endl;
-            exit(1);
+            LOG(ERR) << "Failed to record command buffer";
+            assert(false);
         }
     }
 }
@@ -958,8 +926,8 @@ void VulkanInterface::createCommandPool()
 
     if(vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS)
     {
-        std::cout << "Failed to create command pool" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create command pool";
+        assert(false);
     }
 }
 
@@ -984,8 +952,8 @@ void VulkanInterface::createFramebuffers()
 
         if(vkCreateFramebuffer(device, &framebufferInfo, NULL, &swapChainFramebuffers[i]) != VK_SUCCESS)
         {
-            std::cout << "Failed to create framebuffer" << std::endl;
-            exit(1);
+            LOG(ERR) << "Failed to create framebuffer";
+            assert(false);
         }
     }
 }
@@ -1052,8 +1020,8 @@ void VulkanInterface::createRenderPass()
 
     if(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
     {
-        std::cout << "Failed to create render pass" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create render pass";
+        assert(false);
     }
 }
 
@@ -1061,9 +1029,6 @@ void VulkanInterface::createGraphicsPipeline()
 {
     std::vector<char> vertShaderCode = readFile(VERT_SHADER);
     std::vector<char> fragShaderCode = readFile(FRAG_SHADER);
-
-    //std::cout << "Vert shader length: " << vertShaderCode.size() << std::endl;
-    //std::cout << "Frag shader length: " << fragShaderCode.size() << std::endl;
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -1215,8 +1180,8 @@ void VulkanInterface::createGraphicsPipeline()
 
     if(vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS)
     {
-        std::cout << "Failed to create pipeline layout" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create pipeline layout";
+        assert(false);
     }
 
     //Create pipeline!
@@ -1240,8 +1205,8 @@ void VulkanInterface::createGraphicsPipeline()
 
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
     {
-        std::cout << "Failed to create graphics pipeline!" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create graphics pipeline!";
+        assert(false);
     }
 
     vkDestroyShaderModule(device, fragShaderModule, NULL);
@@ -1258,8 +1223,8 @@ VkShaderModule VulkanInterface::createShaderModule(const std::vector<char>& code
     VkShaderModule shaderModule;
     if(vkCreateShaderModule(device, &createInfo, NULL, &shaderModule) != VK_SUCCESS)
     {
-        std::cout << "Failed to create shader module" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create shader module";
+        assert(false);
     }
     return shaderModule;
 }
@@ -1333,8 +1298,8 @@ void VulkanInterface::createSwapChain()
 
     if(vkCreateSwapchainKHR(device, &createInfo, NULL, &swapChain) != VK_SUCCESS)
     {
-        std::cout << "Failed to create swap chain" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create swap chain";
+        assert(false);
     }
 
     vkGetSwapchainImagesKHR(device, swapChain, &imageCount, NULL);
@@ -1350,8 +1315,8 @@ void VulkanInterface::createSurface()
 {
     if(!SDL_Vulkan_CreateSurface(window, instance, &surface))
     {
-        std::cout << "Couldn\'t create window surface: " << SDL_GetError() << std::endl;
-        exit(1);
+        LOG(ERR) << "Couldn\'t create window surface: " << SDL_GetError();
+        assert(false);
     }
 }
 
@@ -1399,8 +1364,8 @@ void VulkanInterface::createLogicalDevice()
 
     if(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
     {
-        std::cout << "Failed to create logical device!" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to create logical device!";
+        assert(false);
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
@@ -1413,10 +1378,10 @@ void VulkanInterface::pickPhysicalDevice()
     vkEnumeratePhysicalDevices(instance, &deviceCount, NULL);
     if(deviceCount == 0)
     {
-        std::cout << "No physical device has Vulkan support" << std::endl;
-        exit(1);
+        LOG(ERR) << "No physical device has Vulkan support";
+        assert(false);
     }
-    std::cout << "Found " << deviceCount << " physical device(s)" << std::endl;
+    LOG(ERR) << "Found " << deviceCount << " physical device(s)";
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -1435,8 +1400,8 @@ void VulkanInterface::pickPhysicalDevice()
         physicalDevice = candidates.rbegin()->second;
     else
     {
-        std::cout << "Failed to find a suitable GPU" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to find a suitable GPU";
+        assert(false);
     }
 }
 
@@ -1444,7 +1409,7 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
 {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    std::cout << "Device name: " << deviceProperties.deviceName << std::endl;
+    LOG(ERR) << "Device name: " << deviceProperties.deviceName;
 
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
@@ -1605,27 +1570,11 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
 
 void VulkanInterface::mainLoop()
 {
-    //Loop forever
-    //while(true)
-    //{
-    //    //Pop events of SDL event queue
-    //    SDL_Event event;
-    //    while(SDL_PollEvent(&event))
-    //    {
-    //        //Exit by clicking X in window or pressing ESC
-    //        if(event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
-    //            return;
+    //Update uniforms
+    updateUniformBuffer();
 
-    //        if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-    //            resizeWindow(event.window.data1, event.window.data2);
-    //    }
-
-        //Update uniforms
-        updateUniformBuffer();
-
-        //Draw
-        drawFrame();
-    //}
+    //Draw
+    drawFrame();
 }
 
 //TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
@@ -1667,8 +1616,8 @@ void VulkanInterface::drawFrame()
     }
     else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     {
-        std::cout << "Failed to acquire swap chain image" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to acquire swap chain image";
+        assert(false);
     }
 
     //Submit the command buffer
@@ -1688,8 +1637,8 @@ void VulkanInterface::drawFrame()
 
     if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
     {
-        std::cout << "Failed to submit draw command buffer" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to submit draw command buffer";
+        assert(false);
     }
 
     //Presentation
@@ -1711,8 +1660,8 @@ void VulkanInterface::drawFrame()
         recreateSwapChain();
     else if(result != VK_SUCCESS)
     {
-        std::cout << "Failed to present swap chain image" << std::endl;
-        exit(1);
+        LOG(ERR) << "Failed to present swap chain image";
+        assert(false);
     }
 
 #ifdef ENABLE_VALIDATION_LAYERS
@@ -1770,8 +1719,8 @@ void VulkanInterface::createInstance()
 #ifdef ENABLE_VALIDATION_LAYERS
     if(!checkValidationLayerSupport())
     {
-        std::cout << "No validation layers supported" << std::endl;
-        exit(1);
+        LOG(ERR) << "No validation layers supported";
+        assert(false);
     }
 #endif
 
@@ -1795,18 +1744,18 @@ void VulkanInterface::createInstance()
 #endif
 
     //Optional: Show required extensions
-    std::cout << "Required Extensions:" << std::endl;
+    LOG(INFO) << "Required Extensions:";
     for(auto extension : requiredExtensions)
-        std::cout << '\t' << extension << std::endl;
+        LOG(INFO) << '\t' << extension;
 
     //Optional: Show available extensions
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, NULL);
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, extensions.data());
-    std::cout << "Available extensions:" << std::endl;
+    LOG(INFO) << "Available extensions:";
     for(const auto& extension : extensions)
-        std::cout << '\t' << extension.extensionName << std::endl;
+        LOG(INFO) << '\t' << extension.extensionName;
 
     //Create application instance info struct
     VkInstanceCreateInfo createInfo = {};
@@ -1822,8 +1771,8 @@ void VulkanInterface::createInstance()
 #endif
     if(vkCreateInstance(&createInfo, NULL, &instance) != VK_SUCCESS)
     {
-        std::cout << "Error creating Vulkan instance" << std::endl;
-        exit(1);
+        LOG(ERR) << "Error creating Vulkan instance";
+        assert(false);
     }
 
     //Cleanup allocated memory

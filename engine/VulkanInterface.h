@@ -89,8 +89,6 @@ private:
 
     std::vector<char> readFile(const std::string& filename);
 
-    //void initWindow();
-
     void initVulkan();
 
     void createDepthResources();
