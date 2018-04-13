@@ -149,7 +149,7 @@ private:
 
     VkShaderModule createShaderModule(const std::vector<char>& code);
 
-    void createImageViews();
+    void createSwapChainImageViews();
 
     void recreateSwapChain();
 

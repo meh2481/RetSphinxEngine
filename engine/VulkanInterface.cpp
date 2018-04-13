@@ -199,7 +199,7 @@ void VulkanInterface::initVulkan()
     pickPhysicalDevice();
     createLogicalDevice();
     createSwapChain();
-    createImageViews();
+    createSwapChainImageViews();
     createRenderPass();
     createDescriptorSetLayout();
     createGraphicsPipeline();
@@ -1226,7 +1226,7 @@ VkShaderModule VulkanInterface::createShaderModule(const std::vector<char>& code
     return shaderModule;
 }
 
-void VulkanInterface::createImageViews()
+void VulkanInterface::createSwapChainImageViews()
 {
     swapChainImageViews.resize(swapChainImages.size());
 
@@ -1239,7 +1239,7 @@ void VulkanInterface::recreateSwapChain()
     cleanupSwapChain();
 
     createSwapChain();
-    createImageViews();
+    createSwapChainImageViews();
     createRenderPass();
     createGraphicsPipeline();
     createDepthResources();
