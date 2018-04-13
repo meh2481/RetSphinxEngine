@@ -81,6 +81,9 @@ void Engine::setup_sdl()
 void Engine::setup_vulkan()
 {
     m_vulkan = new VulkanInterface(m_Window);
+
+    glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
+    m_renderState.projection = persp;
 }
 
 void Engine::teardown_vulkan()

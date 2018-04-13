@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 #include <SDL_vulkan.h>
 #include <vector>
@@ -24,6 +25,13 @@ struct SwapChainSupportDetails
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
+};
+
+struct UniformBufferObject
+{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
 };
 
 class VulkanInterface
@@ -77,7 +85,7 @@ public:
     VulkanInterface(SDL_Window* window);
     ~VulkanInterface();
 
-    void mainLoop();
+    void mainLoop(glm::mat4& model, glm::mat4& view, glm::mat4& proj);
     void resizeWindow(int width, int height);
 
 private:
@@ -175,7 +183,7 @@ private:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-    void updateUniformBuffer();
+    void updateUniformBuffer(const UniformBufferObject& ubo);
 
     void drawFrame();
 

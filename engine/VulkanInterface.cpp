@@ -75,13 +75,6 @@ struct Vertex
     }
 };
 
-struct UniformBufferObject
-{
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
-
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
@@ -1565,27 +1558,23 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
     return indices;
 }
 
-void VulkanInterface::mainLoop()
+void VulkanInterface::mainLoop(glm::mat4& model, glm::mat4& view, glm::mat4& proj)
 {
+    UniformBufferObject ubo = {model, view, proj};
+    ubo.proj[1][1] *= -1; //Flip y
+
     //Update uniforms
-    updateUniformBuffer();
+    updateUniformBuffer(ubo);
 
     //Draw
     drawFrame();
 }
 
 //TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
-void VulkanInterface::updateUniformBuffer()
+void VulkanInterface::updateUniformBuffer(const UniformBufferObject& ubo)
 {
     //Get time in seconds since program start
     float time = (float)SDL_GetTicks() / 1000.0f;
-
-    //Rotate view around center
-    UniformBufferObject ubo = {};
-    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-    ubo.proj[1][1] *= -1; //Flip y
 
     //Copy memory
     void* data;
