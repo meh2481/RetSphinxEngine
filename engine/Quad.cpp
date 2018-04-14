@@ -16,12 +16,12 @@ namespace Draw
 
     void drawQuad(Quad* q, RenderState* state)
     {
-        //glm::mat4 mvp = state->projection * state->view * state->model;
+        //glm::mat4 mvp = state->proj * state->view * state->model;
 
         //glUseProgram(state->programId);
         //glUniformMatrix4fv(modelId, 1, false, &state->model[0][0]);
         //glUniformMatrix4fv(viewId, 1, false, &state->view[0][0]);
-        //glUniformMatrix4fv(projectionId, 1, false, &state->projection[0][0]);
+        //glUniformMatrix4fv(projectionId, 1, false, &state->proj[0][0]);
         // tell opengl to use the generated texture
 
 
@@ -93,12 +93,12 @@ namespace Draw
 
         //modelId = glGetUniformLocation(programId, "model");
         //viewId = glGetUniformLocation(programId, "view");
-        //projectionId = glGetUniformLocation(programId, "projection");
+        //projectionId = glGetUniformLocation(programId, "proj");
 
 #ifdef _DEBUG
         //model.reserve(MAX_COUNT);
         //view.reserve(MAX_COUNT);
-        //projection.reserve(MAX_COUNT);
+        //proj.reserve(MAX_COUNT);
         triangles2d.reserve(MAX_COUNT);
         lines2d.reserve(MAX_COUNT);
         points2d.reserve(MAX_COUNT);

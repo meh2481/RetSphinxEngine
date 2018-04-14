@@ -51,7 +51,7 @@ ParticleSystem::ParticleSystem(RenderState* shader)
     //m_texAttrib = glGetAttribLocation(shader->programId, "texcoord");
     //modelId = glGetUniformLocation(shader->programId, "model");
     //viewId = glGetUniformLocation(shader->programId, "view");
-    //projectionId = glGetUniformLocation(shader->programId, "projection");
+    //projectionId = glGetUniformLocation(shader->programId, "proj");
 
     //glGenVertexArrays(1, &vertArray);
 }
@@ -550,7 +550,7 @@ void ParticleSystem::draw(const RenderState& renderState)
 
     //glUniformMatrix4fv(modelId, 1, false, &renderState.model[0][0]);
     //glUniformMatrix4fv(viewId, 1, false, &renderState.view[0][0]);
-    //glUniformMatrix4fv(projectionId, 1, false, &renderState.projection[0][0]);
+    //glUniformMatrix4fv(projectionId, 1, false, &renderState.proj[0][0]);
 
     ////Render everything in one pass
     //glBindTexture(GL_TEXTURE_2D, img->tex.tex); //Bind once before we draw since all our particles will use one texture

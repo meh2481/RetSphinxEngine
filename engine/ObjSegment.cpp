@@ -49,7 +49,7 @@ void ObjSegment::draw(RenderState renderState)
             //glUseProgram(renderState.programId);
             //glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
             //glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
-            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.proj[0][0]);
 
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;
@@ -98,7 +98,7 @@ void ObjSegment::draw(RenderState renderState)
             //glUseProgram(renderState.programId);
             //glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
             //glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
-            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.projection[0][0]);
+            //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.proj[0][0]);
 
             //TODO: This needs to be constant, only updating when size/tex/tile changes
             Quad q;

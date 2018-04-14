@@ -16,7 +16,7 @@ Object3D::Object3D(unsigned char* data, Image* tex, RenderState* renderState)
 
     //modelId = glGetUniformLocation(renderState->programId, "model");
     //viewId = glGetUniformLocation(renderState->programId, "view");
-    //projectionId = glGetUniformLocation(renderState->programId, "projection");
+    //projectionId = glGetUniformLocation(renderState->programId, "proj");
 
     _fromData(data, tex);
 }
@@ -97,14 +97,14 @@ void Object3D::render(RenderState renderState)
     //assert(num > 0);
 
     //m_renderState->model = renderState.model;
-    //m_renderState->projection = renderState.projection;
+    //m_renderState->proj = renderState.proj;
     //m_renderState->view = renderState.view;
 
     //glUseProgram(m_renderState->programId);
 
     //glUniformMatrix4fv(modelId, 1, false, &m_renderState->model[0][0]);
     //glUniformMatrix4fv(viewId, 1, false, &m_renderState->view[0][0]);
-    //glUniformMatrix4fv(projectionId, 1, false, &m_renderState->projection[0][0]);
+    //glUniformMatrix4fv(projectionId, 1, false, &m_renderState->proj[0][0]);
 
     //glBindTexture(GL_TEXTURE_2D, m_tex);    //Bind texture
 

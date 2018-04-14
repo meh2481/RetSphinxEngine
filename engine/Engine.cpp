@@ -298,7 +298,7 @@ void Engine::_render()
 #endif
     Draw::flush();
 
-    m_vulkan->mainLoop(m_renderState.model, m_renderState.view, m_renderState.projection);
+    m_vulkan->mainLoop(m_renderState);
 }
 
 

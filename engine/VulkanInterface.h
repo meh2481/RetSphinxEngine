@@ -4,6 +4,7 @@
 #include <SDL_vulkan.h>
 #include <vector>
 #include <string>
+#include "RenderState.h"
 
 #ifdef _DEBUG
 #define ENABLE_VALIDATION_LAYERS
@@ -27,12 +28,7 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct UniformBufferObject
-{
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
+typedef RenderState UniformBufferObject;
 
 class VulkanInterface
 {
@@ -85,7 +81,7 @@ public:
     VulkanInterface(SDL_Window* window);
     ~VulkanInterface();
 
-    void mainLoop(glm::mat4& model, glm::mat4& view, glm::mat4& proj);
+    void mainLoop(UniformBufferObject& state);
     void resizeWindow(int width, int height);
 
 private:

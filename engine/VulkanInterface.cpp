@@ -1558,9 +1558,9 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
     return indices;
 }
 
-void VulkanInterface::mainLoop(glm::mat4& model, glm::mat4& view, glm::mat4& proj)
+void VulkanInterface::mainLoop(UniformBufferObject& state)
 {
-    UniformBufferObject ubo = {model, view, proj};
+    UniformBufferObject ubo = {state.model, state.view, state.proj};
     ubo.proj[1][1] *= -1; //Flip y
 
     //Update uniforms
