@@ -653,7 +653,7 @@ void VulkanInterface::createDescriptorSet()
     VkDescriptorBufferInfo bufferInfo = {};
     bufferInfo.buffer = uniformBuffer;
     bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(UniformBufferObject);
+    bufferInfo.range = sizeof(RenderState);
 
     VkDescriptorImageInfo imageInfo = {};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -704,7 +704,7 @@ void VulkanInterface::createDescriptorPool()
 
 void VulkanInterface::createUniformBuffer()
 {
-    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    VkDeviceSize bufferSize = sizeof(RenderState);
     createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
 }
 
@@ -717,7 +717,7 @@ void VulkanInterface::createDescriptorSetLayout()
     uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     uboLayoutBinding.pImmutableSamplers = NULL;
 
-    //TODO: Multiple descriptor sets via layout(set = 0, binding = 0) uniform UniformBufferObject { ... }
+    //TODO: Multiple descriptor sets via layout(set = 0, binding = 0) uniform RenderState { ... }
     VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
     samplerLayoutBinding.binding = 1;
     samplerLayoutBinding.descriptorCount = 1;
@@ -1558,9 +1558,10 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
     return indices;
 }
 
-void VulkanInterface::mainLoop(UniformBufferObject& state)
+void VulkanInterface::mainLoop(const RenderState& state)
 {
-    UniformBufferObject ubo = {state.model, state.view, state.proj};
+    //Make a copy so we can flip y
+    RenderState ubo = {state.model, state.view, state.proj};
     ubo.proj[1][1] *= -1; //Flip y
 
     //Update uniforms
@@ -1571,7 +1572,7 @@ void VulkanInterface::mainLoop(UniformBufferObject& state)
 }
 
 //TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
-void VulkanInterface::updateUniformBuffer(const UniformBufferObject& ubo)
+void VulkanInterface::updateUniformBuffer(const RenderState& ubo)
 {
     //Get time in seconds since program start
     float time = (float)SDL_GetTicks() / 1000.0f;

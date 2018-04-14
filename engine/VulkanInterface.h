@@ -28,8 +28,6 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-typedef RenderState UniformBufferObject;
-
 class VulkanInterface
 {
 private:
@@ -81,7 +79,7 @@ public:
     VulkanInterface(SDL_Window* window);
     ~VulkanInterface();
 
-    void mainLoop(UniformBufferObject& state);
+    void mainLoop(const RenderState& state);
     void resizeWindow(int width, int height);
 
 private:
@@ -179,7 +177,7 @@ private:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-    void updateUniformBuffer(const UniformBufferObject& ubo);
+    void updateUniformBuffer(const RenderState& ubo);
 
     void drawFrame();
 
