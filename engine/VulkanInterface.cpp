@@ -1659,12 +1659,6 @@ void VulkanInterface::drawFrame()
 
 void VulkanInterface::setupCommandBuffer(uint32_t index)
 {
-    if(vkResetCommandBuffer(commandBuffers[index], VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT) != VK_SUCCESS)
-    {
-        LOG(ERR) << "Unable to reset command buffer";
-        assert(false);
-    }
-
     //Start buffer recording
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
