@@ -196,6 +196,7 @@ void VulkanInterface::initVulkan()
     createRenderPass();
     createDescriptorSetLayout();
     createGraphicsPipeline();
+
     createCommandPool();
     createDepthResources();
     createFramebuffers();
@@ -208,6 +209,7 @@ void VulkanInterface::initVulkan()
     createDescriptorSet();
     createCommandBuffers();
     createSemaphores();
+    createFences();
 }
 
 void VulkanInterface::createDepthResources()
@@ -841,6 +843,28 @@ void VulkanInterface::createSemaphores()
     {
         LOG(ERR) << "Failed to create semaphores";
         assert(false);
+    }
+}
+
+void VulkanInterface::createFences()
+{
+    size_t fenceCount = swapChainImages.size();
+    fences.resize(fenceCount);
+    bufferSubmitted.resize(fenceCount);
+
+    VkFenceCreateInfo fenceInfo = {};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.pNext = NULL;
+    fenceInfo.flags = 0;    //Start unsignaled
+
+    for(size_t i = 0; i < fenceCount; i++)
+    {
+        if(vkCreateFence(device, &fenceInfo, NULL, &fences.data()[i]) != VK_SUCCESS)
+        {
+            LOG(ERR) << "Failed to create fences";
+            assert(false);
+        }
+        bufferSubmitted[i] = false;
     }
 }
 
@@ -1611,6 +1635,27 @@ void VulkanInterface::drawFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+    //First-run check to prevent validation layer errors
+    if(bufferSubmitted[imageIndex])
+    {
+        //Make absolutely sure that the work has completed, via fence wait
+        if(vkWaitForFences(device, 1, &fences[imageIndex], true, UINT64_MAX) != VK_SUCCESS)
+        {
+            LOG(ERR) << "Failed to wait for fence";
+            assert(false);
+        }
+    }
+    bufferSubmitted[imageIndex] = true;
+
+    //Reset the fences we waited on, so they can be re-used
+    if(vkResetFences(device, 1, &fences[imageIndex]) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Failed to reset fence";
+        assert(false);
+    }
+
+    //TODO: Change per-frame data
+
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.waitSemaphoreCount = 1;
@@ -1622,7 +1667,7 @@ void VulkanInterface::drawFrame()
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+    if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, fences[imageIndex]) != VK_SUCCESS)
     {
         LOG(ERR) << "Failed to submit draw command buffer";
         assert(false);
@@ -1692,6 +1737,8 @@ void VulkanInterface::cleanup()
     vkFreeMemory(device, combinedBufferMemory, NULL);
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);
+    for(auto fence : fences)
+        vkDestroyFence(device, fence, NULL);
     vkDestroyCommandPool(device, commandPool, NULL);
     vkDestroyDevice(device, NULL);
 #ifdef ENABLE_VALIDATION_LAYERS

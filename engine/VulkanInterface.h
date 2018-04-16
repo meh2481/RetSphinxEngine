@@ -56,6 +56,8 @@ private:
     std::vector<VkCommandBuffer> commandBuffers;
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
+    std::vector<VkFence> fences;
+    std::vector<bool> bufferSubmitted;
     VkBuffer combinedBuffer;
     VkDeviceMemory combinedBufferMemory;
     VkBuffer uniformBuffer;
@@ -138,6 +140,8 @@ private:
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     void createSemaphores();
+
+    void createFences();
 
     void createCommandBuffers();
 
