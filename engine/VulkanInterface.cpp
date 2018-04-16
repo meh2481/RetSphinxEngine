@@ -884,52 +884,6 @@ void VulkanInterface::createCommandBuffers()
         LOG(ERR) << "Failed to allocate command buffers";
         assert(false);
     }
-
-    for(size_t i = 0; i < commandBuffers.size(); i++)
-    {
-        //Start buffer recording
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-        beginInfo.pInheritanceInfo = NULL;
-
-        vkBeginCommandBuffer(commandBuffers[i], &beginInfo);
-
-        std::array<VkClearValue, 2> clearValues = {};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
-
-        //Start render pass
-        VkRenderPassBeginInfo renderPassInfo = {};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers[i];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = swapChainExtent;
-        renderPassInfo.clearValueCount = clearValues.size();
-        renderPassInfo.pClearValues = clearValues.data();
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        //Draw
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-        VkBuffer vertexBuffers[] = { combinedBuffer };
-        VkDeviceSize offsets[] = { sizeof(indices[0]) * indices.size() };   //Vertex buffer after index buffer in data
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-        vkCmdBindIndexBuffer(commandBuffers[i], combinedBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-        //Bind descriptor sets
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
-
-        vkCmdDrawIndexed(commandBuffers[i], (uint32_t)indices.size(), 1, 0, 0, 0);
-        vkCmdEndRenderPass(commandBuffers[i]);
-
-        if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
-        {
-            LOG(ERR) << "Failed to record command buffer";
-            assert(false);
-        }
-    }
 }
 
 void VulkanInterface::createCommandPool()
@@ -939,7 +893,7 @@ void VulkanInterface::createCommandPool()
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
-    poolInfo.flags = 0;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;   //Allow us to reset command buffers from this pool
 
     if(vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS)
     {
@@ -1654,7 +1608,8 @@ void VulkanInterface::drawFrame()
         assert(false);
     }
 
-    //TODO: Change per-frame data
+    //TODO: Change vertex data per-frame here
+    setupCommandBuffer(imageIndex); //Rebuild the command buffer, since the vertex buffer data has changed
 
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
@@ -1700,6 +1655,58 @@ void VulkanInterface::drawFrame()
     //Fix memory leak in validation layer by explicitly syncronizing with GPU
     vkQueueWaitIdle(presentQueue);
 #endif
+}
+
+void VulkanInterface::setupCommandBuffer(uint32_t index)
+{
+    if(vkResetCommandBuffer(commandBuffers[index], VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Unable to reset command buffer";
+        assert(false);
+    }
+
+    //Start buffer recording
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    beginInfo.pInheritanceInfo = NULL;
+
+    vkBeginCommandBuffer(commandBuffers[index], &beginInfo);
+
+    std::array<VkClearValue, 2> clearValues = {};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    //Start render pass
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapChainFramebuffers[index];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = swapChainExtent;
+    renderPassInfo.clearValueCount = clearValues.size();
+    renderPassInfo.pClearValues = clearValues.data();
+    vkCmdBeginRenderPass(commandBuffers[index], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    //Draw
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+    VkBuffer vertexBuffers[] = { combinedBuffer };
+    VkDeviceSize offsets[] = { sizeof(indices[0]) * indices.size() };   //Vertex buffer after index buffer in data
+    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+    //Bind descriptor sets
+    vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)indices.size(), 1, 0, 0, 0);
+    vkCmdEndRenderPass(commandBuffers[index]);
+
+    if(vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Failed to record command buffer";
+        assert(false);
+    }
 }
 
 void VulkanInterface::cleanupSwapChain()

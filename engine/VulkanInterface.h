@@ -145,6 +145,8 @@ private:
 
     void createCommandBuffers();
 
+    void setupCommandBuffer(uint32_t index);
+
     void createCommandPool();
 
     void createFramebuffers();
