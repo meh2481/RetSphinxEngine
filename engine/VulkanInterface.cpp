@@ -79,7 +79,19 @@ const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-const std::vector<Vertex> vertices = {
+std::vector<Vertex> vertices = {
+    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, -0.5f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, -0.5f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
+
+    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } }
+};
+
+const std::vector<Vertex> orig_vertices = {
     { { -0.5f, -0.5f, -0.5f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
     { { 0.5f, -0.5f, -0.5f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
     { { 0.5f, 0.5f, -0.5f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
@@ -748,26 +760,11 @@ void VulkanInterface::createVertIndexBuffers()
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Create staging buffer
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-    //Copy in data
-    void* data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    //Index data first
-    memcpy(data, indices.data(), (size_t)indexBufferSize);
-    //Vertex data after index data
-    memcpy((void*)((VkDeviceSize)data+indexBufferSize), vertices.data(), (size_t)vertBufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
 
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedBuffer, combinedBufferMemory);
-
-    copyBuffer(stagingBuffer, combinedBuffer, bufferSize);
-
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
 }
 
 void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -804,17 +801,6 @@ void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, 
 
     //Bind memory
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
-}
-
-void VulkanInterface::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
-{
-    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
-    VkBufferCopy copyRegion = {};
-    copyRegion.size = size;
-    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-    endSingleTimeCommands(commandBuffer);
 }
 
 uint32_t VulkanInterface::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
@@ -1552,9 +1538,6 @@ void VulkanInterface::mainLoop(const RenderState& state)
 //TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
 void VulkanInterface::updateUniformBuffer(const RenderState& ubo)
 {
-    //Get time in seconds since program start
-    float time = (float)SDL_GetTicks() / 1000.0f;
-
     //Copy memory
     void* data;
     vkMapMemory(device, uniformBufferMemory, 0, sizeof(ubo), 0, &data);
@@ -1608,8 +1591,28 @@ void VulkanInterface::drawFrame()
         assert(false);
     }
 
-    //TODO: Change vertex data per-frame here
+    //Change vertex data per-frame as a test
+
+    //Simulate vertex movement
+    float curTimeSec = (float)SDL_GetTicks() / 1000.0f;
+    for(int i = 0; i < 4; i++)
+        vertices[i].pos.x = orig_vertices[i].pos.x + sin(curTimeSec);
+
+    //Rebind vertex buffer
+    VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
+    VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
+    VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+    //Copy in data
+    void* data;
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    //Index data first
+    memcpy(data, indices.data(), (size_t)indexBufferSize);
+    //Vertex data after index data
+    memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
     setupCommandBuffer(imageIndex); //Rebuild the command buffer, since the vertex buffer data has changed
+
 
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
@@ -1667,6 +1670,12 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
     vkBeginCommandBuffer(commandBuffers[index], &beginInfo);
 
+    //Copy Vertex Buffer over
+    VkBufferCopy copyRegion = {};
+    copyRegion.size = sizeof(indices[0]) * indices.size() + sizeof(vertices[0]) * vertices.size();
+    vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
+
+    //Clear color and depth stencil
     std::array<VkClearValue, 2> clearValues = {};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[1].depthStencil = { 1.0f, 0 };
@@ -1736,6 +1745,8 @@ void VulkanInterface::cleanup()
     vkFreeMemory(device, uniformBufferMemory, NULL);
     vkDestroyBuffer(device, combinedBuffer, NULL);
     vkFreeMemory(device, combinedBufferMemory, NULL);
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);
     for(auto fence : fences)
