@@ -1,8 +1,7 @@
 #include "VulkanInterface.h"
 #include "Logger.h"
 
-#include <SDL.h>
-//#include <SDL_vulkan.h>
+#include <SDL.h>    //TODO: Remove once we remove SDL_GetTicks()
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -109,8 +108,6 @@ const std::vector<uint16_t> indices = {
 };
 
 #ifdef ENABLE_VALIDATION_LAYERS
-//Enable validation layers in debug mode
-
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_LUNARG_standard_validation"
 };
@@ -130,9 +127,7 @@ void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
     if(func != NULL)
         func(instance, callback, pAllocator);
 }
-#endif
 
-#ifdef ENABLE_VALIDATION_LAYERS
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugReportFlagsEXT flags,
     VkDebugReportObjectTypeEXT objType,
@@ -149,17 +144,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     return VK_FALSE;
 }
 
-VulkanInterface::VulkanInterface(SDL_Window* w)
-{
-    window = w;
-    initVulkan();
-}
-
-VulkanInterface::~VulkanInterface()
-{
-    cleanup();
-}
-
 void VulkanInterface::setupDebugCallback()
 {
     VkDebugReportCallbackCreateInfoEXT createInfo = {};
@@ -173,7 +157,46 @@ void VulkanInterface::setupDebugCallback()
         assert(false);
     }
 }
+
+bool VulkanInterface::checkValidationLayerSupport()
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, NULL);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for(const char* layerName : validationLayers)
+    {
+        bool layerFound = false;
+
+        for(const auto& layerProperties : availableLayers)
+        {
+            if(strcmp(layerName, layerProperties.layerName) == 0)
+            {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if(!layerFound)
+            return false;
+    }
+
+    return true;
+}
 #endif
+
+VulkanInterface::VulkanInterface(SDL_Window* w)
+{
+    window = w;
+    initVulkan();
+}
+
+VulkanInterface::~VulkanInterface()
+{
+    cleanup();
+}
 
 std::vector<char> VulkanInterface::readFile(const std::string& filename)
 {
@@ -1806,32 +1829,3 @@ void VulkanInterface::createInstance()
     delete[] names;
 }
 
-#ifdef ENABLE_VALIDATION_LAYERS
-bool VulkanInterface::checkValidationLayerSupport()
-{
-    uint32_t layerCount;
-    vkEnumerateInstanceLayerProperties(&layerCount, NULL);
-
-    std::vector<VkLayerProperties> availableLayers(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-    for(const char* layerName : validationLayers)
-    {
-        bool layerFound = false;
-
-        for(const auto& layerProperties : availableLayers)
-        {
-            if(strcmp(layerName, layerProperties.layerName) == 0)
-            {
-                layerFound = true;
-                break;
-            }
-        }
-
-        if(!layerFound)
-            return false;
-    }
-
-    return true;
-}
-#endif

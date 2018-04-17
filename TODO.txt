@@ -1,6 +1,5 @@
 Current higher pri:
 - atexit() flush & close log file, so even on crash we have a full logfile? Is that how that works?
-- Fix release build on Windows
 - FMOD 3D sound
     - Objects can have their own sfx associated with them (channel group)
 	- Change listener up/forward vectors with head tracker for fun
@@ -119,43 +118,9 @@ Other misc unordered TODO:
 
 
 
-OPENGL STUFF
 
-- glNamedBufferStorageEXT()
-https://www.opengl.org/wiki/Nomenclature/Direct_State_Access
-https://dl.dropboxusercontent.com/u/22111385/crap/renderer.cpp
-- glUniformX() functions for sending stuff to shaders
-- Load from pakfile only if actual file doesn't exist?
-	- Better to remove file loading entirely and ONLY load from pakfile
-https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.vert
-https://dl.dropboxusercontent.com/u/22111385/crap/correlation_lines.frag
-https://dl.dropboxusercontent.com/u/22111385/crap/gpubase.7z
-
-
-
-
-
-
-
-SafeShaderVar sv[] =
-{
-{ "proj", as_uniform(proj) },
-{ "tex", as_uniform(textureUnit) },
-{ "rayExitTex", as_uniform(textureUnitBack) },
-{ "samplingDist", as_uniform(vrp.samplingDist) },
-{ "stepValue", as_uniform(vrp.stepValue) },
-{ "deformTex", as_uniform(textureUnitDeform) },
-{ "intensity", as_uniform(vrp.intensity) },
-{ "alphaMult", as_uniform(vrp.alphaMult) },
-{ "colorTex", as_uniform(textureUnitColor) },
-{ "deformMult", as_uniform(vrp.deformMult) },
-};
-
-shader->setUniforms(sv);
-
-
-
-
+For Windows release build:
+- Flip Box2D lib to release lib (via cmake)
 
 
 
