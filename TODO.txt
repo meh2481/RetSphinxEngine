@@ -1,5 +1,6 @@
 Current higher pri:
 - atexit() flush & close log file, so even on crash we have a full logfile? Is that how that works?
+- Fix release build on Windows
 - FMOD 3D sound
     - Objects can have their own sfx associated with them (channel group)
 	- Change listener up/forward vectors with head tracker for fun

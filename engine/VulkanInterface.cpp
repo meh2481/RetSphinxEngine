@@ -39,7 +39,7 @@
 struct Vertex
 {
     glm::vec3 pos;
-    glm::vec3 color;
+    glm::vec4 color;
     glm::vec2 texCoord;
 
     static VkVertexInputBindingDescription getBindingDescription()
@@ -63,7 +63,7 @@ struct Vertex
 
         attributeDescriptions[1].binding = 0;
         attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         attributeDescriptions[1].offset = offsetof(Vertex, color);
 
         attributeDescriptions[2].binding = 0;
@@ -80,27 +80,27 @@ const std::vector<const char*> deviceExtensions = {
 };
 
 std::vector<Vertex> vertices = {
-    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, -0.5f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, -0.5f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
+    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
 
-    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } }
+    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f, 0.5f },{ 0.0f, 1.0f } }
 };
 
 const std::vector<Vertex> orig_vertices = {
-    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, -0.5f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, -0.5f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
+    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
 
-    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } }
+    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
+    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f },{ 1.0f, 0.0f } },
+    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
+    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f, 0.5f },{ 0.0f, 1.0f } }
 };
 
 const std::vector<uint16_t> indices = {
@@ -1590,8 +1590,10 @@ void VulkanInterface::drawFrame()
     memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    setupCommandBuffer(imageIndex); //Rebuild the command buffer, since the vertex buffer size may have changed
+    //Rebuild the command buffer, since the vertex buffer size may have changed
+    setupCommandBuffer(imageIndex);
 
+    //Set up queue submission
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.waitSemaphoreCount = 1;
