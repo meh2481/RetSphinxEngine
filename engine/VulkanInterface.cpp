@@ -762,7 +762,6 @@ void VulkanInterface::createVertIndexBuffers()
     //Create staging buffer
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedBuffer, combinedBufferMemory);
 }
@@ -1602,17 +1601,15 @@ void VulkanInterface::drawFrame()
     VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
     VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
-    //Copy in data
+
+    //Copy new data into staging buffer (command buffer already has commands to copy this into vertex/index buffer)
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    //Index data first
     memcpy(data, indices.data(), (size_t)indexBufferSize);
-    //Vertex data after index data
     memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    setupCommandBuffer(imageIndex); //Rebuild the command buffer, since the vertex buffer data has changed
-
+    setupCommandBuffer(imageIndex); //Rebuild the command buffer, since the vertex buffer size may have changed
 
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
@@ -1670,7 +1667,8 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
     vkBeginCommandBuffer(commandBuffers[index], &beginInfo);
 
-    //Copy Vertex Buffer over
+    //Copy vertex/index buffer data over from staging buffer to internal memory buffer
+    //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
     VkBufferCopy copyRegion = {};
     copyRegion.size = sizeof(indices[0]) * indices.size() + sizeof(vertices[0]) * vertices.size();
     vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
