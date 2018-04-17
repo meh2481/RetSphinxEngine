@@ -1,4 +1,5 @@
 Current higher pri:
+- Vulkan
 - atexit() flush & close log file, so even on crash we have a full logfile? Is that how that works?
 - FMOD 3D sound
     - Objects can have their own sfx associated with them (channel group)
@@ -19,13 +20,6 @@ Current higher pri:
 	- Think about tree structure for asset dependencies, pros/cons
 - Better handling of raw vs. DXT images for compression - need to be able to specify which you want
 - Compressor should be multithreaded
-- Remove OpenGL deprecated things and re-enable forward compat flag
-	GL[37190]: glVertexPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
-	GL[37190]: glTexCoordPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
-	GL[37190]: Using glDrawArrays in a Core context with parameter <mode> and enum '0x7' which was removed from Core OpenGL (GL_INVALID_ENUM)
-	GL[37190]: glEnableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
-	GL[37190]: glColorPointer has been removed from OpenGL Core context (GL_INVALID_OPERATION)
-	GL[37190]: glDisableClientState has been removed from OpenGL Core context (GL_INVALID_OPERATION)
 - Small-block memory allocator for Lua
 	- Other memory allocators/uses?
 - Objects
@@ -54,7 +48,6 @@ Current higher pri:
 - Use level editor to create geometry/scenery
 - Fix tamerisk board
 - Better handling of object reskinning than obj_setImage from lua
-- Fix framerate stuttering. For real this time.
 
 Bugs:
 - Physics engine tied to framerate; 144Hz same # of physics engine cycles as 60Hz per frame
@@ -121,19 +114,12 @@ Other misc unordered TODO:
 
 For Windows release build:
 - Flip Box2D lib to release lib (via cmake)
+- Fix release mode having such a weird long loading time thing
 
 
 
 
 
-
-
-
-notes from talk with fg:
-- if GL 4.5 if(glDebugMessageCallback) - GL_DEBUG_OUTPUT_SYNCHRONOUS
-	-- set core profile SDL_GL_CONTEXT_PROFILE_CORE
-	-- gontext)forward_compatible_flag | sdl_gl_context debug_flag
-- "push lines ino std::vector, then do glBufferData and draw that buffer as lines"
 	
 -GLM for math
 	- mat4 for transformations
