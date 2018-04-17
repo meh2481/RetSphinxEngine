@@ -16,10 +16,6 @@
 #  endif
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
-#  define EWOULDBLOCK WSAEWOULDBLOCK
-#  define ETIMEDOUT WSAETIMEDOUT
-#  define ECONNRESET WSAECONNRESET
-#  define ENOTCONN WSAENOTCONN
 #  include <io.h>
 #else
 #  include <sys/types.h>
@@ -290,7 +286,7 @@ bool SplitURI(const std::string& uri, std::string& protocol, std::string& host, 
     size_t colon = host.find(':');
     if(colon != std::string::npos)
     {
-		const char* pos = host.c_str() + colon + 1;
+        const char* pos = host.c_str() + colon + 1;
         port = atoi(pos);
         host.erase(colon);
     }
@@ -503,7 +499,7 @@ bool TcpSocket::open(const char *host /* = NULL */, unsigned int port /* = 0 */)
     traceprint("TcpSocket::open(): host = [%s], port = %d\n", host, port);
 
     assert(!SOCKETVALID(_s));
-    
+
     _recvSize = 0;
 
     {
@@ -792,8 +788,8 @@ static void strToLower(std::string& s)
 
 POST& POST::add(const char *key, const char *value)
 {
-	if(json)
-		data.clear();
+    if(json)
+        data.clear();
     if(!empty())
         data += '&';
     URLEncode(key, data);
@@ -804,9 +800,9 @@ POST& POST::add(const char *key, const char *value)
 
 POST & POST::setJsonData(const char * value)
 {
-	data = value;
-	json = true;
-	return *this;
+    data = value;
+    json = true;
+    return *this;
 }
 
 
@@ -937,10 +933,10 @@ bool HttpSocket::SendRequest(Request& req, bool enqueue)
     if(post)
     {
         r << "Content-Length: " << req.post.length() << crlf;
-		if(req.post.isJson())
-			r << "Content-Type: application/json" << crlf;
-		else
-			r << "Content-Type: application/x-www-form-urlencoded" << crlf;
+        if(req.post.isJson())
+            r << "Content-Type: application/json" << crlf;
+        else
+            r << "Content-Type: application/x-www-form-urlencoded" << crlf;
     }
 
     if(req.extraGetHeaders.length())
@@ -952,7 +948,7 @@ bool HttpSocket::SendRequest(Request& req, bool enqueue)
 
     r << crlf; // header terminator
 
-	//Add data to POST
+    //Add data to POST
     if(post)
         r << req.post.str();
 
@@ -1074,7 +1070,7 @@ void HttpSocket::_ProcessChunk(void)
             return;
         }
         term += 2; // skip CRLF
-        
+
         // when we are here, the (next) chunk header was completely received.
         chunksize = strtoul(_readptr, NULL, 16);
         _remaining = chunksize + 2; // the http protocol specifies that each chunk has a trailing CRLF
@@ -1143,7 +1139,7 @@ bool HttpSocket::_HandleStatus()
 
     const char *encoding = Hdr("transfer-encoding");
     _chunkedTransfer = encoding && !STRNICMP(encoding, "chunked", 7);
-    
+
     const char *conn = Hdr("connection"); // if its not keep-alive, server will close it, so we can too
     _mustClose = !conn || STRNICMP(conn, "keep-alive", 10);
 
