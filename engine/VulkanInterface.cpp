@@ -1530,8 +1530,8 @@ void VulkanInterface::drawFrame()
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     //TODO: Figure out why it realllly likes indicies to be divisible by 4
-    while(indices.size() % 4 != 0)
-        indices.push_back(0);
+    //while(indices.size() % 4 != 0)
+    //    indices.push_back(0);
 
     //Trim vert/idx buffers if too big
     if(indices.size() > INDICES_COUNT)
@@ -1550,11 +1550,12 @@ void VulkanInterface::drawFrame()
     VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
-    //Copy new data into staging buffer (command buffer already has commands to copy this into vertex/index buffer)
+    //Copy new data into staging buffer (command buffer will have commands to copy this into vertex/index buffer)
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), (size_t)indexBufferSize);
-    memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
+	//Vertex data first, since indices can be non-32bit-aligned
+	memcpy(data, vertices.data(), (size_t)vertBufferSize);
+    memcpy((void*)((VkDeviceSize)data + vertBufferSize), indices.data(), (size_t)indexBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     //Rebuild the command buffer, since the vertex buffer size may have changed
@@ -1643,9 +1644,9 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
     VkBuffer vertexBuffers[] = { combinedBuffer };
-    VkDeviceSize offsets[] = { sizeof(indices[0]) * indices.size() };   //Vertex buffer after index buffer in data
+    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, sizeof(vertices[0]) * vertices.size(), VK_INDEX_TYPE_UINT16);
 
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
