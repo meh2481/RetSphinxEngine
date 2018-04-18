@@ -44,6 +44,7 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
+    //if(vertexCount != 4) return;
     //Draw filled center
     assert(vertexCount >= 3);
 
@@ -80,7 +81,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
         //This triangle is formed by the first vertex, the previous vertex, and this vertex
         m_indices.push_back(idx0);
         m_indices.push_back(curIdx);
-        m_indices.push_back(+curIdx);
+        m_indices.push_back(++curIdx);
     }
 
     //Fill in outside

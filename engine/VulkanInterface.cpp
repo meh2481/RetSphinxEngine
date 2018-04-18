@@ -44,24 +44,6 @@ const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-
-const std::vector<DbgVertex> orig_vertices = {
-    { { -0.5f, -0.5f },{ 1.0f, 0.0f, 1.0f, 1.0f }},
-    { { 0.5f, -0.5f },{ 1.0f, 1.0f, 0.0f, 1.0f } },
-    { { 0.5f, 0.5f },{ 0.0f, 1.0f, 1.0f, 1.0f } },
-    { { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-
-    { { 1.5f, -0.5f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-    { { 2.5f, -0.5f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-    { { 2.5f, 0.5f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-    { { 1.5f, 0.5f },{ 1.0f, 1.0f, 1.0f, 0.5f } }
-};
-
-const std::vector<uint16_t> orig_indices = {
-    0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4
-};
-
 #ifdef ENABLE_VALIDATION_LAYERS
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_LUNARG_standard_validation"
@@ -1030,8 +1012,8 @@ void VulkanInterface::createGraphicsPipeline()
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterizer.cullMode = VK_CULL_MODE_NONE;
+    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f;
     rasterizer.depthBiasClamp = 0.0f;
@@ -1549,6 +1531,10 @@ void VulkanInterface::drawFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+    //TODO: Figure out why it realllly likes indicies to be divisible by 4
+    while(indices.size() % 4 != 0)
+        indices.push_back(0);
+
     //Trim vert/idx buffers if too big
     if(indices.size() > INDICES_COUNT)
     {
@@ -1562,15 +1548,15 @@ void VulkanInterface::drawFrame()
     }
 
     //Rebind vertex buffer
-    VkDeviceSize indexBufferSize = sizeof(orig_indices[0]) * orig_indices.size();
-    VkDeviceSize vertBufferSize = sizeof(orig_vertices[0]) * orig_vertices.size();
+    VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
+    VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Copy new data into staging buffer (command buffer already has commands to copy this into vertex/index buffer)
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, orig_indices.data(), (size_t)indexBufferSize);
-    memcpy((void*)((VkDeviceSize)data + indexBufferSize), orig_vertices.data(), (size_t)vertBufferSize);
+    memcpy(data, indices.data(), (size_t)indexBufferSize);
+    memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     //Rebuild the command buffer, since the vertex buffer size may have changed
@@ -1636,7 +1622,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer
     //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
     VkBufferCopy copyRegion = {};
-    copyRegion.size = sizeof(orig_indices[0]) * orig_indices.size() + sizeof(orig_vertices[0]) * orig_vertices.size();
+    copyRegion.size = sizeof(indices[0]) * indices.size() + sizeof(vertices[0]) * vertices.size();
     vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
@@ -1659,14 +1645,14 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
     VkBuffer vertexBuffers[] = { combinedBuffer };
-    VkDeviceSize offsets[] = { sizeof(orig_indices[0]) * orig_indices.size() };   //Vertex buffer after index buffer in data
+    VkDeviceSize offsets[] = { sizeof(indices[0]) * indices.size() };   //Vertex buffer after index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, 0, VK_INDEX_TYPE_UINT16);
 
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)orig_indices.size(), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)indices.size(), 1, 0, 0, 0);
     vkCmdEndRenderPass(commandBuffers[index]);
 
     if(vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)
