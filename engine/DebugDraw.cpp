@@ -44,7 +44,6 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
-    //if(vertexCount != 4) return;
     //Draw filled center
     assert(vertexCount >= 3);
 
@@ -105,28 +104,48 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
     //Draw filled circle in center
-    float data[NUM_SEGMENTS * 6];
-    const float col[] = {
-        color.r * fillMul,
-        color.g * fillMul,
-        color.b * fillMul,
-        color.a * fillAlpha
-    };
+
+    //Fill out triangles
+    uint16_t idx0 = (uint16_t)m_vertices.size();  //Index of starting vertex
+
+    //Push center vertex
+    DbgVertex v = {};
+    v.pos.x = center.x;
+    v.pos.y = center.y;
+    v.color.r = color.r * fillMul;
+    v.color.g = color.g * fillMul;
+    v.color.b = color.b * fillMul;
+    v.color.a = color.a * fillAlpha;
+    m_vertices.push_back(v);
+
+    assert(NUM_SEGMENTS > 2);
+
+    //Push second vertex
     float angle = 0.0f;
-    for(int i = 0; i < NUM_SEGMENTS; i++)
+    b2Vec2 pt = center + radius * b2Vec2(cosf(angle), sinf(angle));
+    angle += ANGLE_INCREMENT;
+    v.pos.x = pt.x;
+    v.pos.y = pt.y;
+    m_vertices.push_back(v);
+    uint16_t idx1 = idx0 + 1;	//Index of second vertex
+    uint16_t curIdx = idx1;
+
+    for(int i = 1; i < NUM_SEGMENTS; i++)
     {
-        b2Vec2 v = center + radius * b2Vec2(cosf(angle), sinf(angle));
-        data[i * 6] = v.x;
-        data[i * 6 + 1] = v.y;
+        pt = center + radius * b2Vec2(cosf(angle), sinf(angle));
+        v.pos.x = pt.x;
+        v.pos.y = pt.y;
+        m_vertices.push_back(v);
         angle += ANGLE_INCREMENT;
-        v = center + radius * b2Vec2(cosf(angle), sinf(angle));
-        data[i * 6 + 2] = v.x;
-        data[i * 6 + 3] = v.y;
-        data[i * 6 + 4] = center.x;
-        data[i * 6 + 5] = center.y;
+        m_indices.push_back(idx0);
+        m_indices.push_back(curIdx);
+        m_indices.push_back(++curIdx);
     }
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * NUM_SEGMENTS * 6, 2, NUM_SEGMENTS * 3, GL_TRIANGLES);
+
+    //Push last triangle
+    m_indices.push_back(idx0);
+    m_indices.push_back(idx1);
+    m_indices.push_back(curIdx);
 
     //Draw circle
     DrawCircle(center, radius, color);

@@ -33,8 +33,8 @@
 #define IMG_TEXTURE "res/gfx/blob2.png"
 
 //TODO
-#define INDICES_COUNT 128
-#define VERTICES_COUNT 128
+#define INDICES_COUNT 1024
+#define VERTICES_COUNT 512
 #define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
 #define VERTICES_SIZE sizeof(DbgVertex) * VERTICES_COUNT
 
@@ -1529,10 +1529,6 @@ void VulkanInterface::drawFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    //TODO: Figure out why it realllly likes indicies to be divisible by 4
-    //while(indices.size() % 4 != 0)
-    //    indices.push_back(0);
-
     //Trim vert/idx buffers if too big
     if(indices.size() > INDICES_COUNT)
     {
@@ -1553,8 +1549,8 @@ void VulkanInterface::drawFrame()
     //Copy new data into staging buffer (command buffer will have commands to copy this into vertex/index buffer)
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	//Vertex data first, since indices can be non-32bit-aligned
-	memcpy(data, vertices.data(), (size_t)vertBufferSize);
+    //Vertex data first, since indices can be non-32bit-aligned
+    memcpy(data, vertices.data(), (size_t)vertBufferSize);
     memcpy((void*)((VkDeviceSize)data + vertBufferSize), indices.data(), (size_t)indexBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
