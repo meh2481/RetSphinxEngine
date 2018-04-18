@@ -15,7 +15,6 @@
 #include <set>
 #include <algorithm>
 #include <fstream>
-#include <array>
 
 //Application-specific defines
 #define WIDTH 800
@@ -31,78 +30,34 @@
 #define QUEUE_PRIORITY 1.0f
 
 //Temp resources
-#define VERT_SHADER "res/shaders/vert.spv"
-#define FRAG_SHADER "res/shaders/frag.spv"
+#define VERT_SHADER "res/shaders/vertdbg.spv"
+#define FRAG_SHADER "res/shaders/fragdbg.spv"
 #define IMG_TEXTURE "res/gfx/blob2.png"
 
-struct Vertex
-{
-    glm::vec3 pos;
-    glm::vec4 color;
-    glm::vec2 texCoord;
-
-    static VkVertexInputBindingDescription getBindingDescription()
-    {
-        VkVertexInputBindingDescription bindingDescription = {};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
-    {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-        return attributeDescriptions;
-    }
-};
+//TODO
+#define INDICES_COUNT 128
+#define VERTICES_COUNT 128
+#define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
+#define VERTICES_SIZE sizeof(DbgVertex) * VERTICES_COUNT
 
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-std::vector<Vertex> vertices = {
-    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
 
-    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f, 0.5f },{ 0.0f, 1.0f } }
+const std::vector<DbgVertex> orig_vertices = {
+    { { -0.5f, -0.5f },{ 1.0f, 0.0f, 1.0f, 1.0f }},
+    { { 0.5f, -0.5f },{ 1.0f, 1.0f, 0.0f, 1.0f } },
+    { { 0.5f, 0.5f },{ 0.0f, 1.0f, 1.0f, 1.0f } },
+    { { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
+
+    { { 1.5f, -0.5f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
+    { { 2.5f, -0.5f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
+    { { 2.5f, 0.5f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
+    { { 1.5f, 0.5f },{ 1.0f, 1.0f, 1.0f, 0.5f } }
 };
 
-const std::vector<Vertex> orig_vertices = {
-    { { -0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, -0.5f },{ 1.0f, 1.0f, 1.0f, 1.0f },{ 0.0f, 1.0f } },
-
-    { { -0.5f, -0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f },{ 0.0f, 0.0f } },
-    { { 0.5f, -0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f },{ 1.0f, 0.0f } },
-    { { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f },{ 1.0f, 1.0f } },
-    { { -0.5f, 0.5f, 0.0f },{ 1.0f, 1.0f, 1.0f, 0.5f },{ 0.0f, 1.0f } }
-};
-
-const std::vector<uint16_t> indices = {
+const std::vector<uint16_t> orig_indices = {
     0, 1, 2, 2, 3, 0,
     4, 5, 6, 6, 7, 4
 };
@@ -778,8 +733,8 @@ void VulkanInterface::createDescriptorSetLayout()
 void VulkanInterface::createVertIndexBuffers()
 {
     //Combined buffer size
-    VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
-    VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
+    VkDeviceSize indexBufferSize = INDICES_SIZE;
+    VkDeviceSize vertBufferSize = VERTICES_SIZE;
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Create staging buffer
@@ -1030,8 +985,8 @@ void VulkanInterface::createGraphicsPipeline()
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
     //Vertex input
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    auto bindingDescription = DbgVertex::getBindingDescription();
+    auto attributeDescriptions = DbgVertex::getAttributeDescriptions();
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -1594,23 +1549,28 @@ void VulkanInterface::drawFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    //Change vertex data per-frame as a test
-
-    //Simulate vertex movement
-    float curTimeSec = (float)SDL_GetTicks() / 1000.0f;
-    for(int i = 0; i < 4; i++)
-        vertices[i].pos.x = orig_vertices[i].pos.x + sin(curTimeSec);
+    //Trim vert/idx buffers if too big
+    if(indices.size() > INDICES_COUNT)
+    {
+        LOG(WARN) << "Reducing index buffer - was " << indices.size();
+        indices.resize(INDICES_COUNT);
+    }
+    if(vertices.size() > VERTICES_COUNT)
+    {
+        LOG(WARN) << "Reducing vertex buffer - was " << vertices.size();
+        vertices.resize(VERTICES_COUNT);
+    }
 
     //Rebind vertex buffer
-    VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
-    VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
+    VkDeviceSize indexBufferSize = sizeof(orig_indices[0]) * orig_indices.size();
+    VkDeviceSize vertBufferSize = sizeof(orig_vertices[0]) * orig_vertices.size();
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Copy new data into staging buffer (command buffer already has commands to copy this into vertex/index buffer)
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), (size_t)indexBufferSize);
-    memcpy((void*)((VkDeviceSize)data + indexBufferSize), vertices.data(), (size_t)vertBufferSize);
+    memcpy(data, orig_indices.data(), (size_t)indexBufferSize);
+    memcpy((void*)((VkDeviceSize)data + indexBufferSize), orig_vertices.data(), (size_t)vertBufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     //Rebuild the command buffer, since the vertex buffer size may have changed
@@ -1676,7 +1636,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer
     //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
     VkBufferCopy copyRegion = {};
-    copyRegion.size = sizeof(indices[0]) * indices.size() + sizeof(vertices[0]) * vertices.size();
+    copyRegion.size = sizeof(orig_indices[0]) * orig_indices.size() + sizeof(orig_vertices[0]) * orig_vertices.size();
     vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
@@ -1699,14 +1659,14 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
     VkBuffer vertexBuffers[] = { combinedBuffer };
-    VkDeviceSize offsets[] = { sizeof(indices[0]) * indices.size() };   //Vertex buffer after index buffer in data
+    VkDeviceSize offsets[] = { sizeof(orig_indices[0]) * orig_indices.size() };   //Vertex buffer after index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, 0, VK_INDEX_TYPE_UINT16);
 
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)indices.size(), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)orig_indices.size(), 1, 0, 0, 0);
     vkCmdEndRenderPass(commandBuffers[index]);
 
     if(vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)

@@ -19,7 +19,9 @@ class SoundManager;
 class InterpolationManager;
 class HeadTracker;
 class EngineContactListener;
+#ifdef _DEBUG
 class DebugDraw;
+#endif
 class VulkanInterface;
 
 #define VELOCITY_ITERATIONS 8

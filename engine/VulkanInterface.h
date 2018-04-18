@@ -4,10 +4,45 @@
 #include <SDL_vulkan.h>
 #include <vector>
 #include <string>
+#include <array>
 #include "RenderState.h"
 
 #ifdef _DEBUG
 #define ENABLE_VALIDATION_LAYERS
+
+struct DbgVertex
+{
+    glm::vec2 pos;
+    glm::vec4 color;
+
+    static VkVertexInputBindingDescription getBindingDescription()
+    {
+        VkVertexInputBindingDescription bindingDescription = {};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(DbgVertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions()
+    {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(DbgVertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(DbgVertex, color);
+
+        return attributeDescriptions;
+    }
+};
+
 #endif
 
 struct QueueFamilyIndices
@@ -26,6 +61,45 @@ struct SwapChainSupportDetails
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
+};
+
+struct Vertex
+{
+    glm::vec3 pos;
+    glm::vec4 color;
+    glm::vec2 texCoord;
+
+    static VkVertexInputBindingDescription getBindingDescription()
+    {
+        VkVertexInputBindingDescription bindingDescription = {};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
+    {
+        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        attributeDescriptions[2].binding = 0;
+        attributeDescriptions[2].location = 2;
+        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+
+        return attributeDescriptions;
+    }
 };
 
 class VulkanInterface
@@ -85,6 +159,12 @@ public:
 
     void mainLoop(const RenderState& state);
     void resizeWindow(int width, int height);
+
+#ifdef _DEBUG
+    //For debugging stuff
+    std::vector<DbgVertex> vertices;
+    std::vector<uint16_t> indices;
+#endif
 
 private:
     //Private member functions

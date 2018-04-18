@@ -99,7 +99,7 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
 
 #ifdef _DEBUG
     LOG(DBG) << "Create debug draw";
-    m_debugDraw = new DebugDraw(m_debugRenderState);
+    m_debugDraw = new DebugDraw(m_vulkan);
     m_debugDraw->outlineAlpha = 0.75f;
     m_debugDraw->fillAlpha = 0.5f;
     m_debugDraw->fillMul = m_debugDraw->fillAlpha;
@@ -307,7 +307,10 @@ void Engine::drawDebug()
 #ifdef _DEBUG
     // Draw physics debug stuff
     if(m_bDebugDraw)
+    {
         m_physicsWorld->DrawDebugData();
+        m_debugDraw->flush();
+    }
     if(m_bSoundDebugDraw)
         getSoundManager()->drawDebug(m_debugDraw);
 #endif // _DEBUG

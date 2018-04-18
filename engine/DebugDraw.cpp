@@ -2,18 +2,35 @@
     RetSphinxEngine source - DebugDraw.cpp
     Copyright (c) 2017 Mark Hutcheson
 */
+#ifdef _DEBUG   //Only debug draw in debug mode
 
 #include "DebugDraw.h"
 #include "Box2D/Box2D.h"
-#include "Quad.h"
+#include "VulkanInterface.h"
+#include "Logger.h"
 
 //TODO: Rewrite for vulkan
 
-DebugDraw::DebugDraw(RenderState renderState)
+DebugDraw::DebugDraw(VulkanInterface* vulkan)
 {
-    m_renderState = renderState;
-    //m_colorUniformId = glGetUniformLocation(m_renderState.programId, "col");
-    //assert(m_colorUniformId >= 0);
+    m_vulkan = vulkan;
+}
+
+void DebugDraw::flush()
+{
+    //Push to vulkan
+    m_vulkan->vertices.clear();
+    m_vulkan->indices.clear();
+    for(auto i : m_vertices)
+        m_vulkan->vertices.push_back(i);
+    for(auto i : m_indices)
+        m_vulkan->indices.push_back(i);
+
+    //Clear for next pass
+    //LOG(DBG) << "Vertices: " << m_vertices.size();
+    m_vertices.clear();
+    //LOG(DBG) << "Indices: " << m_indices.size();
+    m_indices.clear();
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -29,36 +46,45 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 {
     //Draw filled center
     assert(vertexCount >= 3);
-    unsigned int numTriangles = vertexCount - 2;
-    float* data = new float[numTriangles * 6];
-    const float col[] = {
-        color.r * fillMul,
-        color.g * fillMul,
-        color.b * fillMul,
-        color.a * fillAlpha
-    };
+
     //Fill out triangles
-    for(unsigned int i = 0; i < numTriangles; i++)
+    uint16_t idx0 = (uint16_t)m_vertices.size();  //Index of starting vertex
+    uint16_t curIdx = idx0;
+
+    //Push first triangle
+    DbgVertex v = {};
+    v.pos.x = vertices[0].x;
+    v.pos.y = vertices[0].y;
+    v.color.r = color.r * fillMul;
+    v.color.g = color.g * fillMul;
+    v.color.b = color.b * fillMul;
+    v.color.a = color.a * fillAlpha;
+    m_vertices.push_back(v);
+    m_indices.push_back(idx0);
+    v.pos.x = vertices[1].x;
+    v.pos.y = vertices[1].y;
+    m_vertices.push_back(v);
+    m_indices.push_back(++curIdx);
+    v.pos.x = vertices[2].x;
+    v.pos.y = vertices[2].y;
+    m_vertices.push_back(v);
+    m_indices.push_back(++curIdx);
+
+    //Fill out the rest
+    for(int32 i = 3; i < vertexCount; i++)
     {
-        data[i * 6] = vertices[0].x;
-        data[i * 6 + 1] = vertices[0].y;
-        data[i * 6 + 2] = vertices[i + 1].x;
-        data[i * 6 + 3] = vertices[i + 1].y;
-        data[i * 6 + 4] = vertices[i + 2].x;
-        data[i * 6 + 5] = vertices[i + 2].y;
+        //Add one new vertex
+        v.pos.x = vertices[i].x;
+        v.pos.y = vertices[i].y;
+        m_vertices.push_back(v);
+        //This triangle is formed by the first vertex, the previous vertex, and this vertex
+        m_indices.push_back(idx0);
+        m_indices.push_back(curIdx);
+        m_indices.push_back(+curIdx);
     }
-    //for(int i = 0; i < vertexCount; i++)
-    //{
-    //    data[i * 2] = vertices[i].x;
-    //    data[i * 2 + 1] = vertices[i].y;
-    //}
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * numTriangles * 6, 2, numTriangles*3, GL_TRIANGLES);
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
-
-    delete[] data;
 }
 
 const int NUM_SEGMENTS = 16;
@@ -164,7 +190,6 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
     //Don't care about drawing AABBs, as they're generally useless to see
 }
 
-#ifdef _DEBUG
 void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& color)
 {
     const float data[] = {
@@ -230,4 +255,4 @@ void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2C
 
     delete[] data;
 }
-#endif
+#endif //_DEBUG

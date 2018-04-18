@@ -1,23 +1,25 @@
+#ifdef _DEBUG
 #ifndef DEBUG_DRAW_H
 #define DEBUG_DRAW_H
 
 #include "Box2D/Box2D.h"
-#include "RenderState.h"
-
-#ifdef _DEBUG
 #include "Rect.h"
-#endif
+#include "VulkanInterface.h"
+#include <vector>
 
 //Debug draw class for drawing Box2D stuff
 class DebugDraw : public b2Draw
 {
-    RenderState m_renderState;
+    VulkanInterface* m_vulkan;
+    std::vector<DbgVertex> m_vertices;
+    std::vector<uint16_t> m_indices;
 
     DebugDraw() {};
 
 public:
 
-    DebugDraw(RenderState renderState);
+    DebugDraw(VulkanInterface* vulkan);
+    void flush();   //Finish rendering
 
     void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
     void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
@@ -29,10 +31,8 @@ public:
     void DrawString(int x, int y, const char* string, ...);
     void DrawString(const b2Vec2& p, const char* string, ...);
     void DrawAABB(b2AABB* aabb, const b2Color& color);
-#ifdef _DEBUG
     void Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color);
     void Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& color);
-#endif
 
     float fillAlpha;
     float fillMul;
@@ -41,3 +41,4 @@ public:
 
 
 #endif //DEBUG_DRAW_H
+#endif //_DEBUG
