@@ -158,7 +158,7 @@ public:
     ~VulkanInterface();
 
     void mainLoop(const RenderState& state);
-    void resizeWindow(int width, int height);
+    void resizeWindow();
 
 #ifdef _DEBUG
     //For debugging stuff

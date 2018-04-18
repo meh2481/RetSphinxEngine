@@ -17,8 +17,6 @@
 #include <fstream>
 
 //Application-specific defines
-#define WIDTH 800
-#define HEIGHT 600
 #define APPLICATION_NAME "Vulkan SDL"
 
 #define MAJOR_VERSION 1
@@ -1395,8 +1393,8 @@ VkExtent2D VulkanInterface::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& cap
         return capabilities.currentExtent;
     else
     {
-        int width = WIDTH;
-        int height = HEIGHT;
+        int width;
+        int height;
         SDL_Vulkan_GetDrawableSize(window, &width, &height);
         VkExtent2D actualExtent = { (uint32_t)width, (uint32_t)height };
 
@@ -1504,7 +1502,7 @@ void VulkanInterface::updateUniformBuffer(const RenderState& ubo)
     vkUnmapMemory(device, uniformBufferMemory);
 }
 
-void VulkanInterface::resizeWindow(int width, int height)
+void VulkanInterface::resizeWindow()
 {
     recreateSwapChain();
 }

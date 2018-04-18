@@ -12,10 +12,12 @@ void Engine::changeScreenResolution(int w, int h)
     if(m_bFullscreen)
         SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-    SDL_SetWindowSize(m_Window, m_iWidth, m_iHeight);
+    SDL_SetWindowSize(m_Window, w, h);
+
+    m_renderState.proj = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)w / (float)h, 0.1f);
 
     //Update vulkan
-    m_vulkan->resizeWindow(w, h);
+    m_vulkan->resizeWindow();
 }
 
 void Engine::setFullscreen(bool bFullscreen)
