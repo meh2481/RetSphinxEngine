@@ -12,7 +12,7 @@
 
 struct DbgVertex
 {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec4 color;
 
     static VkVertexInputBindingDescription getBindingDescription()
@@ -31,7 +31,7 @@ struct DbgVertex
 
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
         attributeDescriptions[0].offset = offsetof(DbgVertex, pos);
 
         attributeDescriptions[1].binding = 0;
@@ -124,7 +124,8 @@ private:
     std::vector<VkImageView> swapChainImageViews;
     VkPipelineLayout pipelineLayout;
     VkRenderPass renderPass;
-    VkPipeline graphicsPipeline;
+    VkPipeline debugGeometryGraphicsPipeline;
+    VkPipeline debugOutlineGraphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
@@ -203,7 +204,7 @@ private:
     void createCommandPool();
     void createFramebuffers();
     void createRenderPass();
-    void createGraphicsPipeline();
+    void createGraphicsPipelines();
     VkShaderModule createShaderModule(const std::vector<char>& code);
     void createSwapChainImageViews();
     void recreateSwapChain();

@@ -177,7 +177,7 @@ void VulkanInterface::initVulkan()
 
     //Pipeline setup
     createDescriptorSetLayout();
-    createGraphicsPipeline();
+    createGraphicsPipelines();
 
     //Drawing setup
     createCommandPool();
@@ -952,7 +952,7 @@ void VulkanInterface::createRenderPass()
     }
 }
 
-void VulkanInterface::createGraphicsPipeline()
+void VulkanInterface::createGraphicsPipelines()
 {
     std::vector<char> vertShaderCode = readFile(VERT_SHADER);
     std::vector<char> fragShaderCode = readFile(FRAG_SHADER);
@@ -1127,9 +1127,23 @@ void VulkanInterface::createGraphicsPipeline()
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex = -1;
 
-    if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
+    //Create debug geom pipeline
+    if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugGeometryGraphicsPipeline) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create graphics pipeline!";
+        LOG(ERR) << "Failed to create debug geom graphics pipeline!";
+        assert(false);
+    }
+
+    //Create debug outline geom pipeline
+    //TODO
+    //bindingDescription=
+    //attributeDescriptions=
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    pipelineInfo.basePipelineHandle = debugGeometryGraphicsPipeline;
+    if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugOutlineGraphicsPipeline) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Failed to create debug outline graphics pipeline!";
         assert(false);
     }
 
@@ -1168,7 +1182,7 @@ void VulkanInterface::recreateSwapChain()
     createSwapChain();
     createSwapChainImageViews();
     createRenderPass();
-    createGraphicsPipeline();
+    createGraphicsPipelines();
     createDepthResources();
     createFramebuffers();
     createCommandBuffers();
@@ -1666,10 +1680,12 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     renderPassInfo.renderArea.extent = swapChainExtent;
     renderPassInfo.clearValueCount = clearValues.size();
     renderPassInfo.pClearValues = clearValues.data();
+
+    //-------------- Begin Render Pass --------------
     vkCmdBeginRenderPass(commandBuffers[index], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    //Draw
-    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    //----Draw debug geometry first----
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugGeometryGraphicsPipeline);
 
     VkBuffer vertexBuffers[] = { combinedBuffer };
     VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
@@ -1680,6 +1696,11 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
     vkCmdDrawIndexed(commandBuffers[index], (uint32_t)indices.size(), 1, 0, 0, 0);
+
+    //----Draw debug geometry outlines second----
+
+
+    //-------------- End Render Pass --------------
     vkCmdEndRenderPass(commandBuffers[index]);
 
     if(vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)
@@ -1700,7 +1721,8 @@ void VulkanInterface::cleanupSwapChain()
     for(auto framebuffer : swapChainFramebuffers)
         vkDestroyFramebuffer(device, framebuffer, NULL);
     vkFreeCommandBuffers(device, commandPool, commandBuffers.size(), commandBuffers.data());
-    vkDestroyPipeline(device, graphicsPipeline, NULL);
+    vkDestroyPipeline(device, debugGeometryGraphicsPipeline, NULL);
+    vkDestroyPipeline(device, debugOutlineGraphicsPipeline, NULL);
     vkDestroyPipelineLayout(device, pipelineLayout, NULL);
     vkDestroyRenderPass(device, renderPass, NULL);
     for(auto imageView : swapChainImageViews)

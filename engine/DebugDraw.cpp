@@ -9,8 +9,12 @@
 #include "VulkanInterface.h"
 #include "Logger.h"
 
+#define START_VERT_DEPTH 0.0f;
+#define VERT_DEPTH_INCR  0.0006f;
+
 static const int NUM_SEGMENTS = 16;    //Must be greater than 2
 static const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)NUM_SEGMENTS;
+static float vertexDepth = START_VERT_DEPTH;
 
 DebugDraw::DebugDraw(VulkanInterface* vulkan)
 {
@@ -30,6 +34,7 @@ void DebugDraw::flush()
     //Clear for next pass
     m_vertices.clear();
     m_indices.clear();
+    vertexDepth = START_VERT_DEPTH;
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -54,6 +59,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     DbgVertex v = {};
     v.pos.x = vertices[0].x;
     v.pos.y = vertices[0].y;
+    v.pos.z = vertexDepth;
     v.color.r = color.r * fillMul;
     v.color.g = color.g * fillMul;
     v.color.b = color.b * fillMul;
@@ -84,6 +90,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
+    vertexDepth += VERT_DEPTH_INCR;
 }
 
 void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
@@ -107,6 +114,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     DbgVertex v = {};
     v.pos.x = center.x;
     v.pos.y = center.y;
+    v.pos.z = vertexDepth;
     v.color.r = color.r * fillMul;
     v.color.g = color.g * fillMul;
     v.color.b = color.b * fillMul;
@@ -146,6 +154,8 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     //Draw axis
     b2Vec2 p = center + radius * axis;
     DrawSegment(center, p, color);
+
+    vertexDepth += VERT_DEPTH_INCR;
 }
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
