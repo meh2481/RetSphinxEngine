@@ -1593,12 +1593,15 @@ void VulkanInterface::drawFrame()
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Copy new data into staging buffer (command buffer will have commands to copy this into vertex/index buffer)
-    void* data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    //Vertex data first, since indices can be non-32bit-aligned
-    memcpy(data, vertices.data(), (size_t)vertBufferSize);
-    memcpy((void*)((VkDeviceSize)data + vertBufferSize), indices.data(), (size_t)indexBufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
+    if(bufferSize > 0)
+    {
+        void* data;
+        vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+        //Vertex data first, since indices can be non-32bit-aligned
+        memcpy(data, vertices.data(), (size_t)vertBufferSize);
+        memcpy((void*)((VkDeviceSize)data + vertBufferSize), indices.data(), (size_t)indexBufferSize);
+        vkUnmapMemory(device, stagingBufferMemory);
+    }
 
     //Rebuild the command buffer, since the vertex buffer size may have changed
     setupCommandBuffer(imageIndex);
@@ -1659,6 +1662,8 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     beginInfo.pInheritanceInfo = NULL;
 
     vkBeginCommandBuffer(commandBuffers[index], &beginInfo);
+
+    //--------------- Copy Buffer Data ---------------
 
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer
     //TODO: This may be a bit wasteful, since we're copying it in every frame anyway

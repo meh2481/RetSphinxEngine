@@ -302,19 +302,17 @@ void Engine::_render()
 }
 
 
+#ifdef _DEBUG
 void Engine::drawDebug()
 {
-#ifdef _DEBUG
     // Draw physics debug stuff
-    //if(m_bDebugDraw)
-    {
+    if(m_bDebugDraw)
         m_physicsWorld->DrawDebugData();
-        m_debugDraw->flush();
-    }
+    m_debugDraw->flush();
     if(m_bSoundDebugDraw)
         getSoundManager()->drawDebug(m_debugDraw);
-#endif // _DEBUG
 }
+#endif // _DEBUG
 
 void Engine::setFramerate(float fFramerate)
 {

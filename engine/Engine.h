@@ -134,7 +134,9 @@ public:
 
     //Drawing functions
     Rect getScreenRect() { Rect rc(0, 0, getWidth(), getHeight()); return rc; };
+#ifdef _DEBUG
     void drawDebug();
+#endif // _DEBUG
 
     //Window functions - engine_window.cpp
     void changeScreenResolution(int w, int h);  //Change resolution mid-game
