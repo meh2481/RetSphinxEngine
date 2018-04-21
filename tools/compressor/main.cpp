@@ -20,6 +20,7 @@
 bool g_bImageOut;
 bool g_bClean;
 bool g_bRawImg;
+bool g_bReduceShader;
 
 typedef struct
 {
@@ -625,6 +626,7 @@ int main(int argc, char** argv)
     initLua();
     initSound();
     g_bImageOut = g_bClean = g_bRawImg = false;
+    g_bReduceShader = true;
     workMem = (uint8_t*)malloc(wfLZ_GetWorkMemSize());
     std::vector<std::string> sFilelistNames;
 
@@ -638,6 +640,8 @@ int main(int argc, char** argv)
             g_bClean = true;
         else if(s == "--raw")
             g_bRawImg = true;
+        else if(s == "--no-reduce-shader")
+            g_bReduceShader = false;
         else
             sFilelistNames.push_back(s);
     }

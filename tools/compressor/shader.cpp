@@ -4,6 +4,9 @@
 #include <iostream>
 
 #define GLSLANGVALIDATOR "glslangValidator"
+#define SPIRV_OPT "spirv-opt"
+
+extern bool g_bReduceShader;
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -34,7 +37,7 @@ std::string getTempFilename()
     //Generate a temporary file name
     UINT uRetVal = GetTempFileNameW(lpTempPathBuffer, TEXT(L"SPV"), 0, szTempFileName);
     if(uRetVal == 0)
-        return DEFAULT_TMP_NAME;
+        return ws2s(lpTempPathBuffer) + "\\" + DEFAULT_TMP_NAME;
 
     std::wstring wFilename(szTempFileName);
     return ws2s(wFilename);
@@ -44,28 +47,66 @@ std::string getTempFilename()
 #endif
 }
 
+//Assumes glslangValidator tools are in your PATH
 unsigned char* extractShader(const std::string& glslFilename, unsigned int* size)
 {
     //Read the GLSL shader code
     unsigned int glslSize;
     unsigned char* shaderCode = FileOperations::readFile(glslFilename, &glslSize);
 
-    std::string tempFilename = getTempFilename();
+    std::string tempFilename1 = getTempFilename();
 
-    //Assumes glslangValidator is in your PATH
+    //Convert glsl to SPIR-V
     std::ostringstream oss;
     oss << GLSLANGVALIDATOR << " -Os -o \""
-        << tempFilename
+        << tempFilename1
         << "\" -V \""
         << glslFilename << "\"";
-    std::cout << "Invoking " << oss.str() << std::endl;
+    //std::cout << "Invoking " << oss.str() << std::endl;
 
     int result = system(oss.str().c_str());
     if(result != EXIT_SUCCESS)
     {
-        std::cout << "Unable to invoke glslangValidator" << std::endl;
+        std::cout << "Unable to invoke " << GLSLANGVALIDATOR << std::endl;
         return NULL;
     }
+
+    if(g_bReduceShader)
+    {
+        std::string tempFilename2 = getTempFilename();
+
+        //Reduce file size of SPIR-V (still bigger than glsl; meh)
+        oss.str("");
+        oss << SPIRV_OPT << " --strip-debug -Os \""
+            << tempFilename1
+            << "\" -o \""
+            << tempFilename2
+            << "\"";
+        //std::cout << "Invoking " << oss.str() << std::endl;
+
+        result = system(oss.str().c_str());
+        unsigned char* ret = NULL;
+        if(result != EXIT_SUCCESS)
+        {
+            std::cout << "Unable to invoke " << SPIRV_OPT << std::endl;
+            //Return the non-minified version
+            ret = FileOperations::readFile(tempFilename1.c_str(), size);
+            remove(tempFilename1.c_str());
+        }
+        else
+        {
+            ret = FileOperations::readFile(tempFilename2.c_str(), size);
+            remove(tempFilename1.c_str());
+            remove(tempFilename2.c_str());
+        }
+        return ret;
+    }
+
     //Read back output
-    return FileOperations::readFile(tempFilename.c_str(), size);
+    unsigned char* ret = FileOperations::readFile(tempFilename1.c_str(), size);
+
+    //Cleanup temp files
+    remove(tempFilename1.c_str());
+
+    return ret;
 }
