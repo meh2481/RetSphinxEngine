@@ -305,14 +305,14 @@ void VulkanInterface::createTextureImage()
 
     textureMipLevels = (uint32_t)std::floor(std::log2(std::max(texWidth, texHeight))) + 1;
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+    VkBuffer imgStagingBuffer;
+    VkDeviceMemory imgStagingBufferMemory;
+    createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imgStagingBuffer, imgStagingBufferMemory);
 
     void* data;
-    vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
+    vkMapMemory(device, imgStagingBufferMemory, 0, imageSize, 0, &data);
     memcpy(data, pixels, static_cast<size_t>(imageSize));
-    vkUnmapMemory(device, stagingBufferMemory);
+    vkUnmapMemory(device, imgStagingBufferMemory);
 
     stbi_image_free(pixels);
 
@@ -320,10 +320,10 @@ void VulkanInterface::createTextureImage()
     createImage(texWidth, texHeight, textureMipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 
     transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, textureMipLevels);
-    copyBufferToImage(stagingBuffer, textureImage, (uint32_t)texWidth, (uint32_t)texHeight);
+    copyBufferToImage(imgStagingBuffer, textureImage, (uint32_t)texWidth, (uint32_t)texHeight);
 
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
+    vkDestroyBuffer(device, imgStagingBuffer, NULL);
+    vkFreeMemory(device, imgStagingBufferMemory, NULL);
 
     generateMipmaps(textureImage, texWidth, texHeight, textureMipLevels);
 }
@@ -1745,10 +1745,12 @@ void VulkanInterface::cleanup()
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, NULL);
     vkDestroyBuffer(device, uniformBuffer, NULL);
     vkFreeMemory(device, uniformBufferMemory, NULL);
+
     vkDestroyBuffer(device, combinedBuffer, NULL);
     vkFreeMemory(device, combinedBufferMemory, NULL);
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);
+
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);
     for(auto fence : fences)
