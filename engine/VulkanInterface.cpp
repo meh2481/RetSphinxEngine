@@ -1495,7 +1495,7 @@ QueueFamilyIndices VulkanInterface::findQueueFamilies(VkPhysicalDevice device)
 void VulkanInterface::mainLoop(const RenderState& state)
 {
     //Make a copy so we can flip y
-    RenderState ubo = {state.model, state.view, state.proj};
+    RenderState ubo = { state.model, state.view, state.proj };
     ubo.proj[1][1] *= -1; //Flip y
 
     //Update uniforms
@@ -1542,6 +1542,25 @@ void VulkanInterface::drawFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+    //First-run check to prevent validation layer errors
+    if(bufferSubmitted[imageIndex])
+    {
+        //Make absolutely sure that the work has completed, via fence wait
+        if(vkWaitForFences(device, 1, &fences[imageIndex], true, UINT64_MAX) != VK_SUCCESS)
+        {
+            LOG(ERR) << "Failed to wait for fence";
+            assert(false);
+        }
+    }
+    bufferSubmitted[imageIndex] = true;
+
+    //Reset the fences we waited on, so they can be re-used
+    if(vkResetFences(device, 1, &fences[imageIndex]) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Failed to reset fence";
+        assert(false);
+    }
+
     //Trim vert/idx buffers if too big
     if(indices.size() > INDICES_COUNT)
     {
@@ -1582,7 +1601,7 @@ void VulkanInterface::drawFrame()
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+    if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, fences[imageIndex]) != VK_SUCCESS)
     {
         LOG(ERR) << "Failed to submit draw command buffer";
         assert(false);
