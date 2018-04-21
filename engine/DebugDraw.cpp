@@ -33,7 +33,8 @@ void DebugDraw::flush()
     m_vulkan->polyLineIdx = (uint32_t)m_vertices.size();
     for(auto i : m_lineVertices)
     {
-        i.pos.z = vertexDepth + VERT_DEPTH_INCR;
+        if(i.pos.z == FLT_MIN)
+            i.pos.z = vertexDepth + VERT_DEPTH_INCR;
         m_vulkan->dbgPolyVertices.push_back(i);
     }
 
@@ -167,18 +168,14 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-    DbgVertex v = {};
-    v.pos.x = p1.x;
-    v.pos.y = p1.y;
-    v.pos.z = 0.0f;
-    v.color.r = color.r;
-    v.color.g = color.g;
-    v.color.b = color.b;
-    v.color.a = color.a * outlineAlpha;
-    m_lineVertices.push_back(v);
-    v.pos.x = p2.x;
-    v.pos.y = p2.y;
-    m_lineVertices.push_back(v);
+    Vec3 pt1;
+    Vec3 pt2;
+    pt1.x = p1.x;
+    pt1.y = p1.y;
+    pt2.x = p2.x;
+    pt2.y = p2.y;
+    pt1.z = pt2.z = FLT_MIN;
+    Draw3DSegment(pt1, pt2, color);
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)
@@ -198,6 +195,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
         color.b,
         color.a * outlineAlpha
     };
+    //TODO
     //glPointSize(size);
     //glUniform4fv(m_colorUniformId, 1, col);
     //Draw::drawHelper(data, sizeof(float) * 2, 2, 1, GL_POINTS);
@@ -220,22 +218,19 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 
 void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& color)
 {
-    const float data[] = {
-        p1.x,
-        p1.y,
-        p1.z,
-        p2.x,
-        p2.y,
-        p2.z
-    };
-    const float col[] = {
-        color.r,
-        color.g,
-        color.b,
-        color.a * outlineAlpha
-    };
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * 6, 3, 2, GL_LINES);
+    DbgVertex v = {};
+    v.pos.x = p1.x;
+    v.pos.y = p1.y;
+    v.pos.z = p1.z;
+    v.color.r = color.r;
+    v.color.g = color.g;
+    v.color.b = color.b;
+    v.color.a = color.a * outlineAlpha;
+    m_lineVertices.push_back(v);
+    v.pos.x = p2.x;
+    v.pos.y = p2.y;
+    v.pos.z = p2.z;
+    m_lineVertices.push_back(v);
 }
 
 void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color)

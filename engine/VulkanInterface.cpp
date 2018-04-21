@@ -34,7 +34,7 @@
 
 //TODO let these counts grow if needed
 #define INDICES_COUNT 1024
-#define VERTICES_COUNT 1024
+#define VERTICES_COUNT 1700
 #define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
 #define VERTICES_SIZE sizeof(DbgVertex) * VERTICES_COUNT
 
