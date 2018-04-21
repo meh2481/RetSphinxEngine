@@ -34,7 +34,7 @@
 
 //TODO let these counts grow if needed
 #define INDICES_COUNT 1024
-#define VERTICES_COUNT 512
+#define VERTICES_COUNT 1024
 #define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
 #define VERTICES_SIZE sizeof(DbgVertex) * VERTICES_COUNT
 
@@ -1135,10 +1135,6 @@ void VulkanInterface::createGraphicsPipelines()
     }
 
     //Create debug outline geom pipeline
-    //TODO
-    //bindingDescription=
-    //attributeDescriptions=
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
     pipelineInfo.basePipelineHandle = debugGeometryGraphicsPipeline;
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugOutlineGraphicsPipeline) != VK_SUCCESS)
@@ -1576,20 +1572,20 @@ void VulkanInterface::drawFrame()
     }
 
     //Trim vert/idx buffers if too big
-    if(indices.size() > INDICES_COUNT)
+    if(dbgPolyIndices.size() > INDICES_COUNT)
     {
-        LOG(WARN) << "Reducing index buffer - was " << indices.size();
-        indices.resize(INDICES_COUNT);
+        LOG(WARN) << "Reducing index buffer - was " << dbgPolyIndices.size();
+        dbgPolyIndices.resize(INDICES_COUNT);
     }
-    if(vertices.size() > VERTICES_COUNT)
+    if(dbgPolyVertices.size() > VERTICES_COUNT)
     {
-        LOG(WARN) << "Reducing vertex buffer - was " << vertices.size();
-        vertices.resize(VERTICES_COUNT);
+        LOG(WARN) << "Reducing vertex buffer - was " << dbgPolyVertices.size();
+        dbgPolyVertices.resize(VERTICES_COUNT);
     }
 
     //Rebind vertex buffer
-    VkDeviceSize indexBufferSize = sizeof(indices[0]) * indices.size();
-    VkDeviceSize vertBufferSize = sizeof(vertices[0]) * vertices.size();
+    VkDeviceSize indexBufferSize = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size();
+    VkDeviceSize vertBufferSize = sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Copy new data into staging buffer (command buffer will have commands to copy this into vertex/index buffer)
@@ -1598,8 +1594,8 @@ void VulkanInterface::drawFrame()
         void* data;
         vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
         //Vertex data first, since indices can be non-32bit-aligned
-        memcpy(data, vertices.data(), (size_t)vertBufferSize);
-        memcpy((void*)((VkDeviceSize)data + vertBufferSize), indices.data(), (size_t)indexBufferSize);
+        memcpy(data, dbgPolyVertices.data(), (size_t)vertBufferSize);
+        memcpy((void*)((VkDeviceSize)data + vertBufferSize), dbgPolyIndices.data(), (size_t)indexBufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
     }
 
@@ -1668,7 +1664,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer
     //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
     VkBufferCopy copyRegion = {};
-    copyRegion.size = sizeof(indices[0]) * indices.size() + sizeof(vertices[0]) * vertices.size();
+    copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
     vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
@@ -1695,14 +1691,16 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     VkBuffer vertexBuffers[] = { combinedBuffer };
     VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, sizeof(vertices[0]) * vertices.size(), VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
 
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)indices.size(), 1, 0, 0, 0);
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
 
     //----Draw debug geometry outlines second----
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
+    vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyLineIdx, 1, polyLineIdx, 0);
 
 
     //-------------- End Render Pass --------------

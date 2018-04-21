@@ -24,16 +24,23 @@ DebugDraw::DebugDraw(VulkanInterface* vulkan)
 void DebugDraw::flush()
 {
     //Push to vulkan
-    m_vulkan->vertices.clear();
-    m_vulkan->indices.clear();
+    m_vulkan->dbgPolyVertices.clear();
+    m_vulkan->dbgPolyIndices.clear();
     for(auto i : m_vertices)
-        m_vulkan->vertices.push_back(i);
+        m_vulkan->dbgPolyVertices.push_back(i);
     for(auto i : m_indices)
-        m_vulkan->indices.push_back(i);
+        m_vulkan->dbgPolyIndices.push_back(i);
+    m_vulkan->polyLineIdx = (uint32_t)m_vertices.size();
+    for(auto i : m_lineVertices)
+    {
+        i.pos.z = vertexDepth + VERT_DEPTH_INCR;
+        m_vulkan->dbgPolyVertices.push_back(i);
+    }
 
     //Clear for next pass
     m_vertices.clear();
     m_indices.clear();
+    m_lineVertices.clear();
     vertexDepth = START_VERT_DEPTH;
 }
 
@@ -160,20 +167,18 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-    const float data[] = {
-        p1.x,
-        p1.y,
-        p2.x,
-        p2.y
-    };
-    const float col[] = {
-        color.r,
-        color.g,
-        color.b,
-        color.a * outlineAlpha
-    };
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * 4, 2, 2, GL_LINES);
+    DbgVertex v = {};
+    v.pos.x = p1.x;
+    v.pos.y = p1.y;
+    v.pos.z = 0.0f;
+    v.color.r = color.r;
+    v.color.g = color.g;
+    v.color.b = color.b;
+    v.color.a = color.a * outlineAlpha;
+    m_lineVertices.push_back(v);
+    v.pos.x = p2.x;
+    v.pos.y = p2.y;
+    m_lineVertices.push_back(v);
 }
 
 void DebugDraw::DrawTransform(const b2Transform& xf)

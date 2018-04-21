@@ -163,8 +163,10 @@ public:
 
 #ifdef _DEBUG
     //For debugging stuff
-    std::vector<DbgVertex> vertices;
-    std::vector<uint16_t> indices;
+    std::vector<DbgVertex> dbgPolyVertices;
+    std::vector<uint16_t> dbgPolyIndices;
+    std::vector<uint16_t> dbgPolyLines;
+    uint32_t polyLineIdx;
 #endif
 
 private:
