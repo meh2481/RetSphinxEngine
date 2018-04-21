@@ -32,7 +32,7 @@
 #define FRAG_SHADER "res/shaders/fragdbg.spv"
 #define IMG_TEXTURE "res/gfx/blob2.png"
 
-//TODO
+//TODO let these counts grow if needed
 #define INDICES_COUNT 1024
 #define VERTICES_COUNT 512
 #define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
@@ -151,9 +151,17 @@ std::vector<char> VulkanInterface::readFile(const std::string& filename)
 
     return buffer;
 }
+/*    createSwapChain();
+    createSwapChainImageViews();
+    createRenderPass();
+    createGraphicsPipeline();
+    createDepthResources();
+    createFramebuffers();
+    createCommandBuffers();*/
 
 void VulkanInterface::initVulkan()
 {
+    //Device setup
     createInstance();
 #ifdef ENABLE_VALIDATION_LAYERS
     setupDebugCallback();
@@ -161,12 +169,17 @@ void VulkanInterface::initVulkan()
     createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
+
+    //Swapchain setup
     createSwapChain();
     createSwapChainImageViews();
     createRenderPass();
+
+    //Pipeline setup
     createDescriptorSetLayout();
     createGraphicsPipeline();
 
+    //Drawing setup
     createCommandPool();
     createDepthResources();
     createFramebuffers();

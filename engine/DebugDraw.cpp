@@ -9,7 +9,8 @@
 #include "VulkanInterface.h"
 #include "Logger.h"
 
-//TODO: Rewrite for vulkan
+static const int NUM_SEGMENTS = 16;    //Must be greater than 2
+static const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)NUM_SEGMENTS;
 
 DebugDraw::DebugDraw(VulkanInterface* vulkan)
 {
@@ -27,9 +28,7 @@ void DebugDraw::flush()
         m_vulkan->indices.push_back(i);
 
     //Clear for next pass
-    //LOG(DBG) << "Vertices: " << m_vertices.size();
     m_vertices.clear();
-    //LOG(DBG) << "Indices: " << m_indices.size();
     m_indices.clear();
 }
 
@@ -87,8 +86,6 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     DrawPolygon(vertices, vertexCount, color);
 }
 
-const int NUM_SEGMENTS = 16;
-const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)NUM_SEGMENTS;
 void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
     float angle = 0.0f;
@@ -103,8 +100,6 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& co
 
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
-    //Draw filled circle in center
-
     //Fill out triangles
     uint16_t idx0 = (uint16_t)m_vertices.size();  //Index of starting vertex
 
@@ -117,8 +112,6 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     v.color.b = color.b * fillMul;
     v.color.a = color.a * fillAlpha;
     m_vertices.push_back(v);
-
-    assert(NUM_SEGMENTS > 2);
 
     //Push second vertex
     float angle = 0.0f;
