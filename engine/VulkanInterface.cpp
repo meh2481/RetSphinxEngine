@@ -32,11 +32,11 @@
 #define FRAG_SHADER "res/shaders/fragdbg.spv"
 #define IMG_TEXTURE "res/gfx/blob2.png"
 
-//TODO let these counts grow if needed
-#define INDICES_COUNT 1024
-#define VERTICES_COUNT 1700
-#define INDICES_SIZE sizeof(uint16_t) * INDICES_COUNT
-#define VERTICES_SIZE sizeof(DbgVertex) * VERTICES_COUNT
+#ifdef _DEBUG
+//Vertex and index buffer size helper macros
+#define INDICES_SIZE sizeof(uint16_t) * dbgIndicesCount
+#define VERTICES_SIZE sizeof(DbgVertex) * dbgVerticesCount
+#endif
 
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -125,6 +125,10 @@ bool VulkanInterface::checkValidationLayerSupport()
 VulkanInterface::VulkanInterface(SDL_Window* w)
 {
     window = w;
+#ifdef _DEBUG
+    dbgIndicesCount = 512;
+    dbgVerticesCount = 512;
+#endif
     initVulkan();
 }
 
@@ -1571,16 +1575,21 @@ void VulkanInterface::drawFrame()
         assert(false);
     }
 
-    //Trim vert/idx buffers if too big
-    if(dbgPolyIndices.size() > INDICES_COUNT)
+    //Grow buffer if necessary
+    //TODO shrink buffers if too big, especially between load areas
+    if(dbgPolyIndices.size() > dbgIndicesCount || dbgPolyVertices.size() > dbgVerticesCount)
     {
-        LOG(WARN) << "Reducing index buffer - was " << dbgPolyIndices.size();
-        dbgPolyIndices.resize(INDICES_COUNT);
-    }
-    if(dbgPolyVertices.size() > VERTICES_COUNT)
-    {
-        LOG(WARN) << "Reducing vertex buffer - was " << dbgPolyVertices.size();
-        dbgPolyVertices.resize(VERTICES_COUNT);
+        //Vert/index buffers likely to grow at the same time, so just recalc both
+        LOG(DBG) << "Changing buffer sizes - had indices " << dbgIndicesCount << " now " << dbgPolyIndices.size()
+            << "; vertices had " << dbgVerticesCount << " now " << dbgPolyVertices.size();
+
+        //Use max() to not shrink either buffer
+        dbgIndicesCount = std::max((VkDeviceSize)dbgPolyIndices.size(), dbgIndicesCount);
+        dbgVerticesCount = std::max((VkDeviceSize)dbgPolyVertices.size(), dbgVerticesCount);
+
+        //Reallocate
+        cleanupVertBufferMemory();
+        createVertIndexBuffers();
     }
 
     //Rebind vertex buffer
@@ -1733,6 +1742,14 @@ void VulkanInterface::cleanupSwapChain()
     vkDestroySwapchainKHR(device, swapChain, NULL);
 }
 
+void VulkanInterface::cleanupVertBufferMemory()
+{
+    vkDestroyBuffer(device, combinedBuffer, NULL);
+    vkFreeMemory(device, combinedBufferMemory, NULL);
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
+}
+
 void VulkanInterface::cleanup()
 {
     cleanupSwapChain();
@@ -1746,10 +1763,7 @@ void VulkanInterface::cleanup()
     vkDestroyBuffer(device, uniformBuffer, NULL);
     vkFreeMemory(device, uniformBufferMemory, NULL);
 
-    vkDestroyBuffer(device, combinedBuffer, NULL);
-    vkFreeMemory(device, combinedBufferMemory, NULL);
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
+    cleanupVertBufferMemory();
 
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);

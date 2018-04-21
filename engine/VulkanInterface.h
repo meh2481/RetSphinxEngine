@@ -167,6 +167,10 @@ public:
     std::vector<uint16_t> dbgPolyIndices;
     std::vector<uint16_t> dbgPolyLines;
     uint32_t polyLineIdx;
+
+private:
+    VkDeviceSize dbgIndicesCount;
+    VkDeviceSize dbgVerticesCount;
 #endif
 
 private:
@@ -224,6 +228,7 @@ private:
     void updateUniformBuffer(const RenderState& ubo);
     void drawFrame();
     void cleanupSwapChain();
+    void cleanupVertBufferMemory();
     void cleanup();
     void createInstance();
 
