@@ -559,6 +559,11 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
             helper.header.type = RESOURCE_TYPE_SHADER;
             decompressed = extractShader(*i, &size);
         }
+        else if(ext == "spv")   //Already-compiled shader; store as-is without trying to minify
+        {
+            helper.header.type = RESOURCE_TYPE_SHADER;
+            decompressed = FileOperations::readFile(*i, &size);
+        }
         else
         {
             decompressed = FileOperations::readFile(*i, &size);    //Store as-is
