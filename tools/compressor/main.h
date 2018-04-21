@@ -33,6 +33,9 @@ unsigned char* extractLua(const std::string& luaFilename, unsigned int* size);
 void initLua();
 void teardownLua();
 
+//shader.cpp
+unsigned char* extractShader(const std::string& glslFilename, unsigned int* size);
+
 //sound.cpp
 void extractSoundGeometry(const std::string& xmlFilename);
 void initSound();

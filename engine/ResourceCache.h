@@ -3,16 +3,21 @@
 #include <string>
 #include <stdint.h>
 
-//TODO: Move this inside ResourceLoader or something, since this is just a map
+typedef struct
+{
+    void* data;
+    unsigned int length;
+} ResourceItem;
+
 class ResourceCache
 {
-    std::map<uint64_t, void*> map;
+    std::map<uint64_t, ResourceItem> map;
 
 public:
     ~ResourceCache();
 
-    void* find(uint64_t id);
-    void add(uint64_t id, void* item);
+    void* find(uint64_t id, unsigned int* length = NULL);
+    void add(uint64_t id, void* item, unsigned int length);
 
     void clear();
 };

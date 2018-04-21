@@ -78,5 +78,5 @@ public:
     SoundLoop* getSoundLoop(const std::string& sID);
 
     //Binary data
-    unsigned char* getData(const std::string& sID);
+    unsigned char* getData(const std::string& sID, unsigned int* length = NULL);
 };

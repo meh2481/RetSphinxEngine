@@ -7,6 +7,8 @@
 #include <array>
 #include "RenderState.h"
 
+class ResourceLoader;
+
 #ifdef _DEBUG
 #define ENABLE_VALIDATION_LAYERS
 
@@ -151,11 +153,13 @@ private:
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
 
+    ResourceLoader* m_resourceLoader;
+
     //No default constructor
     VulkanInterface() {};
 
 public:
-    VulkanInterface(SDL_Window* window);
+    VulkanInterface(SDL_Window* window, ResourceLoader* shaderLoader);  //Resource loader to handle loading shaders
     ~VulkanInterface();
 
     void mainLoop(const RenderState& state);
@@ -180,7 +184,6 @@ private:
     bool checkValidationLayerSupport();
 #endif
 
-    std::vector<char> readFile(const std::string& filename);
     void initVulkan();
     void createDepthResources();
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
@@ -211,7 +214,7 @@ private:
     void createFramebuffers();
     void createRenderPass();
     void createGraphicsPipelines();
-    VkShaderModule createShaderModule(const std::vector<char>& code);
+    VkShaderModule createShaderModule(const std::string& filename);
     void createSwapChainImageViews();
     void recreateSwapChain();
     void createSwapChain();

@@ -481,7 +481,7 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
     if(!g_bClean && nothingToDo(filesToPak, in, pakFilename))
     {
         std::cout << "Pakfile " << pakFilename << " already up-to-date" << std::endl;
-        return;
+        //return;
     }
 
     for(std::vector<std::string>::iterator i = filesToPak.begin(); i != filesToPak.end(); i++)
@@ -553,10 +553,10 @@ void compress(std::vector<std::string> filesToPak, const std::string& in)
             helper.header.type = RESOURCE_TYPE_OBJ;
             decompressed = extract3dObject(*i, &size);
         }
-        else if(ext == "vert" || ext == "frag" || ext == "glsl")
+        else if(ext == "vert" || ext == "tesc" || ext == "tese" || ext == "geom" || ext == "frag" || ext == "comp") //See https://github.com/KhronosGroup/glslang/wiki/HLSL-FAQ
         {
             helper.header.type = RESOURCE_TYPE_SHADER;
-            decompressed = FileOperations::readFile(*i, &size);
+            decompressed = extractShader(*i, &size);
         }
         else
         {

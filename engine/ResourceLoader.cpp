@@ -54,7 +54,7 @@ Image* ResourceLoader::getImage(uint64_t hashID)
         {
             LOG(TRACE) << "Pak hit - load " << hashID << " from data";
             img = loadImageFromData(resource, len);
-            m_cache->add(hashID, img);
+            m_cache->add(hashID, img, len);
             free(resource);                        //Free memory
         }
         else
@@ -74,7 +74,7 @@ Image* ResourceLoader::getImage(const std::string& sID)
     {
         LOG(TRACE) << "Attempting to load from file";
         img = loadImageFromFile(sID);                //Create this image
-        m_cache->add(hashVal, img);    //Add to the cache
+        m_cache->add(hashVal, img, sizeof(Image));    //Add to the cache
     }
     return img;
 }
@@ -106,18 +106,19 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
             unsigned char* meshData = (unsigned char*)m_cache->find(header->meshId);
             if(!meshData)
             {
-                meshData = m_pakLoader->loadResource(header->meshId);
+                unsigned int meshLen = 0;
+                meshData = m_pakLoader->loadResource(header->meshId, &meshLen);
                 if(!meshData)
                 {
                     LOG(ERR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
                     return NULL;
                 }
-                m_cache->add(header->meshId, meshData);
+                m_cache->add(header->meshId, meshData, meshLen);
             }
 
             //free(resource);                        //Free memory
             object3d = new Object3D(meshData, img, m_3dShader);
-            m_cache->add(hashVal, object3d);
+            m_cache->add(hashVal, object3d, sizeof(Object3D));
         }
     }
     else
@@ -455,7 +456,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
             memcpy(imgRects, &resource[offset], imgRectSz);
 
             font = new ImgFont(getImage(fontHeader.textureId), fontHeader.numChars, codePoints, imgRects);
-            m_cache->add(hashVal, font);
+            m_cache->add(hashVal, font, sizeof(ImgFont));
             free(resource);                        //Free memory
         }
     }
@@ -978,20 +979,22 @@ Texture* ResourceLoader::getAtlas(uint64_t atlasId)
 
         free(buf);
 
-        m_cache->add(atlasId, atlas);    //Add to the cache
+        m_cache->add(atlasId, atlas, sizeof(Texture));    //Add to the cache
     }
     return atlas;
 }
 
-unsigned char* ResourceLoader::getData(const std::string& sID)
+unsigned char* ResourceLoader::getData(const std::string& sID, unsigned int* length)
 {
     uint64_t hash = Hash::hash(sID.c_str());
-    unsigned char* obj = (unsigned char*)m_cache->find(hash);
+    unsigned char* obj = (unsigned char*)m_cache->find(hash, length);
     if(!obj)
     {
         unsigned int len = 0;
         obj = m_pakLoader->loadResource(hash, &len);
-        m_cache->add(hash, obj);
+        if(length != NULL)
+            *length = len;
+        m_cache->add(hash, obj, len);
     }
     return obj;
 }

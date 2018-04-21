@@ -4,6 +4,7 @@ lua.cpp
 mesh.cpp
 main.cpp
 main.h
+shader.cpp
 sound.cpp
 )
 

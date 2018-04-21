@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
+#include "ResourceLoader.h"
 
 #include <stdexcept>
 #include <functional>
@@ -122,9 +123,10 @@ bool VulkanInterface::checkValidationLayerSupport()
 }
 #endif
 
-VulkanInterface::VulkanInterface(SDL_Window* w)
+VulkanInterface::VulkanInterface(SDL_Window* w, ResourceLoader* shaderLoader)
 {
     window = w;
+    m_resourceLoader = shaderLoader;
 #ifdef _DEBUG
     dbgIndicesCount = 512;
     dbgVerticesCount = 512;
@@ -136,32 +138,6 @@ VulkanInterface::~VulkanInterface()
 {
     cleanup();
 }
-
-std::vector<char> VulkanInterface::readFile(const std::string& filename)
-{
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-    if(!file.is_open())
-    {
-        LOG(ERR) << "Failed to open file " << filename.c_str();
-        assert(false);
-    }
-
-    size_t fileSize = (size_t)file.tellg();
-    std::vector<char> buffer(fileSize);
-    file.seekg(0);
-    file.read(buffer.data(), fileSize);
-    file.close();
-
-    return buffer;
-}
-/*    createSwapChain();
-    createSwapChainImageViews();
-    createRenderPass();
-    createGraphicsPipeline();
-    createDepthResources();
-    createFramebuffers();
-    createCommandBuffers();*/
 
 void VulkanInterface::initVulkan()
 {
@@ -958,24 +934,21 @@ void VulkanInterface::createRenderPass()
 
 void VulkanInterface::createGraphicsPipelines()
 {
-    std::vector<char> vertShaderCode = readFile(VERT_SHADER);
-    std::vector<char> fragShaderCode = readFile(FRAG_SHADER);
-
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+    VkShaderModule dbgVertShaderModule = createShaderModule("res/shaders/shaderdbg.vert");
+    VkShaderModule dbgFragShaderModule = createShaderModule("res/shaders/shaderdbg.frag");
 
     //Vert shader stage
     VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
+    vertShaderStageInfo.module = dbgVertShaderModule;
     vertShaderStageInfo.pName = "main";
 
     //Frag shader stage
     VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
     fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
+    fragShaderStageInfo.module = dbgFragShaderModule;
     fragShaderStageInfo.pName = "main";
 
     //Create shader stages
@@ -1147,16 +1120,18 @@ void VulkanInterface::createGraphicsPipelines()
         assert(false);
     }
 
-    vkDestroyShaderModule(device, fragShaderModule, NULL);
-    vkDestroyShaderModule(device, vertShaderModule, NULL);
+    vkDestroyShaderModule(device, dbgFragShaderModule, NULL);
+    vkDestroyShaderModule(device, dbgVertShaderModule, NULL);
 }
 
-VkShaderModule VulkanInterface::createShaderModule(const std::vector<char>& code)
+VkShaderModule VulkanInterface::createShaderModule(const std::string& filename)
 {
+    unsigned int len = 0;
+    unsigned char* code = m_resourceLoader->getData(filename, &len);
     VkShaderModuleCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    createInfo.codeSize = (size_t)len;
+    createInfo.pCode = reinterpret_cast<const uint32_t*>(code);
 
     VkShaderModule shaderModule;
     if(vkCreateShaderModule(device, &createInfo, NULL, &shaderModule) != VK_SUCCESS)

@@ -8,22 +8,27 @@ ResourceCache::~ResourceCache()
     clear();
 }
 
-void ResourceCache::add(uint64_t id, void* item)
+void ResourceCache::add(uint64_t id, void* item, unsigned int length)
 {
-    map[id] = item;
+    ResourceItem it;
+    it.data = item;
+    it.length = length;
+    map[id] = it;
 }
 
-void* ResourceCache::find(uint64_t id)  //NOTE: This seems like a mis-design to not have a length included
+void* ResourceCache::find(uint64_t id, unsigned int* length)
 {
-    std::map<uint64_t, void*>::iterator i = map.find(id);
+    auto i = map.find(id);
     if(i == map.end())    //This image isn't here
         return NULL;
-    return i->second;
+    if(length != NULL)
+        *length = i->second.length;
+    return i->second.data;
 }
 
 void ResourceCache::clear()
 {
-    for(std::map<uint64_t, void*>::iterator i = map.begin(); i != map.end(); i++)
-        free(i->second);
+    for(auto i = map.begin(); i != map.end(); i++)
+        free(i->second.data);
     map.clear();
 }
