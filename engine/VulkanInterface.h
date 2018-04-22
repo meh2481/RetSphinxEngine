@@ -126,8 +126,13 @@ private:
     std::vector<VkImageView> swapChainImageViews;
     VkPipelineLayout pipelineLayout;
     VkRenderPass renderPass;
+#ifdef _DEBUG
     VkPipeline debugGeometryGraphicsPipeline;
     VkPipeline debugOutlineGraphicsPipeline;
+    VkPipeline debugPointGraphicsPipeline;
+    VkDeviceSize dbgIndicesCount;
+    VkDeviceSize dbgVerticesCount;
+#endif
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
@@ -171,10 +176,7 @@ public:
     std::vector<uint16_t> dbgPolyIndices;
     std::vector<uint16_t> dbgPolyLines;
     uint32_t polyLineIdx;
-
-private:
-    VkDeviceSize dbgIndicesCount;
-    VkDeviceSize dbgVerticesCount;
+    uint32_t polyPointIdx;
 #endif
 
 private:

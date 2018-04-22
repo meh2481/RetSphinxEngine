@@ -13,6 +13,7 @@ class DebugDraw : public b2Draw
     VulkanInterface* m_vulkan;
     std::vector<DbgVertex> m_vertices;
     std::vector<DbgVertex> m_lineVertices;
+    std::vector<DbgVertex> m_pointVertices;
     std::vector<uint16_t> m_indices;
 
     DebugDraw() {};

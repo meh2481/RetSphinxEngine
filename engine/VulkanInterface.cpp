@@ -1104,6 +1104,7 @@ void VulkanInterface::createGraphicsPipelines()
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex = -1;
 
+#ifdef _DEBUG
     //Create debug geom pipeline
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugGeometryGraphicsPipeline) != VK_SUCCESS)
     {
@@ -1119,6 +1120,15 @@ void VulkanInterface::createGraphicsPipelines()
         LOG(ERR) << "Failed to create debug outline graphics pipeline!";
         assert(false);
     }
+
+    //Create debug point geom pipeline
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+    if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugPointGraphicsPipeline) != VK_SUCCESS)
+    {
+        LOG(ERR) << "Failed to create debug outline graphics pipeline!";
+        assert(false);
+    }
+#endif
 
     vkDestroyShaderModule(device, dbgFragShaderModule, NULL);
     vkDestroyShaderModule(device, dbgVertShaderModule, NULL);
@@ -1684,7 +1694,12 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
     //----Draw debug geometry outlines second----
     vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
-    vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyLineIdx, 1, polyLineIdx, 0);
+    vkCmdDraw(commandBuffers[index], polyPointIdx - polyLineIdx, 1, polyLineIdx, 0);
+
+
+    //----Draw debug geometry points third----
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
+    vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyPointIdx, 1, polyPointIdx, 0);
 
 
     //-------------- End Render Pass --------------
@@ -1710,6 +1725,7 @@ void VulkanInterface::cleanupSwapChain()
     vkFreeCommandBuffers(device, commandPool, commandBuffers.size(), commandBuffers.data());
     vkDestroyPipeline(device, debugGeometryGraphicsPipeline, NULL);
     vkDestroyPipeline(device, debugOutlineGraphicsPipeline, NULL);
+    vkDestroyPipeline(device, debugPointGraphicsPipeline, NULL);
     vkDestroyPipelineLayout(device, pipelineLayout, NULL);
     vkDestroyRenderPass(device, renderPass, NULL);
     for(auto imageView : swapChainImageViews)

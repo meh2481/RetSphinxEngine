@@ -30,11 +30,17 @@ void DebugDraw::flush()
         m_vulkan->dbgPolyVertices.push_back(i);
     for(auto i : m_indices)
         m_vulkan->dbgPolyIndices.push_back(i);
-    m_vulkan->polyLineIdx = (uint32_t)m_vertices.size();
+    m_vulkan->polyLineIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
     for(auto i : m_lineVertices)
     {
         if(i.pos.z == FLT_MIN)
             i.pos.z = vertexDepth + VERT_DEPTH_INCR;
+        m_vulkan->dbgPolyVertices.push_back(i);
+    }
+    m_vulkan->polyPointIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
+    for(auto i : m_pointVertices)
+    {
+        i.pos.z = vertexDepth + VERT_DEPTH_INCR;
         m_vulkan->dbgPolyVertices.push_back(i);
     }
 
@@ -42,6 +48,7 @@ void DebugDraw::flush()
     m_vertices.clear();
     m_indices.clear();
     m_lineVertices.clear();
+    m_pointVertices.clear();
     vertexDepth = START_VERT_DEPTH;
 }
 
@@ -185,20 +192,15 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
-    const float data[] = {
-        p.x,
-        p.y
-    };
-    const float col[] = {
-        color.r,
-        color.g,
-        color.b,
-        color.a * outlineAlpha
-    };
-    //TODO
-    //glPointSize(size);
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * 2, 2, 1, GL_POINTS);
+    DbgVertex v = {};
+    v.pos.x = p.x;
+    v.pos.y = p.y;
+    v.color.r = color.r;
+    v.color.g = color.g;
+    v.color.b = color.b;
+    v.color.a = color.a * outlineAlpha;
+    m_pointVertices.push_back(v);
+    //glPointSize(size);    //Setting this to 4.0 in the shader, since it seems that it stays constant
 }
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
