@@ -1679,9 +1679,6 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //-------------- Begin Render Pass --------------
     vkCmdBeginRenderPass(commandBuffers[index], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    //----Draw debug geometry first----
-    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugGeometryGraphicsPipeline);
-
     VkBuffer vertexBuffers[] = { combinedBuffer };
     VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
@@ -1690,17 +1687,26 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
+    //----Draw debug geometry first----
+    if(dbgPolyIndices.size() > 0)
+    {
+        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugGeometryGraphicsPipeline);
+        vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
+    }
 
     //----Draw debug geometry outlines second----
-    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
-    vkCmdDraw(commandBuffers[index], polyPointIdx - polyLineIdx, 1, polyLineIdx, 0);
-
+    if(polyPointIdx - polyLineIdx > 0)
+    {
+        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
+        vkCmdDraw(commandBuffers[index], polyPointIdx - polyLineIdx, 1, polyLineIdx, 0);
+    }
 
     //----Draw debug geometry points third----
-    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
-    vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyPointIdx, 1, polyPointIdx, 0);
-
+    if((uint32_t)dbgPolyVertices.size() - polyPointIdx > 0)
+    {
+        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
+        vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyPointIdx, 1, polyPointIdx, 0);
+    }
 
     //-------------- End Render Pass --------------
     vkCmdEndRenderPass(commandBuffers[index]);

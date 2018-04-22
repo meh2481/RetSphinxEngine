@@ -237,47 +237,12 @@ void DebugDraw::Draw3DSegment(const Vec3& p1, const Vec3& p2, const b2Color& col
 
 void DebugDraw::Draw3DPolygon(const Vec3* vertices, int32 vertexCount, const b2Color& color)
 {
-    //Draw filled center
     assert(vertexCount >= 3);
-    unsigned int numTriangles = vertexCount - 2;
-    float* data = new float[numTriangles * 9];
-    const float col[] = {
-        color.r * fillMul,
-        color.g * fillMul,
-        color.b * fillMul,
-        color.a * fillAlpha
-    };
-    //Fill out triangles
-    for(unsigned int i = 0; i < numTriangles; i++)
-    {
-        data[i * 9] = vertices[0].x;
-        data[i * 9 + 1] = vertices[0].y;
-        data[i * 9 + 2] = vertices[0].z;
 
-        data[i * 9 + 3] = vertices[i + 1].x;
-        data[i * 9 + 4] = vertices[i + 1].y;
-        data[i * 9 + 5] = vertices[i + 1].z;
-
-        data[i * 9 + 6] = vertices[i + 2].x;
-        data[i * 9 + 7] = vertices[i + 2].y;
-        data[i * 9 + 8] = vertices[i + 2].z;
-    }
-    //for(int i = 0; i < vertexCount; i++)
-    //{
-    //    data[i * 3] = vertices[i].x;
-    //    data[i * 3 + 1] = vertices[i].y;
-    //    data[i * 3 + 2] = vertices[i].z;
-    //}
-    //glUniform4fv(m_colorUniformId, 1, col);
-    //Draw::drawHelper(data, sizeof(float) * numTriangles * 9, 3, numTriangles * 3, GL_TRIANGLES);
-
-    //Fill in outside
     //Draw sides
     for(int i = 0; i < vertexCount - 1; i++)
         Draw3DSegment(vertices[i], vertices[i + 1], color);
     //Draw last side
     Draw3DSegment(vertices[0], vertices[vertexCount - 1], color);
-
-    delete[] data;
 }
 #endif //_DEBUG
