@@ -144,8 +144,8 @@ private:
     VkDeviceMemory combinedBufferMemory;
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
-    VkBuffer uniformBuffer;
-    VkDeviceMemory uniformBufferMemory;
+    //VkBuffer uniformBuffer;
+    //VkDeviceMemory uniformBufferMemory;
     VkDescriptorSetLayout descriptorSetLayout;
     VkDescriptorPool descriptorPool;
     VkDescriptorSet descriptorSet;
@@ -203,7 +203,7 @@ private:
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     void createDescriptorSet();
     void createDescriptorPool();
-    void createUniformBuffer();
+    //void createUniformBuffer();
     void createDescriptorSetLayout();
     void createVertIndexBuffers();
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
@@ -211,7 +211,7 @@ private:
     void createSemaphores();
     void createFences();
     void createCommandBuffers();
-    void setupCommandBuffer(uint32_t index);
+    void setupCommandBuffer(uint32_t index, glm::mat4 mvp);
     void createCommandPool();
     void createFramebuffers();
     void createRenderPass();
@@ -230,8 +230,8 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-    void updateUniformBuffer(const RenderState& ubo);
-    void drawFrame();
+    //void updateUniformBuffer(const RenderState& ubo);
+    void drawFrame(glm::mat4 mvp);
     void cleanupSwapChain();
     void cleanupVertBufferMemory();
     void cleanup();
