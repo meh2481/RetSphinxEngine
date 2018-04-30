@@ -29,9 +29,8 @@
 #define QUEUE_PRIORITY 1.0f
 
 //Temp resources
-#define VERT_SHADER "res/shaders/vertdbg.spv"
-#define FRAG_SHADER "res/shaders/fragdbg.spv"
 #define IMG_TEXTURE "res/gfx/blob2.png"
+#define TEXTURE_MIP_LEVELS 8
 
 #ifdef _DEBUG
 //Vertex and index buffer size helper macros
@@ -234,7 +233,7 @@ void VulkanInterface::createTextureSampler()
     samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
     samplerInfo.mipLodBias = 0.0f;
     samplerInfo.minLod = 0.0f;
-    samplerInfo.maxLod = (float)textureMipLevels;
+    samplerInfo.maxLod = (float)TEXTURE_MIP_LEVELS;
 
     if(vkCreateSampler(device, &samplerInfo, NULL, &textureSampler) != VK_SUCCESS)
     {
@@ -245,7 +244,7 @@ void VulkanInterface::createTextureSampler()
 
 void VulkanInterface::createTextureImageView()
 {
-    textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureMipLevels);
+    textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, TEXTURE_MIP_LEVELS);
 }
 
 VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
@@ -283,8 +282,6 @@ void VulkanInterface::createTextureImage()
         assert(false);
     }
 
-    textureMipLevels = (uint32_t)std::floor(std::log2(std::max(texWidth, texHeight))) + 1;
-
     VkBuffer imgStagingBuffer;
     VkDeviceMemory imgStagingBufferMemory;
     createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imgStagingBuffer, imgStagingBufferMemory);
@@ -297,15 +294,15 @@ void VulkanInterface::createTextureImage()
     stbi_image_free(pixels);
 
     //TODO: VK_FORMAT_BC1_RGBA_UNORM_BLOCK for DXT-compressed images
-    createImage(texWidth, texHeight, textureMipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+    createImage(texWidth, texHeight, TEXTURE_MIP_LEVELS, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 
-    transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, textureMipLevels);
+    transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TEXTURE_MIP_LEVELS);
     copyBufferToImage(imgStagingBuffer, textureImage, (uint32_t)texWidth, (uint32_t)texHeight);
 
     vkDestroyBuffer(device, imgStagingBuffer, NULL);
     vkFreeMemory(device, imgStagingBufferMemory, NULL);
 
-    generateMipmaps(textureImage, texWidth, texHeight, textureMipLevels);
+    generateMipmaps(textureImage, texWidth, texHeight, TEXTURE_MIP_LEVELS);
 }
 
 void VulkanInterface::generateMipmaps(VkImage image, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
@@ -1074,8 +1071,9 @@ void VulkanInterface::createGraphicsPipelines()
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(glm::mat4);
-    assert(pushConstantRange.size % 4 == 0);    //Requirements from Vulkan spec
-    assert(pushConstantRange.size != 0);
+    assert(pushConstantRange.size % 4 == 0);	//Requirement from Vulkan spec that it be 4byte-aligned
+    assert(pushConstantRange.size != 0);		//Cannot be empty
+    assert(pushConstantRange.size <= 128);		//Guaranteed minimum for push constant buffer size
 
     //Create pipeline layout
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -1355,6 +1353,13 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     // Application can't function without geometry shaders
     if(!deviceFeatures.geometryShader || !deviceFeatures.samplerAnisotropy) //Config option: Don't require ansitropic filtering
         return 0;
+
+    //TODO: We can get around this by binding descriptor sets per texture. Especially relevant on mobile platforms that don't support dynamic array texture indexing
+    /*if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
+    {
+        LOG(ERR) << "Dyn array indexing: " << deviceFeatures.shaderSampledImageArrayDynamicIndexing;
+        return 0;
+    }*/
 
     //Need device to be able to process commands we want to use
     QueueFamilyIndices indices = findQueueFamilies(device);
@@ -1667,7 +1672,8 @@ void VulkanInterface::setupCommandBuffer(uint32_t index, glm::mat4 mvp)
     //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
     VkBufferCopy copyRegion = {};
     copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
-    vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
+    if(!!copyRegion.size)
+        vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
     std::array<VkClearValue, 2> clearValues = {};
