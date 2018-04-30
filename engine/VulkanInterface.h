@@ -173,9 +173,15 @@ public:
     //For debugging stuff
     std::vector<DbgVertex> dbgPolyVertices;
     std::vector<uint16_t> dbgPolyIndices;
-    std::vector<uint16_t> dbgPolyLines;
     uint32_t polyLineIdx;
     uint32_t polyPointIdx;
+private:
+    //Store these so we know when to rebuild cmd buffer
+    std::vector<uint32_t> lastPolyLineIdx;
+    std::vector<uint32_t> lastPolyPointIdx;
+    std::vector<size_t> lastVertexSize;
+    std::vector<size_t> lastIndicesSize;
+public:
 #endif
 
 private:
@@ -200,7 +206,7 @@ private:
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-    void createDescriptorSet();
+    void createDescriptorSet(const VkImageView& imgView, const VkSampler& texSampler);
     void createDescriptorPool();
     //void createUniformBuffer();
     void createDescriptorSetLayout();

@@ -168,7 +168,7 @@ void VulkanInterface::initVulkan()
     createVertIndexBuffers();
     //createUniformBuffer();
     createDescriptorPool();
-    createDescriptorSet();
+    createDescriptorSet(textureImageView, textureSampler);
     createCommandBuffers();
     createSemaphores();
     createFences();
@@ -204,7 +204,7 @@ VkFormat VulkanInterface::findSupportedFormat(const std::vector<VkFormat>& candi
 VkFormat VulkanInterface::findDepthFormat()
 {
     return findSupportedFormat(
-        { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+    { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
     );
@@ -595,7 +595,7 @@ void VulkanInterface::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t
     endSingleTimeCommands(commandBuffer);
 }
 
-void VulkanInterface::createDescriptorSet()
+void VulkanInterface::createDescriptorSet(const VkImageView& imgView, const VkSampler& texSampler)
 {
     //Create the descriptor set
     VkDescriptorSetLayout layouts[] = { descriptorSetLayout };
@@ -619,8 +619,8 @@ void VulkanInterface::createDescriptorSet()
 
     VkDescriptorImageInfo imageInfo = {};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = textureImageView;
-    imageInfo.sampler = textureSampler;
+    imageInfo.imageView = imgView;
+    imageInfo.sampler = texSampler;
 
     std::array<VkWriteDescriptorSet, 1> descriptorWrites = {};
 
@@ -1236,6 +1236,17 @@ void VulkanInterface::createSwapChain()
     //Store format & extent
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
+
+#ifdef _DEBUG
+    lastPolyLineIdx.resize(imageCount);
+    lastPolyPointIdx.resize(imageCount);
+    lastVertexSize.resize(imageCount);
+    lastIndicesSize.resize(imageCount);
+    for(uint32_t i = 0; i < imageCount; i++)
+    {
+        lastPolyLineIdx[i] = lastPolyPointIdx[i] = lastVertexSize[i] = lastIndicesSize[i] = 0;
+    }
+#endif
 }
 
 void VulkanInterface::createSurface()
@@ -1606,8 +1617,23 @@ void VulkanInterface::drawFrame(glm::mat4 mvp)
         vkUnmapMemory(device, stagingBufferMemory);
     }
 
-    //Rebuild the command buffer, since the vertex buffer size may have changed
-    setupCommandBuffer(imageIndex, mvp);
+    //Rebuild the command buffer - only if the vertex buffer size changed for this index
+#ifdef _DEBUG
+    if(lastPolyLineIdx[imageIndex] != polyLineIdx ||
+        lastPolyPointIdx[imageIndex] != polyPointIdx ||
+        lastVertexSize[imageIndex] != dbgPolyVertices.size() ||
+        lastIndicesSize[imageIndex] != dbgPolyIndices.size())
+    {
+        lastPolyLineIdx[imageIndex] = polyLineIdx;
+        lastPolyPointIdx[imageIndex] = polyPointIdx;
+        lastVertexSize[imageIndex] = dbgPolyVertices.size();
+        lastIndicesSize[imageIndex] = dbgPolyIndices.size();
+#endif
+
+        setupCommandBuffer(imageIndex, mvp);
+#ifdef _DEBUG
+    }
+#endif
 
     //Set up queue submission
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
