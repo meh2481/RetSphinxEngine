@@ -817,6 +817,15 @@ void VulkanInterface::createCommandBuffers()
         LOG(ERR) << "Failed to allocate command buffers";
         assert(false);
     }
+
+#ifdef _DEBUG
+    lastPolyLineIdx.resize(swapChainFramebuffers.size());
+    lastPolyPointIdx.resize(swapChainFramebuffers.size());
+    lastVertexSize.resize(swapChainFramebuffers.size());
+    lastIndicesSize.resize(swapChainFramebuffers.size());
+#endif
+    for(size_t i = 0; i < commandBuffers.size(); i++)
+        setupCommandBuffer(i);
 }
 
 void VulkanInterface::createCommandPool()
@@ -1236,17 +1245,6 @@ void VulkanInterface::createSwapChain()
     //Store format & extent
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
-
-#ifdef _DEBUG
-    lastPolyLineIdx.resize(imageCount);
-    lastPolyPointIdx.resize(imageCount);
-    lastVertexSize.resize(imageCount);
-    lastIndicesSize.resize(imageCount);
-    for(uint32_t i = 0; i < imageCount; i++)
-    {
-        lastPolyLineIdx[i] = lastPolyPointIdx[i] = lastVertexSize[i] = lastIndicesSize[i] = 0;
-    }
-#endif
 }
 
 void VulkanInterface::createSurface()
@@ -1617,23 +1615,20 @@ void VulkanInterface::drawFrame(glm::mat4 mvp)
         vkUnmapMemory(device, stagingBufferMemory);
     }
 
+    //TODO Remove
+    mvpp = mvp;
+
     //Rebuild the command buffer - only if the vertex buffer size changed for this index
 #ifdef _DEBUG
     if(lastPolyLineIdx[imageIndex] != polyLineIdx ||
         lastPolyPointIdx[imageIndex] != polyPointIdx ||
         lastVertexSize[imageIndex] != dbgPolyVertices.size() ||
         lastIndicesSize[imageIndex] != dbgPolyIndices.size())
+#endif
     {
-        lastPolyLineIdx[imageIndex] = polyLineIdx;
-        lastPolyPointIdx[imageIndex] = polyPointIdx;
-        lastVertexSize[imageIndex] = dbgPolyVertices.size();
-        lastIndicesSize[imageIndex] = dbgPolyIndices.size();
-#endif
-
-        setupCommandBuffer(imageIndex, mvp);
-#ifdef _DEBUG
+        //TODO Only update command buffer in release mode when it needs to be
+        setupCommandBuffer(imageIndex);
     }
-#endif
 
     //Set up queue submission
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
@@ -1682,7 +1677,7 @@ void VulkanInterface::drawFrame(glm::mat4 mvp)
 #endif
 }
 
-void VulkanInterface::setupCommandBuffer(uint32_t index, glm::mat4 mvp)
+void VulkanInterface::setupCommandBuffer(uint32_t index)
 {
     //Start buffer recording
     VkCommandBufferBeginInfo beginInfo = {};
@@ -1695,7 +1690,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index, glm::mat4 mvp)
     //--------------- Copy Buffer Data ---------------
 
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer
-    //TODO: This may be a bit wasteful, since we're copying it in every frame anyway
+    //TODO: This may be a bit wasteful, since we're copying it in every frame anyway    //This TODO doesn't make any logical sense
     VkBufferCopy copyRegion = {};
     copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
     if(!!copyRegion.size)
@@ -1730,7 +1725,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index, glm::mat4 mvp)
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
     //Update push constants
-    vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvp);
+    vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
 
     //----Draw debug geometry first----
     if(dbgPolyIndices.size() > 0)
@@ -1761,6 +1756,11 @@ void VulkanInterface::setupCommandBuffer(uint32_t index, glm::mat4 mvp)
         LOG(ERR) << "Failed to record command buffer";
         assert(false);
     }
+
+    lastPolyLineIdx[index] = polyLineIdx;
+    lastPolyPointIdx[index] = polyPointIdx;
+    lastVertexSize[index] = dbgPolyVertices.size();
+    lastIndicesSize[index] = dbgPolyIndices.size();
 }
 
 void VulkanInterface::cleanupSwapChain()

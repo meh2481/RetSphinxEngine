@@ -181,6 +181,8 @@ private:
     std::vector<uint32_t> lastPolyPointIdx;
     std::vector<size_t> lastVertexSize;
     std::vector<size_t> lastIndicesSize;
+
+    glm::mat4 mvpp; //TODO Remove
 public:
 #endif
 
@@ -216,7 +218,7 @@ private:
     void createSemaphores();
     void createFences();
     void createCommandBuffers();
-    void setupCommandBuffer(uint32_t index, glm::mat4 mvp);
+    void setupCommandBuffer(uint32_t index);
     void createCommandPool();
     void createFramebuffers();
     void createRenderPass();
