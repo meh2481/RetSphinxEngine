@@ -166,7 +166,7 @@ void VulkanInterface::initVulkan()
     createTextureImageView();
     createTextureSampler();
     createVertIndexBuffers();
-    //createUniformBuffer();
+    createUniformBuffer();
     createDescriptorPool();
     createDescriptorSet(textureImageView, textureSampler);
     createCommandBuffers();
@@ -612,33 +612,33 @@ void VulkanInterface::createDescriptorSet(const VkImageView& imgView, const VkSa
     }
 
     //Create descriptors
-    //VkDescriptorBufferInfo bufferInfo = {};
-    //bufferInfo.buffer = uniformBuffer;
-    //bufferInfo.offset = 0;
-    //bufferInfo.range = sizeof(RenderState);
+    VkDescriptorBufferInfo bufferInfo = {};
+    bufferInfo.buffer = uniformBuffer;
+    bufferInfo.offset = 0;
+    bufferInfo.range = sizeof(RenderState);
 
     VkDescriptorImageInfo imageInfo = {};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = imgView;
     imageInfo.sampler = texSampler;
 
-    std::array<VkWriteDescriptorSet, 1> descriptorWrites = {};
-
-    //descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    //descriptorWrites[0].dstSet = descriptorSet;
-    //descriptorWrites[0].dstBinding = 0;
-    //descriptorWrites[0].dstArrayElement = 0;
-    //descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    //descriptorWrites[0].descriptorCount = 1;
-    //descriptorWrites[0].pBufferInfo = &bufferInfo;
+    std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
     descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     descriptorWrites[0].dstSet = descriptorSet;
     descriptorWrites[0].dstBinding = 0;
     descriptorWrites[0].dstArrayElement = 0;
-    descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     descriptorWrites[0].descriptorCount = 1;
-    descriptorWrites[0].pImageInfo = &imageInfo;
+    descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+    descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrites[1].dstSet = descriptorSet;
+    descriptorWrites[1].dstBinding = 1;
+    descriptorWrites[1].dstArrayElement = 0;
+    descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrites[1].descriptorCount = 1;
+    descriptorWrites[1].pImageInfo = &imageInfo;
 
     vkUpdateDescriptorSets(device, descriptorWrites.size(), descriptorWrites.data(), 0, NULL);
 }
@@ -664,30 +664,30 @@ void VulkanInterface::createDescriptorPool()
     }
 }
 
-//void VulkanInterface::createUniformBuffer()
-//{
-//    VkDeviceSize bufferSize = sizeof(RenderState);
-//    createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
-//}
+void VulkanInterface::createUniformBuffer()
+{
+    VkDeviceSize bufferSize = sizeof(RenderState);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+}
 
 void VulkanInterface::createDescriptorSetLayout()
 {
-    //VkDescriptorSetLayoutBinding uboLayoutBinding = {};
-    //uboLayoutBinding.binding = 0;
-    //uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    //uboLayoutBinding.descriptorCount = 1;
-    //uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    //uboLayoutBinding.pImmutableSamplers = NULL;
+    VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = NULL;
 
     //TODO: Multiple descriptor sets via layout(set = 0, binding = 0) uniform RenderState { ... }
     VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
-    samplerLayoutBinding.binding = 0;
+    samplerLayoutBinding.binding = 1;
     samplerLayoutBinding.descriptorCount = 1;
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     samplerLayoutBinding.pImmutableSamplers = nullptr;
     samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    std::array<VkDescriptorSetLayoutBinding, 1> bindings = { /*uboLayoutBinding,*/ samplerLayoutBinding };
+    std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
     VkDescriptorSetLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = bindings.size();
@@ -1076,21 +1076,24 @@ void VulkanInterface::createGraphicsPipelines()
     dynamicState.dynamicStateCount = 2;
     dynamicState.pDynamicStates = dynamicStates;
     */
-    VkPushConstantRange pushConstantRange = {};
-    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(glm::mat4);
-    assert(pushConstantRange.size % 4 == 0);	//Requirement from Vulkan spec that it be 4byte-aligned
-    assert(pushConstantRange.size != 0);		//Cannot be empty
-    assert(pushConstantRange.size <= 128);		//Guaranteed minimum for push constant buffer size
+
+    //VkPushConstantRange pushConstantRange = {};
+    //pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    //pushConstantRange.offset = 0;
+    //pushConstantRange.size = sizeof(glm::mat4);
+    //assert(pushConstantRange.size % 4 == 0);	//Requirement from Vulkan spec that it be 4byte-aligned
+    //assert(pushConstantRange.size != 0);		//Cannot be empty
+    //assert(pushConstantRange.size <= 128);		//Guaranteed minimum for push constant buffer size
 
     //Create pipeline layout
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+    pipelineLayoutInfo.pushConstantRangeCount = 0;
+    pipelineLayoutInfo.pPushConstantRanges = NULL;
+    //pipelineLayoutInfo.pushConstantRangeCount = 1;
+    //pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
     if(vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS)
     {
@@ -1518,30 +1521,29 @@ void VulkanInterface::mainLoop(const RenderState& state)
     ubo.proj[1][1] *= -1; //Flip y
 
     //Update uniforms
-    //updateUniformBuffer(ubo);
-    glm::mat4 mvp = ubo.proj * ubo.view * ubo.model;
+    updateUniformBuffer(ubo);
+    //glm::mat4 mvp = ubo.proj * ubo.view * ubo.model;
 
     //Draw
-    drawFrame(mvp);
+    drawFrame();
 }
 
-//TODO: Look into push constants instead for a more efficient way to pass frequently-changing values to the shader
-//void VulkanInterface::updateUniformBuffer(const RenderState& ubo)
-//{
-//    //Copy memory
-//    void* data;
-//    size_t sz = sizeof(ubo);
-//    vkMapMemory(device, uniformBufferMemory, 0, sz, 0, &data);
-//    memcpy(data, &ubo, sz);
-//    vkUnmapMemory(device, uniformBufferMemory);
-//}
+void VulkanInterface::updateUniformBuffer(const RenderState& ubo)
+{
+    //Copy memory
+    void* data;
+    size_t sz = sizeof(ubo);
+    vkMapMemory(device, uniformBufferMemory, 0, sz, 0, &data);
+    memcpy(data, &ubo, sz);
+    vkUnmapMemory(device, uniformBufferMemory);
+}
 
 void VulkanInterface::resizeWindow()
 {
     recreateSwapChain();
 }
 
-void VulkanInterface::drawFrame(glm::mat4 mvp)
+void VulkanInterface::drawFrame()
 {
     //Get a new image from the swapchain
     uint32_t imageIndex;
@@ -1614,9 +1616,6 @@ void VulkanInterface::drawFrame(glm::mat4 mvp)
         memcpy((void*)((VkDeviceSize)data + vertBufferSize), dbgPolyIndices.data(), (size_t)indexBufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
     }
-
-    //TODO Remove
-    mvpp = mvp;
 
     //Rebuild the command buffer - only if the vertex buffer size changed for this index
 #ifdef _DEBUG
@@ -1725,7 +1724,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
     //Update push constants
-    vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
+    //vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
 
     //----Draw debug geometry first----
     if(dbgPolyIndices.size() > 0)
@@ -1802,8 +1801,8 @@ void VulkanInterface::cleanup()
     vkFreeMemory(device, textureImageMemory, NULL);
     vkDestroyDescriptorPool(device, descriptorPool, NULL);
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, NULL);
-    //vkDestroyBuffer(device, uniformBuffer, NULL);
-    //vkFreeMemory(device, uniformBufferMemory, NULL);
+    vkDestroyBuffer(device, uniformBuffer, NULL);
+    vkFreeMemory(device, uniformBufferMemory, NULL);
 
     cleanupVertBufferMemory();
 
