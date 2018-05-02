@@ -1364,7 +1364,17 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
 
     // Application can't function without geometry shaders
     if(!deviceFeatures.geometryShader || !deviceFeatures.samplerAnisotropy) //Config option: Don't require ansitropic filtering
+    {
+        LOG(WARN) << "Graphics card requires geometry shader and sampler anisotropy";
         return 0;
+    }
+
+    //TODO: Some mobile GPUs do not support this, so alternatives if porting to mobile engines
+    if(!deviceFeatures.textureCompressionBC)
+    {
+        LOG(WARN) << "Graphics card requires BC texture compression for DXT images";
+        return 0;
+    }
 
     //TODO: We can get around this by binding descriptor sets per texture. Especially relevant on mobile platforms that don't support dynamic array texture indexing
     /*if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
@@ -1376,16 +1386,25 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     //Need device to be able to process commands we want to use
     QueueFamilyIndices indices = findQueueFamilies(device);
     if(!indices.isComplete())
+    {
+        LOG(WARN) << "Graphics card requires complete queue family indices";
         return 0;
+    }
 
-    //Need device to have swapchain support (generally true if presentation queue is supported)
+    //Need device to have support for all required extensions
     if(!checkDeviceExtensionSupport(device))
+    {
+        LOG(WARN) << "Graphics card missing required extensions";
         return 0;
+    }
 
     //Swapchain needs to have at least one format and one present mode
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
     if(swapChainSupport.formats.empty() || swapChainSupport.presentModes.empty())
+    {
+        LOG(WARN) << "Graphics card does not support swapchain";
         return 0;
+    }
 
     return score;
 }
@@ -1623,11 +1642,10 @@ void VulkanInterface::drawFrame()
         lastPolyPointIdx[imageIndex] != polyPointIdx ||
         lastVertexSize[imageIndex] != dbgPolyVertices.size() ||
         lastIndicesSize[imageIndex] != dbgPolyIndices.size())
-#endif
     {
-        //TODO Only update command buffer in release mode when it needs to be
         setupCommandBuffer(imageIndex);
     }
+#endif
 
     //Set up queue submission
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
@@ -1733,14 +1751,14 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
         vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
     }
 
-    //----Draw debug geometry outlines second----
+    //----Draw debug geometry outlines second, without indices----
     if(polyPointIdx - polyLineIdx > 0)
     {
         vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
         vkCmdDraw(commandBuffers[index], polyPointIdx - polyLineIdx, 1, polyLineIdx, 0);
     }
 
-    //----Draw debug geometry points third----
+    //----Draw debug geometry points third - no indices because that would be wasteful----
     if((uint32_t)dbgPolyVertices.size() - polyPointIdx > 0)
     {
         vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
