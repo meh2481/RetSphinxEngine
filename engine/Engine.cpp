@@ -128,7 +128,6 @@ Engine::~Engine()
 #ifdef _DEBUG
     delete m_debugDraw;
 #endif
-    Draw::shutdown();
 
     //Clean up ImGui
     ImGui_Impl_Vulkan_Shutdown();
@@ -296,7 +295,6 @@ void Engine::_render()
     if(drawDebugUI())
         ImGui::Render();
 #endif
-    Draw::flush();
 
     m_vulkan->mainLoop(m_renderState);
 }

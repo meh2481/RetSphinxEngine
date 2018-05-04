@@ -711,7 +711,7 @@ void VulkanInterface::createVertIndexBuffers()
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedBuffer, combinedBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
 }
 
 void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -819,10 +819,10 @@ void VulkanInterface::createCommandBuffers()
     }
 
 #ifdef _DEBUG
-    lastPolyLineIdx.resize(swapChainFramebuffers.size());
-    lastPolyPointIdx.resize(swapChainFramebuffers.size());
-    lastVertexSize.resize(swapChainFramebuffers.size());
-    lastIndicesSize.resize(swapChainFramebuffers.size());
+    lastDbgPolyLineIdx.resize(swapChainFramebuffers.size());
+    lastDbgPolyPointIdx.resize(swapChainFramebuffers.size());
+    lastDbgVertexSize.resize(swapChainFramebuffers.size());
+    lastDbgIndicesSize.resize(swapChainFramebuffers.size());
 #endif
     for(size_t i = 0; i < commandBuffers.size(); i++)
         setupCommandBuffer(i);
@@ -1638,10 +1638,10 @@ void VulkanInterface::drawFrame()
 
     //Rebuild the command buffer - only if the vertex buffer size changed for this index
 #ifdef _DEBUG
-    if(lastPolyLineIdx[imageIndex] != polyLineIdx ||
-        lastPolyPointIdx[imageIndex] != polyPointIdx ||
-        lastVertexSize[imageIndex] != dbgPolyVertices.size() ||
-        lastIndicesSize[imageIndex] != dbgPolyIndices.size())
+    if(lastDbgPolyLineIdx[imageIndex] != polyDbgLineIdx ||
+        lastDbgPolyPointIdx[imageIndex] != polyDbgPointIdx ||
+        lastDbgVertexSize[imageIndex] != dbgPolyVertices.size() ||
+        lastDbgIndicesSize[imageIndex] != dbgPolyIndices.size())
     {
         setupCommandBuffer(imageIndex);
     }
@@ -1711,7 +1711,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     VkBufferCopy copyRegion = {};
     copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
     if(!!copyRegion.size)
-        vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedBuffer, 1, &copyRegion);
+        vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedDbgBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
     std::array<VkClearValue, 2> clearValues = {};
@@ -1733,10 +1733,10 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
 
     //Update vert/index buffers
-    VkBuffer vertexBuffers[] = { combinedBuffer };
+    VkBuffer vertexBuffers[] = { combinedDbgBuffer };
     VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
     vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedDbgBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
 
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
@@ -1752,17 +1752,17 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     }
 
     //----Draw debug geometry outlines second, without indices----
-    if(polyPointIdx - polyLineIdx > 0)
+    if(polyDbgPointIdx - polyDbgLineIdx > 0)
     {
         vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
-        vkCmdDraw(commandBuffers[index], polyPointIdx - polyLineIdx, 1, polyLineIdx, 0);
+        vkCmdDraw(commandBuffers[index], polyDbgPointIdx - polyDbgLineIdx, 1, polyDbgLineIdx, 0);
     }
 
     //----Draw debug geometry points third - no indices because that would be wasteful----
-    if((uint32_t)dbgPolyVertices.size() - polyPointIdx > 0)
+    if((uint32_t)dbgPolyVertices.size() - polyDbgPointIdx > 0)
     {
         vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
-        vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyPointIdx, 1, polyPointIdx, 0);
+        vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyDbgPointIdx, 1, polyDbgPointIdx, 0);
     }
 
     //-------------- End Render Pass --------------
@@ -1774,10 +1774,10 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
         assert(false);
     }
 
-    lastPolyLineIdx[index] = polyLineIdx;
-    lastPolyPointIdx[index] = polyPointIdx;
-    lastVertexSize[index] = dbgPolyVertices.size();
-    lastIndicesSize[index] = dbgPolyIndices.size();
+    lastDbgPolyLineIdx[index] = polyDbgLineIdx;
+    lastDbgPolyPointIdx[index] = polyDbgPointIdx;
+    lastDbgVertexSize[index] = dbgPolyVertices.size();
+    lastDbgIndicesSize[index] = dbgPolyIndices.size();
 }
 
 void VulkanInterface::cleanupSwapChain()
@@ -1803,8 +1803,8 @@ void VulkanInterface::cleanupSwapChain()
 
 void VulkanInterface::cleanupVertBufferMemory()
 {
-    vkDestroyBuffer(device, combinedBuffer, NULL);
-    vkFreeMemory(device, combinedBufferMemory, NULL);
+    vkDestroyBuffer(device, combinedDbgBuffer, NULL);
+    vkFreeMemory(device, combinedDbgBufferMemory, NULL);
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);
 }

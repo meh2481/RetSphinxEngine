@@ -30,14 +30,14 @@ void DebugDraw::flush()
         m_vulkan->dbgPolyVertices.push_back(i);
     for(auto i : m_indices)
         m_vulkan->dbgPolyIndices.push_back(i);
-    m_vulkan->polyLineIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
+    m_vulkan->polyDbgLineIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
     for(auto i : m_lineVertices)
     {
         if(i.pos.z == FLT_MIN)
             i.pos.z = vertexDepth + VERT_DEPTH_INCR;
         m_vulkan->dbgPolyVertices.push_back(i);
     }
-    m_vulkan->polyPointIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
+    m_vulkan->polyDbgPointIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
     for(auto i : m_pointVertices)
     {
         i.pos.z = vertexDepth + VERT_DEPTH_INCR;

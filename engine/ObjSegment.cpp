@@ -72,7 +72,7 @@ void ObjSegment::draw(RenderState renderState)
                     q.pos[6] = q.pos[2];
                     q.pos[7] = q.pos[5]; // lower right
 
-                    Draw::drawQuad(&q, &renderState);
+                    Draw::drawQuad(&q);
                 }
             }
         }
@@ -121,7 +121,7 @@ void ObjSegment::draw(RenderState renderState)
                     q.pos[6] = q.pos[2];
                     q.pos[7] = q.pos[5]; // lower right
 
-                    Draw::drawQuad(&q, &renderState);
+                    Draw::drawQuad(&q);
                 }
             }
         }

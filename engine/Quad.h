@@ -26,10 +26,5 @@ class RenderState;
 
 namespace Draw
 {
-    void init(int programId);
-    void shutdown();
-    void drawQuad(Quad* q, RenderState* state);    //Yeeeeaaaaaaah
-
-    void drawHelper(const float* data, unsigned int len, int numPer, int count, int type);
-    void flush();   //Flush all gathered draw data
+    void drawQuad(Quad* q);
 }

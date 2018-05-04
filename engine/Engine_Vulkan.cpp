@@ -9,6 +9,9 @@
 
 #define GAME_CONTROLLER_DB_FILE "gamecontrollerdb.txt"
 
+//HACK
+VulkanInterface* g_vulkan;
+
 void Engine::setup_sdl()
 {
 
@@ -81,6 +84,7 @@ void Engine::setup_sdl()
 void Engine::setup_vulkan()
 {
     m_vulkan = new VulkanInterface(m_Window, m_resourceLoader);
+    g_vulkan = m_vulkan;
 
     glm::mat4 persp = glm::tweakedInfinitePerspective(glm::radians(45.0f), (float)m_iWidth / (float)m_iHeight, 0.1f);
     m_renderState.proj = persp;

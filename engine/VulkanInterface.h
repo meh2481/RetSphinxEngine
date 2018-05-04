@@ -8,6 +8,7 @@
 #include "RenderState.h"
 
 class ResourceLoader;
+class Quad;
 
 #ifdef _DEBUG
 #define ENABLE_VALIDATION_LAYERS
@@ -140,10 +141,19 @@ private:
     VkSemaphore renderFinishedSemaphore;
     std::vector<VkFence> fences;
     std::vector<bool> bufferSubmitted;
-    VkBuffer combinedBuffer;
-    VkDeviceMemory combinedBufferMemory;
+#ifdef _DEBUG
+    VkBuffer combinedDbgBuffer;
+    VkDeviceMemory combinedDbgBufferMemory;
+    VkBuffer stagingDbgBuffer;
+    VkDeviceMemory stagingDbgBufferMemory;
+#endif
+    VkBuffer combinedVertIndexBuffer;
+    VkDeviceMemory combinedVertIndexBufferMemory;
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
+    VkDeviceSize maxIndicesCount;
+    VkDeviceSize maxVerticesCount;
+
     VkBuffer uniformBuffer;
     VkDeviceMemory uniformBufferMemory;
     VkDescriptorSetLayout descriptorSetLayout;
@@ -173,18 +183,25 @@ public:
     //For debugging stuff
     std::vector<DbgVertex> dbgPolyVertices;
     std::vector<uint16_t> dbgPolyIndices;
-    uint32_t polyLineIdx;
-    uint32_t polyPointIdx;
+    uint32_t polyDbgLineIdx;
+    uint32_t polyDbgPointIdx;
 private:
     //Store these so we know when to rebuild cmd buffer
-    std::vector<uint32_t> lastPolyLineIdx;
-    std::vector<uint32_t> lastPolyPointIdx;
-    std::vector<size_t> lastVertexSize;
-    std::vector<size_t> lastIndicesSize;
+    std::vector<uint32_t> lastDbgPolyLineIdx;
+    std::vector<uint32_t> lastDbgPolyPointIdx;
+    std::vector<size_t> lastDbgVertexSize;
+    std::vector<size_t> lastDbgIndicesSize;
 public:
 #endif
+    std::vector<Vertex> quadVertices;
+    std::vector<uint32_t> quadIndices;
 
 private:
+    //For handling changes in quad sizes
+    std::vector<size_t> lastQuadVertexSize;
+    std::vector<size_t> lastQuadIndexSize;
+
+
     //Private member functions
 #ifdef ENABLE_VALIDATION_LAYERS
     void setupDebugCallback();
@@ -241,5 +258,6 @@ private:
     void cleanupVertBufferMemory();
     void cleanup();
     void createInstance();
+    void handleBufferGrowth(uint32_t imageIndex);
 
 };
