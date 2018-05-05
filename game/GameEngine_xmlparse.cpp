@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------------------------------------------------------
 bool GameEngine::loadConfig(const std::string& sFilename)
 {
-    LOG_info("Parsing config file %d", sFilename.c_str());
+    LOG_info("Parsing config file %s", sFilename.c_str());
     //Open file
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sFilename.c_str());

@@ -1608,7 +1608,7 @@ void VulkanInterface::drawFrame()
     if(dbgPolyIndices.size() > dbgIndicesCount || dbgPolyVertices.size() > dbgVerticesCount)
     {
         //Vert/index buffers likely to grow at the same time, so just recalc both
-        LOG_dbg("Changing buffer sizes - had indices %ul now %ul; vertices had %ul now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
+        LOG_dbg("Changing buffer sizes - had indices %lu now %lu; vertices had %lu now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
 
         //Use max() to not shrink either buffer
         dbgIndicesCount = std::max((VkDeviceSize)dbgPolyIndices.size(), dbgIndicesCount);

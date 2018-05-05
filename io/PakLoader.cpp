@@ -89,18 +89,18 @@ void PakLoader::parseFile(const std::string& sFileName)
 
 unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 {
-    LOG_info("load resource with id %u", id);
+    LOG_trace("load resource with id %u", id);
     std::map<uint64_t, PakPtr>::iterator it = m_pakFiles.find(id);
     if(it == m_pakFiles.end())
     {
-        LOG_info("resource was not in pak files");
+        LOG_trace("resource was not in pak files");
         return NULL;
     }
 
     //Load resource
     if(fseek(it->second.fp, (long)it->second.ptr.offset, SEEK_SET))
     {
-        LOG_warn("Unable to seek to proper location in resource file for resource ID %ul", id);
+        LOG_err("Unable to seek to proper location in resource file for resource ID %lu", id);
         return NULL;
     }
 
@@ -108,7 +108,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
     CompressionHeader compHeader;
     if(fread(&compHeader, 1, sizeof(CompressionHeader), it->second.fp) != sizeof(CompressionHeader))
     {
-        LOG_warn("couldn\'t read compression header");
+        LOG_err("couldn\'t read compression header");
         return NULL;
     }
 
@@ -119,7 +119,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
         {
             if(!compHeader.compressedSize)
             {
-                LOG_warn("compressed size 0");
+                LOG_err("compressed size 0");
                 return NULL;
             }
 
@@ -129,7 +129,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
         unsigned char* uncompressedData = (unsigned char*)malloc(compHeader.decompressedSize);
         if(fread(uncompressedData, 1, compHeader.decompressedSize, it->second.fp) != compHeader.decompressedSize)
         {
-            LOG_warn("couldn\'t read decompressed size of bytes");
+            LOG_err("couldn\'t read decompressed size of bytes");
             free(uncompressedData);
             return NULL;
         }
@@ -137,21 +137,21 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
         if(len)
             *len = compHeader.decompressedSize;
 
-        LOG_info("all good uncompressed");
+        LOG_trace("all good uncompressed");
         return uncompressedData;
     }
     else if(compHeader.compressionType == COMPRESSION_FLAGS_WFLZ)
     {
         if(!compHeader.compressedSize)
         {
-            LOG_warn("compressed size is zero");
+            LOG_err("compressed size is zero");
             return NULL;
         }
 
         unsigned char* compressedData = (unsigned char*)malloc(compHeader.compressedSize);
         if(fread(compressedData, 1, compHeader.compressedSize, it->second.fp) != compHeader.compressedSize)
         {
-            LOG_warn("couldn\'t read compressed data");
+            LOG_err("couldn\'t read compressed data");
             free(compressedData);
             return NULL;
         }
@@ -162,7 +162,7 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
 
         if(!compHeader.decompressedSize)
         {
-            LOG_warn("decompressed size wrong");
+            LOG_err("decompressed size wrong");
             free(compressedData);
             return NULL;
         }
@@ -175,11 +175,11 @@ unsigned char* PakLoader::loadResource(uint64_t id, unsigned int* len)
         if(len)
             *len = compHeader.decompressedSize;
 
-        LOG_info("all good wflz");
+        LOG_trace("all good wflz");
         free(compressedData);
         return decompressedData;
     }
 
-    LOG_warn("Unknown compression header type %u", compHeader.compressionType);
+    LOG_err("Unknown compression header type %u", compHeader.compressionType);
     return NULL;
 }

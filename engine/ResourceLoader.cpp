@@ -43,36 +43,36 @@ void ResourceLoader::clearCache()
 
 Image* ResourceLoader::getImage(uint64_t hashID)
 {
-    LOG_info("Loading Image from ID %ul", hashID);
+    LOG_trace("Loading Image from ID %lu", hashID);
     Image* img = (Image*)m_cache->find(hashID);
     if(!img)    //This image isn't here; load it
     {
-        LOG_info("Cache miss");
+        LOG_trace("Cache miss");
         unsigned int len = 0;
         unsigned char* resource = m_pakLoader->loadResource(hashID, &len);
         if(resource && len)
         {
-            LOG_info("Pak hit - load %ul from data", hashID);
+            LOG_trace("Pak hit - load %lu from data", hashID);
             img = loadImageFromData(resource, len);
             m_cache->add(hashID, img, len);
             free(resource);                        //Free memory
         }
         else
-            LOG_info("Pak miss %ul", hashID);
+            LOG_trace("Pak miss %lu", hashID);
     }
     else
-        LOG_info("Cache hit %ul", hashID);
+        LOG_trace("Cache hit %lu", hashID);
     return img;
 }
 
 Image* ResourceLoader::getImage(const std::string& sID)
 {
-    LOG_info("Loading image %s", sID.c_str());
+    LOG_dbg("Loading image %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     Image* img = getImage(hashVal);
     if(!img)    //This image isn't here; load it
     {
-        LOG_info("Attempting to load from file");
+        LOG_trace("Attempting to load from file");
         img = loadImageFromFile(sID);                //Create this image
         m_cache->add(hashVal, img, sizeof(Image));    //Add to the cache
     }
@@ -81,13 +81,13 @@ Image* ResourceLoader::getImage(const std::string& sID)
 
 Object3D* ResourceLoader::get3dObject(const std::string& sID)
 {
-    LOG_info("Loading 3D object %s", sID.c_str());
+    LOG_dbg("Loading 3D object %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
-    LOG_info("3D object has ID ", hashVal);
+    LOG_trace("3D object has ID ", hashVal);
     Object3D* object3d = (Object3D*)m_cache->find(hashVal);
     if(!object3d)    //This object isn't here; load it
     {
-        LOG_info("Cache miss");
+        LOG_trace("Cache miss");
         unsigned int len = 0;
         Object3DHeader* header = (Object3DHeader*)m_pakLoader->loadResource(hashVal, &len);
         if(!header || len != sizeof(Object3DHeader))
@@ -97,7 +97,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
         }
         else
         {
-            LOG_info("Pak hit - load from data");
+            LOG_trace("Pak hit - load from data");
 
             //Get image
             Image* img = getImage(header->textureId);
@@ -110,7 +110,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
                 meshData = m_pakLoader->loadResource(header->meshId, &meshLen);
                 if(!meshData)
                 {
-                    LOG_err("Unable to load 3D mesh %ul Referenced from 3D object %s", header->meshId, sID.c_str());
+                    LOG_err("Unable to load 3D mesh %lu Referenced from 3D object %s", header->meshId, sID.c_str());
                     return NULL;
                 }
                 m_cache->add(header->meshId, meshData, meshLen);
@@ -122,7 +122,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
         }
     }
     else
-        LOG_info("Cache hit %s", sID.c_str());
+        LOG_trace("Cache hit %s", sID.c_str());
     return object3d;
 }
 
@@ -130,7 +130,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
 ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 {
     ParticleSystem* ps = new ParticleSystem(getParticleShader());
-    LOG_info("Loading particle system %s", sID.c_str());
+    LOG_dbg("Loading particle system %s", sID.c_str());
     ps->_initValues();
 
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
@@ -142,12 +142,12 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
     int iErr;
     if(!resource || !len)
     {
-        LOG_info("Pak miss");
+        LOG_trace("Pak miss");
         iErr = doc->LoadFile(sID.c_str());
     }
     else
     {
-        LOG_info("Loading from pak");
+        LOG_trace("Loading from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
@@ -335,7 +335,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 
 SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
 {
-    LOG_info("Load icon %s", sID.c_str());
+    LOG_dbg("Load icon %s", sID.c_str());
     uint64_t hashID = Hash::hash(sID.c_str());
     unsigned char* imgBuf = m_pakLoader->loadResource(hashID, NULL);
     ImageHeader* imgHeader = (ImageHeader*)imgBuf;
@@ -366,12 +366,12 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
     int iErr;
     if(!resource || !len)
     {
-        LOG_info("Pak miss");
+        LOG_trace("Pak miss");
         iErr = doc->LoadFile(sID.c_str());
     }
     else
     {
-        LOG_info("loading from pak");
+        LOG_trace("loading from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
@@ -421,9 +421,9 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
 
 ImgFont* ResourceLoader::getFont(const std::string& sID)
 {
-    LOG_info("Loading Font %s", sID.c_str());
+    LOG_dbg("Loading Font %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
-    LOG_info("Font has ID %ul", hashVal);
+    LOG_trace("Font has ID %lu", hashVal);
     ImgFont* font = (ImgFont*)m_cache->find(hashVal);
     if(!font)    //This font isn't here; load it
     {
@@ -437,7 +437,7 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
         }
         else
         {
-            LOG_info("Pak hit - load from data");
+            LOG_trace("Pak hit - load from data");
             assert(len > sizeof(FontHeader));
 
             FontHeader fontHeader;
@@ -461,13 +461,13 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
         }
     }
     else
-        LOG_info("Cache hit %s", sID.c_str());
+        LOG_trace("Cache hit %s", sID.c_str());
     return font;
 }
 
 Stringbank * ResourceLoader::getStringbank(const std::string& sID)
 {
-    LOG_info("Loading stringbank %s", sID.c_str());
+    LOG_dbg("Loading stringbank %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     unsigned int len = 0;
     unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
@@ -497,13 +497,13 @@ std::string ResourceLoader::readTextFile(const std::string& filename)
 
 std::string ResourceLoader::getTextFile(const std::string& sID)
 {
-    LOG_info("Loading text file %s", sID.c_str());
+    LOG_dbg("Loading text file %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     unsigned int len = 0;
     unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
     if(!resource || !len)
     {
-        LOG_info("Unable to load %s from pak", sID.c_str());
+        LOG_trace("Unable to load %s from pak", sID.c_str());
         return readTextFile(sID);
     }
     std::string s;
@@ -548,7 +548,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     oss << "res/obj/" << sType << ".xml";
     std::string sXMLFilename = oss.str();
 
-    LOG_info("Parsing object XML file %s", sXMLFilename.c_str());
+    LOG_dbg("Parsing object XML file %s", sXMLFilename.c_str());
     //Open file
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 
@@ -558,12 +558,12 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     int iErr;
     if(!resource || !len)
     {
-        LOG_info("Pak miss");
+        LOG_trace("Pak miss");
         iErr = doc->LoadFile(sXMLFilename.c_str());
     }
     else
     {
-        LOG_info("load from pak");
+        LOG_trace("load from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
@@ -867,7 +867,7 @@ unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* le
 
 SoundLoop* ResourceLoader::getSoundLoop(const std::string & sID)
 {
-    LOG_info("Loading sound loop info from %s", sID.c_str());
+    LOG_dbg("Loading sound loop info from %s", sID.c_str());
 
     uint64_t hash = Hash::hash(sID.c_str());
     unsigned char* ret = m_pakLoader->loadResource(hash);
@@ -921,7 +921,7 @@ Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
     }
     if(len > sizeof(TextureHeader))
     {
-        LOG_warn("Ignoring extra %ul bytes for texture", len - sizeof(TextureHeader));
+        LOG_warn("Ignoring extra %lu bytes for texture", len - sizeof(TextureHeader));
     }
 
     //Read header
@@ -960,17 +960,17 @@ Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, un
 
 Texture* ResourceLoader::getAtlas(uint64_t atlasId)
 {
-    LOG_info("Loading image atlas %ul", atlasId);
+    LOG_dbg("Loading image atlas %lu", atlasId);
     Texture* atlas = (Texture*)m_cache->find(atlasId);
     if(!atlas)    //This image isn't here; load it
     {
-        LOG_info("Cache miss, load atlas from pak");
+        LOG_trace("Cache miss, load atlas from pak");
 
         unsigned int len = 0;
         unsigned char* buf = m_pakLoader->loadResource(atlasId, &len);
         if(buf == NULL || len < sizeof(AtlasHeader))
         {
-            LOG_err("Unable to load image atlas %ul from pak", atlasId);
+            LOG_err("Unable to load image atlas %lu from pak", atlasId);
             return NULL;
         }
 

@@ -33,9 +33,9 @@ static void logWithLock(void *userdata, int category, SDL_LogPriority priority, 
 {
     SDL_LockMutex(logMutex);
 
-    logfile << levelToString(priority) << ": " << message << std::endl;
+    logfile << message << std::endl;
 #ifdef _DEBUG
-    std::cout << levelToString(priority) << ": " << message << std::endl;
+    std::cout << message << std::endl;
 #endif
 
     SDL_UnlockMutex(logMutex);

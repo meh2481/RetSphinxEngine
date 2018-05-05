@@ -71,17 +71,17 @@ FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TY
         }
         case FMOD_SYSTEM_CALLBACK_PREMIX:
         {
-            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.");
+            LOG_trace("NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_MIDMIX:
         {
-            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.");
+            LOG_trace("NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_POSTMIX:
         {
-            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.");
+            LOG_trace("NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_ERROR:

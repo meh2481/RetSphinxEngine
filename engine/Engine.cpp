@@ -318,7 +318,7 @@ void Engine::drawDebug()
 
 void Engine::setFramerate(float fFramerate)
 {
-    LOG_info("Setting framerate to %f", fFramerate);
+    LOG_info("Setting framerate to %.1f", fFramerate);
     if(fFramerate < 60.0)
         fFramerate = 60.0;    //60fps is bare minimum
     m_fFramerate = fFramerate;

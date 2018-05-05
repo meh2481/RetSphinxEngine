@@ -61,21 +61,21 @@ void Engine::setup_sdl()
     setFramerate((float)mode.refresh_rate);
 
     int numDisplays = SDL_GetNumVideoDisplays();
-    LOG_info("Available displays: %d", numDisplays);
+    LOG_trace("Available displays: %d", numDisplays);
     for(int display = 0; display < numDisplays; display++)
     {
         int num = SDL_GetNumDisplayModes(display);
-        LOG_info("Available modes for display %d", display + 1);
+        LOG_trace("Available modes for display %d", display + 1);
         for(int i = 0; i < num; i++)
         {
             SDL_GetDisplayMode(display, i, &mode);
-            LOG_info("Mode: %dx%d %dHz", mode.w, mode.h, mode.refresh_rate);
+            LOG_trace("Mode: %dx%d %dHz", mode.w, mode.h, mode.refresh_rate);
         }
     }
 
-    LOG_info("Loading gamepad configurations from %s", GAME_CONTROLLER_DB_FILE);
+    LOG_dbg("Loading gamepad configurations from %s", GAME_CONTROLLER_DB_FILE);
     if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
-        LOG_warn("Unable to open %s: %s", GAME_CONTROLLER_DB_FILE, SDL_GetError());
+        LOG_dbg("Unable to open %s: %s", GAME_CONTROLLER_DB_FILE, SDL_GetError());
 
     _loadicon();    //Load our window icon
 }
