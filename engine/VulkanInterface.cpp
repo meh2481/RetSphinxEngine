@@ -942,30 +942,29 @@ void VulkanInterface::createRenderPass()
 
 void VulkanInterface::createGraphicsPipelines()
 {
-    VkShaderModule dbgVertShaderModule = createShaderModule("res/shaders/shaderdbg.vert");
-    VkShaderModule dbgFragShaderModule = createShaderModule("res/shaders/shaderdbg.frag");
+    VkShaderModule vertShaderModule = createShaderModule("res/shaders/shader.vert");
+    VkShaderModule fragShaderModule = createShaderModule("res/shaders/shader.frag");
 
     //Vert shader stage
     VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = dbgVertShaderModule;
+    vertShaderStageInfo.module = vertShaderModule;
     vertShaderStageInfo.pName = "main";
 
     //Frag shader stage
     VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
     fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = dbgFragShaderModule;
+    fragShaderStageInfo.module = fragShaderModule;
     fragShaderStageInfo.pName = "main";
 
     //Create shader stages
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
     //Vertex input
-#ifdef _DEBUG
-    auto bindingDescription = DbgVertex::getBindingDescription();
-    auto attributeDescriptions = DbgVertex::getAttributeDescriptions();
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -973,14 +972,6 @@ void VulkanInterface::createGraphicsPipelines()
     vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-#else
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = NULL;
-    vertexInputInfo.pVertexAttributeDescriptions = NULL;
-#endif
 
     //Input assembly: triangles in a list of vertices
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
@@ -1132,6 +1123,23 @@ void VulkanInterface::createGraphicsPipelines()
     pipelineInfo.basePipelineIndex = -1;
 
 #ifdef _DEBUG
+    //Change shader
+    VkShaderModule dbgVertShaderModule = createShaderModule("res/shaders/shaderdbg.vert");
+    VkShaderModule dbgFragShaderModule = createShaderModule("res/shaders/shaderdbg.frag");
+    vertShaderStageInfo.module = dbgVertShaderModule;
+    fragShaderStageInfo.module = dbgFragShaderModule;
+    VkPipelineShaderStageCreateInfo dbgShaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+    pipelineInfo.pStages = dbgShaderStages;
+
+    //Change vertex descriptions
+    bindingDescription = DbgVertex::getBindingDescription();
+    auto attributeDescriptions2 = DbgVertex::getAttributeDescriptions();
+
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions2.size();
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions2.data();
+
     //Create debug geom pipeline
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugGeometryGraphicsPipeline) != VK_SUCCESS)
     {
@@ -1155,10 +1163,11 @@ void VulkanInterface::createGraphicsPipelines()
         LOG_err("Failed to create debug outline graphics pipeline");
         exit(1);
     }
-#endif
-
     vkDestroyShaderModule(device, dbgFragShaderModule, NULL);
     vkDestroyShaderModule(device, dbgVertShaderModule, NULL);
+#endif
+    vkDestroyShaderModule(device, fragShaderModule, NULL);
+    vkDestroyShaderModule(device, vertShaderModule, NULL);
 }
 
 VkShaderModule VulkanInterface::createShaderModule(const std::string& filename)
