@@ -70,3 +70,38 @@ void logger_quit()
     SDL_Log("%s Logger close", curTime());
     logfile.close();
 }
+
+#define BUF_SZ_ 1024
+void _logHelper(SDL_LogPriority l, const char * file, int line, const char * fmt, ...)
+{
+    char buf[BUF_SZ_];
+    //TODO: File/line
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, BUF_SZ_, fmt, args);
+    va_end(args);
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s %s:%d : %s", curTime(), levelToString(l), StringUtils::getFilename(file).c_str(), line, buf);
+}
+
+/*
+-#ifdef _DEBUG
+-logstream& logg(LogLevel l, const char* file, int line)
+-#else
+-logstream& logg(LogLevel l)
+-#endif
+-{
+-    if(l >= curLogLevel)
+-    {
+-        logfile._on();
+-        logfile << std::endl << curTime() << ' ' << levelToString(l);
+-#ifdef _DEBUG
+-        logfile << ' ' << StringUtils::getFilename(file) << ':' << line;
+-#endif
+-        logfile << " : ";
+-    }
+-    else
+-        logfile._off();
+-    return logfile;
+-}
+
+*/

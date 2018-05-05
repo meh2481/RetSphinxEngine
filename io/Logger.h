@@ -14,12 +14,13 @@ typedef enum loglevel
 void logger_init(const char* filename, SDL_LogPriority l);
 void logger_quit();
 
-//TODO Logging levels
-#define LOG_trace SDL_Log
-#define LOG_dbg SDL_Log
-#define LOG_info SDL_Log
-#define LOG_warn SDL_Log
-#define LOG_err SDL_Log
+//TODO Release
+void _logHelper(SDL_LogPriority l, const char* file, int line, const char* fmt, ...);
+#define LOG_trace(fmt, ...) _logHelper(SDL_LOG_PRIORITY_VERBOSE, __FILE__, __LINE__, fmt, __VA_ARGS__)
+#define LOG_dbg(fmt, ...) _logHelper(SDL_LOG_PRIORITY_DEBUG, __FILE__, __LINE__, fmt, __VA_ARGS__)
+#define LOG_info(fmt, ...) _logHelper(SDL_LOG_PRIORITY_INFO, __FILE__, __LINE__, fmt, __VA_ARGS__)
+#define LOG_warn(fmt, ...) _logHelper(SDL_LOG_PRIORITY_WARN, __FILE__, __LINE__, fmt, __VA_ARGS__)
+#define LOG_err(fmt, ...) _logHelper(SDL_LOG_PRIORITY_ERROR, __FILE__, __LINE__, fmt, __VA_ARGS__)
 
 //#ifdef _DEBUG
 //#define LOG(level) logg(level, __FILE__, __LINE__)
