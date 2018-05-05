@@ -5,7 +5,7 @@
 
 HeadTracker::HeadTracker(SDL_Joystick* joy)
 {
-    LOG(INFO) << "Initializing headtracker from joystick " << SDL_JoystickName(joy);
+    LOG_info("Initializing headtracker from joystick %s", SDL_JoystickName(joy));
     m_joy = joy;
 }
 

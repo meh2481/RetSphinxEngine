@@ -61,7 +61,7 @@ bool Gradient::load(const std::string& sXMLFilename)
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error opening gradient XML file: " << sXMLFilename << "- Error " << iErr;
+        LOG_err("Error opening gradient XML file: %s - Error %d", sXMLFilename.c_str(), iErr);
         delete doc;
         return false;
     }
@@ -69,7 +69,7 @@ bool Gradient::load(const std::string& sXMLFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERR) << "Error: Root element NULL in XML file " << sXMLFilename << ". Ignoring...";
+        LOG_err("Error: Root element NULL in XML file %s. Ignoring...", sXMLFilename.c_str());
         delete doc;
         return false;
     }

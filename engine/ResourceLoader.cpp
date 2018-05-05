@@ -43,36 +43,36 @@ void ResourceLoader::clearCache()
 
 Image* ResourceLoader::getImage(uint64_t hashID)
 {
-    LOG(TRACE) << "Loading Image from ID " << hashID;
+    LOG_info("Loading Image from ID %ul", hashID);
     Image* img = (Image*)m_cache->find(hashID);
     if(!img)    //This image isn't here; load it
     {
-        LOG(TRACE) << "Cache miss";
+        LOG_info("Cache miss");
         unsigned int len = 0;
         unsigned char* resource = m_pakLoader->loadResource(hashID, &len);
         if(resource && len)
         {
-            LOG(TRACE) << "Pak hit - load " << hashID << " from data";
+            LOG_info("Pak hit - load %ul from data", hashID);
             img = loadImageFromData(resource, len);
             m_cache->add(hashID, img, len);
             free(resource);                        //Free memory
         }
         else
-            LOG(TRACE) << "Pak miss " << hashID;
+            LOG_info("Pak miss %ul", hashID);
     }
     else
-        LOG(TRACE) << "Cache hit " << hashID;
+        LOG_info("Cache hit %ul", hashID);
     return img;
 }
 
 Image* ResourceLoader::getImage(const std::string& sID)
 {
-    LOG(TRACE) << "Loading image " << sID;
+    LOG_info("Loading image %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     Image* img = getImage(hashVal);
     if(!img)    //This image isn't here; load it
     {
-        LOG(TRACE) << "Attempting to load from file";
+        LOG_info("Attempting to load from file");
         img = loadImageFromFile(sID);                //Create this image
         m_cache->add(hashVal, img, sizeof(Image));    //Add to the cache
     }
@@ -81,23 +81,23 @@ Image* ResourceLoader::getImage(const std::string& sID)
 
 Object3D* ResourceLoader::get3dObject(const std::string& sID)
 {
-    LOG(TRACE) << "Loading 3D object " << sID;
+    LOG_info("Loading 3D object %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
-    LOG(TRACE) << "3D object has ID " << hashVal;
+    LOG_info("3D object has ID ", hashVal);
     Object3D* object3d = (Object3D*)m_cache->find(hashVal);
     if(!object3d)    //This object isn't here; load it
     {
-        LOG(TRACE) << "Cache miss";
+        LOG_info("Cache miss");
         unsigned int len = 0;
         Object3DHeader* header = (Object3DHeader*)m_pakLoader->loadResource(hashVal, &len);
         if(!header || len != sizeof(Object3DHeader))
         {
-            LOG(ERR) << "Loading 3D object " << sID << " from file not supported";
+            LOG_err("Loading 3D object %s from file not supported", sID.c_str());
             return NULL;
         }
         else
         {
-            LOG(TRACE) << "Pak hit - load from data";
+            LOG_info("Pak hit - load from data");
 
             //Get image
             Image* img = getImage(header->textureId);
@@ -110,7 +110,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
                 meshData = m_pakLoader->loadResource(header->meshId, &meshLen);
                 if(!meshData)
                 {
-                    LOG(ERR) << "Unable to load 3D mesh " << header->meshId << " Referenced from 3D object " << sID;
+                    LOG_err("Unable to load 3D mesh %ul Referenced from 3D object %s", header->meshId, sID.c_str());
                     return NULL;
                 }
                 m_cache->add(header->meshId, meshData, meshLen);
@@ -122,7 +122,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
         }
     }
     else
-        LOG(TRACE) << "Cache hit " << sID;
+        LOG_info("Cache hit %s", sID.c_str());
     return object3d;
 }
 
@@ -130,7 +130,7 @@ Object3D* ResourceLoader::get3dObject(const std::string& sID)
 ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 {
     ParticleSystem* ps = new ParticleSystem(getParticleShader());
-    LOG(INFO) << "Loading particle system " << sID;
+    LOG_info("Loading particle system %s", sID.c_str());
     ps->_initValues();
 
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
@@ -142,19 +142,19 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
     int iErr;
     if(!resource || !len)
     {
-        LOG(TRACE) << "Pak miss";
+        LOG_info("Pak miss");
         iErr = doc->LoadFile(sID.c_str());
     }
     else
     {
-        LOG(TRACE) << "Loading from pak";
+        LOG_info("Loading from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
 
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing XML file " << sID << ": Error " << iErr;
+        LOG_err("Error parsing XML file %s: Error %d", sID.c_str(), iErr);
         delete doc;
         delete ps;
         return NULL;
@@ -163,7 +163,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
     tinyxml2::XMLElement* root = doc->FirstChildElement("particlesystem");
     if(root == NULL)
     {
-        LOG(ERR) << "Error: No toplevel \"particlesystem\" item in XML file " << sID;
+        LOG_err("Error: No toplevel \"particlesystem\" item in XML file %s", sID.c_str());
         delete doc;
         delete ps;
         return NULL;
@@ -324,7 +324,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
             }
         }
         else
-            LOG(WARN) << "Warning: Unknown element type \"" << sName << "\" found in XML file " << sID << ". Ignoring...";
+            LOG_warn("Warning: Unknown element type \"%s\" found in XML file %s. Ignoring...", sName.c_str(), sID.c_str());
     }
 
     delete doc;
@@ -335,7 +335,7 @@ ParticleSystem* ResourceLoader::getParticleSystem(const std::string& sID)
 
 SDL_Surface* ResourceLoader::getSDLImage(const std::string& sID)
 {
-    LOG(INFO) << "Load icon " << sID;
+    LOG_info("Load icon %s", sID.c_str());
     uint64_t hashID = Hash::hash(sID.c_str());
     unsigned char* imgBuf = m_pakLoader->loadResource(hashID, NULL);
     ImageHeader* imgHeader = (ImageHeader*)imgBuf;
@@ -366,19 +366,19 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
     int iErr;
     if(!resource || !len)
     {
-        LOG(TRACE) << "Pak miss";
+        LOG_info("Pak miss");
         iErr = doc->LoadFile(sID.c_str());
     }
     else
     {
-        LOG(TRACE) << "loading from pak";
+        LOG_info("loading from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
 
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing XML file " << sID << ": Error " << iErr;
+        LOG_err("Error parsing XML file %s: Error %d", sID.c_str(), iErr);
         delete doc;
         return NULL;
     }
@@ -386,7 +386,7 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
     tinyxml2::XMLElement* root = doc->FirstChildElement("cursor");
     if(root == NULL)
     {
-        LOG(ERR) << "Error: No toplevel \"cursor\" item in XML file " << sID;
+        LOG_err("Error: No toplevel \"cursor\" item in XML file %s", sID.c_str());
         delete doc;
         return NULL;
     }
@@ -394,7 +394,7 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
     const char* cImgPath = root->Attribute("path");
     if(!cImgPath)
     {
-        LOG(ERR) << "Error: No cursor image path in XML file " << sID;
+        LOG_err("Error: No cursor image path in XML file %s", sID.c_str());
         delete doc;
         return NULL;
     }
@@ -402,7 +402,7 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
     const char* cHotSpot = root->Attribute("hotspot");
     if(!cHotSpot)
     {
-        LOG(ERR) << "Error: No cursor hotspot in XML file " << sID;
+        LOG_err("Error: No cursor hotspot in XML file %s", sID.c_str());
         delete doc;
         return NULL;
     }
@@ -421,9 +421,9 @@ SDL_Cursor* ResourceLoader::getCursor(const std::string& sID)
 
 ImgFont* ResourceLoader::getFont(const std::string& sID)
 {
-    LOG(TRACE) << "Loading Font " << sID;
+    LOG_info("Loading Font %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
-    LOG(TRACE) << "Font has ID " << hashVal;
+    LOG_info("Font has ID %ul", hashVal);
     ImgFont* font = (ImgFont*)m_cache->find(hashVal);
     if(!font)    //This font isn't here; load it
     {
@@ -431,13 +431,13 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
         unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
         if(!resource || !len)
         {
-            LOG(ERR) << "Pak miss, and font files cannot be loaded from file";
+            LOG_err("Pak miss, and font files cannot be loaded from file");
             //font = new Object3D(sID);                //Create this mesh
             //m_cache->addMesh(hashVal, mesh);    //Add to the cache
         }
         else
         {
-            LOG(TRACE) << "Pak hit - load from data";
+            LOG_info("Pak hit - load from data");
             assert(len > sizeof(FontHeader));
 
             FontHeader fontHeader;
@@ -461,19 +461,19 @@ ImgFont* ResourceLoader::getFont(const std::string& sID)
         }
     }
     else
-        LOG(TRACE) << "Cache hit " << sID;
+        LOG_info("Cache hit %s", sID.c_str());
     return font;
 }
 
 Stringbank * ResourceLoader::getStringbank(const std::string& sID)
 {
-    LOG(TRACE) << "Loading stringbank " << sID;
+    LOG_info("Loading stringbank %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     unsigned int len = 0;
     unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
     if(!resource || !len)
     {
-        LOG(ERR) << "Unable to load " << sID << " from pak";
+        LOG_err("Unable to load %s from pak", sID.c_str());
         return NULL;
     }
     Stringbank* sb = new Stringbank(resource, len);
@@ -497,13 +497,13 @@ std::string ResourceLoader::readTextFile(const std::string& filename)
 
 std::string ResourceLoader::getTextFile(const std::string& sID)
 {
-    LOG(TRACE) << "Loading text file " << sID;
+    LOG_info("Loading text file %s", sID.c_str());
     uint64_t hashVal = Hash::hash(sID.c_str());
     unsigned int len = 0;
     unsigned char* resource = m_pakLoader->loadResource(hashVal, &len);
     if(!resource || !len)
     {
-        LOG(TRACE) << "Unable to load " << sID << " from pak";
+        LOG_info("Unable to load %s from pak", sID.c_str());
         return readTextFile(sID);
     }
     std::string s;
@@ -548,7 +548,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     oss << "res/obj/" << sType << ".xml";
     std::string sXMLFilename = oss.str();
 
-    LOG(INFO) << "Parsing object XML file " << sXMLFilename;
+    LOG_info("Parsing object XML file %s", sXMLFilename.c_str());
     //Open file
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 
@@ -558,19 +558,19 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     int iErr;
     if(!resource || !len)
     {
-        LOG(TRACE) << "Pak miss";
+        LOG_info("Pak miss");
         iErr = doc->LoadFile(sXMLFilename.c_str());
     }
     else
     {
-        LOG(TRACE) << "load from pak";
+        LOG_info("load from pak");
         iErr = doc->Parse((const char*)resource, len);
         free(resource);
     }
 
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing object XML file: Error " << iErr;
+        LOG_err("Error parsing object XML file: Error %d", iErr);
         delete doc;
         return NULL;
     }
@@ -579,7 +579,7 @@ Object* ResourceLoader::getObject(const std::string& sType, Vec2 ptOffset, Vec2 
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERR) << "Error: Root element NULL in XML file.";
+        LOG_err("Error: Root element NULL in XML file.");
         delete doc;
         return NULL;
     }
@@ -744,7 +744,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
     const char* cFixType = fixture->Attribute("type");
     if(!cFixType)
     {
-        LOG(ERR) << "readFixture ERR: No fixture type";
+        LOG_err("readFixture ERR: No fixture type");
         return NULL;
     }
     std::string sFixType = cFixType;
@@ -753,7 +753,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         const char* cBoxSize = fixture->Attribute("size");
         if(!cBoxSize)
         {
-            LOG(ERR) << "readFixture ERR: No box size";
+            LOG_err("readFixture ERR: No box size");
             return NULL;
         }
 
@@ -808,7 +808,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         {
             if(vertexCount > b2_maxPolygonVertices)
             {
-                LOG(ERR) << "Only " << b2_maxPolygonVertices << " are allowed per polygon";
+                LOG_err("Only %d vertices are allowed per polygon", b2_maxPolygonVertices);
                 vertexCount = b2_maxPolygonVertices;
                 break;
             }
@@ -820,7 +820,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
         }
         if(vertexCount < 3) //vertexCount <3
         {
-            LOG(ERR) << "Polygons require at least 3 vertices";
+            LOG_err("Polygons require at least 3 vertices");
             return NULL;
         }
         if(bHollow)
@@ -838,7 +838,7 @@ b2Fixture* ResourceLoader::getObjectFixture(tinyxml2::XMLElement* fixture, b2Bod
     }
     else
     {
-        LOG(ERR) << "Unknown fixture type: " << sFixType;
+        LOG_err("Unknown fixture type: %s", sFixType.c_str());
         return NULL;
     }
 
@@ -867,7 +867,7 @@ unsigned char* ResourceLoader::getSound(const std::string& sID, unsigned int* le
 
 SoundLoop* ResourceLoader::getSoundLoop(const std::string & sID)
 {
-    LOG(INFO) << "Loading sound loop info from " << sID;
+    LOG_info("Loading sound loop info from %s", sID.c_str());
 
     uint64_t hash = Hash::hash(sID.c_str());
     unsigned char* ret = m_pakLoader->loadResource(hash);
@@ -898,7 +898,7 @@ Image* ResourceLoader::loadImageFromFile(const std::string& filename)
 
     if((cBuf == 0) || (width == 0) || (height == 0))
     {
-        LOG(ERR) << "Unable to load image " << filename;
+        LOG_err("Unable to load image %s", filename.c_str());
         return NULL;
     }
 
@@ -916,12 +916,12 @@ Image* ResourceLoader::loadImageFromData(unsigned char* data, unsigned int len)
 {
     if(len < sizeof(TextureHeader))
     {
-        LOG(ERR) << "Decompressed image data smaller than texture header";
+        LOG_err("Decompressed image data smaller than texture header");
         return NULL;
     }
     if(len > sizeof(TextureHeader))
     {
-        LOG(WARN) << "Ignoring extra " << len - sizeof(TextureHeader) << " bytes for texture";
+        LOG_warn("Ignoring extra %ul bytes for texture", len - sizeof(TextureHeader));
     }
 
     //Read header
@@ -960,17 +960,17 @@ Texture* ResourceLoader::bindTexture(unsigned char* data, unsigned int width, un
 
 Texture* ResourceLoader::getAtlas(uint64_t atlasId)
 {
-    LOG(TRACE) << "Loading image atlas " << atlasId;
+    LOG_info("Loading image atlas %ul", atlasId);
     Texture* atlas = (Texture*)m_cache->find(atlasId);
     if(!atlas)    //This image isn't here; load it
     {
-        LOG(TRACE) << "Cache miss, load atlas from pak";
+        LOG_info("Cache miss, load atlas from pak");
 
         unsigned int len = 0;
         unsigned char* buf = m_pakLoader->loadResource(atlasId, &len);
         if(buf == NULL || len < sizeof(AtlasHeader))
         {
-            LOG(ERR) << "Unable to load image atlas " << atlasId << " from pak";
+            LOG_err("Unable to load image atlas %ul from pak", atlasId);
             return NULL;
         }
 

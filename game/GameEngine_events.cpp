@@ -78,7 +78,7 @@ void GameEngine::handleEvent(SDL_Event event)
             break;
 
         case SDL_CONTROLLERBUTTONDOWN:
-            LOG(TRACE) << "Controller " << (int)event.cbutton.which << " pressed button " << (int)event.cbutton.button;
+            LOG_info("Controller %d pressed button %d", (int)event.cbutton.which, (int)event.cbutton.button);
             getInputManager()->activateController(event.cbutton.which);
             switch(event.cbutton.button)
             {
@@ -89,12 +89,12 @@ void GameEngine::handleEvent(SDL_Event event)
             break;
 
         case SDL_CONTROLLERBUTTONUP:
-            LOG(TRACE) << "Controller " << (int)event.cbutton.which << " released button " << (int)event.cbutton.button;
+            LOG_trace("Controller %d released button %d", (int)event.cbutton.which, (int)event.cbutton.button);
             break;
 
         case SDL_CONTROLLERAXISMOTION:
             if(abs(event.caxis.value) > JOY_AXIS_TRIP)
-                LOG(TRACE) << "Controller " << (int)event.caxis.which << " moved axis " << (int)event.caxis.axis << " to " << event.caxis.value;
+                LOG_trace("Controller %d moved axis %d to %d", (int)event.caxis.which, (int)event.caxis.axis, event.caxis.value);
             break;
     }
 
@@ -140,7 +140,7 @@ void GameEngine::handleEvent(SDL_Event event)
             if(event.button.button == SDL_BUTTON_RIGHT && m_debugUI->particleEditor->open && m_debugUI->visible)
                 m_debugUI->particleEditor->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.button.x, event.button.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
 #endif
-            LOG(TRACE) << "Mouse button " << (int)event.button.button << " pressed.";
+            LOG_trace("Mouse button %d pressed.");
             break;
 
         case SDL_MOUSEWHEEL:
@@ -154,19 +154,19 @@ void GameEngine::handleEvent(SDL_Event event)
             break;
 
         case SDL_MOUSEBUTTONUP:
-            LOG(TRACE) << "Mouse button " << (int)event.button.button << " released.";
-            if(event.button.button == SDL_BUTTON_LEFT)
-            {
+            LOG_trace("Mouse button %d released.", (int)event.button.button);
+            //if(event.button.button == SDL_BUTTON_LEFT)
+            //{
 
-            }
-            else if(event.button.button == SDL_BUTTON_RIGHT)
-            {
+            //}
+            //else if(event.button.button == SDL_BUTTON_RIGHT)
+            //{
 
-            }
-            else if(event.button.button == SDL_BUTTON_MIDDLE)
-            {
+            //}
+            //else if(event.button.button == SDL_BUTTON_MIDDLE)
+            //{
 
-            }
+            //}
             break;
 
         case SDL_MOUSEMOTION:
@@ -174,7 +174,7 @@ void GameEngine::handleEvent(SDL_Event event)
             if(getCursorDown(SDL_BUTTON_RIGHT) && m_debugUI->particleEditor->open && m_debugUI->visible)
                 m_debugUI->particleEditor->particles->emitFrom.centerOn(worldPosFromCursor(Vec2(event.motion.x, event.motion.y), Vec3(0.0f, 0.0f, m_fDefCameraZ)));
 #endif
-            //LOG(TRACE) << "Mouse moved to " << event.motion.x << ", " << event.motion.y;
+            //LOG_info("Mouse moved to ", event.motion.x, ", ", event.motion.y;
             break;
     }
 }

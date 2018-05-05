@@ -525,7 +525,7 @@ void ParticleEditor::saveParticleSystemXML(std::string filename)
 {
     filename = PARTICLE_SYSTEM_PATH + filename;
 
-    LOG(INFO) << "Saving particle system " << filename;
+    LOG_info("Saving particle system %s", filename.c_str());
 
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
     tinyxml2::XMLElement* root = doc->NewElement("particlesystem");

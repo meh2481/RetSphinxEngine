@@ -74,7 +74,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     void* userData)
 {
 
-    LOG(ERR) << "Validation layer: " << msg;
+    LOG_err("Validation layer: %s", msg);
 
     return VK_FALSE;
 }
@@ -88,8 +88,8 @@ void VulkanInterface::setupDebugCallback()
 
     if(createDebugReportCallbackEXT(instance, &createInfo, NULL, &callback) != VK_SUCCESS)
     {
-        LOG(ERR) << "failed to set up debug callback";
-        assert(false);
+        LOG_err("failed to set up debug callback");
+        exit(1);
     }
 }
 
@@ -196,8 +196,8 @@ VkFormat VulkanInterface::findSupportedFormat(const std::vector<VkFormat>& candi
             return format;
     }
 
-    LOG(ERR) << "Failed to find supported format";
-    assert(false);
+    LOG_err("Failed to find supported format");
+    exit(1);
     return VK_FORMAT_UNDEFINED; //Keep compiler happy
 }
 
@@ -237,8 +237,8 @@ void VulkanInterface::createTextureSampler()
 
     if(vkCreateSampler(device, &samplerInfo, NULL, &textureSampler) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create texture sampler";
-        assert(false);
+        LOG_err("Failed to create texture sampler");
+        exit(1);
     }
 }
 
@@ -263,8 +263,8 @@ VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkI
     VkImageView imageView;
     if(vkCreateImageView(device, &viewInfo, NULL, &imageView) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create texture image view";
-        assert(false);
+        LOG_err("Failed to create texture image view");
+        exit(1);
     }
 
     return imageView;
@@ -278,8 +278,8 @@ void VulkanInterface::createTextureImage()
 
     if(!pixels)
     {
-        LOG(ERR) << "Failed to load texture image";
-        assert(false);
+        LOG_err("Failed to load texture image");
+        exit(1);
     }
 
     VkBuffer imgStagingBuffer;
@@ -426,8 +426,8 @@ void VulkanInterface::createImage(uint32_t width, uint32_t height, uint32_t mipL
 
     if(vkCreateImage(device, &imageInfo, NULL, &image) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create image";
-        assert(false);
+        LOG_err("Failed to create image");
+        exit(1);
     }
 
     VkMemoryRequirements memRequirements;
@@ -440,8 +440,8 @@ void VulkanInterface::createImage(uint32_t width, uint32_t height, uint32_t mipL
 
     if(vkAllocateMemory(device, &allocInfo, NULL, &imageMemory) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to allocate image memory!";
-        assert(false);
+        LOG_err("Failed to allocate image memory");
+        exit(1);
     }
 
     vkBindImageMemory(device, image, imageMemory, 0);
@@ -542,8 +542,8 @@ void VulkanInterface::transitionImageLayout(VkImage image, VkFormat format, VkIm
     }
     else
     {
-        LOG(ERR) << "Unsupported layout transition";
-        assert(false);
+        LOG_err("Unsupported layout transition");
+        exit(1);
     }
 
     vkCmdPipelineBarrier(
@@ -607,8 +607,8 @@ void VulkanInterface::createDescriptorSet(const VkImageView& imgView, const VkSa
 
     if(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)  //Note: Automagically freed
     {
-        LOG(ERR) << "Failed to allocate descriptor set";
-        assert(false);
+        LOG_err("Failed to allocate descriptor set");
+        exit(1);
     }
 
     //Create descriptors
@@ -659,8 +659,8 @@ void VulkanInterface::createDescriptorPool()
 
     if(vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create descriptor pool";
-        assert(false);
+        LOG_err("Failed to create descriptor pool");
+        exit(1);
     }
 }
 
@@ -695,8 +695,8 @@ void VulkanInterface::createDescriptorSetLayout()
 
     if(vkCreateDescriptorSetLayout(device, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create descriptor set layout";
-        assert(false);
+        LOG_err("Failed to create descriptor set layout");
+        exit(1);
     }
 }
 
@@ -724,8 +724,8 @@ void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, 
 
     if(vkCreateBuffer(device, &bufferInfo, NULL, &buffer) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create vertex buffer";
-        assert(false);
+        LOG_err("Failed to create vertex buffer");
+        exit(1);
     }
 
     //Find memory requirements
@@ -742,8 +742,8 @@ void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, 
     //See https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator for a possible allocator to use
     if(vkAllocateMemory(device, &allocInfo, NULL, &bufferMemory) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to allocate vertex buffer memory";
-        assert(false);
+        LOG_err("Failed to allocate vertex buffer memory");
+        exit(1);
     }
 
     //Bind memory
@@ -761,8 +761,8 @@ uint32_t VulkanInterface::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFl
             return i;
     }
 
-    LOG(ERR) << "Failed to find suitable memory type";
-    assert(false);
+    LOG_err("Failed to find suitable memory type");
+    exit(1);
     return 0;   //Keep compiler happy
 }
 
@@ -774,8 +774,8 @@ void VulkanInterface::createSemaphores()
     if(vkCreateSemaphore(device, &semaphoreInfo, NULL, &imageAvailableSemaphore) != VK_SUCCESS ||
         vkCreateSemaphore(device, &semaphoreInfo, NULL, &renderFinishedSemaphore) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create semaphores";
-        assert(false);
+        LOG_err("Failed to create semaphores");
+        exit(1);
     }
 }
 
@@ -794,8 +794,8 @@ void VulkanInterface::createFences()
     {
         if(vkCreateFence(device, &fenceInfo, NULL, &fences.data()[i]) != VK_SUCCESS)
         {
-            LOG(ERR) << "Failed to create fences";
-            assert(false);
+            LOG_err("Failed to create fences");
+            exit(1);
         }
         bufferSubmitted[i] = false;
     }
@@ -814,8 +814,8 @@ void VulkanInterface::createCommandBuffers()
 
     if(vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to allocate command buffers";
-        assert(false);
+        LOG_err("Failed to allocate command buffers");
+        exit(1);
     }
 
 #ifdef _DEBUG
@@ -839,8 +839,8 @@ void VulkanInterface::createCommandPool()
 
     if(vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create command pool";
-        assert(false);
+        LOG_err("Failed to create command pool");
+        exit(1);
     }
 }
 
@@ -865,8 +865,8 @@ void VulkanInterface::createFramebuffers()
 
         if(vkCreateFramebuffer(device, &framebufferInfo, NULL, &swapChainFramebuffers[i]) != VK_SUCCESS)
         {
-            LOG(ERR) << "Failed to create framebuffer";
-            assert(false);
+            LOG_err("Failed to create framebuffer");
+            exit(1);
         }
     }
 }
@@ -933,8 +933,8 @@ void VulkanInterface::createRenderPass()
 
     if(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create render pass";
-        assert(false);
+        LOG_err("Failed to create render pass");
+        exit(1);
     }
 }
 
@@ -1097,8 +1097,8 @@ void VulkanInterface::createGraphicsPipelines()
 
     if(vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create pipeline layout";
-        assert(false);
+        LOG_err("Failed to create pipeline layout");
+        exit(1);
     }
 
     //Create pipeline!
@@ -1124,8 +1124,8 @@ void VulkanInterface::createGraphicsPipelines()
     //Create debug geom pipeline
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugGeometryGraphicsPipeline) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create debug geom graphics pipeline!";
-        assert(false);
+        LOG_err("Failed to create debug geom graphics pipeline");
+        exit(1);
     }
 
     //Create debug outline geom pipeline
@@ -1133,16 +1133,16 @@ void VulkanInterface::createGraphicsPipelines()
     pipelineInfo.basePipelineHandle = debugGeometryGraphicsPipeline;
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugOutlineGraphicsPipeline) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create debug outline graphics pipeline!";
-        assert(false);
+        LOG_err("Failed to create debug outline graphics pipeline");
+        exit(1);
     }
 
     //Create debug point geom pipeline
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
     if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &debugPointGraphicsPipeline) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create debug outline graphics pipeline!";
-        assert(false);
+        LOG_err("Failed to create debug outline graphics pipeline");
+        exit(1);
     }
 #endif
 
@@ -1162,8 +1162,8 @@ VkShaderModule VulkanInterface::createShaderModule(const std::string& filename)
     VkShaderModule shaderModule;
     if(vkCreateShaderModule(device, &createInfo, NULL, &shaderModule) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create shader module";
-        assert(false);
+        LOG_err("Failed to create shader module");
+        exit(1);
     }
     return shaderModule;
 }
@@ -1237,8 +1237,8 @@ void VulkanInterface::createSwapChain()
 
     if(vkCreateSwapchainKHR(device, &createInfo, NULL, &swapChain) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create swap chain";
-        assert(false);
+        LOG_err("Failed to create swap chain");
+        exit(1);
     }
 
     vkGetSwapchainImagesKHR(device, swapChain, &imageCount, NULL);
@@ -1254,8 +1254,8 @@ void VulkanInterface::createSurface()
 {
     if(!SDL_Vulkan_CreateSurface(window, instance, &surface))
     {
-        LOG(ERR) << "Couldn\'t create window surface: " << SDL_GetError();
-        assert(false);
+        LOG_err("Couldn\'t create window surface: %s", SDL_GetError());
+        exit(1);
     }
 }
 
@@ -1303,8 +1303,8 @@ void VulkanInterface::createLogicalDevice()
 
     if(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to create logical device!";
-        assert(false);
+        LOG_err("Failed to create logical device");
+        exit(1);
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
@@ -1317,10 +1317,10 @@ void VulkanInterface::pickPhysicalDevice()
     vkEnumeratePhysicalDevices(instance, &deviceCount, NULL);
     if(deviceCount == 0)
     {
-        LOG(ERR) << "No physical device has Vulkan support";
-        assert(false);
+        LOG_err("No physical device has Vulkan support");
+        exit(1);
     }
-    LOG(INFO) << "Found " << deviceCount << " physical device(s)";
+    LOG_info("Found %u physical device(s)", deviceCount);
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -1339,8 +1339,8 @@ void VulkanInterface::pickPhysicalDevice()
         physicalDevice = candidates.rbegin()->second;
     else
     {
-        LOG(ERR) << "Failed to find a suitable GPU";
-        assert(false);
+        LOG_err("Failed to find a suitable GPU");
+        exit(1);
     }
 }
 
@@ -1348,7 +1348,7 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
 {
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    LOG(INFO) << "Device name: " << deviceProperties.deviceName;
+    LOG_info("Device name: %s", deviceProperties.deviceName);
 
     VkPhysicalDeviceFeatures deviceFeatures;
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
@@ -1365,21 +1365,21 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     // Application can't function without geometry shaders
     if(!deviceFeatures.geometryShader || !deviceFeatures.samplerAnisotropy) //Config option: Don't require ansitropic filtering
     {
-        LOG(WARN) << "Graphics card requires geometry shader and sampler anisotropy";
+        LOG_warn("Graphics card requires geometry shader and sampler anisotropy");
         return 0;
     }
 
     //TODO: Some mobile GPUs do not support this, so alternatives if porting to mobile engines
     if(!deviceFeatures.textureCompressionBC)
     {
-        LOG(WARN) << "Graphics card requires BC texture compression for DXT images";
+        LOG_warn("Graphics card requires BC texture compression for DXT images");
         return 0;
     }
 
     //TODO: We can get around this by binding descriptor sets per texture. Especially relevant on mobile platforms that don't support dynamic array texture indexing
     /*if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
     {
-        LOG(ERR) << "Dyn array indexing: " << deviceFeatures.shaderSampledImageArrayDynamicIndexing;
+        LOG_err("Dyn array indexing: ", deviceFeatures.shaderSampledImageArrayDynamicIndexing;
         return 0;
     }*/
 
@@ -1387,14 +1387,14 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     QueueFamilyIndices indices = findQueueFamilies(device);
     if(!indices.isComplete())
     {
-        LOG(WARN) << "Graphics card requires complete queue family indices";
+        LOG_warn("Graphics card requires complete queue family indices");
         return 0;
     }
 
     //Need device to have support for all required extensions
     if(!checkDeviceExtensionSupport(device))
     {
-        LOG(WARN) << "Graphics card missing required extensions";
+        LOG_warn("Graphics card missing required extensions");
         return 0;
     }
 
@@ -1402,7 +1402,7 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
     if(swapChainSupport.formats.empty() || swapChainSupport.presentModes.empty())
     {
-        LOG(WARN) << "Graphics card does not support swapchain";
+        LOG_warn("Graphics card does not support swapchain");
         return 0;
     }
 
@@ -1576,8 +1576,8 @@ void VulkanInterface::drawFrame()
     }
     else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     {
-        LOG(ERR) << "Failed to acquire swap chain image";
-        assert(false);
+        LOG_err("Failed to acquire swap chain image");
+        exit(1);
     }
 
     //Submit the command buffer
@@ -1590,8 +1590,8 @@ void VulkanInterface::drawFrame()
         //Make absolutely sure that the work has completed, via fence wait
         if(vkWaitForFences(device, 1, &fences[imageIndex], true, UINT64_MAX) != VK_SUCCESS)
         {
-            LOG(ERR) << "Failed to wait for fence";
-            assert(false);
+            LOG_err("Failed to wait for fence");
+            exit(1);
         }
     }
     bufferSubmitted[imageIndex] = true;
@@ -1599,8 +1599,8 @@ void VulkanInterface::drawFrame()
     //Reset the fences we waited on, so they can be re-used
     if(vkResetFences(device, 1, &fences[imageIndex]) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to reset fence";
-        assert(false);
+        LOG_err("Failed to reset fence");
+        exit(1);
     }
 
     //Grow buffer if necessary
@@ -1608,8 +1608,7 @@ void VulkanInterface::drawFrame()
     if(dbgPolyIndices.size() > dbgIndicesCount || dbgPolyVertices.size() > dbgVerticesCount)
     {
         //Vert/index buffers likely to grow at the same time, so just recalc both
-        LOG(DBG) << "Changing buffer sizes - had indices " << dbgIndicesCount << " now " << dbgPolyIndices.size()
-            << "; vertices had " << dbgVerticesCount << " now " << dbgPolyVertices.size();
+        LOG_dbg("Changing buffer sizes - had indices %ul now %ul; vertices had %ul now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
 
         //Use max() to not shrink either buffer
         dbgIndicesCount = std::max((VkDeviceSize)dbgPolyIndices.size(), dbgIndicesCount);
@@ -1661,8 +1660,8 @@ void VulkanInterface::drawFrame()
 
     if(vkQueueSubmit(graphicsQueue, 1, &submitInfo, fences[imageIndex]) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to submit draw command buffer";
-        assert(false);
+        LOG_err("Failed to submit draw command buffer");
+        exit(1);
     }
 
     //Presentation
@@ -1684,14 +1683,18 @@ void VulkanInterface::drawFrame()
         recreateSwapChain();
     else if(result != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to present swap chain image";
-        assert(false);
+        LOG_err("Failed to present swap chain image");
+        exit(1);
     }
 
 #ifdef ENABLE_VALIDATION_LAYERS
     //Fix memory leak in validation layer by explicitly syncronizing with GPU
     vkQueueWaitIdle(presentQueue);
 #endif
+
+    //TODO Actually do something with these
+    quadVertices.clear();
+    quadIndices.clear();
 }
 
 void VulkanInterface::setupCommandBuffer(uint32_t index)
@@ -1770,8 +1773,8 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
     if(vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)
     {
-        LOG(ERR) << "Failed to record command buffer";
-        assert(false);
+        LOG_err("Failed to record command buffer");
+        exit(1);
     }
 
     lastDbgPolyLineIdx[index] = polyDbgLineIdx;
@@ -1842,8 +1845,8 @@ void VulkanInterface::createInstance()
 #ifdef ENABLE_VALIDATION_LAYERS
     if(!checkValidationLayerSupport())
     {
-        LOG(ERR) << "No validation layers supported";
-        assert(false);
+        LOG_err("No validation layers supported");
+        exit(1);
     }
 #endif
 
@@ -1867,18 +1870,18 @@ void VulkanInterface::createInstance()
 #endif
 
     //Optional: Show required extensions
-    LOG(INFO) << "Required Extensions:";
+    LOG_info("Required Extensions:");
     for(auto extension : requiredExtensions)
-        LOG(INFO) << '\t' << extension;
+        LOG_info("\t%s", extension);
 
     //Optional: Show available extensions
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, NULL);
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, extensions.data());
-    LOG(INFO) << "Available extensions:";
+    LOG_info("Available extensions:");
     for(const auto& extension : extensions)
-        LOG(INFO) << '\t' << extension.extensionName;
+        LOG_info("\t%s", extension.extensionName);
 
     //Create application instance info struct
     VkInstanceCreateInfo createInfo = {};
@@ -1894,8 +1897,8 @@ void VulkanInterface::createInstance()
 #endif
     if(vkCreateInstance(&createInfo, NULL, &instance) != VK_SUCCESS)
     {
-        LOG(ERR) << "Error creating Vulkan instance";
-        assert(false);
+        LOG_err("Error creating Vulkan instance");
+        exit(1);
     }
 
     //Cleanup allocated memory

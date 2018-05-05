@@ -35,18 +35,22 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     m_sCompanyName = sCompanyName;
 
     //Start logger
-    logger_init((getSaveLocation() + LOGFILE_NAME).c_str(), DBG);
+#ifdef _DEBUG
+    logger_init((getSaveLocation() + LOGFILE_NAME).c_str(), SDL_LOG_PRIORITY_DEBUG);
+#else
+    logger_init((getSaveLocation() + LOGFILE_NAME).c_str(), SDL_LOG_PRIORITY_INFO);
+#endif
 
     m_sIcon = sIcon;
     m_bResizable = bResizable;
 
-    LOG(INFO) << "-----------------------BEGIN PROGRAM EXECUTION-----------------------";
+    LOG_info("-----------------------BEGIN PROGRAM EXECUTION-----------------------");
 #ifdef _DEBUG
-    LOG(INFO) << "Debug build";
+    LOG_info("Debug build");
     m_bDebugDraw = true;
     m_bSoundDebugDraw = false;
 #else
-    LOG(INFO) << "Release build";
+    LOG_info("Release build");
 #endif
     m_iWidth = iWidth;
     m_iHeight = iHeight;
@@ -71,14 +75,14 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     Random::seed(SDL_GetTicks());
     m_fTimeScale = 1.0f;
 
-    LOG(DBG) << "Create physics world";
+    LOG_dbg("Create physics world");
     b2Vec2 gravity(0.0f, -9.8f);    //Vector for our world's gravity
     m_physicsWorld = new b2World(gravity);
     m_physicsWorld->SetAllowSleeping(true);
     m_clContactListener = new EngineContactListener();
     m_physicsWorld->SetContactListener(m_clContactListener);
 
-    LOG(DBG) << "Creating resource loader";
+    LOG_dbg("Creating resource loader");
     m_resourceLoader = new ResourceLoader(m_physicsWorld, PAK_LOCATION);
     m_entityManager = new EntityManager(m_resourceLoader, m_physicsWorld);
     m_stringBank = m_resourceLoader->getStringbank(STRINGBANK_LOCATION);
@@ -93,12 +97,12 @@ Engine::Engine(uint16_t iWidth, uint16_t iHeight, const std::string& sTitle, con
     static const std::string sIniFile = getSaveLocation() + IMGUI_INI;
 
     //Init renderer
-    LOG(DBG) << "Init SDL/Vulkan";
+    LOG_dbg("Init SDL/Vulkan");
     setup_sdl();
     setup_vulkan();
 
 #ifdef _DEBUG
-    LOG(DBG) << "Create debug draw";
+    LOG_dbg("Create debug draw");
     m_debugDraw = new DebugDraw(m_vulkan);
     m_debugDraw->outlineAlpha = 0.75f;
     m_debugDraw->fillAlpha = 0.5f;
@@ -139,9 +143,9 @@ Engine::~Engine()
     SDL_DestroyWindow(m_Window);
 
     // Clean up and shutdown
-    LOG(INFO) << "Deleting phys world";
+    LOG_info("Deleting phys world");
     delete m_physicsWorld;
-    LOG(INFO) << "Quit SDL";
+    LOG_info("Quit SDL");
     SDL_Quit();
 }
 
@@ -179,7 +183,7 @@ bool Engine::_processEvent(SDL_Event& e)
                 if(m_bResizable)
                     changeScreenResolution(e.window.data1, e.window.data2);
                 else
-                    LOG(ERR) << "Resize event generated, but resizable flag not set.";
+                    LOG_err("Resize event generated, but resizable flag not set.");
             }
             else if(e.window.event == SDL_WINDOWEVENT_ENTER)
                 m_bCursorOutOfWindow = false;
@@ -195,7 +199,7 @@ bool Engine::_processEvent(SDL_Event& e)
             break;
 
         case SDL_CONTROLLERDEVICEREMOVED:
-            LOG(INFO) << "Controller " << (int)e.cdevice.which << " disconnected.";
+            LOG_info("Controller %d disconnected.", (int)e.cdevice.which);
             m_inputManager->removeController(e.cdevice.which);
             break;
 
@@ -207,12 +211,12 @@ bool Engine::_processEvent(SDL_Event& e)
                 char guid[GUID_STR_SZ];
                 SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, GUID_STR_SZ);
 
-                LOG(INFO) << "Joystick " << SDL_JoystickName(joy) << " attached. Not using joystick API, but here's info:";
-                LOG(INFO) << "Joystick has GUID " << guid;
-                LOG(INFO) << "Joystick Number of Axes: " << SDL_JoystickNumAxes(joy);
-                LOG(INFO) << "Joystick Number of Buttons: " << SDL_JoystickNumButtons(joy);
-                LOG(INFO) << "Joystick Number of Balls: " << SDL_JoystickNumBalls(joy);
-                LOG(INFO) << "Joystick Number of Hats: " << SDL_JoystickNumHats(joy);
+                LOG_info("Joystick %s attached. Not using joystick API, but here's info:", SDL_JoystickName(joy));
+                LOG_info("Joystick has GUID %s", guid);
+                LOG_info("Joystick Number of Axes: %d", SDL_JoystickNumAxes(joy));
+                LOG_info("Joystick Number of Buttons: %d", SDL_JoystickNumButtons(joy));
+                LOG_info("Joystick Number of Balls: %d", SDL_JoystickNumBalls(joy));
+                LOG_info("Joystick Number of Hats: %d", SDL_JoystickNumHats(joy));
                 if(SDL_JoystickNumAxes(joy) == 3)    //Head tracker
                     m_inputManager->addHeadTracker(joy);
                 else
@@ -314,7 +318,7 @@ void Engine::drawDebug()
 
 void Engine::setFramerate(float fFramerate)
 {
-    LOG(TRACE) << "Setting framerate to " << fFramerate;
+    LOG_info("Setting framerate to %f", fFramerate);
     if(fFramerate < 60.0)
         fFramerate = 60.0;    //60fps is bare minimum
     m_fFramerate = fFramerate;
@@ -329,11 +333,11 @@ void Engine::setMSAA(int iMSAA)
 
 void Engine::_loadicon()    //Load icon into SDL window
 {
-    LOG(INFO) << "Load icon " << m_sIcon;
+    LOG_info("Load icon %s", m_sIcon.c_str());
 
     SDL_Surface *surface = getResourceLoader()->getSDLImage(m_sIcon);
     if(surface == NULL)
-        LOG(ERR) << "NULL surface for icon " << m_sIcon;
+        LOG_err("NULL surface for icon %s", m_sIcon.c_str());
     else
     {
         SDL_SetWindowIcon(m_Window, surface);

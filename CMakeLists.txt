@@ -26,6 +26,7 @@ add_subdirectory(dep)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
+include_directories("${SDL2_INCLUDE_DIR}")
 include_directories(io)
 add_subdirectory(io)
 

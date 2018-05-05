@@ -92,17 +92,17 @@ std::string SteelSeriesClient::getSSURL()
             }
             else
             {
-                LOG(ERR) << "Unable to parse JSON " << oss.str();
+                LOG_err("Unable to parse JSON %s", oss.str().c_str());
             }
         }
         else
         {
-            LOG(ERR) << "Unable to open file " << oss.str();
+            LOG_err("Unable to open file %s", oss.str().c_str());
         }
     }
     else
     {
-        LOG(ERR) << "SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.";
+        LOG_err("SHGetKnownFolderPath() failed; unable to search for SteelSeries JSON file.");
     }
     return std::string();
 #else
@@ -163,7 +163,7 @@ bool SteelSeriesClient::sendJSON(const std::string& stringifiedJSON, const char 
     ssURL << url << endpoint;
     msg.url = ssURL.str();
 
-    //LOG(TRACE) << "Sending json to " << ssURL.str() << " :\n" << stringifiedJSON;
+    //LOG_info("Sending json to " << ssURL.str() << " :\n" << stringifiedJSON;
 
     return NetworkThread::send(msg);
 }

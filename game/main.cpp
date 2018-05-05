@@ -30,9 +30,9 @@ int main(int argc, char** argv)
     eng->start(); //Get the engine rolling
 
     //Done main loop; exit program
-    LOG(INFO) << "Deleting engine";
+    LOG_info("Deleting engine");
     delete eng;
-    LOG(INFO) << "Ending program happily";
+    LOG_info("Ending program happily");
     logger_quit();
     return 0;
 }

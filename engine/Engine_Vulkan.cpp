@@ -17,18 +17,18 @@ void Engine::setup_sdl()
 
     if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
-        LOG(ERR) << "SDL_InitSubSystem Error: " << SDL_GetError();
+        LOG_err("SDL_InitSubSystem Error: %s", SDL_GetError());
         exit(1);
     }
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
-        LOG(ERR) << "Unable to init SDL2 gamepad subsystem.";
+        LOG_err("Unable to init SDL2 gamepad subsystem.");
 
-    LOG(INFO) << "Loading Vulkan...";
+    LOG_info("Loading Vulkan...");
 
     if (SDL_Vulkan_LoadLibrary(NULL) == -1)
     {
-        LOG(ERR) << "SDL_Vulkan_LoadLibrary Error: " << SDL_GetError();
+        LOG_err("SDL_Vulkan_LoadLibrary Error: %s", SDL_GetError());
         exit(1);
     }
 
@@ -49,7 +49,7 @@ void Engine::setup_sdl()
 
     if(m_Window == NULL)
     {
-        LOG(ERR) << "Couldn't set video mode: " << SDL_GetError();
+        LOG_err("Couldn't set video mode: %s", SDL_GetError());
         exit(1);
     }
 
@@ -57,25 +57,25 @@ void Engine::setup_sdl()
     SDL_GetDisplayMode(0, 0, &mode);
     if(!mode.refresh_rate)    //If 0, display doesn't care, so default to 60
         mode.refresh_rate = 60;
-    LOG(DBG) << "Setting framerate to " << mode.refresh_rate << "Hz";
+    LOG_dbg("Setting framerate to %dHz", mode.refresh_rate);
     setFramerate((float)mode.refresh_rate);
 
     int numDisplays = SDL_GetNumVideoDisplays();
-    LOG(INFO) << "Available displays: " << numDisplays;
+    LOG_info("Available displays: %d", numDisplays);
     for(int display = 0; display < numDisplays; display++)
     {
         int num = SDL_GetNumDisplayModes(display);
-        LOG(TRACE) << "Available modes for display " << display + 1 << ':';
+        LOG_info("Available modes for display %d", display + 1);
         for(int i = 0; i < num; i++)
         {
             SDL_GetDisplayMode(display, i, &mode);
-            LOG(TRACE) << "Mode: " << mode.w << "x" << mode.h << " " << mode.refresh_rate << "Hz";
+            LOG_info("Mode: %dx%d %dHz", mode.w, mode.h, mode.refresh_rate);
         }
     }
 
-    LOG(INFO) << "Loading gamepad configurations from " << GAME_CONTROLLER_DB_FILE;
+    LOG_info("Loading gamepad configurations from %s", GAME_CONTROLLER_DB_FILE);
     if(SDL_GameControllerAddMappingsFromFile(GAME_CONTROLLER_DB_FILE) == -1)
-        LOG(WARN) << "Unable to open " << GAME_CONTROLLER_DB_FILE << ": " << SDL_GetError();
+        LOG_warn("Unable to open %s: %s", GAME_CONTROLLER_DB_FILE, SDL_GetError());
 
     _loadicon();    //Load our window icon
 }

@@ -21,12 +21,12 @@ InputDevice::InputDevice(SteelSeriesClient* ssc)
     {
         m_haptic = initHapticDevice(SDL_HapticOpenFromMouse());
         if(m_haptic != NULL)
-            LOG(INFO) << "Initialized haptic from mouse";
+            LOG_info("Initialized haptic from mouse");
     }
     else
     {
         m_haptic = NULL;
-        LOG(INFO) << "Mouse has no haptic";
+        LOG_info("Mouse has no haptic");
     }
     if(ssc != NULL && ssc->isValid())
     {
@@ -50,7 +50,7 @@ InputDevice::InputDevice(int deviceIndex)
         SDL_Joystick* joy = SDL_GameControllerGetJoystick(m_controller);
         if(!joy)
         {
-            LOG(ERR) << "Unable to get joystick from game controller: " << SDL_GetError();
+            LOG_err("Unable to get joystick from game controller: %s", SDL_GetError());
         }
         else
         {
@@ -64,23 +64,23 @@ InputDevice::InputDevice(int deviceIndex)
             joystickName = SDL_JoystickName(joy);
             controllerName = SDL_GameControllerName(m_controller);
 
-            LOG(INFO) << "Opened controller " << controllerName;
-            LOG(INFO) << "Controller joystick has GUID " << guid;
+            LOG_info("Opened controller %s", controllerName.c_str());
+            LOG_info("Controller joystick has GUID %s", guid);
 
             SDL_Haptic* newRumble = NULL;
             if(SDL_JoystickIsHaptic(joy))
                 newRumble = SDL_HapticOpenFromJoystick(joy);
             if(newRumble)
             {
-                LOG(INFO) << "Initialized controller " << (int)deviceIndex << "\'s haptic.";
+                LOG_info("Initialized controller %d\'s haptic.", (int)deviceIndex);
                 m_haptic = initHapticDevice(newRumble);
             }
             else
-                LOG(INFO) << "Controller " << (int)deviceIndex << " has no rumble support.";
+                LOG_info("Controller %d has no rumble support.", (int)deviceIndex);
         }
     }
     else
-        LOG(WARN) << "Couldn't open controller " << (int)deviceIndex;
+        LOG_warn("Couldn't open controller %d", (int)deviceIndex);
 }
 
 
@@ -89,36 +89,36 @@ SDL_Haptic* InputDevice::initHapticDevice(SDL_Haptic* newRumble)
     if(newRumble == NULL)
         return NULL;
 
-    LOG(TRACE) << "Haptic effect storage size: " << SDL_HapticNumEffects(newRumble);
-    LOG(TRACE) << "Haptic effect play channels: " << SDL_HapticNumEffectsPlaying(newRumble);
-    LOG(TRACE) << "Haptic effect number of axes: " << SDL_HapticNumAxes(newRumble);
+    LOG_info("Haptic effect storage size: %d", SDL_HapticNumEffects(newRumble));
+    LOG_info("Haptic effect play channels: %d", SDL_HapticNumEffectsPlaying(newRumble));
+    LOG_info("Haptic effect number of axes: %d", SDL_HapticNumAxes(newRumble));
 
     unsigned int hapticQuery = SDL_HapticQuery(newRumble);
     //Haptic effects
-    LOG(TRACE) << "Haptic functions available: ";
+    LOG_info("Haptic functions available: ");
     //Multi-motor
     rumbleLRSupported = ((hapticQuery & SDL_HAPTIC_LEFTRIGHT) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_LEFTRIGHT: " << rumbleLRSupported;
+    LOG_info("SDL_HAPTIC_LEFTRIGHT: %d", rumbleLRSupported);
 
     //Rumble wave types
-    LOG(TRACE) << "SDL_HAPTIC_CONSTANT: " << ((hapticQuery & SDL_HAPTIC_CONSTANT) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_SINE: " << ((hapticQuery & SDL_HAPTIC_SINE) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_TRIANGLE: " << ((hapticQuery & SDL_HAPTIC_TRIANGLE) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHUP: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHUP) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_SAWTOOTHDOWN: " << ((hapticQuery & SDL_HAPTIC_SAWTOOTHDOWN) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_RAMP: " << ((hapticQuery & SDL_HAPTIC_RAMP) != 0);
+    LOG_info("SDL_HAPTIC_CONSTANT: %d", ((hapticQuery & SDL_HAPTIC_CONSTANT) != 0));
+    LOG_info("SDL_HAPTIC_SINE: %d", ((hapticQuery & SDL_HAPTIC_SINE) != 0));
+    LOG_info("SDL_HAPTIC_TRIANGLE: %d", ((hapticQuery & SDL_HAPTIC_TRIANGLE) != 0));
+    LOG_info("SDL_HAPTIC_SAWTOOTHUP: %d", ((hapticQuery & SDL_HAPTIC_SAWTOOTHUP) != 0));
+    LOG_info("SDL_HAPTIC_SAWTOOTHDOWN: %d", ((hapticQuery & SDL_HAPTIC_SAWTOOTHDOWN) != 0));
+    LOG_info("SDL_HAPTIC_RAMP: %d", ((hapticQuery & SDL_HAPTIC_RAMP) != 0));
     //Define your own wave shape
-    LOG(TRACE) << "SDL_HAPTIC_CUSTOM: " << ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0);
+    LOG_info("SDL_HAPTIC_CUSTOM: %d", ((hapticQuery & SDL_HAPTIC_CUSTOM) != 0));
     //Complicated stuff that requires super-specific hardware
-    LOG(TRACE) << "SDL_HAPTIC_SPRING: " << ((hapticQuery & SDL_HAPTIC_SPRING) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_DAMPER: " << ((hapticQuery & SDL_HAPTIC_DAMPER) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_INERTIA: " << ((hapticQuery & SDL_HAPTIC_INERTIA) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_FRICTION: " << ((hapticQuery & SDL_HAPTIC_FRICTION) != 0);
+    LOG_info("SDL_HAPTIC_SPRING: %d", ((hapticQuery & SDL_HAPTIC_SPRING) != 0));
+    LOG_info("SDL_HAPTIC_DAMPER: %d", ((hapticQuery & SDL_HAPTIC_DAMPER) != 0));
+    LOG_info("SDL_HAPTIC_INERTIA: %d", ((hapticQuery & SDL_HAPTIC_INERTIA) != 0));
+    LOG_info("SDL_HAPTIC_FRICTION: %d", ((hapticQuery & SDL_HAPTIC_FRICTION) != 0));
     //Features
-    LOG(TRACE) << "SDL_HAPTIC_GAIN: " << ((hapticQuery & SDL_HAPTIC_GAIN) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_AUTOCENTER: " << ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_STATUS: " << ((hapticQuery & SDL_HAPTIC_STATUS) != 0);
-    LOG(TRACE) << "SDL_HAPTIC_PAUSE: " << ((hapticQuery & SDL_HAPTIC_PAUSE) != 0);
+    LOG_info("SDL_HAPTIC_GAIN: %d", ((hapticQuery & SDL_HAPTIC_GAIN) != 0));
+    LOG_info("SDL_HAPTIC_AUTOCENTER: %d", ((hapticQuery & SDL_HAPTIC_AUTOCENTER) != 0));
+    LOG_info("SDL_HAPTIC_STATUS: %d", ((hapticQuery & SDL_HAPTIC_STATUS) != 0));
+    LOG_info("SDL_HAPTIC_PAUSE: %d", ((hapticQuery & SDL_HAPTIC_PAUSE) != 0));
 
     if(!rumbleLRSupported)
     {
@@ -184,7 +184,7 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
 
     fLastRumble = curTime + sec;
 
-    LOG(TRACE) << "Running LR effect: " << duration << ", " << sec << ", " << largeMotor << ", " << smallMotor;
+    LOG_info("Running LR effect: %d, %f, %d, %d", duration, sec, largeMotor, smallMotor);
     if(curEffect >= 0)
     {
         SDL_HapticDestroyEffect(m_haptic, curEffect);
@@ -203,13 +203,13 @@ void InputDevice::rumbleLR(uint32_t duration, uint16_t largeMotor, uint16_t smal
     if(curEffect < 0)
     {
         //Shouldn't ever happen, since we check for LR support on device init
-        LOG(WARN) << "Unable to create LR effect: " << SDL_GetError();
+        LOG_warn("Unable to create LR effect: %s", SDL_GetError());
         return;
     }
 
     if(SDL_HapticRunEffect(m_haptic, curEffect, 1) < 0)
     {
-        LOG(WARN) << "Unable to run LR effect: " << SDL_GetError();
+        LOG_warn("Unable to run LR effect: %s", SDL_GetError());
     }
 }
 

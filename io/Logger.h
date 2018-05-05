@@ -1,7 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
+#include <SDL_log.h>
 
 typedef enum loglevel
 {
@@ -10,39 +9,29 @@ typedef enum loglevel
     INFO = 2,
     WARN = 3,
     ERR = 4
-} LogLevel;
+ } LogLevel;
 
-
-class logstream
-{
-public:
-    std::ofstream coss;
-    logstream& operator<< (std::ostream& (*pfun)(std::ostream&));
-    void _on();
-    void _off();
-};
-
-#ifdef _DEBUG
-logstream& logg(LogLevel l, const char* file, int line);
-#else
-logstream& logg(LogLevel l);
-#endif
-
-template<typename T>
-inline logstream& operator<<(logstream & st, const T & val)
-{
-    st.coss << val;
-#ifdef _DEBUG
-    std::cerr << val;
-#endif
-    return st;
-}
-
-void logger_init(const char* filename, LogLevel l);
+void logger_init(const char* filename, SDL_LogPriority l);
 void logger_quit();
 
-#ifdef _DEBUG
-#define LOG(level) logg(level, __FILE__, __LINE__)
-#else
-#define LOG(level) logg(level)
-#endif
+//TODO Logging levels
+#define LOG_trace SDL_Log
+#define LOG_dbg SDL_Log
+#define LOG_info SDL_Log
+#define LOG_warn SDL_Log
+#define LOG_err SDL_Log
+
+//#ifdef _DEBUG
+//#define LOG(level) logg(level, __FILE__, __LINE__)
+//#else
+//#define LOG(level) logg(level)
+//#endif
+
+//#ifdef _DEBUG
+//logstream& logg(LogLevel l, const char* file, int line);
+//#else
+//logstream& logg(LogLevel l);
+//#endif
+
+
+

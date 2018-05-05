@@ -4,7 +4,7 @@
 
 void Engine::changeScreenResolution(int w, int h)
 {
-    LOG(INFO) << "Changing screen resolution to " << w << ", " << h;
+    LOG_info("Changing screen resolution to %dx%d", w, h);
 
     m_iWidth = w;
     m_iHeight = h;

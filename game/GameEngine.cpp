@@ -56,7 +56,7 @@ GameEngine::GameEngine(uint16_t iWidth, uint16_t iHeight, const std::string& sTi
 
 GameEngine::~GameEngine()
 {
-    LOG(INFO) << "~GameEngine()";
+    LOG_dbg("~GameEngine()");
     saveConfig(getSaveLocation() + CONFIG_FILE);
     getEntityManager()->cleanup();
     delete m_debugUI;
@@ -198,7 +198,7 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
 {
     //Run through list for arguments we recognize
     for(std::vector<commandlineArg>::iterator i = sArgs.begin(); i != sArgs.end(); i++)
-        LOG(DBG) << "Commandline argument. Switch: " << i->sSwitch << ", value: " << i->sValue;
+        LOG_dbg("Commandline argument. Switch: %s, value: %s", i->sSwitch.c_str(), i->sValue.c_str());
 
     //Load our last screen position and such
     loadConfig(getSaveLocation() + CONFIG_FILE);
@@ -208,7 +208,7 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
     Lua = new LuaInterface(s.c_str());
     if(!Lua->Init())
     {
-        LOG(ERR) << "Failed to init lua";
+        LOG_err("Failed to init lua");
         return false;
     }
     Lua->call("loadLua");
@@ -216,7 +216,7 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
     std::string sLocale = SystemUtils::getCurLocale();
     if(sLocale.size())
     {
-        LOG(INFO) << "Current system locale: " << sLocale;
+        LOG_info("Current system locale: %s", sLocale.c_str());
         getStringbank()->setLanguage(sLocale.c_str());
     }
 
@@ -225,13 +225,13 @@ bool GameEngine::init(std::vector<commandlineArg> sArgs)
     {
         //NOTE: If we have other networking stuff later, this shouldn't depend on SS engine
         if(!NetworkThread::start())
-            LOG(ERR) << "Unable to start networking thread";
+            LOG_err("Unable to start networking thread");
 
         //Open communication to SteelSeries drivers
         if(steelSeriesClient->init(getAppName()))
-            LOG(INFO) << "Initialized with SteelSeries drivers";
+            LOG_info("Initialized with SteelSeries drivers");
         else
-            LOG(WARN) << "Unable to communicate with SteelSeries drivers";
+            LOG_warn("Unable to communicate with SteelSeries drivers");
     }
 
     //Add kb+mouse controller

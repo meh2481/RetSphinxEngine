@@ -18,13 +18,13 @@
 //---------------------------------------------------------------------------------------------------------------------------
 bool GameEngine::loadConfig(const std::string& sFilename)
 {
-    LOG(INFO) << "Parsing config file " << sFilename;
+    LOG_info("Parsing config file %d", sFilename.c_str());
     //Open file
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing config file: Error " << iErr << ". Ignoring...";
+        LOG_err("Error parsing config file: Error %d. Ignoring...", iErr);
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
@@ -35,7 +35,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERR) << "Error: Root element NULL in XML file. Ignoring...";
+        LOG_err("Error: Root element NULL in XML file. Ignoring...");
         if(isFullscreen())
             setInitialFullscreen();
         delete doc;
@@ -112,7 +112,7 @@ bool GameEngine::loadConfig(const std::string& sFilename)
 //---------------------------------------------------------------------------------------------------------------------------
 void GameEngine::saveConfig(const std::string& sFilename)
 {
-    LOG(INFO) << "Saving config XML " << sFilename;
+    LOG_info("Saving config XML %s", sFilename.c_str());
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     tinyxml2::XMLElement* root = doc->NewElement("config");
 
@@ -154,13 +154,13 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     getEntityManager()->cleanup();
     getSoundManager()->clearGeometry();
     player = NULL;
-    LOG(INFO) << "Loading scene " << sXMLFilename;
+    LOG_info("Loading scene %s", sXMLFilename.c_str());
     cameraPos = Vec3(0, 0, m_fDefCameraZ);    //Reset camera
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(sXMLFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing object XML file " << sXMLFilename << ": Error " << iErr;
+        LOG_err("Error parsing object XML file %s: Error %d", sXMLFilename.c_str(), iErr);
         delete doc;
         return;
     }
@@ -169,7 +169,7 @@ void GameEngine::loadScene(const std::string& sXMLFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERR) << "Error: Root element NULL in XML file " << sXMLFilename;
+        LOG_err("Error: Root element NULL in XML file %s", sXMLFilename.c_str());
         delete doc;
         return;
     }
@@ -364,7 +364,7 @@ void GameEngine::loadSoundGeom(const std::string& sXMLFilename)
             int idx = 0; //Unused
             FMOD_RESULT result = soundGeom->addPolygon(polygon->directOcclusion, polygon->reverbOcclusion, !!polygon->hollow, polygon->numVertices, vertices, &idx);
             if(result != FMOD_OK)
-                LOG(ERR) << result;
+                LOG_err("Err load sound geom: %d", result);
             ptr += sizeof(SoundGeomPolygon) + sizeof(FMOD_VECTOR) * polygon->numVertices;
         }
     }

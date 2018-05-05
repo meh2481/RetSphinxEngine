@@ -30,7 +30,7 @@ Text::Text(const std::string& sXMLFilename)
     const char* cName = elem->Attribute("name");
     if(cName != NULL)
         m_sName = cName;
-    LOG(INFO) << "Creating font \"" << m_sName << "\"";
+    LOG_info("Creating font \"%s\"", m_sName.c_str());
     for(elem = elem->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
     {
         cName = elem->Name();
@@ -61,7 +61,7 @@ Text::Text(const std::string& sXMLFilename)
 
 Text::~Text()
 {
-    LOG(INFO) << "Destroying font \"" << m_sName << "\"";
+    LOG_info("Destroying font \"%s\"", m_sName.c_str());
     if(m_imgFont != NULL)
         delete m_imgFont;
 }

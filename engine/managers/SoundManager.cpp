@@ -8,7 +8,7 @@
 #include "Rect.h"
 #include <cstring>
 
-#define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
+#define ERRCHECK(x) { if(x != 0) LOG_warn("FMOD Error: %d", x); }
 
 #define WINDOW_TYPE FMOD_DSP_FFT_WINDOW_RECT
 #define LOOP_FOREVER -1
@@ -28,25 +28,25 @@ FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TY
         {
             int numdrivers;
 
-            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED occured.";
+            LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_DEVICELISTCHANGED occured.");
 
             sys->getNumDrivers(&numdrivers);
 
-            LOG(INFO) << "Numdevices = " << numdrivers;
+            LOG_info("Numdevices = %d", numdrivers);
             break;
         }
         case FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED:
         {
-            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED occured.";
-            LOG(ERR) << (char*)commanddata1;
-            LOG(ERR) << "%d bytes." << (long)commanddata2;
+            LOG_err("ERROR : FMOD_SYSTEM_CALLBACK_MEMORYALLOCATIONFAILED occured.");
+            LOG_err((char*)commanddata1);
+            LOG_err("%d bytes.", (long)commanddata2);
             break;
         }
         case FMOD_SYSTEM_CALLBACK_THREADCREATED:
         {
-            LOG(INFO) << "NOTE : FMOD_SYSTEM_CALLBACK_THREADCREATED occured.";
-            LOG(INFO) << "Thread ID = " << (long)commanddata1;
-            LOG(INFO) << "Thread Name = " << (char*)commanddata2;
+            LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_THREADCREATED occured.");
+            LOG_info("Thread ID = %d", (long)commanddata1);
+            LOG_info("Thread Name = %s", (char*)commanddata2);
             break;
         }
         case FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION:
@@ -54,44 +54,44 @@ FMOD_RESULT F_CALLBACK fmodCallback(FMOD_SYSTEM *system, FMOD_SYSTEM_CALLBACK_TY
             FMOD::DSP *source = (FMOD::DSP *)commanddata1;
             FMOD::DSP *dest = (FMOD::DSP *)commanddata2;
 
-            LOG(ERR) << "ERROR : FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION occured.";
+            LOG_err("ERROR : FMOD_SYSTEM_CALLBACK_BADDSPCONNECTION occured.");
             if(source)
             {
                 char name[256];
                 source->getInfo(name, 0, 0, 0, 0);
-                LOG(ERR) << "SOURCE = " << name;
+                LOG_err("SOURCE = %s", name);
             }
             if(dest)
             {
                 char name[256];
                 dest->getInfo(name, 0, 0, 0, 0);
-                LOG(ERR) << "DEST = " << name;
+                LOG_err("DEST = %s", name);
             }
             break;
         }
         case FMOD_SYSTEM_CALLBACK_PREMIX:
         {
-            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.";
+            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_PREMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_MIDMIX:
         {
-            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.";
+            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_MIDMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_POSTMIX:
         {
-            LOG(TRACE) << "NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.";
+            //LOG_info("NOTE : FMOD_SYSTEM_CALLBACK_POSTMIX occured.");
             break;
         }
         case FMOD_SYSTEM_CALLBACK_ERROR:
         {
             FMOD_ERRORCALLBACK_INFO* errInfo = (FMOD_ERRORCALLBACK_INFO*)commanddata1;
-            LOG(ERR) << "FMOD Callback error:";
-            LOG(ERR) << "Result: " << errInfo->result;
-            LOG(ERR) << "Instance Type: " << errInfo->instancetype;
-            LOG(ERR) << "Function name: " << errInfo->functionname;
-            LOG(ERR) << "Function params: " << errInfo->functionparams;
+            LOG_err("FMOD Callback error:");
+            LOG_err("Result: %d", errInfo->result);
+            LOG_err("Instance Type: %d", errInfo->instancetype);
+            LOG_err("Function name: %s", errInfo->functionname);
+            LOG_err("Function params: %s", errInfo->functionparams);
 
             break;
         }
@@ -116,7 +116,7 @@ SoundManager::~SoundManager()
     //TODO: Save/load song location on app exit?
     FMOD_RESULT result = system->release();
     if(result)
-        LOG(WARN) << "Unable to close FMOD: " << result;
+        LOG_warn("Unable to close FMOD: %d", result);
     for(std::vector<unsigned char*>::iterator i = soundResources.begin(); i != soundResources.end(); i++)
         free(*i);
     for(std::map<StreamHandle*, SoundLoop*>::iterator i = soundLoopPoints.begin(); i != soundLoopPoints.end(); i++)
@@ -127,7 +127,7 @@ SoundManager::~SoundManager()
 
 int SoundManager::init()
 {
-    LOG(INFO) << "Initializing FMOD...";
+    LOG_info("Initializing FMOD...");
     FMOD_RESULT result;
     unsigned int version;
     int numdrivers;
@@ -138,9 +138,9 @@ int SoundManager::init()
     ERRCHECK(result);
     if(version < FMOD_VERSION)
     {
-        LOG(ERR) << "Error! You are using an old version of FMOD: " << std::hex
-            << ((version >> 16) & 0xFFFF) << '.' << ((version >> 8) & 0xFF) << '.' << (version & 0xFF) << ". This program requires "
-            << ((FMOD_VERSION >> 16) & 0xFFFF) << '.' << ((FMOD_VERSION >> 8) & 0xFF) << '.' << (FMOD_VERSION & 0xFF) << std::dec;
+        LOG_err("Error! You are using an old version of FMOD: %x.%x.%x. This program requires %x.%x.%x",
+            ((version >> 16) & 0xFFFF), ((version >> 8) & 0xFF), (version & 0xFF),
+            ((FMOD_VERSION >> 16) & 0xFFFF), ((FMOD_VERSION >> 8) & 0xFF), (FMOD_VERSION & 0xFF));
         return 1;
     }
     result = system->getNumDrivers(&numdrivers);
@@ -149,7 +149,7 @@ int SoundManager::init()
     {
         result = system->setOutput(FMOD_OUTPUTTYPE_NOSOUND);
         ERRCHECK(result);
-        LOG(WARN) << "No sound driver";
+        LOG_err("No sound driver");
     }
     result = system->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
     ERRCHECK(result);
@@ -180,7 +180,7 @@ int SoundManager::init()
     result = system->setCallback(fmodCallback);
     ERRCHECK(result);
 
-    LOG(INFO) << "FMOD Init success";
+    LOG_info("FMOD Init success");
 
     return 0;
 }
@@ -272,7 +272,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
     std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
     if(existing == sounds.end())    //Doesn't exist; load
     {
-        LOG(INFO) << "Loading sound " << filename;
+        LOG_dbg("Loading sound %s", filename.c_str());
         SoundHandle* handle = NULL;
 
         //Attempt to load from pak
@@ -287,7 +287,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             //In pak; load from memory
             FMOD_RESULT result = system->createSound((const char*)data, FMOD_3D | FMOD_CREATESAMPLE | FMOD_OPENMEMORY_POINT, &info, &handle);
             if(result)
-                LOG(WARN) << "Unable to create sound resource " << filename << "from pak, error " << result;
+                LOG_warn("Unable to create sound resource %s from pak, error %d", filename.c_str(), result);
             soundResources.push_back(data);    //Free this later
         }
         else
@@ -295,7 +295,7 @@ SoundHandle* SoundManager::loadSound(const std::string& filename)
             //Not in pak; load from file
             FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESAMPLE, NULL, &handle);
             if(result)
-                LOG(WARN) << "Unable to create sound resource " << filename << " from file, error " << result;
+                LOG_warn("Unable to create sound resource %s from file, error %d", filename.c_str(), result);
         }
         sounds[filename] = handle;
         FMOD_RESULT result = handle->set3DMinMaxDistance(5.0f, 5000.0f);
@@ -310,14 +310,14 @@ StreamHandle* SoundManager::loadStream(const std::string& filename)
     std::map<const std::string, FMOD::Sound*>::iterator existing = sounds.find(filename);
     if(existing == sounds.end())    //Doesn't exist; load
     {
-        LOG(INFO) << "Loading music " << filename;
+        LOG_dbg("Loading music %s", filename.c_str());
         SoundHandle* handle = NULL;
 
         //Create a streamed, loopable sound
         FMOD_RESULT result = system->createSound(filename.c_str(), FMOD_3D | FMOD_CREATESTREAM | FMOD_LOOP_NORMAL, NULL, &handle);
         if(result)
         {
-            LOG(WARN) << "Unable to create music resource " << filename << ", error " << result;
+            LOG_warn("Unable to create music resource %s, error %d", filename.c_str(), result);
             return NULL;
         }
 

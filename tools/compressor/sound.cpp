@@ -7,7 +7,7 @@
 #include "Box2D/Box2D.h"
 #include <vector>
 
-#define ERRCHECK(x) { if(x != 0) LOG(WARN) << "FMOD Error: " << x; }
+#define ERRCHECK(x) { if(x != 0) LOG_warn("FMOD Error: %d", x); }
 
 #define MAX_POLY 256
 #define MAX_VERT 2560
@@ -56,7 +56,7 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPo
     const char* cFixType = fixture->Attribute("type");
     if(!cFixType)
     {
-        LOG(WARN) << "loadSoundGeom: No fixture type";
+        LOG_warn("loadSoundGeom: No fixture type");
         return;
     }
 
@@ -114,7 +114,7 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPo
         {
             if(num > MAX_SOUND_POLY_VERTS)
             {
-                LOG(ERR) << "Only " << MAX_SOUND_POLY_VERTS << " are allowed per polygon";
+                LOG_err("Only %d vertices are allowed per polygon", MAX_SOUND_POLY_VERTS);
                 num = MAX_SOUND_POLY_VERTS;
                 break;
             }
@@ -139,7 +139,7 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPo
         num = 2;
     }
     else
-        LOG(WARN) << "Unknown fixture type: " << sFixType;
+        LOG_warn("Unknown fixture type: %s", sFixType.c_str());
 
     if(num > 1)
     {
@@ -182,7 +182,7 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPo
             //int polygonIndex;   //Unused
             //FMOD_RESULT result = soundGeom->addPolygon(directocclusion, reverbocclusion, bHollow, 4, quads, &polygonIndex);
             //if(result != FMOD_OK)
-            //    LOG(WARN) << "Unable to create FMOD polygon: " << result;
+            //    LOG_warn("Unable to create FMOD polygon: " << result;
         }
     }
 }
@@ -190,12 +190,12 @@ static void loadSoundGeom(tinyxml2::XMLElement* fixture, std::vector<SoundGeomPo
 void extractSoundGeometry(const std::string& xmlFilename)
 {
     std::string geomFilename = xmlFilename + ".soundgeom";
-    std::cout << "Compressing \"" << geomFilename << "\"..."<< std::endl;
+    //std::cout << "Compressing \"" << geomFilename << "\"..."<< std::endl;
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
     int iErr = doc->LoadFile(xmlFilename.c_str());
     if(iErr != tinyxml2::XML_NO_ERROR)
     {
-        LOG(ERR) << "Error parsing object XML file " << xmlFilename << ": Error " << iErr;
+        LOG_err("Error parsing object XML file %s: Error %d", xmlFilename.c_str(), iErr);
         delete doc;
         return;
     }
@@ -204,7 +204,7 @@ void extractSoundGeometry(const std::string& xmlFilename)
     tinyxml2::XMLElement* root = doc->RootElement();
     if(root == NULL)
     {
-        LOG(ERR) << "Error: Root element NULL in XML file " << xmlFilename;
+        LOG_err("Error: Root element NULL in XML file %s", xmlFilename.c_str());
         delete doc;
         return;
     }
@@ -228,7 +228,7 @@ void extractSoundGeometry(const std::string& xmlFilename)
     //result = soundSystem->createGeometry(MAX_POLY, MAX_VERT, &soundGeom);
     //if(result != FMOD_OK)
     //{
-    //    LOG(ERR) << "Unable to create sound geom";
+    //    LOG_err("Unable to create sound geom";
     //    delete doc;
     //    return;
     //}
@@ -278,7 +278,7 @@ void extractSoundGeometry(const std::string& xmlFilename)
     //memset(data, 0, sz);
     //result = soundGeom->save(data + sizeof(SoundGeomHeader), &throwaway);
     //ERRCHECK(result);
-    //LOG(TRACE) << "saving geom size: " << sz;
+    //LOG_info("saving geom size: " << sz;
 
     //SoundGeomHeader* header = (SoundGeomHeader*)data;
     //header->worldSize = worldSz;

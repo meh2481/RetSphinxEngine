@@ -4,6 +4,7 @@
 #include "FileOperations.h"
 #include "lua.hpp"
 #include <cstring>
+#include <iostream>
 
 static LuaInterface* lua = NULL;
 
@@ -33,7 +34,7 @@ unsigned char* extractLua(const std::string& luaFilename, unsigned int* size)
 
 void initLua()
 {
-    logger_init("compressor_out.log", DBG);
+    logger_init("compressor_out.log", SDL_LOG_PRIORITY_DEBUG);
     unsigned int size = 0;
     char* luaFile = (char*)FileOperations::readFile("tools/compressor/LuaMinify/CommandLineMinify.lua", &size);
     if(luaFile == NULL || size < 1)
