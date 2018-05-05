@@ -708,7 +708,7 @@ void VulkanInterface::createVertIndexBuffers()
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Create staging buffer
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
 
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
@@ -1628,11 +1628,11 @@ void VulkanInterface::drawFrame()
     if(bufferSize > 0)
     {
         void* data;
-        vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+        vkMapMemory(device, stagingDbgBufferMemory, 0, bufferSize, 0, &data);
         //Vertex data first, since indices can be non-32bit-aligned
         memcpy(data, dbgPolyVertices.data(), (size_t)vertBufferSize);
         memcpy((void*)((VkDeviceSize)data + vertBufferSize), dbgPolyIndices.data(), (size_t)indexBufferSize);
-        vkUnmapMemory(device, stagingBufferMemory);
+        vkUnmapMemory(device, stagingDbgBufferMemory);
     }
 
     //Rebuild the command buffer - only if the vertex buffer size changed for this index
@@ -1714,7 +1714,7 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     VkBufferCopy copyRegion = {};
     copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
     if(!!copyRegion.size)
-        vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedDbgBuffer, 1, &copyRegion);
+        vkCmdCopyBuffer(commandBuffers[index], stagingDbgBuffer, combinedDbgBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
     std::array<VkClearValue, 2> clearValues = {};
@@ -1808,8 +1808,8 @@ void VulkanInterface::cleanupVertBufferMemory()
 {
     vkDestroyBuffer(device, combinedDbgBuffer, NULL);
     vkFreeMemory(device, combinedDbgBufferMemory, NULL);
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
+    vkDestroyBuffer(device, stagingDbgBuffer, NULL);
+    vkFreeMemory(device, stagingDbgBufferMemory, NULL);
 }
 
 void VulkanInterface::cleanup()

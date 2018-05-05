@@ -5,9 +5,9 @@
 #include <SDL_mutex.h>
 #include <iostream>
 
-#define BUF_SZ 32
+#define TIME_BUF_SZ 32
 
-static char buffer[BUF_SZ];
+static char timeBuf[TIME_BUF_SZ];
 static std::ofstream logfile;
 static SDL_mutex *logMutex = NULL;
 
@@ -45,8 +45,8 @@ static const char* curTime()
 {
     time_t t = time(0);
     struct tm* now = localtime(&t);
-    strftime(buffer, BUF_SZ, "%D %T", now);
-    return buffer;
+    strftime(timeBuf, TIME_BUF_SZ, "%D %T", now);
+    return timeBuf;
 }
 
 void logger_init(const char* filename, SDL_LogPriority l)
@@ -69,10 +69,11 @@ void logger_quit()
 {
     SDL_Log("%s Logger close", curTime());
     logfile.close();
+    SDL_DestroyMutex(logMutex);
 }
 
-#define BUF_SZ_ 4096
-char buf[BUF_SZ_];
+#define LOG_BUF_SZ 4096
+static char logBuf[LOG_BUF_SZ];
 #ifdef _DEBUG
 void _logHelper(SDL_LogPriority l, const char * file, int line, const char * fmt, ...)
 #else
@@ -81,10 +82,10 @@ void _logHelper(SDL_LogPriority l, const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, BUF_SZ_, fmt, args);
+    vsnprintf(logBuf, LOG_BUF_SZ, fmt, args);
     va_end(args);
 #ifdef _DEBUG
-    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s %s:%d : %s", curTime(), levelToString(l), StringUtils::getFilename(file).c_str(), line, buf);
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s %s:%d : %s", curTime(), levelToString(l), StringUtils::getFilename(file).c_str(), line, logBuf);
 #else
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s : %s", curTime(), levelToString(l), buf);
 #endif
