@@ -2,15 +2,6 @@
 
 #include <SDL_log.h>
 
-typedef enum loglevel
-{
-    TRACE = 0,
-    DBG = 1,
-    INFO = 2,
-    WARN = 3,
-    ERR = 4
- } LogLevel;
-
 void logger_init(const char* filename, SDL_LogPriority l);
 void logger_quit();
 
