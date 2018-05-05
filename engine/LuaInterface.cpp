@@ -102,11 +102,7 @@ static void printCallstack(lua_State *L, const char *errmsg = "<unspecified erro
         os << luaFormatStackInfo(L, level) << "\n";
         ++level;
     }
-#ifdef _DEBUG
-    printf("%s\n", os.str().c_str());
-#else
-    LOG_err(os.str();
-#endif
+    LOG_err("%s", os.str().c_str());
 }
 
 void LuaInterface::lookupFunc(const char *f)

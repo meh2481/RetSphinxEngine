@@ -87,6 +87,6 @@ void _logHelper(SDL_LogPriority l, const char * fmt, ...)
 #ifdef _DEBUG
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s %s:%d : %s", curTime(), levelToString(l), StringUtils::getFilename(file).c_str(), line, logBuf);
 #else
-    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s : %s", curTime(), levelToString(l), buf);
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s : %s", curTime(), levelToString(l), logBuf);
 #endif
 }
