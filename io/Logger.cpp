@@ -71,37 +71,21 @@ void logger_quit()
     logfile.close();
 }
 
-#define BUF_SZ_ 1024
+#define BUF_SZ_ 4096
+char buf[BUF_SZ_];
+#ifdef _DEBUG
 void _logHelper(SDL_LogPriority l, const char * file, int line, const char * fmt, ...)
+#else
+void _logHelper(SDL_LogPriority l, const char * fmt, ...)
+#endif
 {
-    char buf[BUF_SZ_];
-    //TODO: File/line
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, BUF_SZ_, fmt, args);
     va_end(args);
+#ifdef _DEBUG
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s %s:%d : %s", curTime(), levelToString(l), StringUtils::getFilename(file).c_str(), line, buf);
+#else
+    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s : %s", curTime(), levelToString(l), buf);
+#endif
 }
-
-/*
--#ifdef _DEBUG
--logstream& logg(LogLevel l, const char* file, int line)
--#else
--logstream& logg(LogLevel l)
--#endif
--{
--    if(l >= curLogLevel)
--    {
--        logfile._on();
--        logfile << std::endl << curTime() << ' ' << levelToString(l);
--#ifdef _DEBUG
--        logfile << ' ' << StringUtils::getFilename(file) << ':' << line;
--#endif
--        logfile << " : ";
--    }
--    else
--        logfile._off();
--    return logfile;
--}
-
-*/
