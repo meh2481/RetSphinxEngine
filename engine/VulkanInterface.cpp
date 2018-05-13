@@ -37,8 +37,6 @@
 #define DBG_INDICES_SIZE sizeof(uint16_t) * dbgIndicesCount
 #define DBG_VERTICES_SIZE sizeof(DbgVertex) * dbgVerticesCount
 #endif
-#define INDICES_SIZE sizeof(uint16_t) * maxIndicesCount
-#define VERTICES_SIZE sizeof(Vertex) * maxVerticesCount
 
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -710,9 +708,10 @@ void VulkanInterface::createDescriptorSetLayout()
 void VulkanInterface::createVertIndexBuffers()
 {
     //Combined buffer size
-    VkDeviceSize indexBufferSize = INDICES_SIZE;
-    VkDeviceSize vertBufferSize = VERTICES_SIZE;
+    VkDeviceSize indexBufferSize = sizeof(uint16_t) * maxIndicesCount;
+    VkDeviceSize vertBufferSize = sizeof(Vertex) * maxVerticesCount;
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+    LOG_dbg("Total buffer size: %lu", bufferSize);
 
     //Create staging buffer
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
@@ -728,6 +727,7 @@ void VulkanInterface::createDbgVertIndexBuffers()
     VkDeviceSize indexBufferSize = DBG_INDICES_SIZE;
     VkDeviceSize vertBufferSize = DBG_VERTICES_SIZE;
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+    LOG_dbg("Total dbg buffer size: %lu", bufferSize);
 
     //Create staging buffer
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
@@ -846,6 +846,9 @@ void VulkanInterface::createCommandBuffers()
     lastDbgVertexSize.resize(swapChainFramebuffers.size());
     lastDbgIndicesSize.resize(swapChainFramebuffers.size());
 #endif
+    lastQuadVertexSize.resize(swapChainFramebuffers.size());
+    lastQuadIndexSize.resize(swapChainFramebuffers.size());
+
     for(size_t i = 0; i < commandBuffers.size(); i++)
         setupCommandBuffer(i);
 }
@@ -1649,7 +1652,7 @@ void VulkanInterface::drawFrame()
     if(dbgPolyIndices.size() > dbgIndicesCount || dbgPolyVertices.size() > dbgVerticesCount)
     {
         //Vert/index buffers likely to grow at the same time, so just recalc both
-        LOG_dbg("Changing buffer sizes - had indices %lu now %lu; vertices had %lu now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
+        LOG_dbg("Changing dbg buffer sizes - had indices %lu now %lu; vertices had %lu now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
 
         //Use max() to not shrink either buffer
         dbgIndicesCount = std::max((VkDeviceSize)dbgPolyIndices.size(), dbgIndicesCount);
@@ -1685,6 +1688,8 @@ void VulkanInterface::drawFrame()
         setupCommandBuffer(imageIndex);
     }
 #endif
+
+    growShrinkBuffers(imageIndex);
 
     //Set up queue submission
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
@@ -1735,6 +1740,48 @@ void VulkanInterface::drawFrame()
     //TODO Actually do something with these
     quadVertices.clear();
     quadIndices.clear();
+}
+
+void VulkanInterface::growShrinkBuffers(uint32_t imageIndex)
+{
+    //Grow buffer if necessary
+    //TODO shrink buffers if too big, especially between load areas
+    if(quadIndices.size() > maxIndicesCount || quadVertices.size() > maxVerticesCount)
+    {
+        //Vert/index buffers likely to grow at the same time, so just recalc both
+        LOG_dbg("Changing buffer sizes - had indices %lu now %lu; vertices had %lu now %d", maxIndicesCount, quadIndices.size(), maxVerticesCount, quadVertices.size());
+
+        //Use max() to not shrink either buffer
+        maxIndicesCount = std::max((VkDeviceSize)quadIndices.size(), maxIndicesCount);
+        maxVerticesCount = std::max((VkDeviceSize)quadVertices.size(), maxVerticesCount);
+
+        //Reallocate
+        cleanupVertBufferMemory();
+        createVertIndexBuffers();
+    }
+
+    //Rebind vertex buffer
+    VkDeviceSize indexBufferSize = sizeof(uint16_t) * quadIndices.size();
+    VkDeviceSize vertBufferSize = sizeof(Vertex) * quadVertices.size();
+    VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+
+    //Copy new data into staging buffer (command buffer will have commands to copy this into vertex/index buffer)
+    if(bufferSize > 0)
+    {
+        void* data;
+        vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+        //Vertex data first, since indices can be non-32bit-aligned
+        memcpy(data, quadVertices.data(), (size_t)vertBufferSize);
+        memcpy((void*)((VkDeviceSize)data + vertBufferSize), quadIndices.data(), (size_t)indexBufferSize);
+        vkUnmapMemory(device, stagingBufferMemory);
+    }
+
+    //Rebuild the command buffer - only if the vertex buffer size changed for this index
+    if(lastQuadVertexSize[imageIndex] != quadVertices.size() ||
+        lastQuadIndexSize[imageIndex] != quadIndices.size())
+    {
+        setupCommandBuffer(imageIndex);
+    }
 }
 
 void VulkanInterface::setupCommandBuffer(uint32_t index)
@@ -1825,6 +1872,8 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     lastDbgVertexSize[index] = dbgPolyVertices.size();
     lastDbgIndicesSize[index] = dbgPolyIndices.size();
 #endif
+    lastQuadVertexSize[index] = quadVertices.size();
+    lastQuadIndexSize[index] = quadIndices.size();
 }
 
 void VulkanInterface::cleanupSwapChain()

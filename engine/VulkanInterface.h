@@ -194,7 +194,7 @@ private:
 public:
 #endif
     std::vector<Vertex> quadVertices;
-    std::vector<uint32_t> quadIndices;
+    std::vector<uint16_t> quadIndices;
 
 private:
     //For handling changes in quad sizes
@@ -256,6 +256,7 @@ private:
     void cleanupSwapChain();
     void cleanupVertBufferMemory();
     void createVertIndexBuffers();
+    void growShrinkBuffers(uint32_t imageIndex);
 #ifdef _DEBUG
     void cleanupDbgVertBufferMemory();
     void createDbgVertIndexBuffers();
