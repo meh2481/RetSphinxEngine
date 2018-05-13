@@ -170,6 +170,9 @@ void VulkanInterface::initVulkan()
     createTextureImageView();
     createTextureSampler();
     createVertIndexBuffers();
+#ifdef _DEBUG
+    createDbgVertIndexBuffers();
+#endif
     createUniformBuffer();
     createDescriptorPool();
     createDescriptorSet(textureImageView, textureSampler);
@@ -706,20 +709,6 @@ void VulkanInterface::createDescriptorSetLayout()
 
 void VulkanInterface::createVertIndexBuffers()
 {
-#ifdef _DEBUG
-    {
-        //Combined buffer size
-        VkDeviceSize indexBufferSize = DBG_INDICES_SIZE;
-        VkDeviceSize vertBufferSize = DBG_VERTICES_SIZE;
-        VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
-
-        //Create staging buffer
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
-
-        //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
-    }
-#endif
     //Combined buffer size
     VkDeviceSize indexBufferSize = INDICES_SIZE;
     VkDeviceSize vertBufferSize = VERTICES_SIZE;
@@ -731,6 +720,20 @@ void VulkanInterface::createVertIndexBuffers()
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedVertIndexBuffer, combinedVertIndexBufferMemory);
 
+}
+
+void VulkanInterface::createDbgVertIndexBuffers()
+{
+    //Combined buffer size
+    VkDeviceSize indexBufferSize = DBG_INDICES_SIZE;
+    VkDeviceSize vertBufferSize = DBG_VERTICES_SIZE;
+    VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+
+    //Create staging buffer
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
+
+    //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
 }
 
 void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1653,8 +1656,8 @@ void VulkanInterface::drawFrame()
         dbgVerticesCount = std::max((VkDeviceSize)dbgPolyVertices.size(), dbgVerticesCount);
 
         //Reallocate
-        cleanupVertBufferMemory();
-        createVertIndexBuffers();
+        cleanupDbgVertBufferMemory();
+        createDbgVertIndexBuffers();
     }
 
     //Rebind vertex buffer
@@ -1771,14 +1774,6 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //-------------- Begin Render Pass --------------
     vkCmdBeginRenderPass(commandBuffers[index], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-#ifdef _DEBUG
-    //Bind vert/index buffers for debug data
-    VkBuffer vertexBuffers[] = { combinedDbgBuffer };
-    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
-    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedDbgBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
-#endif
-
     //Bind descriptor sets
     vkCmdBindDescriptorSets(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
@@ -1786,6 +1781,12 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
 
 #ifdef _DEBUG
+    //Bind vert/index buffers for debug data
+    VkBuffer vertexBuffers[] = { combinedDbgBuffer };
+    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
+    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedDbgBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
+
     //----Draw debug geometry first----
     if(dbgPolyIndices.size() > 0)
     {
@@ -1849,14 +1850,18 @@ void VulkanInterface::cleanupSwapChain()
     vkDestroySwapchainKHR(device, swapChain, NULL);
 }
 
-void VulkanInterface::cleanupVertBufferMemory()
-{
 #ifdef _DEBUG
+void VulkanInterface::cleanupDbgVertBufferMemory()
+{
     vkDestroyBuffer(device, combinedDbgBuffer, NULL);
     vkFreeMemory(device, combinedDbgBufferMemory, NULL);
     vkDestroyBuffer(device, stagingDbgBuffer, NULL);
     vkFreeMemory(device, stagingDbgBufferMemory, NULL);
+}
 #endif
+
+void VulkanInterface::cleanupVertBufferMemory()
+{
     vkDestroyBuffer(device, combinedVertIndexBuffer, NULL);
     vkFreeMemory(device, combinedVertIndexBufferMemory, NULL);
     vkDestroyBuffer(device, stagingBuffer, NULL);
@@ -1877,6 +1882,9 @@ void VulkanInterface::cleanup()
     vkFreeMemory(device, uniformBufferMemory, NULL);
 
     cleanupVertBufferMemory();
+#ifdef _DEBUG
+    cleanupDbgVertBufferMemory();
+#endif
 
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);

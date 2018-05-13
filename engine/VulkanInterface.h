@@ -227,7 +227,6 @@ private:
     void createDescriptorPool();
     void createUniformBuffer();
     void createDescriptorSetLayout();
-    void createVertIndexBuffers();
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     void createSemaphores();
@@ -256,6 +255,11 @@ private:
     void drawFrame();
     void cleanupSwapChain();
     void cleanupVertBufferMemory();
+    void createVertIndexBuffers();
+#ifdef _DEBUG
+    void cleanupDbgVertBufferMemory();
+    void createDbgVertIndexBuffers();
+#endif
     void cleanup();
     void createInstance();
     void handleBufferGrowth(uint32_t imageIndex);
