@@ -34,9 +34,11 @@
 
 #ifdef _DEBUG
 //Vertex and index buffer size helper macros
-#define INDICES_SIZE sizeof(uint16_t) * dbgIndicesCount
-#define VERTICES_SIZE sizeof(DbgVertex) * dbgVerticesCount
+#define DBG_INDICES_SIZE sizeof(uint16_t) * dbgIndicesCount
+#define DBG_VERTICES_SIZE sizeof(DbgVertex) * dbgVerticesCount
 #endif
+#define INDICES_SIZE sizeof(uint16_t) * maxIndicesCount
+#define VERTICES_SIZE sizeof(Vertex) * maxVerticesCount
 
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -130,6 +132,8 @@ VulkanInterface::VulkanInterface(SDL_Window* w, ResourceLoader* shaderLoader)
     dbgIndicesCount = 512;
     dbgVerticesCount = 512;
 #endif
+    maxIndicesCount = 512;
+    maxVerticesCount = 512;
     initVulkan();
 }
 
@@ -703,17 +707,30 @@ void VulkanInterface::createDescriptorSetLayout()
 void VulkanInterface::createVertIndexBuffers()
 {
 #ifdef _DEBUG
+    {
+        //Combined buffer size
+        VkDeviceSize indexBufferSize = DBG_INDICES_SIZE;
+        VkDeviceSize vertBufferSize = DBG_VERTICES_SIZE;
+        VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
+
+        //Create staging buffer
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
+
+        //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
+    }
+#endif
     //Combined buffer size
     VkDeviceSize indexBufferSize = INDICES_SIZE;
     VkDeviceSize vertBufferSize = VERTICES_SIZE;
     VkDeviceSize bufferSize = indexBufferSize + vertBufferSize;
 
     //Create staging buffer
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingDbgBuffer, stagingDbgBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedDbgBuffer, combinedDbgBufferMemory);
-#endif
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedVertIndexBuffer, combinedVertIndexBufferMemory);
+
 }
 
 void VulkanInterface::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1124,7 +1141,7 @@ void VulkanInterface::createGraphicsPipelines()
 
 #ifdef _DEBUG
     //Change shader
-    VkShaderModule dbgVertShaderModule = createShaderModule("res/shaders/shaderdbg.vert");
+    VkShaderModule dbgVertShaderModule = createShaderModule("res/shaders/shaderdbg.vert");  //These resources will be fine hardcoded because they'll be static
     VkShaderModule dbgFragShaderModule = createShaderModule("res/shaders/shaderdbg.frag");
     vertShaderStageInfo.module = dbgVertShaderModule;
     fragShaderStageInfo.module = dbgFragShaderModule;
@@ -1840,6 +1857,10 @@ void VulkanInterface::cleanupVertBufferMemory()
     vkDestroyBuffer(device, stagingDbgBuffer, NULL);
     vkFreeMemory(device, stagingDbgBufferMemory, NULL);
 #endif
+    vkDestroyBuffer(device, combinedVertIndexBuffer, NULL);
+    vkFreeMemory(device, combinedVertIndexBufferMemory, NULL);
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
 }
 
 void VulkanInterface::cleanup()
