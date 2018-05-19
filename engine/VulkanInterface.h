@@ -134,6 +134,7 @@ private:
     VkDeviceSize dbgIndicesCount;
     VkDeviceSize dbgVerticesCount;
 #endif
+    VkPipeline graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;

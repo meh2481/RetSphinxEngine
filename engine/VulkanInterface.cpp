@@ -1126,7 +1126,7 @@ void VulkanInterface::createGraphicsPipelines()
         exit(1);
     }
 
-    //Create pipeline!
+    //Create pipeline
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;    //Vert & frag
@@ -1144,6 +1144,12 @@ void VulkanInterface::createGraphicsPipelines()
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex = -1;
+
+    if(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
+    {
+        LOG_err("Failed to create graphics pipeline");
+        exit(1);
+    }
 
 #ifdef _DEBUG
     //Change shader
@@ -1689,6 +1695,7 @@ void VulkanInterface::drawFrame()
     }
 #endif
 
+    //This also updates buffer memory; could prolly use a better name
     growShrinkBuffers(imageIndex);
 
     //Set up queue submission
@@ -1737,7 +1744,7 @@ void VulkanInterface::drawFrame()
     vkQueueWaitIdle(presentQueue);
 #endif
 
-    //TODO Actually do something with these
+    //Clear out vertices/indices for next pass
     quadVertices.clear();
     quadIndices.clear();
 }
@@ -1828,31 +1835,33 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
 
 #ifdef _DEBUG
-    //Bind vert/index buffers for debug data
-    VkBuffer vertexBuffers[] = { combinedDbgBuffer };
-    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
-    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedDbgBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
-
-    //----Draw debug geometry first----
-    if(dbgPolyIndices.size() > 0)
     {
-        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugGeometryGraphicsPipeline);
-        vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
-    }
+        //Bind vert/index buffers for debug data
+        VkBuffer vertexBuffers[] = { combinedDbgBuffer };
+        VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
+        vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
+        vkCmdBindIndexBuffer(commandBuffers[index], combinedDbgBuffer, sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size(), VK_INDEX_TYPE_UINT16);
 
-    //----Draw debug geometry outlines second, without indices----
-    if(polyDbgPointIdx - polyDbgLineIdx > 0)
-    {
-        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
-        vkCmdDraw(commandBuffers[index], polyDbgPointIdx - polyDbgLineIdx, 1, polyDbgLineIdx, 0);
-    }
+        //----Draw debug geometry first----
+        if(dbgPolyIndices.size() > 0)
+        {
+            vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugGeometryGraphicsPipeline);
+            vkCmdDrawIndexed(commandBuffers[index], (uint32_t)dbgPolyIndices.size(), 1, 0, 0, 0);
+        }
 
-    //----Draw debug geometry points third - no indices because that would be wasteful----
-    if((uint32_t)dbgPolyVertices.size() - polyDbgPointIdx > 0)
-    {
-        vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
-        vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyDbgPointIdx, 1, polyDbgPointIdx, 0);
+        //----Draw debug geometry outlines second, without indices----
+        if(polyDbgPointIdx - polyDbgLineIdx > 0)
+        {
+            vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugOutlineGraphicsPipeline);
+            vkCmdDraw(commandBuffers[index], polyDbgPointIdx - polyDbgLineIdx, 1, polyDbgLineIdx, 0);
+        }
+
+        //----Draw debug geometry points third - no indices because that would be wasteful----
+        if((uint32_t)dbgPolyVertices.size() - polyDbgPointIdx > 0)
+        {
+            vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, debugPointGraphicsPipeline);
+            vkCmdDraw(commandBuffers[index], (uint32_t)dbgPolyVertices.size() - polyDbgPointIdx, 1, polyDbgPointIdx, 0);
+        }
     }
 #endif
 
@@ -1892,6 +1901,7 @@ void VulkanInterface::cleanupSwapChain()
     vkDestroyPipeline(device, debugOutlineGraphicsPipeline, NULL);
     vkDestroyPipeline(device, debugPointGraphicsPipeline, NULL);
 #endif
+    vkDestroyPipeline(device, graphicsPipeline, NULL);
     vkDestroyPipelineLayout(device, pipelineLayout, NULL);
     vkDestroyRenderPass(device, renderPass, NULL);
     for(auto imageView : swapChainImageViews)

@@ -24,7 +24,7 @@ namespace Draw
         v.color.a = 1.0f;
         v.texCoord.x = q->tex.uv[0];
         v.texCoord.y = q->tex.uv[1];
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size());
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size());
         g_vulkan->quadVertices.push_back(v);
 
         //Lower left
@@ -32,7 +32,7 @@ namespace Draw
         v.pos.y = q->pos[5];
         v.texCoord.x = q->tex.uv[4];
         v.texCoord.y = q->tex.uv[5];
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size());
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size());
         g_vulkan->quadVertices.push_back(v);
 
         //Upper right
@@ -40,7 +40,7 @@ namespace Draw
         v.pos.y = q->pos[3];
         v.texCoord.x = q->tex.uv[2];
         v.texCoord.y = q->tex.uv[3];
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size());
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size());
         g_vulkan->quadVertices.push_back(v);
 
         //Second triangle
@@ -49,13 +49,13 @@ namespace Draw
         v.pos.y = q->pos[7];
         v.texCoord.x = q->tex.uv[6];
         v.texCoord.y = q->tex.uv[7];
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size());
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size());
         g_vulkan->quadVertices.push_back(v);
 
         //Upper right
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size() - 2);
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size() - 2);
 
         //Lower left
-        g_vulkan->quadIndices.push_back(g_vulkan->quadVertices.size() - 3);
+        g_vulkan->quadIndices.push_back((uint16_t)g_vulkan->quadVertices.size() - 3);
     }
 }
