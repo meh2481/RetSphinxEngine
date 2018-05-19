@@ -60,8 +60,8 @@ void ObjSegment::draw(RenderState renderState)
             {
                 for(float x = 0; x < tile.x; x++)    //TODO: Partial quad at end
                 {
-                    q.pos[0] = -size.x / 2.0f + sizex * x;
-                    q.pos[1] = -size.y / 2.0f + sizey * y; // upper left
+                    q.pos[0] = -size.x / 2.0f + sizex * x + pos.x;  //TODO: Take rotation into account
+                    q.pos[1] = -size.y / 2.0f + sizey * y + pos.y; // upper left
 
                     q.pos[2] = q.pos[0] + sizex;
                     q.pos[3] = q.pos[1]; // upper right
@@ -109,8 +109,8 @@ void ObjSegment::draw(RenderState renderState)
             {
                 for(float x = 0; x < tile.x; x++)    //TODO: Partial quad at end
                 {
-                    q.pos[0] = -size.x / 2.0f + sizex * x;
-                    q.pos[1] = -size.y / 2.0f + sizey * y; // upper left
+                    q.pos[0] = -size.x / 2.0f + sizex * x + objpos.x;   //TODO: Take rotation into account
+                    q.pos[1] = -size.y / 2.0f + sizey * y + objpos.y; // upper left
 
                     q.pos[2] = q.pos[0] + sizex;
                     q.pos[3] = q.pos[1]; // upper right
