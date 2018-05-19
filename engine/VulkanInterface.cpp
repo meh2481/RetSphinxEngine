@@ -127,11 +127,11 @@ VulkanInterface::VulkanInterface(SDL_Window* w, ResourceLoader* shaderLoader)
     window = w;
     m_resourceLoader = shaderLoader;
 #ifdef _DEBUG
-    dbgIndicesCount = 512;
-    dbgVerticesCount = 512;
+    dbgIndicesCount = 801;
+    dbgVerticesCount = 972;
 #endif
-    maxIndicesCount = 512;
-    maxVerticesCount = 512;
+    maxIndicesCount = 7878;
+    maxVerticesCount = 5252;
     initVulkan();
 }
 
@@ -1658,13 +1658,14 @@ void VulkanInterface::drawFrame()
     if(dbgPolyIndices.size() > dbgIndicesCount || dbgPolyVertices.size() > dbgVerticesCount)
     {
         //Vert/index buffers likely to grow at the same time, so just recalc both
-        LOG_dbg("Changing dbg buffer sizes - had indices %lu now %lu; vertices had %lu now %d", dbgIndicesCount, dbgPolyIndices.size(), dbgVerticesCount, dbgPolyVertices.size());
+        LOG_dbg("Changing dbg buffer sizes - had indices %d now %d; vertices had %d now %d", (int)dbgIndicesCount, (int)dbgPolyIndices.size(), (int)dbgVerticesCount, (int)dbgPolyVertices.size());
 
         //Use max() to not shrink either buffer
         dbgIndicesCount = std::max((VkDeviceSize)dbgPolyIndices.size(), dbgIndicesCount);
         dbgVerticesCount = std::max((VkDeviceSize)dbgPolyVertices.size(), dbgVerticesCount);
 
         //Reallocate
+        //TODO: We can't do this, because the buffer is in use by the gfx card drawing the other frame
         cleanupDbgVertBufferMemory();
         createDbgVertIndexBuffers();
     }
@@ -1756,13 +1757,14 @@ void VulkanInterface::growShrinkBuffers(uint32_t imageIndex)
     if(quadIndices.size() > maxIndicesCount || quadVertices.size() > maxVerticesCount)
     {
         //Vert/index buffers likely to grow at the same time, so just recalc both
-        LOG_dbg("Changing buffer sizes - had indices %lu now %lu; vertices had %lu now %d", maxIndicesCount, quadIndices.size(), maxVerticesCount, quadVertices.size());
+        LOG_dbg("Changing buffer sizes - had indices %d now %d; vertices had %d now %d", (int)maxIndicesCount, (int)quadIndices.size(), (int)maxVerticesCount, (int)quadVertices.size());
 
         //Use max() to not shrink either buffer
         maxIndicesCount = std::max((VkDeviceSize)quadIndices.size(), maxIndicesCount);
         maxVerticesCount = std::max((VkDeviceSize)quadVertices.size(), maxVerticesCount);
 
         //Reallocate
+        //TODO: We can't do this, because the buffer is in use by the gfx card drawing the other frame
         cleanupVertBufferMemory();
         createVertIndexBuffers();
     }
@@ -1803,12 +1805,19 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
 
     //--------------- Copy Buffer Data ---------------
 #ifdef _DEBUG
+    {
+        //Copy vertex/index buffer data over from staging buffer to internal memory buffer for debug vertices
+        VkBufferCopy copyRegion = {};
+        copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
+        if(!!copyRegion.size)
+            vkCmdCopyBuffer(commandBuffers[index], stagingDbgBuffer, combinedDbgBuffer, 1, &copyRegion);
+    }
+#endif
     //Copy vertex/index buffer data over from staging buffer to internal memory buffer for debug vertices
     VkBufferCopy copyRegion = {};
-    copyRegion.size = sizeof(dbgPolyIndices[0]) * dbgPolyIndices.size() + sizeof(dbgPolyVertices[0]) * dbgPolyVertices.size();
+    copyRegion.size = sizeof(uint16_t) * quadIndices.size() + sizeof(Vertex) * quadVertices.size();
     if(!!copyRegion.size)
-        vkCmdCopyBuffer(commandBuffers[index], stagingDbgBuffer, combinedDbgBuffer, 1, &copyRegion);
-#endif
+        vkCmdCopyBuffer(commandBuffers[index], stagingBuffer, combinedVertIndexBuffer, 1, &copyRegion);
 
     //Clear color and depth stencil
     std::array<VkClearValue, 2> clearValues = {};
@@ -1864,6 +1873,15 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
         }
     }
 #endif
+    //Bind buffers
+    VkBuffer vertexBuffers[] = { combinedVertIndexBuffer };
+    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
+    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedVertIndexBuffer, sizeof(Vertex) * quadVertices.size(), VK_INDEX_TYPE_UINT16);
+
+    //Draw vertices
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)quadIndices.size(), 1, 0, 0, 0);
 
     //-------------- End Render Pass --------------
     vkCmdEndRenderPass(commandBuffers[index]);

@@ -31,14 +31,14 @@ static const char* levelToString(SDL_LogPriority l)
 
 static void logWithLock(void *userdata, int category, SDL_LogPriority priority, const char *message)
 {
-    SDL_LockMutex(logMutex);
 
     logfile << message << std::endl;
 #ifdef _DEBUG
+    logfile.flush();
     std::cout << message << std::endl;
+    std::cout.flush();
 #endif
 
-    SDL_UnlockMutex(logMutex);
 }
 
 static const char* curTime()
@@ -80,6 +80,7 @@ void _logHelper(SDL_LogPriority l, const char * file, int line, const char * fmt
 void _logHelper(SDL_LogPriority l, const char * fmt, ...)
 #endif
 {
+    SDL_LockMutex(logMutex);
     va_list args;
     va_start(args, fmt);
     vsnprintf(logBuf, LOG_BUF_SZ, fmt, args);
@@ -89,4 +90,5 @@ void _logHelper(SDL_LogPriority l, const char * fmt, ...)
 #else
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, l, "%s %s : %s", curTime(), levelToString(l), logBuf);
 #endif
+    SDL_UnlockMutex(logMutex);
 }
