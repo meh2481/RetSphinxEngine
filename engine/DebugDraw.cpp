@@ -9,12 +9,8 @@
 #include "VulkanInterface.h"
 #include "Logger.h"
 
-#define START_VERT_DEPTH 0.0f;
-#define VERT_DEPTH_INCR  0.0006f;
-
 static const int NUM_SEGMENTS = 16;    //Must be greater than 2
 static const float ANGLE_INCREMENT = 2.0f * b2_pi / (float)NUM_SEGMENTS;
-static float vertexDepth = START_VERT_DEPTH;
 
 DebugDraw::DebugDraw(VulkanInterface* vulkan)
 {
@@ -32,24 +28,16 @@ void DebugDraw::flush()
         m_vulkan->dbgPolyIndices.push_back(i);
     m_vulkan->polyDbgLineIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
     for(auto i : m_lineVertices)
-    {
-        if(i.pos.z == FLT_MIN)
-            i.pos.z = vertexDepth + VERT_DEPTH_INCR;
         m_vulkan->dbgPolyVertices.push_back(i);
-    }
     m_vulkan->polyDbgPointIdx = (uint32_t)m_vulkan->dbgPolyVertices.size();
     for(auto i : m_pointVertices)
-    {
-        i.pos.z = vertexDepth + VERT_DEPTH_INCR;
         m_vulkan->dbgPolyVertices.push_back(i);
-    }
 
     //Clear for next pass
     m_vertices.clear();
     m_indices.clear();
     m_lineVertices.clear();
     m_pointVertices.clear();
-    vertexDepth = START_VERT_DEPTH;
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -74,7 +62,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     DbgVertex v = {};
     v.pos.x = vertices[0].x;
     v.pos.y = vertices[0].y;
-    v.pos.z = vertexDepth;
+    v.pos.z = 0.0f;
     v.color.r = color.r * fillMul;
     v.color.g = color.g * fillMul;
     v.color.b = color.b * fillMul;
@@ -105,7 +93,6 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 
     //Fill in outside
     DrawPolygon(vertices, vertexCount, color);
-    vertexDepth += VERT_DEPTH_INCR;
 }
 
 void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
@@ -129,7 +116,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     DbgVertex v = {};
     v.pos.x = center.x;
     v.pos.y = center.y;
-    v.pos.z = vertexDepth;
+    v.pos.z = 0.0f;
     v.color.r = color.r * fillMul;
     v.color.g = color.g * fillMul;
     v.color.b = color.b * fillMul;
@@ -169,8 +156,6 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2
     //Draw axis
     b2Vec2 p = center + radius * axis;
     DrawSegment(center, p, color);
-
-    vertexDepth += VERT_DEPTH_INCR;
 }
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -181,7 +166,7 @@ void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& c
     pt1.y = p1.y;
     pt2.x = p2.x;
     pt2.y = p2.y;
-    pt1.z = pt2.z = FLT_MIN;
+    pt1.z = pt2.z = 0.0f;
     Draw3DSegment(pt1, pt2, color);
 }
 
@@ -195,6 +180,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
     DbgVertex v = {};
     v.pos.x = p.x;
     v.pos.y = p.y;
+    v.pos.z = 0.0f;
     v.color.r = color.r;
     v.color.g = color.g;
     v.color.b = color.b;

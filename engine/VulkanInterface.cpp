@@ -29,7 +29,7 @@
 #define QUEUE_PRIORITY 1.0f
 
 //Temp resources
-#define IMG_TEXTURE "res/gfx/blob2.png"
+#define IMG_TEXTURE "res/pak/filelist.txt - atlas 4.png"
 #define TEXTURE_MIP_LEVELS 8
 
 #ifdef _DEBUG
@@ -718,7 +718,6 @@ void VulkanInterface::createVertIndexBuffers()
 
     //Create buffer (Used as both index buffer and vertex buffer, so set both flags accordingly)
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, combinedVertIndexBuffer, combinedVertIndexBufferMemory);
-
 }
 
 void VulkanInterface::createDbgVertIndexBuffers()
@@ -1051,7 +1050,7 @@ void VulkanInterface::createGraphicsPipelines()
     //Depth stencil
     VkPipelineDepthStencilStateCreateInfo depthStencil = {};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthTestEnable = VK_FALSE;
     depthStencil.depthWriteEnable = VK_TRUE;
     depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
     depthStencil.depthBoundsTestEnable = VK_FALSE;
@@ -1426,11 +1425,11 @@ int VulkanInterface::rateDeviceSuitability(VkPhysicalDevice device)
     }
 
     //TODO: We can get around this by binding descriptor sets per texture. Especially relevant on mobile platforms that don't support dynamic array texture indexing
-    /*if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
+    if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
     {
-        LOG_err("Dyn array indexing: ", deviceFeatures.shaderSampledImageArrayDynamicIndexing;
+        LOG_warn("Graphics card requires dynamic array indexing: %d", deviceFeatures.shaderSampledImageArrayDynamicIndexing);
         return 0;
-    }*/
+    }
 
     //Need device to be able to process commands we want to use
     QueueFamilyIndices indices = findQueueFamilies(device);
@@ -1843,6 +1842,16 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
     //Update push constants
     //vkCmdPushConstants(commandBuffers[index], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &mvpp);
 
+    //Bind buffers
+    VkBuffer vertexBuffers[] = { combinedVertIndexBuffer };
+    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
+    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffers[index], combinedVertIndexBuffer, sizeof(Vertex) * quadVertices.size(), VK_INDEX_TYPE_UINT16);
+
+    //Draw vertices
+    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)quadIndices.size(), 1, 0, 0, 0);
+
 #ifdef _DEBUG
     {
         //Bind vert/index buffers for debug data
@@ -1873,15 +1882,6 @@ void VulkanInterface::setupCommandBuffer(uint32_t index)
         }
     }
 #endif
-    //Bind buffers
-    VkBuffer vertexBuffers[] = { combinedVertIndexBuffer };
-    VkDeviceSize offsets[] = { 0 };   //Vertex buffer before index buffer in data
-    vkCmdBindVertexBuffers(commandBuffers[index], 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffers[index], combinedVertIndexBuffer, sizeof(Vertex) * quadVertices.size(), VK_INDEX_TYPE_UINT16);
-
-    //Draw vertices
-    vkCmdBindPipeline(commandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-    vkCmdDrawIndexed(commandBuffers[index], (uint32_t)quadIndices.size(), 1, 0, 0, 0);
 
     //-------------- End Render Pass --------------
     vkCmdEndRenderPass(commandBuffers[index]);
