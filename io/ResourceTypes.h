@@ -70,7 +70,7 @@ typedef struct
 //--------------------------------------------------------------
 typedef struct //Structure for texture data
 {
-    uint16_t mode;        //One of the OpenGL texture modes
+    uint16_t mode;        //One of the Vulkan texture modes
     uint8_t width;        //Width of image in power of 2
     uint8_t height;        //Height of image in power of 2
     //Followed by image data
@@ -88,7 +88,7 @@ typedef struct //Structure for (non-atlased) image data
     uint16_t width;         //Width of image
     uint16_t height;        //Height of image
     uint16_t pad;
-                           //Followed by image data
+    //Followed by image data
 } ImageHeader;
 
 

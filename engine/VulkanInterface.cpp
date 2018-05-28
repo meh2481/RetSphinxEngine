@@ -164,7 +164,17 @@ void VulkanInterface::initVulkan()
     createCommandPool();
     createDepthResources();
     createFramebuffers();
-    createTextureImage(IMG_TEXTURE, textureImage, textureImageMemory);
+    int texWidth, texHeight, texChannels;
+    stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+    if(!pixels)
+    {
+        LOG_err("Failed to load texture image");
+        exit(1);
+    }
+    createTextureImage(pixels, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
+    stbi_image_free(pixels);
     textureImageView = createTextureImageView(textureImage);
     createTextureSampler();
     createVertIndexBuffers();
@@ -275,18 +285,8 @@ VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkI
     return imageView;
 }
 
-void VulkanInterface::createTextureImage(const char* imgFilename, VkImage& texImg, VkDeviceMemory& texImgMemory)
+void VulkanInterface::createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize, VkImage& texImg, VkDeviceMemory& texImgMemory)
 {
-    int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load(imgFilename, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-    if(!pixels)
-    {
-        LOG_err("Failed to load texture image");
-        exit(1);
-    }
-
     VkBuffer imgStagingBuffer;
     VkDeviceMemory imgStagingBufferMemory;
     createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imgStagingBuffer, imgStagingBufferMemory);
@@ -296,12 +296,10 @@ void VulkanInterface::createTextureImage(const char* imgFilename, VkImage& texIm
     memcpy(data, pixels, static_cast<size_t>(imageSize));
     vkUnmapMemory(device, imgStagingBufferMemory);
 
-    stbi_image_free(pixels);
-
     //TODO: VK_FORMAT_BC1_RGBA_UNORM_BLOCK for DXT-compressed images
-    createImage(texWidth, texHeight, TEXTURE_MIP_LEVELS, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texImg, texImgMemory);
+    createImage(texWidth, texHeight, TEXTURE_MIP_LEVELS, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texImg, texImgMemory);
 
-    transitionImageLayout(texImg, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TEXTURE_MIP_LEVELS);
+    transitionImageLayout(texImg, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TEXTURE_MIP_LEVELS);
     copyBufferToImage(imgStagingBuffer, texImg, (uint32_t)texWidth, (uint32_t)texHeight);
 
     vkDestroyBuffer(device, imgStagingBuffer, NULL);
@@ -422,7 +420,7 @@ void VulkanInterface::createImage(uint32_t width, uint32_t height, uint32_t mipL
     imageInfo.extent.depth = 1;
     imageInfo.mipLevels = mipLevels;
     imageInfo.arrayLayers = 1;
-    imageInfo.format = format;  //TODO VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK and VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK
+    imageInfo.format = format;
     imageInfo.tiling = tiling;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = usage;

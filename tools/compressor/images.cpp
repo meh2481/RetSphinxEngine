@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <iostream>
 #include <sstream>
-#include <SDL_opengl.h>
+#include "vulkan/vulkan.h"
 
 #define DEFAULT_SZ 9    //512*512
 #define BYTES_PER_PIXEL_RGBA STBI_rgb_alpha
@@ -103,13 +103,13 @@ void createTexturesForAtlas(unsigned char* uncompressedBuf, stbrp_rect *rects, i
     }
 }
 
-unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas,stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
+unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
 {
     //Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1.
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-        *mode = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+        *mode = VK_FORMAT_BC1_RGB_UNORM_BLOCK;
     else
-        *mode = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        *mode = VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
 
     size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
     unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
@@ -141,9 +141,9 @@ unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, Compress
 unsigned char* compressImageRaw(int atlasSzPixels, int* compressedSize, CompressionHelper* atlasHelper, const std::string& filename, int curAtlas, stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, int bytesPerPixel, uint16_t* mode)
 {
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-        *mode = GL_RGB;
+        *mode = VK_FORMAT_R8G8B8_UNORM;
     else
-        *mode = GL_RGBA;
+        *mode = VK_FORMAT_R8G8B8A8_UNORM;
 
     *compressedSize = atlasSzPixels * atlasSzPixels * bytesPerPixel + sizeof(AtlasHeader);
     unsigned char* uncompressedBuf = (unsigned char*)malloc(*compressedSize);
@@ -157,7 +157,7 @@ unsigned char* compressImageRaw(int atlasSzPixels, int* compressedSize, Compress
     atlasHelper->id = Hash::hash(oss.str().c_str());
 
     //Create Textures that point to locations in this atlas
-    createTexturesForAtlas(uncompressedBuf+sizeof(AtlasHeader), rects, rectSz, images, atlasSzPixels, atlasHelper->id, bytesPerPixel);
+    createTexturesForAtlas(uncompressedBuf + sizeof(AtlasHeader), rects, rectSz, images, atlasSzPixels, atlasHelper->id, bytesPerPixel);
 
     return uncompressedBuf;
 }
@@ -216,7 +216,7 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
 {
     //Select compression/save method to use
     unsigned char* (*compressFunc)(int, int*, CompressionHelper*, const std::string&, int, stbrp_rect*, int, std::vector<ImageHelper>*, int, uint16_t*);
-    void (*saveFunc)(int, int, int, unsigned char*, const std::string&);
+    void(*saveFunc)(int, int, int, unsigned char*, const std::string&);
     if(g_bRawImg)
     {
         compressFunc = &compressImageRaw;
@@ -234,11 +234,11 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     //Create destination buffer for atlas
     int compressedSize;
     uint16_t mode;
-    unsigned char* compressedBuf = (*compressFunc)(atlasSzPixels, &compressedSize,&atlasHelper,filename,curAtlas, rects, rectSz, images, bytesPerPixel, &mode);
+    unsigned char* compressedBuf = (*compressFunc)(atlasSzPixels, &compressedSize, &atlasHelper, filename, curAtlas, rects, rectSz, images, bytesPerPixel, &mode);
 
     //Output PNG if in testing mode
     if(g_bImageOut)
-        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf+sizeof(AtlasHeader), filename);
+        (*saveFunc)(bytesPerPixel, curAtlas, atlasSzPixels, compressedBuf + sizeof(AtlasHeader), filename);
 
     //Create header for atlas
     AtlasHeader* header = (AtlasHeader*)compressedBuf;
@@ -374,7 +374,7 @@ unsigned char* extractImage(const std::string& filename, unsigned int* size)
 
     unsigned char* outBuf = (unsigned char*)malloc(sizeof(ImageHeader) + w*h*bpp);
 
-    ImageHeader* header = (ImageHeader*) outBuf;
+    ImageHeader* header = (ImageHeader*)outBuf;
     header->width = w;
     header->height = h;
     header->bpp = bpp;
