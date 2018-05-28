@@ -246,6 +246,12 @@ void packImage(stbrp_rect *rects, int rectSz, std::vector<ImageHelper>* images, 
     header->width = atlasSz;
     header->mode = mode;
 
+    std::ostringstream oss;
+    oss << filename << curAtlas << ".atlas";
+    FILE* testOut = fopen(oss.str().c_str(), "wb");
+    fwrite(compressedBuf, 1, compressedSize, testOut);
+    fclose(testOut);
+
     //Add atlas to .pak
     createCompressionHelper(&atlasHelper, compressedBuf, compressedSize);
     addHelper(atlasHelper);

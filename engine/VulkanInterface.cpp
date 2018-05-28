@@ -140,6 +140,23 @@ VulkanInterface::~VulkanInterface()
     cleanup();
 }
 
+//TODO remove all this
+#include "ResourceTypes.h"
+unsigned char* imgTempLoader(int& texWidth, int& texHeight, VkDeviceSize& imageSize, VkFormat& fmt)
+{
+    int texChannels;
+    stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    imageSize = texWidth * texHeight * 4;
+    fmt = VK_FORMAT_R8G8B8A8_UNORM;
+
+    if(!pixels)
+    {
+        LOG_err("Failed to load texture image");
+        exit(1);
+    }
+    return (unsigned char*)pixels;
+}
+
 void VulkanInterface::initVulkan()
 {
     //Device setup
@@ -164,16 +181,11 @@ void VulkanInterface::initVulkan()
     createCommandPool();
     createDepthResources();
     createFramebuffers();
-    int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-    if(!pixels)
-    {
-        LOG_err("Failed to load texture image");
-        exit(1);
-    }
-    createTextureImage(pixels, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
+    int texWidth, texHeight;
+    VkDeviceSize imageSize;
+    VkFormat fmt;
+    unsigned char* pixels = imgTempLoader(texWidth, texHeight, imageSize, fmt);
+    createTextureImage(pixels, fmt, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
     stbi_image_free(pixels);
     textureImageView = createTextureImageView(textureImage);
     createTextureSampler();
