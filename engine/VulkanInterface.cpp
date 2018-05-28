@@ -30,7 +30,7 @@
 
 //Temp resources
 #define IMG_TEXTURE "res/pak/filelist.txt - atlas 4.png"
-#define TEXTURE_MIP_LEVELS 8
+#define TEXTURE_MIP_LEVELS 1//8
 
 #ifdef _DEBUG
 //Vertex and index buffer size helper macros
@@ -142,19 +142,28 @@ VulkanInterface::~VulkanInterface()
 
 //TODO remove all this
 #include "ResourceTypes.h"
+#include "FileOperations.h"
 unsigned char* imgTempLoader(int& texWidth, int& texHeight, VkDeviceSize& imageSize, VkFormat& fmt)
 {
-    int texChannels;
-    stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    imageSize = texWidth * texHeight * 4;
-    fmt = VK_FORMAT_R8G8B8A8_UNORM;
+    //int texChannels;
+    //stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    //imageSize = texWidth * texHeight * 4;
+    //fmt = VK_FORMAT_R8G8B8A8_UNORM;
 
-    if(!pixels)
-    {
-        LOG_err("Failed to load texture image");
-        exit(1);
-    }
-    return (unsigned char*)pixels;
+    //if(!pixels)
+    //{
+    //    LOG_err("Failed to load texture image");
+    //    exit(1);
+    //}
+    //return (unsigned char*)pixels;
+    unsigned int fileSize;
+    unsigned char* compressedBuf = FileOperations::readFile("res/pak/filelist.txt0.atlas", &fileSize);
+    AtlasHeader* header = (AtlasHeader*)compressedBuf;
+    texWidth = 1 << header->width;
+    texHeight = 1 << header->height;
+    fmt = (VkFormat)header->mode;
+    imageSize = (VkDeviceSize)fileSize - sizeof(AtlasHeader);
+    return compressedBuf;
 }
 
 void VulkanInterface::initVulkan()
@@ -185,9 +194,9 @@ void VulkanInterface::initVulkan()
     VkDeviceSize imageSize;
     VkFormat fmt;
     unsigned char* pixels = imgTempLoader(texWidth, texHeight, imageSize, fmt);
-    createTextureImage(pixels, fmt, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
-    stbi_image_free(pixels);
-    textureImageView = createTextureImageView(textureImage);
+    createTextureImage(&pixels[sizeof(AtlasHeader)], fmt, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
+    free(pixels);
+    textureImageView = createTextureImageView(textureImage, fmt);
     createTextureSampler();
     createVertIndexBuffers();
 #ifdef _DEBUG
@@ -269,9 +278,9 @@ void VulkanInterface::createTextureSampler()
     }
 }
 
-VkImageView VulkanInterface::createTextureImageView(VkImage& texImg)
+VkImageView VulkanInterface::createTextureImageView(VkImage& texImg, VkFormat format)
 {
-    return createImageView(texImg, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, TEXTURE_MIP_LEVELS);
+    return createImageView(texImg, format, VK_IMAGE_ASPECT_COLOR_BIT, TEXTURE_MIP_LEVELS);
 }
 
 VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
@@ -317,7 +326,7 @@ void VulkanInterface::createTextureImage(const unsigned char* pixels, VkFormat f
     vkDestroyBuffer(device, imgStagingBuffer, NULL);
     vkFreeMemory(device, imgStagingBufferMemory, NULL);
 
-    generateMipmaps(texImg, texWidth, texHeight, TEXTURE_MIP_LEVELS);
+    //generateMipmaps(texImg, texWidth, texHeight, TEXTURE_MIP_LEVELS);
 }
 
 void VulkanInterface::generateMipmaps(VkImage image, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
@@ -1343,6 +1352,7 @@ void VulkanInterface::createLogicalDevice()
 
     VkPhysicalDeviceFeatures deviceFeatures = {};
     deviceFeatures.samplerAnisotropy = VK_TRUE; //Config option: Not require this
+    deviceFeatures.textureCompressionBC = VK_TRUE;
 
     VkDeviceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

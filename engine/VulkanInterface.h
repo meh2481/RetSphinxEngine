@@ -215,7 +215,7 @@ private:
     VkFormat findDepthFormat();
     bool hasStencilComponent(VkFormat format);
     void createTextureSampler();
-    VkImageView createTextureImageView(VkImage& texImg);
+    VkImageView createTextureImageView(VkImage& texImg, VkFormat format);
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
     void createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize, VkImage& texImg, VkDeviceMemory& texImgMemory);
     void generateMipmaps(VkImage image, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
