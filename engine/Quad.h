@@ -1,10 +1,14 @@
 #pragma once
 #include "Rect.h"
+#include <vulkan/vulkan.h>
 
 class Texture
 {
 public:
-    unsigned int tex;
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+    VkImageView textureImageView;
+
     unsigned int width;
     unsigned int height;
 };

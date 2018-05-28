@@ -200,11 +200,11 @@ void ParticleEditor::draw(int windowFlags)
                 ImGui::SliderFloat("Bottom", &particles->imgRect.at(curSelectedImgRect).bottom, 0.0f, particles->img->tex.height - 1.0f, "%.0f");
                 ImGui::Text("Preview:");
                 //Crop image
-                ImGui::Image(
+                /*ImGui::Image(
                     (ImTextureID)particles->img->tex.tex,
                     ImVec2(particles->imgRect.at(curSelectedImgRect).width(), particles->imgRect.at(curSelectedImgRect).height()),
                     ImVec2(particles->imgRect.at(curSelectedImgRect).left / (float)particles->img->tex.width, particles->imgRect.at(curSelectedImgRect).top / (float)particles->img->tex.height),
-                    ImVec2(particles->imgRect.at(curSelectedImgRect).right / (float)particles->img->tex.width, particles->imgRect.at(curSelectedImgRect).bottom / (float)particles->img->tex.height));
+                    ImVec2(particles->imgRect.at(curSelectedImgRect).right / (float)particles->img->tex.width, particles->imgRect.at(curSelectedImgRect).bottom / (float)particles->img->tex.height));*/
             }
         }
 

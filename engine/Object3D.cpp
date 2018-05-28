@@ -11,7 +11,7 @@
 Object3D::Object3D(unsigned char* data, Image* tex, RenderState* renderState)
 {
     num = 0;
-    m_tex = tex->tex.tex;
+    //m_tex = tex->tex.tex;
     m_renderState = renderState;
 
     //modelId = glGetUniformLocation(renderState->programId, "model");

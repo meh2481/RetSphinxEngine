@@ -29,7 +29,7 @@ ObjSegment::~ObjSegment()
 
 void ObjSegment::draw(RenderState renderState)
 {
-    if(!active)
+    if(!active) //TODO: Separate out into active/non-active lists?
         return;
 
     Vec3 objpos(pos.x, pos.y, depth);
@@ -43,7 +43,7 @@ void ObjSegment::draw(RenderState renderState)
 
     if(obj3D)
         obj3D->render(renderState);
-    else if(img != NULL)
+    else if(img != NULL)    //TODO: Why do we have non-image segments?
     {
         //assert(img != NULL);
         float sizex = size.x / tile.x;
