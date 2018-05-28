@@ -1,4 +1,5 @@
 #pragma once
+#include "Rect.h"
 
 class Texture
 {
@@ -15,16 +16,9 @@ public:
     float uv[8];
 };
 
-class Quad
-{
-public:
-    Image tex;
-    float pos[8];
-};
-
 class RenderState;
 
 namespace Draw
 {
-    void drawQuad(Quad* q);
+    void drawQuad(Image* img, const Vec3& pos1, const Vec3& pos2, const Vec3& pos3, const Vec3& pos4);
 }

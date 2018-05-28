@@ -42,42 +42,34 @@ void ObjSegment::draw(RenderState renderState)
     }
 
     if(obj3D)
-    {
-        renderState.model = glm::scale(renderState.model, glm::vec3(size.x, size.y, size.x)); //No Z axis to scale on, hmm
-
-        //glEnable(GL_CULL_FACE);
         obj3D->render(renderState);
-        //glDisable(GL_CULL_FACE);
-    }
     else if(img != NULL)
     {
-        //glUseProgram(renderState.programId);
-        //glUniformMatrix4fv(renderState.modelId, 1, false, &renderState.model[0][0]);
-        //glUniformMatrix4fv(renderState.viewId, 1, false, &renderState.view[0][0]);
-        //glUniformMatrix4fv(renderState.projectionId, 1, false, &renderState.proj[0][0]);
-
-        //TODO: This needs to be constant, only updating when size/tex/tile changes
-        Quad q;
-        q.tex = *img;
+        //assert(img != NULL);
         float sizex = size.x / tile.x;
         float sizey = size.y / tile.y;
         for(float y = 0; y < tile.y; y++)
         {
             for(float x = 0; x < tile.x; x++)    //TODO: Partial quad at end
             {
-                q.pos[0] = -size.x / 2.0f + sizex * x + objpos.x;   //TODO: Take rotation into account
-                q.pos[1] = -size.y / 2.0f + sizey * y + objpos.y; // upper left
+                //TODO: Rotating a tiled image now breaks tiling
+                Vec3 pos1(-size.x / 2.0f + sizex * x + objpos.x,   //TODO: Take rotation into account
+                    -size.y / 2.0f + sizey * y + objpos.y,
+                    objpos.z); // upper left
 
-                q.pos[2] = q.pos[0] + sizex;
-                q.pos[3] = q.pos[1]; // upper right
+                Vec3 pos2(pos1.x + sizex,
+                    pos1.y,
+                    pos1.z); // upper right
 
-                q.pos[4] = q.pos[0];
-                q.pos[5] = q.pos[1] + sizey; // lower left
+                Vec3 pos3(pos1.x,
+                    pos1.y + sizey,
+                    pos1.z); // lower left
 
-                q.pos[6] = q.pos[2];
-                q.pos[7] = q.pos[5]; // lower right
+                Vec3 pos4(pos2.x,
+                    pos3.y,
+                    pos1.z); // lower right
 
-                Draw::drawQuad(&q);
+                Draw::drawQuad(img, pos1, pos2, pos3, pos4);
             }
         }
     }
