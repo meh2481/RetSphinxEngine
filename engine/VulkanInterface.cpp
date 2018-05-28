@@ -6,7 +6,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "stb_image.h"
 #include "ResourceLoader.h"
 
 #include <stdexcept>
@@ -145,19 +144,8 @@ VulkanInterface::~VulkanInterface()
 #include "FileOperations.h"
 unsigned char* imgTempLoader(int& texWidth, int& texHeight, VkDeviceSize& imageSize, VkFormat& fmt)
 {
-    //int texChannels;
-    //stbi_uc* pixels = stbi_load(IMG_TEXTURE, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    //imageSize = texWidth * texHeight * 4;
-    //fmt = VK_FORMAT_R8G8B8A8_UNORM;
-
-    //if(!pixels)
-    //{
-    //    LOG_err("Failed to load texture image");
-    //    exit(1);
-    //}
-    //return (unsigned char*)pixels;
     unsigned int fileSize;
-    unsigned char* compressedBuf = FileOperations::readFile("res/pak/filelist.txt0.atlas", &fileSize);
+    unsigned char* compressedBuf = FileOperations::readFile("res/pak/filelist.txt4.atlas", &fileSize);
     AtlasHeader* header = (AtlasHeader*)compressedBuf;
     texWidth = 1 << header->width;
     texHeight = 1 << header->height;

@@ -107,9 +107,9 @@ unsigned char* compressImageDXT(int atlasSzPixels, int* compressedSize, Compress
 {
     //Using BYTES_PER_PIXEL_RGBA past here, as squish requires rgba even if dxt1.
     if(bytesPerPixel == BYTES_PER_PIXEL_RGB)
-        *mode = VK_FORMAT_BC1_RGB_UNORM_BLOCK;
+        *mode = VK_FORMAT_BC1_RGB_UNORM_BLOCK;  //DXT1 == BC1 without alpha
     else
-        *mode = VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+        *mode = VK_FORMAT_BC3_UNORM_BLOCK;      //DXT5 == BC3
 
     size_t bufferSize = atlasSzPixels * atlasSzPixels * BYTES_PER_PIXEL_RGBA;
     unsigned char* uncompressedBuf = (unsigned char*)malloc(bufferSize);
