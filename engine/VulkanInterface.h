@@ -9,6 +9,7 @@
 
 class ResourceLoader;
 class Quad;
+class Texture;
 
 #ifdef _DEBUG
 #define ENABLE_VALIDATION_LAYERS
@@ -160,9 +161,7 @@ private:
     VkDescriptorSetLayout descriptorSetLayout;
     VkDescriptorPool descriptorPool;
     VkDescriptorSet descriptorSet;
-    VkImage textureImage;
-    VkDeviceMemory textureImageMemory;
-    VkImageView textureImageView;
+    Texture* m_texture;
     VkSampler textureSampler;
     VkImage depthImage;
     VkDeviceMemory depthImageMemory;
@@ -217,7 +216,8 @@ private:
     void createTextureSampler();
     VkImageView createTextureImageView(VkImage& texImg, VkFormat format);
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
-    void createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize, VkImage& texImg, VkDeviceMemory& texImgMemory);
+    Texture* createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize);
+    void cleanupTexture(Texture* tex);
     void generateMipmaps(VkImage image, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
     void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     VkCommandBuffer beginSingleTimeCommands();

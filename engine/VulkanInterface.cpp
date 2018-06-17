@@ -15,6 +15,7 @@
 #include <set>
 #include <algorithm>
 #include <fstream>
+#include "Quad.h"
 
 //Application-specific defines
 #define APPLICATION_NAME "Vulkan SDL"
@@ -182,9 +183,8 @@ void VulkanInterface::initVulkan()
     VkDeviceSize imageSize;
     VkFormat fmt;
     unsigned char* pixels = imgTempLoader(texWidth, texHeight, imageSize, fmt);
-    createTextureImage(&pixels[sizeof(AtlasHeader)], fmt, texWidth, texHeight, imageSize, textureImage, textureImageMemory);
+    m_texture = createTextureImage(&pixels[sizeof(AtlasHeader)], fmt, texWidth, texHeight, imageSize);
     free(pixels);
-    textureImageView = createTextureImageView(textureImage, fmt);
     createTextureSampler();
     createVertIndexBuffers();
 #ifdef _DEBUG
@@ -192,7 +192,7 @@ void VulkanInterface::initVulkan()
 #endif
     createUniformBuffer();
     createDescriptorPool();
-    createDescriptorSet(textureImageView, textureSampler);
+    createDescriptorSet(m_texture->textureImageView, textureSampler);
     createCommandBuffers();
     createSemaphores();
     createFences();
@@ -294,8 +294,9 @@ VkImageView VulkanInterface::createImageView(VkImage image, VkFormat format, VkI
     return imageView;
 }
 
-void VulkanInterface::createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize, VkImage& texImg, VkDeviceMemory& texImgMemory)
+Texture* VulkanInterface::createTextureImage(const unsigned char* pixels, VkFormat format, unsigned int texWidth, unsigned int texHeight, VkDeviceSize imageSize)
 {
+    Texture* tex = new Texture();
     VkBuffer imgStagingBuffer;
     VkDeviceMemory imgStagingBufferMemory;
     createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imgStagingBuffer, imgStagingBufferMemory);
@@ -306,15 +307,19 @@ void VulkanInterface::createTextureImage(const unsigned char* pixels, VkFormat f
     vkUnmapMemory(device, imgStagingBufferMemory);
 
     //TODO: VK_FORMAT_BC1_RGBA_UNORM_BLOCK for DXT-compressed images
-    createImage(texWidth, texHeight, TEXTURE_MIP_LEVELS, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texImg, texImgMemory);
+    createImage(texWidth, texHeight, TEXTURE_MIP_LEVELS, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, tex->textureImage, tex->textureImageMemory);
 
-    transitionImageLayout(texImg, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TEXTURE_MIP_LEVELS);
-    copyBufferToImage(imgStagingBuffer, texImg, (uint32_t)texWidth, (uint32_t)texHeight);
+    transitionImageLayout(tex->textureImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TEXTURE_MIP_LEVELS);
+    copyBufferToImage(imgStagingBuffer, tex->textureImage, (uint32_t)texWidth, (uint32_t)texHeight);
 
     vkDestroyBuffer(device, imgStagingBuffer, NULL);
     vkFreeMemory(device, imgStagingBufferMemory, NULL);
 
+    //TODO: Figure out if mipmaps should be generated, since texture compression isn't supported when blitting, or remove
     //generateMipmaps(texImg, texWidth, texHeight, TEXTURE_MIP_LEVELS);
+
+    tex->textureImageView = createTextureImageView(tex->textureImage, format);
+    return tex;
 }
 
 void VulkanInterface::generateMipmaps(VkImage image, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
@@ -1953,14 +1958,20 @@ void VulkanInterface::cleanupVertBufferMemory()
     vkFreeMemory(device, stagingBufferMemory, NULL);
 }
 
+void VulkanInterface::cleanupTexture(Texture* tex)
+{
+    vkDestroyImageView(device, tex->textureImageView, NULL);
+    vkDestroyImage(device, tex->textureImage, NULL);
+    vkFreeMemory(device, tex->textureImageMemory, NULL);
+    delete tex;
+}
+
 void VulkanInterface::cleanup()
 {
     cleanupSwapChain();
 
     vkDestroySampler(device, textureSampler, NULL);
-    vkDestroyImageView(device, textureImageView, NULL);
-    vkDestroyImage(device, textureImage, NULL);
-    vkFreeMemory(device, textureImageMemory, NULL);
+    cleanupTexture(m_texture);
     vkDestroyDescriptorPool(device, descriptorPool, NULL);
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, NULL);
     vkDestroyBuffer(device, uniformBuffer, NULL);
